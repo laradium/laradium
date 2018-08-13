@@ -6,6 +6,9 @@ use Netcore\Aven\Registries\RouteRegistry;
 
 class Aven {
 
+    /**
+     * @var
+     */
     protected $routeRegistry;
 
     /**

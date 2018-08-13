@@ -9,16 +9,34 @@ use Illuminate\Support\Collection;
 class FieldSet
 {
 
+    /**
+     * @var
+     */
     protected $fieldRegistry;
+
+    /**
+     * @var Collection
+     */
     protected $fields;
+
+    /**
+     * @var
+     */
     protected $model;
 
+    /**
+     * FieldSet constructor.
+     */
     public function __construct()
     {
         $this->fieldRegistry = app(FieldRegistry::class);
         $this->fields = new Collection;
     }
 
+    /**
+     * @param Model $model
+     * @return $this
+     */
     public function setModel(Model $model)
     {
         $this->model = $model;
@@ -26,16 +44,27 @@ class FieldSet
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function model()
     {
         return $this->model;
     }
 
+    /**
+     * @return Collection
+     */
     public function fields()
     {
         return $this->fields;
     }
 
+    /**
+     * @param $method
+     * @param $parameters
+     * @return $this
+     */
     public function __call($method, $parameters)
     {
         $class = $this->fieldRegistry->getClassByName($method);
