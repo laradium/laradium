@@ -11,14 +11,5 @@ class Textarea extends Field
     /**
      * @var string
      */
-    public $field = 'textarea';
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function render()
-    {
-        $field = $this;
-        return view('admin.fields.' . $this->field, compact('field'));
-    }
+    protected $view = 'aven::admin.fields.textarea';
 }

@@ -1,15 +1,19 @@
 <div class="form-group">
-    <label for="{{ $field->getLabelId() }}">
-        <input type="hidden" name="{!! $field->getFieldNameAttribute() !!}" value="0">
-        <input
-                type="checkbox"
-                name="{!! $field->getFieldNameAttribute() !!}"
-                id="{{ $field->getLabelId() }}"
-                @if($field->getValue() == 1)
+    <div class="row">
+        <div class="col-md-2">
+            <label for="{{ $field->name() }}">{{ $field->name() }}</label>
+        </div>
+        <div class="col-md-8">
+            <input type="hidden" name="{!! $field->getNameAttribute() !!}" value="0">
+            <input
+                    type="checkbox"
+                    name="{!! $field->getNameAttribute() !!}"
+                    id="{{ $field->name() }}"
+                    @if($field->getValue() == 1)
                     checked="checked"
-                @endif
-                value="1"
-        >
-        {{ $field->getLabel() }}
-    </label>
+                    @endif
+                    value="1"
+            >
+        </div>
+    </div>
 </div>

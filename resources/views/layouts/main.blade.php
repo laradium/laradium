@@ -48,7 +48,9 @@
     });
 
     $(document).ready(function() {
-        $('textarea.summer-note').summernote();
+        $('textarea.summer-note').summernote({
+            height: 150
+        });
     });
 </script>
 

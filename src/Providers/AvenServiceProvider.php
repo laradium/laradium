@@ -12,6 +12,7 @@ class AvenServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerResources();
+        $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
 
         $configPath = __DIR__ . '/../../config/aven.php';
         $this->mergeConfigFrom( $configPath, 'aven' );

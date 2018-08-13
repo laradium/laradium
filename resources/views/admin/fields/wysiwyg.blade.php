@@ -1,22 +1,38 @@
 @if($field->isTranslatable())
-    <div class="row">@endif
-        <div class="col-md-2">
-            <label for="{{ $field->getLabelId() }}">
-                {{ $field->getLabel() }}
-            </label>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-2">
+                {{ $field->name() }}
+                @include('aven::admin._partials.language-select')
+            </div>
+            <div class="col-md-10">
+                @foreach(config('translatable.locales') as $locale)
+                    @php($field->setLocale($locale))
+                    <div class="js-tab js-tab-{{ $locale }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
+                        <textarea name="{!! $field->getNameAttribute() !!}"
+                                  class="form-control summer-note"
+                        >
+                            {!! $field->getValue() !!}
+                        </textarea>
+                    </div>
+                @endforeach
+            </div>
         </div>
-        @if($field->isTranslatable())
-            @include('admin._partials.language-select')
+    </div>
+@else
+    <div class="form-group">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="">{{ $field->name() }}</label>
 
-            @foreach(config('translatable.locales') as $locale)
-                <div class="js-tab js-tab-{{ $field->setLocale($locale) }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
-                <textarea
-                        name="{!! $field->getFieldNameAttribute() !!}"
-                        class="form-control summer-note">{!! $field->getValue() !!}</textarea>
-                </div>
-            @endforeach
-        @else
-            <textarea
-                    name="{!! $field->getFieldNameAttribute() !!}"
-                    class="form-control">{!! $field->getValue() !!}</textarea>
+            </div>
+            <div class="col-md-10">
+                <textarea name="{!! $field->getNameAttribute() !!}"
+                          class="form-control summer-note"
+                          >
+                    {!! $field->getValue() !!}
+                </textarea>
+            </div>
+        </div>
+    </div>
 @endif
