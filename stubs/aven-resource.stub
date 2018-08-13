@@ -1,0 +1,37 @@
+<?php
+
+namespace {{namespace}}\Aven\Resources;
+
+use Netcore\Aven\Aven\AbstractAvenResource;
+use Netcore\Aven\Aven\FieldSet;
+use Netcore\Aven\Aven\Resource;
+use {{namespace}}\{{resource}};
+
+Class {{resource}}Resource extends AbstractAvenResource
+{
+
+    /**
+     * @var string
+     */
+    protected $resource = {{resource}}::class;
+
+    /**
+     * @return \Netcore\Aven\Aven\Resource
+     */
+    public function resource()
+    {
+        return (new Resource)->make(function (FieldSet $set) {
+            $set->text('type')->rules('required|min:3');
+        });
+    }
+
+    /**
+     * @return array
+     */
+    public function table()
+    {
+        return [
+
+        ];
+    }
+}
