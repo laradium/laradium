@@ -35,12 +35,24 @@ class RouteRegistry
     {
         $routeSlug = $this->getRouteSlug($resourceName);
         $this->routes->push([
-            $resourceName                 => $this->router->resource($routeSlug,
-                '\\' . $resourceName)->middleware('web'),
-            $resourceName . '/data-table' => $this->router->get($routeSlug . '/data-table',
-                '\\' . $resourceName . '@dataTable'),
-            $resourceName . '/editable'   => $this->router->post($routeSlug . '/editable',
-                '\\' . $resourceName . '@editable'),
+            '/admin/' . $resourceName                 => $this->router->resource('/admin/' . $routeSlug,
+                '\\' . $resourceName)->middleware(['web', 'aven']),
+            '/admin/' . $resourceName . '/data-table' => $this->router->get('/admin/' . $routeSlug . '/data-table',
+                '\\' . $resourceName . '@dataTable')->middleware(['web', 'aven']),
+            '/admin/' . $resourceName . '/editable'   => $this->router->post('/admin/' . $routeSlug . '/editable',
+                '\\' . $resourceName . '@editable')->middleware(['web', 'aven']),
+            '/admin/login'                            => $this->router->get('/admin/login',
+                '\Netcore\Aven\Http\Controllers\Admin\LoginController@index'
+            )->middleware('web'),
+            '/admin/login/post'                       => $this->router->post('/admin/login',
+                '\Netcore\Aven\Http\Controllers\Admin\LoginController@login'
+            )->middleware('web'),
+            '/admin/logout'                           => $this->router->post('/admin/logout',
+                '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout'
+            )->middleware('web'),
+            '/admin/dashboard'                            => $this->router->get('/admin/dashboard',
+                '\Netcore\Aven\Http\Controllers\Admin\AdminController@index'
+            )->middleware('web'),
         ]);
 
         return $this;

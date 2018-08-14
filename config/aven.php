@@ -11,6 +11,15 @@ return [
         'hasMany'  => \Netcore\Aven\Aven\Fields\HasMany::class,
     ],
     'resources'   => [
+        \Netcore\Aven\Aven\Resources\TranslationResource::class,
+        \Netcore\Aven\Aven\Resources\LanguageResource::class,
         // list of your resources
-    ]
+    ],
+
+    'user' => [
+        'email'    => 'admin@netcore.lv',
+        'password' => 'aven2018'
+    ],
+
+    'dashboard-view' => 'aven::admin.dashboard',
 ];

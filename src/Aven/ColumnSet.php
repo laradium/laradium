@@ -7,7 +7,14 @@ use Illuminate\Support\Collection;
 class ColumnSet
 {
 
+    /**
+     * @var Collection
+     */
     public $list;
+
+    /**
+     * @var string
+     */
     public $column;
 
     /**
@@ -18,6 +25,11 @@ class ColumnSet
         $this->list = new Collection();
     }
 
+    /**
+     * @param $column
+     * @param null $name
+     * @return $this
+     */
     public function add($column, $name = null)
     {
         $this->list->push([
@@ -33,6 +45,9 @@ class ColumnSet
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function editable()
     {
         $this->list = $this->list->map(function ($item) {

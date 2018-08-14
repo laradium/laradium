@@ -3,10 +3,12 @@
 namespace Netcore\Aven\Aven;
 
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
+use Netcore\Aven\Traits\Crud;
+use Netcore\Aven\Traits\Datatable;
 
 abstract class AbstractAvenResource
 {
+    use Crud, Datatable;
 
     /**
      * @var
@@ -31,7 +33,7 @@ abstract class AbstractAvenResource
         $model = $this->model;
         $table = $this->table()->setModel($this->model);
 
-        return view('aven::admin.resource.index', compact('table'));
+        return view('aven::admin.resource.index', compact('table', 'model'));
     }
 
     /**
@@ -72,6 +74,10 @@ abstract class AbstractAvenResource
         return back()->withSuccess('Resource successfully created!');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function edit($id)
     {
         $model = $this->model->findOrNew($id);
@@ -131,161 +137,12 @@ abstract class AbstractAvenResource
     }
 
     /**
-     * @param $resourceData
-     * @param $model
-     * @return bool
-     * @throws \ReflectionException
-     */
-    public function updateResource($resourceData, $model)
-    {
-        $resourceFields = $resourceData['resourceFields'];
-        $relations = $resourceData['relations'];
-        $translations = $resourceData['translations'];
-
-        $model->fill($resourceFields->toArray());
-        $model->save();
-        $this->putTranslations($model, $translations);
-
-        $this->updateRelations($relations, $model);
-
-        return true;
-    }
-
-    /**
-     * @param $fields
-     * @return array
-     */
-    public function getResourceData($fields): array
-    {
-        $resourceFields = $fields->filter(function ($item) {
-            return !is_array($item);
-        });
-
-        $relations = $fields->filter(function ($item) {
-            return is_array($item);
-        });
-
-        $translations = $fields->filter(function ($item, $index) {
-            return is_array($item) && $index == 'translations';
-        })->toArray();
-
-        $relationList = array_keys($relations->toArray());
-
-
-        return compact('resourceFields', 'relations', 'relationList', 'translations');
-    }
-
-    /**
-     * @param $relations
-     * @param $model
-     * @throws \ReflectionException
-     */
-    public function updateRelations($relations, $model)
-    {
-        foreach (array_except($relations, 'translations') as $relationName => $relationSet) {
-            $existingItemSet = collect($relationSet)->filter(function ($item) {
-                return isset($item['id']);
-            })->toArray();
-            $nonExistingItemSet = collect($relationSet)->filter(function ($item) {
-                return !isset($item['id']);
-            })->toArray();
-
-            $relationModel = $model->{$relationName}();
-            $relationType = (new \ReflectionClass($relationModel))->getShortName();
-
-            if (count($nonExistingItemSet)) {
-                if ($relationType == 'HasMany') {
-                    foreach ($nonExistingItemSet as $item) {
-                        $newItem = $relationModel->create(array_except($item, 'translations'));
-                        $this->putTranslations($newItem, array_only($item, 'translations'));
-                    }
-                }
-            }
-
-            if (count($existingItemSet)) {
-                if ($relationType == 'HasMany') {
-                    foreach ($existingItemSet as $item) {
-                        $relationModel = $model->{$relationName}()->find($item['id']);
-                        $relationModel->fill(array_except($item, 'translations'));
-                        $relationModel->save();
-                        $this->putTranslations($relationModel, array_only($item, 'translations'));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $model
-     * @param $translations
-     * @return bool
-     */
-    protected function putTranslations($model, $translations)
-    {
-        if (isset($translations['translations'])) {
-            $translations = $translations['translations'];
-            if (count($translations)) {
-                foreach ($translations as $locale => $translationList) {
-                    $translation = $model->translations()->firstOrCreate(['locale' => $locale]);
-                    $translation->fill($translationList);
-                    $translation->save();
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public function editable(Request $request)
-    {
-        $model = $this->model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
-
-        return [
-            'state' => 'success'
-        ];
-    }
-
-    public function dataTable()
-    {
-        $table = $this->table();
-        $resourceName = $this->model->getTable();
-        if (count($table->getRelations())) {
-            $model = $this->model->with($table->getRelations())->select('*');
-        } else {
-            $model = $this->model->select('*');
-        }
-
-        $dataTable = DataTables::of($model);
-
-        $columns = $table->columns();
-        $editableColumns = $columns->where('editable', true);
-        foreach($editableColumns as $column) {
-            $dataTable->editColumn($column['column_parsed'], function ($item) use($column, $resourceName) {
-                return '<a href="#" 
-                class="js-editable" 
-                data-name="' . $column['column_parsed'] . '"
-                data-type="text" 
-                data-pk="' . $item->id . '" 
-                data-url="/' . $resourceName . '/editable" 
-                data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
-            });
-        }
-
-        if($editableColumns->count()) {
-            $dataTable->rawColumns($editableColumns->pluck('column')->toArray());
-        }
-
-
-        return $dataTable->make(true);
-    }
-
-    /**
-     * @return array
+     * @return \Netcore\Aven\Aven\Resource
      */
     abstract protected function resource();
 
     /**
-     * @return array
+     * @return Table
      */
     abstract protected function table();
 }

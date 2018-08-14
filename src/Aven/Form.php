@@ -108,15 +108,15 @@ class Form
     {
         $resource = $this->resourceName();
         if ($action == 'create') {
-            return url($resource . '/create');
+            return url('/admin/' . $resource . '/create');
         } elseif ($action == 'create') {
-            return url($resource . '/create');
+            return url('/admin/' . $resource . '/create');
         } elseif ($action == 'store') {
-            return url($resource);
+            return url('/admin/' . $resource);
         } elseif ($action == 'update') {
-            return url($resource . '/' . $this->model->id);
+            return url('/admin/' . $resource . '/' . $this->model->id);
         }
 
-        return url($resource);
+        return url('/admin/' . $resource);
     }
 }

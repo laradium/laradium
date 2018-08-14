@@ -3,6 +3,7 @@
 namespace Netcore\Aven\Providers;
 
 use Netcore\Aven\Console\Commands\MakeAvenResource;
+use Netcore\Aven\Http\Middleware\AvenMiddleware;
 use Netcore\Aven\Registries\FieldRegistry;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,15 +14,18 @@ class AvenServiceProvider extends ServiceProvider
     {
         $this->registerResources();
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
+        $this->app->register(AvenTranslationServiceProvider::class);
+        $this->app['router']->aliasMiddleware('aven', AvenMiddleware::class);
 
         $configPath = __DIR__ . '/../../config/aven.php';
-        $this->mergeConfigFrom( $configPath, 'aven' );
+        $this->mergeConfigFrom($configPath, 'aven');
 
         $this->publishes([
             $configPath => config_path('aven.php'),
         ], 'aven');
 
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'aven');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'aven');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -30,7 +34,7 @@ class AvenServiceProvider extends ServiceProvider
         }
 
         $this->publishes([
-            __DIR__.'/../../public/aven' => public_path('aven'),
+            __DIR__ . '/../../public/aven' => public_path('aven'),
         ], 'aven');
     }
 
