@@ -45,7 +45,6 @@ class Field
      */
     protected $setNameAttributeList = [];
 
-
     /**
      * Field constructor.
      * @param $parameters

@@ -19,7 +19,7 @@ class AvenServiceProvider extends ServiceProvider
 
         $this->publishes([
             $configPath => config_path('aven.php'),
-        ], 'config');
+        ], 'aven');
 
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'aven');
 
@@ -31,7 +31,7 @@ class AvenServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../../public/aven' => public_path('aven'),
-        ], 'public');
+        ], 'aven');
     }
 
     /**

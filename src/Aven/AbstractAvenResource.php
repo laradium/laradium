@@ -25,6 +25,13 @@ abstract class AbstractAvenResource
         $this->model = new $this->resource;
     }
 
+    public function index()
+    {
+        $model = $this->model;
+
+        return view('aven::admin.resource.index');
+    }
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */

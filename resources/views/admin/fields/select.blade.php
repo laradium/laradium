@@ -1,12 +1,20 @@
-<label for="{{ $field->getLabelId() }}">{{ $field->getLabel() }}</label>
-<select name="{!! $field->getFieldNameAttribute() !!}"
-        id="{{ $field->getLabelId() }}"
-        class="form-control"
->
-    @foreach($options as $value => $name)
-        <option value="{{ $value }}"
-                {!! isset($resource) ? $resource->{$field->getFieldName()} == $value ? 'selected="selected"' : '' : '' !!}>
-                {{ $name }}
-        </option>
-    @endforeach
-</select>
+<div class="form-group">
+        <div class="row">
+                <div class="col-md-2">
+                        <label for="">{{ $field->name() }}</label>
+                </div>
+                <div class="col-md-10">
+                        <select name="{!! $field->getNameAttribute() !!}"
+                                class="form-control"
+                        >
+                                @foreach($field->getOptions() as $value => $name)
+                                        <option value="{{ $value }}"
+                                                {!! $field->getValue() == $value ? 'selected="selected"' : '' !!}>
+                                                {{ $name }}
+                                        </option>
+                                @endforeach
+                        </select>
+                </div>
+
+        </div>
+</div>

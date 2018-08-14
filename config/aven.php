@@ -7,7 +7,7 @@ return [
         'wysiwyg'  => \Netcore\Aven\Aven\Fields\Wysiwyg::class,
         'boolean'  => \Netcore\Aven\Aven\Fields\Boolean::class,
         'textarea' => \Netcore\Aven\Aven\Fields\Textarea::class,
-//        'select'   => \Netcore\Aven\Aven\Fields\Select::class,
+        'select'   => \Netcore\Aven\Aven\Fields\Select::class,
         'hasMany'  => \Netcore\Aven\Aven\Fields\HasMany::class,
     ],
     'resources'   => [

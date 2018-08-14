@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Fields;
+namespace Netcore\Aven\Aven\Fields;
 
 
 use Netcore\Aven\Aven\Field;
@@ -11,15 +11,29 @@ class Select extends Field
     /**
      * @var string
      */
-    public $field = 'select';
+    protected $view = 'aven::admin.fields.select';
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @var array
      */
-    public function render()
+    protected $options = [];
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function options(array $options)
     {
-        $field = $this;
-        $options = array_pop($field->parameters);
-        return view('admin.fields.' . $this->field, compact('field', 'options'));
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }
