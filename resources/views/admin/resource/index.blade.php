@@ -14,7 +14,7 @@
                     <thead>
                     <tr>
                         @foreach($table->columns() as $column)
-                            <th>{{ ucfirst($column['name']) }}</th>
+                            <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
                         @endforeach
                         <th>
                             Action

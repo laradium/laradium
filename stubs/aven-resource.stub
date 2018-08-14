@@ -5,6 +5,8 @@ namespace {{namespace}}\Aven\Resources;
 use Netcore\Aven\Aven\AbstractAvenResource;
 use Netcore\Aven\Aven\FieldSet;
 use Netcore\Aven\Aven\Resource;
+use Netcore\Aven\Aven\ColumnSet;
+use Netcore\Aven\Aven\Table;
 use {{namespace}}\{{resource}};
 
 Class {{resource}}Resource extends AbstractAvenResource
@@ -25,13 +27,13 @@ Class {{resource}}Resource extends AbstractAvenResource
         });
     }
 
-    /**
-     * @return array
+     /**
+     * @return Table
      */
     public function table()
     {
-        return [
-
-        ];
+        return (new Table)->make(function (ColumnSet $column) {
+            $column->add('id', '#ID');
+        });
     }
 }
