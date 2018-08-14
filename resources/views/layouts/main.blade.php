@@ -52,11 +52,6 @@
         $('textarea.summer-note').summernote({
             height: 150
         });
-
-        $('.resource-datatable').editable({
-            selector: 'a'
-        });
-
     });
 </script>
 

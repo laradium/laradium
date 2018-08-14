@@ -236,9 +236,19 @@ abstract class AbstractAvenResource
         return true;
     }
 
+    public function editable(Request $request)
+    {
+        $model = $this->model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
+
+        return [
+            'state' => 'success'
+        ];
+    }
+
     public function dataTable()
     {
         $table = $this->table();
+        $resourceName = $this->model->getTable();
         if (count($table->getRelations())) {
             $model = $this->model->with($table->getRelations())->select('*');
         } else {
@@ -250,13 +260,14 @@ abstract class AbstractAvenResource
         $columns = $table->columns();
         $editableColumns = $columns->where('editable', true);
         foreach($editableColumns as $column) {
-            $dataTable->editColumn($column['column'], function ($item) use($column) {
+            $dataTable->editColumn($column['column_parsed'], function ($item) use($column, $resourceName) {
                 return '<a href="#" 
                 class="js-editable" 
+                data-name="' . $column['column_parsed'] . '"
                 data-type="text" 
                 data-pk="' . $item->id . '" 
-                data-url="#" 
-                data-title="Enter value">' . $item->{$column['column']} . '</a>';
+                data-url="/' . $resourceName . '/editable" 
+                data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
             });
         }
 
