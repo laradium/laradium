@@ -35,7 +35,8 @@ class RouteRegistry
     {
         $routeSlug = $this->getRouteSlug($resourceName);
         $this->routes->push([
-            $resourceName => $this->router->resource($routeSlug, '\\' . $resourceName)->middleware('web')
+            $resourceName => $this->router->resource($routeSlug, '\\' . $resourceName)->middleware('web'),
+            $resourceName.'/data-table' => $this->router->get($routeSlug . '/data-table', '\\' . $resourceName . '@dataTable')
         ]);
 
         return $this;

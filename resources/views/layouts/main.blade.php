@@ -12,13 +12,14 @@
           integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
     <style>
         .js-tab:not(.active) {
             display: none;
         }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @stack('styles')
 </head>
 <body>
 
@@ -37,7 +38,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="/aven/assets/js/fields/has-many.js?v={{ time() }}"></script>
 <script src="/aven/assets/js/translatable.js?v={{ time() }}"></script>
-
+<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 @include('aven::admin.fields.templates.text')
 
 <script>
@@ -51,6 +52,11 @@
         $('textarea.summer-note').summernote({
             height: 150
         });
+
+        $('.resource-datatable').editable({
+            selector: 'a'
+        });
+
     });
 </script>
 

@@ -3,6 +3,7 @@
 namespace Netcore\Aven\Aven;
 
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 abstract class AbstractAvenResource
 {
@@ -28,8 +29,9 @@ abstract class AbstractAvenResource
     public function index()
     {
         $model = $this->model;
+        $table = $this->table()->setModel($this->model);
 
-        return view('aven::admin.resource.index');
+        return view('aven::admin.resource.index', compact('table'));
     }
 
     /**
@@ -193,7 +195,7 @@ abstract class AbstractAvenResource
 
             if (count($nonExistingItemSet)) {
                 if ($relationType == 'HasMany') {
-                    foreach($nonExistingItemSet as $item) {
+                    foreach ($nonExistingItemSet as $item) {
                         $newItem = $relationModel->create(array_except($item, 'translations'));
                         $this->putTranslations($newItem, array_only($item, 'translations'));
                     }
@@ -222,7 +224,7 @@ abstract class AbstractAvenResource
     {
         if (isset($translations['translations'])) {
             $translations = $translations['translations'];
-            if(count($translations)) {
+            if (count($translations)) {
                 foreach ($translations as $locale => $translationList) {
                     $translation = $model->translations()->firstOrCreate(['locale' => $locale]);
                     $translation->fill($translationList);
@@ -232,6 +234,38 @@ abstract class AbstractAvenResource
         }
 
         return true;
+    }
+
+    public function dataTable()
+    {
+        $table = $this->table();
+        if (count($table->getRelations())) {
+            $model = $this->model->with($table->getRelations())->select('*');
+        } else {
+            $model = $this->model->select('*');
+        }
+
+        $dataTable = DataTables::of($model);
+
+        $columns = $table->columns();
+        $editableColumns = $columns->where('editable', true);
+        foreach($editableColumns as $column) {
+            $dataTable->editColumn($column['column'], function ($item) use($column) {
+                return '<a href="#" 
+                class="js-editable" 
+                data-type="text" 
+                data-pk="' . $item->id . '" 
+                data-url="#" 
+                data-title="Enter value">' . $item->{$column['column']} . '</a>';
+            });
+        }
+
+        if($editableColumns->count()) {
+            $dataTable->rawColumns($editableColumns->pluck('column')->toArray());
+        }
+
+
+        return $dataTable->make(true);
     }
 
     /**
