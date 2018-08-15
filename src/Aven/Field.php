@@ -130,7 +130,7 @@ class Field
      */
     public function getRuleSet(): string
     {
-        return $this->ruleSet??'';
+        return $this->ruleSet ?? '';
     }
 
     /**
@@ -206,11 +206,12 @@ class Field
         $this->setNameAttributeList($attributeList);
         $this->setNameAttribute($this->buildNameAttribute($attributeList));
         $this->setValue($this->model->getAttribute($this->name()));
-        if($this->isTranslatable()) {
+        if ($this->isTranslatable()) {
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
-            foreach(config('translatable.locales') as $locale){
-                $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $locale], $attributeList)), $this->getRuleSet());
+            foreach (translate()->languages() as $language) {
+                $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
+                    $attributeList)), $this->getRuleSet());
             }
         } else {
             $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());

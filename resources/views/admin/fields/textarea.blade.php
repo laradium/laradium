@@ -6,9 +6,9 @@
                 @include('aven::admin._partials.language-select')
             </div>
             <div class="col-md-10">
-                @foreach(config('translatable.locales') as $locale)
-                    @php($field->setLocale($locale))
-                    <div class="js-tab js-tab-{{ $locale }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
+                @foreach(translate()->languages() as $language)
+                    @php($field->setLocale($language['iso_code']))
+                    <div class="js-tab js-tab-{{ $language['iso_code'] }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
                         <textarea name="{!! $field->getNameAttribute() !!}"
                                   class="form-control"
                                   rows="5">

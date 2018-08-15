@@ -22,6 +22,10 @@ Class LanguageResource extends AbstractAvenResource
      */
     public function resource()
     {
+        $this->registerEvent('afterSave', function () {
+            cache()->forget('languages');
+        });
+
         return (new Resource)->make(function (FieldSet $set) {
             $set->text('iso_code')->rules('required');
             $set->text('title')->rules('required');
@@ -32,7 +36,7 @@ Class LanguageResource extends AbstractAvenResource
     }
 
     /**
-     * @return array
+     * @return Table
      */
     public function table()
     {

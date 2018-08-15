@@ -7,13 +7,13 @@
                     @include('aven::admin._partials.language-select')
                 </div>
                 <div class="col-md-10">
-                    @foreach(config('translatable.locales') as $locale)
-                        <div class="js-tab js-tab-{{ $locale }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
+                    @foreach(translate()->languages() as $language)
+                        <div class="js-tab js-tab-{{ $language['iso_code'] }} {{ $loop->iteration == 1? 'active' : 'hidden' }}">
                             <input
                                     type="text"
                                     name="__FIELD_NAME_ATTRIBUTE__"
                                     value=""
-                                    data-locale="{{ $locale }}"
+                                    data-locale="{{ $language['iso_code'] }}"
                                     class="form-control js-field">
                         </div>
                     @endforeach

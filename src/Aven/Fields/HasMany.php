@@ -81,9 +81,9 @@ class HasMany extends Field
                 $last = $ruleAttributeList[$count];
                 unset($ruleAttributeList[$count]);
 
-                foreach (config('translatable.locales') as $locale) {
+                foreach(translate()->languages() as $language) {
                     $this->setValidationRules($this->buildRuleSetKey(array_merge($ruleAttributeList,
-                        ['translations', $locale], [$last])), $field->getRuleSet());
+                        ['translations', $language['iso_code']], [$last])), $field->getRuleSet());
                 }
             } else {
                 $this->setValidationRules($this->buildRuleSetKey($attributeList), $field->getRuleSet());
