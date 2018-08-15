@@ -23,6 +23,10 @@ Class TranslationResource extends AbstractAvenResource
      */
     public function resource()
     {
+        $this->registerEvent('afterSave', function () {
+            cache()->forget('translations');
+        });
+
         return (new Resource)->make(function (FieldSet $set) {
             $set->select('locale')->options($this->localeList());
             $set->text('group')->rules('required');

@@ -2,9 +2,12 @@
 
 namespace Netcore\Aven\Traits;
 
+use Netcore\Aven\Aven\Form;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Http\Request;
 
-trait Datatable {
+trait Datatable
+{
 
     /**
      * @param Request $request
@@ -12,7 +15,20 @@ trait Datatable {
      */
     public function editable(Request $request)
     {
-        $this->model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
+        $model = $this->model;
+        $resource = $this->resource();
+        $form = new Form($resource->setModel($model)->build());
+        $form->buildForm();
+
+        if (isset($this->events['beforeSave'])) {
+            $this->events['beforeSave']($this->model, $request);
+        }
+
+        $model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
+
+        if (isset($this->events['afterSave'])) {
+            $this->events['afterSave']($this->model, $request);
+        }
 
         return [
             'state' => 'success'

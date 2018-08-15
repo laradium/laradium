@@ -13,9 +13,6 @@ class CreateLanguagesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('languages')) {
-            return;
-        }
         Schema::create('languages', function (Blueprint $table) {
             $table->increments('id');
             $table->string('iso_code', 2)->index();
@@ -23,9 +20,14 @@ class CreateLanguagesTable extends Migration
             $table->string('title_localized');
             $table->boolean('is_fallback')->default(0)->index();
             $table->boolean('is_visible')->default(1)->index();
-            $table->softDeletes();
             $table->timestamps();
         });
+
+        if($languages = config('aven.languages', [])) {
+            foreach($languages as $language) {
+                \Netcore\Aven\Models\Language::create($language);
+            }
+        }
     }
 
     /**
@@ -35,8 +37,6 @@ class CreateLanguagesTable extends Migration
      */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('languages');
-        Schema::enableForeignKeyConstraints();
     }
 }

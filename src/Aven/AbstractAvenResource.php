@@ -8,6 +8,7 @@ use Netcore\Aven\Traits\Datatable;
 
 abstract class AbstractAvenResource
 {
+
     use Crud, Datatable;
 
     /**
@@ -21,6 +22,11 @@ abstract class AbstractAvenResource
     protected $resource;
 
     /**
+     * @var array
+     */
+    protected $events = [];
+
+    /**
      * AbstractAvenResource constructor.
      */
     public function __construct()
@@ -28,6 +34,9 @@ abstract class AbstractAvenResource
         $this->model = new $this->resource;
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
         $model = $this->model;
@@ -64,12 +73,21 @@ abstract class AbstractAvenResource
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
+
+        if (isset($this->events['beforeSave'])) {
+            $this->events['beforeSave']($this->model, $request);
+        }
+
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
         $fields = collect($request->except('_token'));
         $resourceData = $this->getResourceData($fields);
         $this->updateResource($resourceData, $model);
+
+        if (isset($this->events['afterSave'])) {
+            $this->events['afterSave']($this->model, $request);
+        }
 
         return back()->withSuccess('Resource successfully created!');
     }
@@ -103,6 +121,10 @@ abstract class AbstractAvenResource
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
+        if (isset($this->events['beforeSave'])) {
+            $this->events['beforeSave']($this->model, $request);
+        }
+
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
@@ -112,6 +134,10 @@ abstract class AbstractAvenResource
         $model = $this->model->with(array_except($relationList, 'translations'))->find($id);
 
         $this->updateResource($resourceData, $model);
+
+        if (isset($this->events['afterSave'])) {
+            $this->events['afterSave']($this->model, $request);
+        }
 
         return back()->withSuccess('Resource successfully updated!');
 
@@ -134,6 +160,13 @@ abstract class AbstractAvenResource
         }
 
         return back()->withSuccess('Resource successfully deleted!');
+    }
+
+    protected function registerEvent($name, \Closure $callable)
+    {
+        $this->events[$name] = $callable;
+
+        return $this;
     }
 
     /**
