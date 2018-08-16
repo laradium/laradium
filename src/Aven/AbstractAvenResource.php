@@ -45,6 +45,30 @@ abstract class AbstractAvenResource
         return view('aven::admin.resource.index', compact('table', 'model'));
     }
 
+    public function getForm($id = null)
+    {
+        if($id) {
+            $model = $this->model->find($id);
+        } else {
+            $model = $this->model;
+        }
+
+        $resource = $this->resource();
+        $form = new Form($resource->setModel($model)->build());
+        $form->buildForm();
+
+        $response = $form->formatedResponse();
+
+        return ([
+            'languages' => collect(translate()->languages())->map(function ($item, $index) {
+                $item['is_current'] = $index == 0;
+
+                return $item;
+            })->toArray(),
+            'inputs' => $response
+        ]);
+    }
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */

@@ -15,7 +15,9 @@
 
     <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
           rel="stylesheet"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
+    <link href="/aven/admin/assets/plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="/aven/admin/assets/css/icons.css" rel="stylesheet" type="text/css"/>
     <link href="/aven/admin/assets/css/style.css" rel="stylesheet" type="text/css"/>
 
@@ -25,6 +27,7 @@
             display: none;
         }
     </style>
+    <link rel="stylesheet" href="{{ mix('aven/assets/css/aven.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
@@ -117,13 +120,8 @@
 
 </div>
 <!-- END wrapper -->
-<script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
+@yield('crud-url')
+<script src="{{ mix('aven/assets/js/aven.js') }}"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"
         integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
         crossorigin="anonymous"></script>
@@ -139,16 +137,14 @@
 <script src="/aven/admin/assets/js/jquery.nicescroll.js"></script>
 <script src="/aven/admin/assets/js/jquery.slimscroll.js"></script>
 <script src="/aven/admin/assets/js/jquery.scrollTo.min.js"></script>
+<script src="/aven/admin/assets/plugins/switchery/switchery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <!-- App js -->
 <script src="/aven/admin/assets/js/jquery.core.js"></script>
 <script src="/aven/admin/assets/js/jquery.app.js"></script>
 
 <!-- Aven js -->
-<script src="/aven/assets/js/fields/has-many.js?v={{ time() }}"></script>
-<script src="/aven/assets/js/translatable.js?v={{ time() }}"></script>
-<!-- Aven field template -->
-@include('aven::admin.fields.templates.text')
 
 <script>
     $.ajaxSetup({

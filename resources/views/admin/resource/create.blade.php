@@ -4,18 +4,23 @@
         <div class="col-12">
             <div class="card-box table-responsive">
                 @include('aven::admin._partials.messages')
-                <form action="{{ $form->getAction('update') }}" method="post">
-                    {{ csrf_field() }}
+                {{--<form action="{{ $form->getAction('update') }}" method="post">--}}
+                    {{--{{ csrf_field() }}--}}
 
-                    @foreach ($form->fields() as $field)
-                        {!! view($field->view(), compact('field'))->render() !!}
-                    @endforeach
-
+                    <div id="crud-form">
+                        <crud-form></crud-form>
+                    </div>
                     <div class="form-group">
                         <button class="btn btn-primary">Create</button>
                     </div>
-                </form>
+                {{--</form>--}}
             </div>
         </div>
     </div>
+@endsection
+
+@section('crud-url')
+    <script>
+        let url = '/admin/{{ $form->resourceName() }}/get-form';
+    </script>
 @endsection

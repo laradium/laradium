@@ -36,4 +36,22 @@ class Select extends Field
     {
         return $this->options;
     }
+
+    public function formatedResponse($field = null)
+    {
+        $field = !is_null($field) ? $field : $this;
+
+        return [
+            'type'    => strtolower(array_last(explode('\\', get_class($field)))),
+            'name'    => $field->getNameAttribute(),
+            'label'   => $field->getLabel(),
+            'options' => collect($field->getOptions())->map(function ($text, $value) use($field) {
+                return [
+                    'value'    => $value,
+                    'text'     => $text,
+                    'selected' => $field->getValue() == $value,
+                ];
+            })->toArray(),
+        ];
+    }
 }

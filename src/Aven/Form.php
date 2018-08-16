@@ -4,6 +4,7 @@ namespace Netcore\Aven\Aven;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Netcore\Aven\Aven\Fields\HasMany;
 
 class Form
 {
@@ -55,6 +56,15 @@ class Form
         }
 
         return $this;
+    }
+
+    public function formatedResponse()
+    {
+        foreach ($this->fields as $field) {
+            $fieldList[] = $field->formatedResponse($field);
+        }
+
+        return $fieldList;
     }
 
     /**

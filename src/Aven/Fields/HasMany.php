@@ -30,6 +30,16 @@ class HasMany extends Field
     protected $view = 'aven::admin.fields.has-many';
 
     /**
+     * @var boolean
+     */
+    protected $sortable = false;
+
+    /**
+     * @var string
+     */
+    protected $sortableColumn;
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -52,9 +62,9 @@ class HasMany extends Field
     }
 
     /**
-     * @return Collection
+     * @return array
      */
-    public function fieldGroups(): Collection
+    public function fieldGroups()
     {
         return $this->fields;
     }
@@ -81,7 +91,7 @@ class HasMany extends Field
                 $last = $ruleAttributeList[$count];
                 unset($ruleAttributeList[$count]);
 
-                foreach(translate()->languages() as $language) {
+                foreach (translate()->languages() as $language) {
                     $this->setValidationRules($this->buildRuleSetKey(array_merge($ruleAttributeList,
                         ['translations', $language['iso_code']], [$last])), $field->getRuleSet());
                 }
@@ -93,7 +103,14 @@ class HasMany extends Field
 
         if ($relation->count()) {
             $fields = [];
-            foreach ($relation->get() as $item) {
+
+            if ($this->isSortable()) {
+                $itemList = $relation->orderBy($this->sortableColumn)->get();
+            } else {
+                $itemList = $relation->get();
+            }
+
+            foreach ($itemList as $item) {
                 foreach ($resource->fieldSet()->fields() as $field) {
                     $attributeList = [
                         $this->relationName,
@@ -111,15 +128,35 @@ class HasMany extends Field
 
 
                     $fields[$item->id]['fields'][] = $f;
+                    if ($this->isSortable()) {
+                        $fields[$item->id][$this->sortableColumn] = $item->{$this->sortableColumn};
+                    }
                     $fields[$item->id]['id'] = $item->id;
+                }
+                if ($this->isSortable()) {
+                    $fields[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
                 }
                 $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
 
             }
-            $this->fields->push($fields);
+
+            $this->fields = $fields;
         }
 
         return $this;
+    }
+
+    public function sortable($value)
+    {
+        $this->sortable = true;
+        $this->sortableColumn = $value;
+
+        return $this;
+    }
+
+    public function isSortable()
+    {
+        return $this->sortable;
     }
 
     /**
@@ -131,42 +168,61 @@ class HasMany extends Field
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function template()
     {
         $resource = $this->resource;
 
         $fields = [];
-        foreach ($resource->fieldSet()->fields() as $field) {
-            if($field->isTranslatable()) {
-                $attributeList = [
-                    $this->relationName,
-                    '__ID__',
-                    'translations',
-                    '__LOCALE__',
-                    $field->name()
-                ];
-            } else {
-                $attributeList = [
-                    $this->relationName,
-                    '__ID__',
-                    $field->name()
-                ];
-            }
+        foreach ($resource->fieldSet()->fields() as $f) {
+            $field = clone $f;
 
-            $explode = explode('\\', get_class($field));
-            $name = array_pop($explode);
-
-            $fields[] = [
-                'type'           => strtolower($name),
-                'nameAttribute'  => $this->buildNameAttribute($attributeList),
-                'name'           => $field->name(),
-                'isTranslatable' => $field->isTranslatable(),
+            $attributeList = [
+                $this->relationName,
+                '__ID__',
+                $field->name()
             ];
+
+            $field->setNameAttributeList($attributeList);
+            $field->setValue(null);
+            $class = get_class($this->model);
+            $model = new $class;
+            $field->setModel($model);
+
+            $fields[] = $field->formatedResponse($field);
         }
 
-        return json_encode($fields);
+        return [
+            'id'     => 0,
+            'order'  => 0,
+            'fields' => $fields
+        ];
+    }
+
+    public function formatedResponse($f = null)
+    {
+        $f ?? $this;
+        $items = [];
+
+        foreach ($f->fieldGroups() as $group) {
+            $item = [
+                'id'    => $group['id'],
+                'order' => $group[$f->sortableColumn],
+            ];
+            foreach ($group['fields'] as $field) {
+                $item['fields'][] = $field->formatedResponse();
+            }
+            $items[] = $item;
+        }
+
+        return [
+            'type'        => 'has-many',
+            'name'        => $f->relationName,
+            'is_sortable' => $f->isSortable(),
+            'template'    => $f->template(),
+            'items'       => $items
+        ];
     }
 
     /**
@@ -178,6 +234,25 @@ class HasMany extends Field
     {
         $field = new Hidden(['id'], $model);
         $attributeList[count($attributeList) - 1] = 'id';
+        $field->setNameAttribute($this->buildNameAttribute($attributeList));
+        $field->setValue($model->getAttribute($field->name()));
+
+        return $field;
+    }
+
+    /**
+     * @param $model
+     * @param $attributeList
+     * @return Hidden
+     */
+    public function createSortableField($model, $attributeList)
+    {
+        $field = new Hidden([$this->sortableColumn], $model);
+        $field->class('js-sortable-item');
+        $field->params([
+            'orderable' => true
+        ]);
+        $attributeList[count($attributeList) - 1] = $this->sortableColumn;
         $field->setNameAttribute($this->buildNameAttribute($attributeList));
         $field->setValue($model->getAttribute($field->name()));
 

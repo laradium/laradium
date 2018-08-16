@@ -95,7 +95,6 @@ class Field
             }
 
             $this->nameAttribute = $this->buildNameAttribute($attributeList);
-//            $this->setValidationRules('test', 'required');
 
         }
 
@@ -183,6 +182,7 @@ class Field
     public function setNameAttributeList(array $list)
     {
         $this->setNameAttributeList = $list;
+        $this->nameAttribute = $this->buildNameAttribute($list);
 
         return $this;
     }
@@ -203,9 +203,11 @@ class Field
         $attributeList = [
             $this->name()
         ];
+
         $this->setNameAttributeList($attributeList);
         $this->setNameAttribute($this->buildNameAttribute($attributeList));
         $this->setValue($this->model->getAttribute($this->name()));
+
         if ($this->isTranslatable()) {
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
@@ -218,6 +220,48 @@ class Field
         }
 
         return $this;
+    }
+
+    public function formatedResponse($field = null)
+    {
+        $field = !is_null($field) ? $field : $this;
+        if (!$field->isTranslatable()) {
+            $data = [
+                'type'           => strtolower(array_last(explode('\\', get_class($field)))),
+                'name'           => $field->getNameAttribute(),
+                'label'          => $field->getLabel(),
+                'value'          => $field->getValue(),
+                'isTranslatable' => $field->isTranslatable(),
+            ];
+        } else {
+            $data = [
+                'type'           => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'          => $field->getLabel(),
+                'isTranslatable' => $field->isTranslatable(),
+            ];
+            $translatedAttributes = [];
+
+            foreach (translate()->languages() as $language) {
+                $field->setLocale($language['iso_code']);
+                $translatedAttributes[] = [
+                    'iso_code' => $language['iso_code'],
+                    'value'    => $field->getValue(),
+                    'name'     => $field->getNameAttribute(),
+                ];
+            }
+
+            $data['translatedAttributes'] = $translatedAttributes;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return ucfirst(str_replace('_', ' ', $this->name()));
     }
 
     /**
