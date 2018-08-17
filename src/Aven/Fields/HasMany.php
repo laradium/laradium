@@ -92,8 +92,10 @@ class HasMany extends Field
                 unset($ruleAttributeList[$count]);
 
                 foreach (translate()->languages() as $language) {
-                    $this->setValidationRules($this->buildRuleSetKey(array_merge($ruleAttributeList,
-                        ['translations', $language['iso_code']], [$last])), $field->getRuleSet());
+                    if ($language['is_fallback']) {
+                        $this->setValidationRules($this->buildRuleSetKey(array_merge($ruleAttributeList,
+                            ['translations', $language['iso_code']], [$last])), $field->getRuleSet());
+                    }
                 }
             } else {
                 $this->setValidationRules($this->buildRuleSetKey($attributeList), $field->getRuleSet());
@@ -208,17 +210,21 @@ class HasMany extends Field
         foreach ($f->fieldGroups() as $group) {
             $item = [
                 'id'    => $group['id'],
-                'order' => $group[$f->sortableColumn],
+                'order' => $this->isSortable() ? $group[$f->sortableColumn] : 0,
             ];
+            $url = '';
             foreach ($group['fields'] as $field) {
                 $item['fields'][] = $field->formatedResponse();
+                $tableName = str_replace('_', '-', $field->model()->getTable());
             }
+            $item['url'] = '/admin/' . $tableName . '/' . $group['id'];
             $items[] = $item;
         }
 
         return [
             'type'        => 'has-many',
             'name'        => $f->relationName,
+            'nameLabel'   => ucfirst(str_singular($f->relationName)),
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
             'items'       => $items

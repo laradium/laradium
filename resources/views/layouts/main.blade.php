@@ -101,6 +101,7 @@
     <div class="content-page">
         <!-- Start content -->
         <div class="content">
+            <br>
             <div class="container-fluid">
                 @yield('content')
             </div> <!-- container -->

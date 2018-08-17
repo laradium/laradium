@@ -44,10 +44,10 @@ class Hidden extends Field
     {
         $field = !is_null($field) ? $field : $this;
         $data = [
-            'type'    => $field->getParam('orderable') ? 'hidden-sortable' : strtolower(array_last(explode('\\',
+            'type'  => $field->getParam('orderable') ? 'hidden-sortable' : strtolower(array_last(explode('\\',
                 get_class($field)))),
-            'name'    => $field->getNameAttribute(),
-            'checked' => $field->getValue() == 1,
+            'name'  => $field->getNameAttribute(),
+            'value' => $field->getValue(),
         ];
         if ($field->getParam('orderable')) {
             $data['orderable'] = true;

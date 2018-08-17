@@ -47,7 +47,7 @@ abstract class AbstractAvenResource
 
     public function getForm($id = null)
     {
-        if($id) {
+        if ($id) {
             $model = $this->model->find($id);
         } else {
             $model = $this->model;
@@ -65,7 +65,7 @@ abstract class AbstractAvenResource
 
                 return $item;
             })->toArray(),
-            'inputs' => $response
+            'inputs'    => $response
         ]);
     }
 
@@ -90,7 +90,6 @@ abstract class AbstractAvenResource
      */
     public function store(Request $request)
     {
-
         $model = $this->model;
 
         $resource = $this->resource();
@@ -111,6 +110,13 @@ abstract class AbstractAvenResource
 
         if (isset($this->events['afterSave'])) {
             $this->events['afterSave']($this->model, $request);
+        }
+
+        if($request->ajax()) {
+            return [
+                'success'  => 'Resource successfully created',
+                'redirect' => $form->getAction('create')
+            ];
         }
 
         return back()->withSuccess('Resource successfully created!');
@@ -163,6 +169,12 @@ abstract class AbstractAvenResource
             $this->events['afterSave']($this->model, $request);
         }
 
+        if($request->ajax()) {
+            return [
+                'success'  => 'Resource successfully updated',
+            ];
+        }
+
         return back()->withSuccess('Resource successfully updated!');
 
     }
@@ -191,6 +203,11 @@ abstract class AbstractAvenResource
         $this->events[$name] = $callable;
 
         return $this;
+    }
+
+    public function getResourceName()
+    {
+        return $this->model->getTable();
     }
 
     /**
