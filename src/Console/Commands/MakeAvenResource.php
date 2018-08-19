@@ -45,7 +45,7 @@ class MakeAvenResource extends Command
         $resourceDirectory = app_path('Aven/Resources');
         if (!file_exists($resourceDirectory)) {
             File::makeDirectory($resourceDirectory, 0755, true);
-            $this->info('Creating resource directory');
+            $this->info('Creating resources directory');
         }
         $dummyResource = File::get(__DIR__.'/../../../stubs/aven-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);

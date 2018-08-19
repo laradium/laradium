@@ -2,9 +2,11 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
+use App\Aven\Fields\MorphsTo;
 use Netcore\Aven\Aven\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Netcore\Aven\Aven\FieldSet;
 
 class HasMany extends Field
 {
@@ -40,6 +42,16 @@ class HasMany extends Field
     protected $sortableColumn;
 
     /**
+     * @var FieldSet
+     */
+    protected $fieldSet;
+
+    /**
+     * @var string
+     */
+    protected $morphType;
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -51,6 +63,7 @@ class HasMany extends Field
         $this->relationName = array_first($parameters);
         $this->resource = array_pop($parameters);
         $this->fields = new Collection;
+        $this->fieldSet = new FieldSet();
     }
 
     /**
@@ -72,36 +85,16 @@ class HasMany extends Field
     /**
      * @return $this
      */
-    public function build()
+    public function build($parentAttributeList = [], $model = null)
     {
+        $this->parentAttributeList = $parentAttributeList;
         $relation = $this->relation();
-        $resource = new $this->resource;
-        $resource = $resource->resource()->setModel($this->model)->build();
-        $this->resource = $resource;
 
-        foreach ($resource->fieldSet()->fields() as $field) {
-            $attributeList = [
-                $this->relationName,
-                null,
-                $field->name()
-            ];
-            if ($field->isTranslatable()) {
-                $count = count($attributeList) - 1;
-                $ruleAttributeList = $attributeList;
-                $last = $ruleAttributeList[$count];
-                unset($ruleAttributeList[$count]);
-
-                foreach (translate()->languages() as $language) {
-                    if ($language['is_fallback']) {
-                        $this->setValidationRules($this->buildRuleSetKey(array_merge($ruleAttributeList,
-                            ['translations', $language['iso_code']], [$last])), $field->getRuleSet());
-                    }
-                }
-            } else {
-                $this->setValidationRules($this->buildRuleSetKey($attributeList), $field->getRuleSet());
+        foreach ($this->fieldSet->fields() as $field) {
+            if($field instanceof MorphsTo) {
+                $relation->where($field->morphName . '_type', $field->morphClass);
             }
         }
-
 
         if ($relation->count()) {
             $fields = [];
@@ -111,28 +104,22 @@ class HasMany extends Field
             } else {
                 $itemList = $relation->get();
             }
-
             foreach ($itemList as $item) {
-                foreach ($resource->fieldSet()->fields() as $field) {
-                    $attributeList = [
+                foreach ($this->fieldSet->fields() as $field) {
+                    $attributeList = array_merge($this->parentAttributeList, [
                         $this->relationName,
-                        null,
-                        $field->name()
-                    ];
-                    $attributeList[1] = $item->id;
+                        $item->id,
+                    ]);
 
-                    $f = clone $field;
+                    $clonedField = clone $field;
+                    $clonedField->build($attributeList, $item);
 
-                    $f->setModel($item);
-                    $f->setNameAttributeList($attributeList);
-                    $f->setNameAttribute($this->buildNameAttribute($attributeList));
-                    $f->setValue($item->getAttribute($f->name()));
+                    $fields[$item->id]['fields'][] = $clonedField;
 
-
-                    $fields[$item->id]['fields'][] = $f;
                     if ($this->isSortable()) {
                         $fields[$item->id][$this->sortableColumn] = $item->{$this->sortableColumn};
                     }
+
                     $fields[$item->id]['id'] = $item->id;
                 }
                 if ($this->isSortable()) {
@@ -148,6 +135,17 @@ class HasMany extends Field
         return $this;
     }
 
+    public function setMorphType($value)
+    {
+        $this->morphType = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
     public function sortable($value)
     {
         $this->sortable = true;
@@ -156,6 +154,9 @@ class HasMany extends Field
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isSortable()
     {
         return $this->sortable;
@@ -174,23 +175,19 @@ class HasMany extends Field
      */
     public function template()
     {
-        $resource = $this->resource;
+        $hasManyFields = $this->fieldSet->fields();
 
         $fields = [];
-        foreach ($resource->fieldSet()->fields() as $f) {
+        foreach ($hasManyFields as $f) {
             $field = clone $f;
-
-            $attributeList = [
+            $attributeList = array_merge($this->parentAttributeList, [
                 $this->relationName,
                 '__ID__',
-                $field->name()
-            ];
+            ]);
 
-            $field->setNameAttributeList($attributeList);
+            $field->build($attributeList, null);
+            $field->isTemplate(true);
             $field->setValue(null);
-            $class = get_class($this->model);
-            $model = new $class;
-            $field->setModel($model);
 
             $fields[] = $field->formatedResponse($field);
         }
@@ -202,29 +199,33 @@ class HasMany extends Field
         ];
     }
 
+    /**
+     * @param null $f
+     * @return array
+     */
     public function formatedResponse($f = null)
     {
-        $f ?? $this;
+        $f = $f ?? $this;
         $items = [];
 
         foreach ($f->fieldGroups() as $group) {
             $item = [
                 'id'    => $group['id'],
-                'order' => $this->isSortable() ? $group[$f->sortableColumn] : 0,
+//                'url'   => route(str_replace('_', '-', $this->relation()->getModel()->getTable()) . '.destroy', $group['id'])
             ];
-            $url = '';
+            if($this->isSortable()) {
+                $item['order'] = $group[$this->sortableColumn];
+            }
             foreach ($group['fields'] as $field) {
                 $item['fields'][] = $field->formatedResponse();
-                $tableName = str_replace('_', '-', $field->model()->getTable());
             }
-            $item['url'] = '/admin/' . $tableName . '/' . $group['id'];
             $items[] = $item;
         }
 
         return [
             'type'        => 'has-many',
+            'full_column' => true,
             'name'        => $f->relationName,
-            'nameLabel'   => ucfirst(str_singular($f->relationName)),
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
             'items'       => $items
@@ -238,10 +239,8 @@ class HasMany extends Field
      */
     public function createIdField($model, $attributeList)
     {
-        $field = new Hidden(['id'], $model);
-        $attributeList[count($attributeList) - 1] = 'id';
-        $field->setNameAttribute($this->buildNameAttribute($attributeList));
-        $field->setValue($model->getAttribute($field->name()));
+        $field = new Hidden('id', $model);
+        $field->build($attributeList);
 
         return $field;
     }
@@ -253,16 +252,27 @@ class HasMany extends Field
      */
     public function createSortableField($model, $attributeList)
     {
-        $field = new Hidden([$this->sortableColumn], $model);
+        $field = new Hidden($this->sortableColumn, $model);
+        $field->build($attributeList);
         $field->class('js-sortable-item');
         $field->params([
             'orderable' => true
         ]);
-        $attributeList[count($attributeList) - 1] = $this->sortableColumn;
-        $field->setNameAttribute($this->buildNameAttribute($attributeList));
-        $field->setValue($model->getAttribute($field->name()));
 
         return $field;
+    }
+
+    /**
+     * @param $closure
+     * @return $this
+     */
+    public function fields($closure)
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->setModel($this->model());
+        $closure($fieldSet);
+
+        return $this;
     }
 
 }

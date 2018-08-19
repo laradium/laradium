@@ -13,6 +13,6 @@
 
 @section('crud-url')
     <script>
-        let url = '/admin/{{ $form->resourceName() }}/get-form/{{ $form->model()->id }}';
+        let url = '{{ route('admin.' . $form->resourceName() . '.form', $form->model()->id) }}';
     </script>
 @endsection

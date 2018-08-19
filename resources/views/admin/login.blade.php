@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <title>Adminto - Responsive Admin Dashboard Template</title>
+    <title>Aven - Login</title>
 
     <!-- App css -->
     <link href="/aven/admin/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />

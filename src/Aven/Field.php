@@ -43,7 +43,17 @@ class Field
     /**
      * @var array
      */
-    protected $setNameAttributeList = [];
+    protected $attributeList = [];
+
+    /**
+     * @var bool
+     */
+    protected $isTemplate = false;
+
+    /**
+     * @var array
+     */
+    protected $parentAttributeList = [];
 
     /**
      * Field constructor.
@@ -52,7 +62,7 @@ class Field
      */
     public function __construct($parameters, Model $model)
     {
-        $this->name = array_first($parameters);
+        $this->name = is_array($parameters) ? array_first($parameters) : $parameters;
         $this->model = $model;
     }
 
@@ -61,7 +71,7 @@ class Field
      */
     public function getValue()
     {
-        if ($this->isTranslatable()) {
+        if ($this->isTranslatable() && !$this->isTemplate) {
             $this->value = $this->model()->translateOrNew($this->getLocale())->{$this->name()};
         }
 
@@ -181,7 +191,7 @@ class Field
      */
     public function setNameAttributeList(array $list)
     {
-        $this->setNameAttributeList = $list;
+        $this->attributeList = $list;
         $this->nameAttribute = $this->buildNameAttribute($list);
 
         return $this;
@@ -192,20 +202,23 @@ class Field
      */
     public function getNameAttributeList()
     {
-        return $this->setNameAttributeList;
+        return $this->attributeList;
     }
 
     /**
      * @return $this
      */
-    public function build()
+    public function build($parentAttributeList = [], $model = null)
     {
-        $attributeList = [
-            $this->name()
-        ];
+        if ($model) {
+            $this->setModel($model);
+        }
+
+        $attributeList = array_merge($parentAttributeList, [$this->name()]);
 
         $this->setNameAttributeList($attributeList);
         $this->setNameAttribute($this->buildNameAttribute($attributeList));
+
         $this->setValue($this->model->getAttribute($this->name()));
 
         if ($this->isTranslatable()) {
@@ -225,6 +238,20 @@ class Field
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
+        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
+            if ($item == '__ID__') {
+                return '__ID' . ($index + 1) . '__';
+            } else {
+                return $item;
+            }
+        });
+
+        $field->setNameAttributeList($attributes->toArray());
+
+        $attributes = $attributes->filter(function ($item) {
+            return str_contains($item, '__ID');
+        });
+
         if (!$field->isTranslatable()) {
             $data = [
                 'type'           => strtolower(array_last(explode('\\', get_class($field)))),
@@ -232,12 +259,15 @@ class Field
                 'label'          => $field->getLabel(),
                 'value'          => $field->getValue(),
                 'isTranslatable' => $field->isTranslatable(),
+                'replacemenetAttributes' => $attributes->toArray()
             ];
         } else {
+
             $data = [
-                'type'           => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'          => $field->getLabel(),
-                'isTranslatable' => $field->isTranslatable(),
+                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'                  => $field->getLabel(),
+                'isTranslatable'         => $field->isTranslatable(),
+                'replacemenetAttributes' => $attributes->toArray()
             ];
             $translatedAttributes = [];
 
@@ -253,7 +283,16 @@ class Field
             $data['translatedAttributes'] = $translatedAttributes;
         }
 
+//        $dataReplacementIds = $attributeList = array_merge($attributeList, ['__ID__']);;
+
         return $data;
+    }
+
+    public function isTemplate($value)
+    {
+        $this->isTemplate = $value;
+
+        return $this;
     }
 
     /**
@@ -270,7 +309,9 @@ class Field
      */
     public function buildNameAttribute($attributes): string
     {
-        return implode('', collect($attributes)->map(function ($item, $index) {
+        return implode('', collect($attributes)->filter(function ($item) {
+            return !is_null($item);
+        })->map(function ($item, $index) {
             if ($index != 0) {
                 return '[' . $item . ']';
             }

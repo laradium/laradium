@@ -158,12 +158,9 @@ abstract class AbstractAvenResource
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
-        $fields = collect($request->except('_token'));
-        $resourceData = $this->getResourceData($fields);
-        $relationList = $resourceData['relationList'];
-        $model = $this->model->with(array_except($relationList, 'translations'))->find($id);
+        $model = $this->model->find($id);
 
-        $this->updateResource($resourceData, $model);
+        $this->updateResource($request->except('_token'), $model);
 
         if (isset($this->events['afterSave'])) {
             $this->events['afterSave']($this->model, $request);
@@ -218,5 +215,5 @@ abstract class AbstractAvenResource
     /**
      * @return Table
      */
-    abstract protected function table();
+//    abstract protected function table();
 }

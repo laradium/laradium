@@ -2,21 +2,21 @@
 
 namespace Netcore\Aven\Aven;
 
-use Netcore\Aven\Registries\RouteRegistry;
+use Netcore\Aven\Registries\ResourceRegistry;
 
 class Aven {
 
     /**
      * @var
      */
-    protected $routeRegistry;
+    protected $resourceRegistry;
 
     /**
      * Aven constructor.
      */
     public function __construct()
     {
-        $this->routeRegistry = app(RouteRegistry::class);
+        $this->resourceRegistry = app(ResourceRegistry::class);
     }
 
     /**
@@ -25,6 +25,6 @@ class Aven {
      */
     public function register($resource)
     {
-        return $this->routeRegistry->register($resource);
+        return $this->resourceRegistry->register($resource);
     }
 }

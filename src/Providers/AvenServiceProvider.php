@@ -16,11 +16,11 @@ class AvenServiceProvider extends ServiceProvider
         $this->registerResources();
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
         $this->app->register(AvenTranslationServiceProvider::class);
+
         \App::bind('Translate', function () {
-
             return new Translate;
-
         });
+
         $this->app['router']->aliasMiddleware('aven', AvenMiddleware::class);
 
         $configPath = __DIR__ . '/../../config/aven.php';

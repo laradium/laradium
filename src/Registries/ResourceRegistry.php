@@ -4,7 +4,7 @@ namespace Netcore\Aven\Registries;
 
 use Illuminate\Support\Collection;
 
-class RouteRegistry
+class ResourceRegistry
 {
 
     /**
@@ -43,7 +43,8 @@ class RouteRegistry
             ->post($this->getRouteName('logout', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout')
             ->middleware(['web']);
         $this->router
-            ->get($this->getRouteName('dashboard', false), '\Netcore\Aven\Http\Controllers\Admin\AdminController@dashboard')
+            ->get($this->getRouteName('dashboard', false),
+                '\Netcore\Aven\Http\Controllers\Admin\AdminController@dashboard')
             ->middleware(['web']);
         $this->router
             ->get($this->getRouteName('', false), '\Netcore\Aven\Http\Controllers\Admin\AdminController@index')
@@ -77,19 +78,25 @@ class RouteRegistry
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
-                'middleware' => ['web', 'aven']
+                'middleware' => ['web', 'aven'],
+                'name'       => 'admin.' . $routeSlug . '.form'
             ],
             [
                 'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'middleware' => ['web', 'aven']
+                'middleware' => ['web', 'aven'],
             ],
         ];
 
         foreach ($routeList as $route) {
-            $this->router->{$route['method']}($route['route_slug'],
-                $route['controller'])->middleware($route['middleware']);
+            if (isset($route['name'])) {
+                $this->router->{$route['method']}($route['route_slug'],
+                    $route['controller'])->middleware($route['middleware'])->name($route['name']);
+            } else {
+                $this->router->{$route['method']}($route['route_slug'],
+                    $route['controller'])->middleware($route['middleware']);
+            }
         }
 
         return $this;
