@@ -230,6 +230,7 @@ class HasMany extends Field
             'type'        => 'has-many',
             'full_column' => true,
             'name'        => $f->relationName,
+            'label'       => ucfirst(str_singular($f->relationName)),
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
             'tab'         => $this->tab(),
