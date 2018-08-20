@@ -41,14 +41,22 @@ class ResourceRegistry
             ->middleware(['web']);
         $this->router
             ->post($this->getRouteName('logout', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout')
-            ->middleware(['web']);
+            ->middleware(['web', 'aven']);
         $this->router
             ->get($this->getRouteName('dashboard', false),
                 '\Netcore\Aven\Http\Controllers\Admin\AdminController@dashboard')
-            ->middleware(['web']);
+            ->middleware(['web', 'aven']);
+        $this->router
+            ->delete($this->getRouteName('content-block/{id}', false),
+                '\Netcore\Aven\Http\Controllers\Admin\PageController@contentBlockDelete')
+            ->middleware(['web', 'aven']);
+        $this->router
+            ->delete($this->getRouteName('resource/{id}', false),
+                '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete')
+            ->middleware(['web', 'aven']);
         $this->router
             ->get($this->getRouteName('', false), '\Netcore\Aven\Http\Controllers\Admin\AdminController@index')
-            ->middleware(['web']);
+            ->middleware(['web', 'aven']);
 
     }
 

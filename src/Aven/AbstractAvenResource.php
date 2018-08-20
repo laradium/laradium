@@ -56,7 +56,6 @@ abstract class AbstractAvenResource
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
-
         $response = $form->formatedResponse();
 
         return ([
@@ -65,7 +64,8 @@ abstract class AbstractAvenResource
 
                 return $item;
             })->toArray(),
-            'inputs'    => $response
+            'inputs'    => $response,
+            'tabs'      => $resource->fieldSet()->tabs()->toArray()
         ]);
     }
 
@@ -104,15 +104,13 @@ abstract class AbstractAvenResource
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
-        $fields = collect($request->except('_token'));
-        $resourceData = $this->getResourceData($fields);
-        $this->updateResource($resourceData, $model);
+        $this->updateResource($request->except('_token'), $model);
 
         if (isset($this->events['afterSave'])) {
             $this->events['afterSave']($this->model, $request);
         }
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return [
                 'success'  => 'Resource successfully created',
                 'redirect' => $form->getAction('create')
@@ -166,9 +164,9 @@ abstract class AbstractAvenResource
             $this->events['afterSave']($this->model, $request);
         }
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return [
-                'success'  => 'Resource successfully updated',
+                'success' => 'Resource successfully updated',
             ];
         }
 

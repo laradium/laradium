@@ -89,9 +89,12 @@ class HasMany extends Field
     {
         $this->parentAttributeList = $parentAttributeList;
         $relation = $this->relation();
+        if ($model) {
+            $this->model = $model;
+        }
 
         foreach ($this->fieldSet->fields() as $field) {
-            if($field instanceof MorphsTo) {
+            if ($field instanceof MorphsTo) {
                 $relation->where($field->morphName . '_type', $field->morphClass);
             }
         }
@@ -210,10 +213,11 @@ class HasMany extends Field
 
         foreach ($f->fieldGroups() as $group) {
             $item = [
-                'id'    => $group['id'],
-//                'url'   => route(str_replace('_', '-', $this->relation()->getModel()->getTable()) . '.destroy', $group['id'])
+                'id'       => $group['id'],
+                'url'      => '/admin/resource/' . $group['id'],
+                'resource' => get_class($this->relation()->getModel())
             ];
-            if($this->isSortable()) {
+            if ($this->isSortable()) {
                 $item['order'] = $group[$this->sortableColumn];
             }
             foreach ($group['fields'] as $field) {
@@ -228,6 +232,7 @@ class HasMany extends Field
             'name'        => $f->relationName,
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
+            'tab'         => $this->tab(),
             'items'       => $items
         ];
     }

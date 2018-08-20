@@ -55,6 +55,8 @@ class Field
      */
     protected $parentAttributeList = [];
 
+    protected $tab;
+
     /**
      * Field constructor.
      * @param $parameters
@@ -64,6 +66,7 @@ class Field
     {
         $this->name = is_array($parameters) ? array_first($parameters) : $parameters;
         $this->model = $model;
+        $this->tab = 'Main';
     }
 
     /**
@@ -210,6 +213,7 @@ class Field
      */
     public function build($parentAttributeList = [], $model = null)
     {
+        $this->parentAttributeList = $parentAttributeList;
         if ($model) {
             $this->setModel($model);
         }
@@ -254,12 +258,13 @@ class Field
 
         if (!$field->isTranslatable()) {
             $data = [
-                'type'           => strtolower(array_last(explode('\\', get_class($field)))),
-                'name'           => $field->getNameAttribute(),
-                'label'          => $field->getLabel(),
-                'value'          => $field->getValue(),
-                'isTranslatable' => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray()
+                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
+                'name'                   => $field->getNameAttribute(),
+                'label'                  => $field->getLabel(),
+                'value'                  => $field->getValue(),
+                'isTranslatable'         => $field->isTranslatable(),
+                'replacemenetAttributes' => $attributes->toArray(),
+                'tab'                    => $this->tab(),
             ];
         } else {
 
@@ -267,7 +272,8 @@ class Field
                 'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
                 'label'                  => $field->getLabel(),
                 'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray()
+                'replacemenetAttributes' => $attributes->toArray(),
+                'tab'                    => $this->tab(),
             ];
             $translatedAttributes = [];
 
@@ -345,5 +351,17 @@ class Field
         $this->validationRules += [$key => $rules];
 
         return $this;
+    }
+
+    public function setTab($value)
+    {
+        $this->tab = $value;
+
+        return $this;
+    }
+
+    public function tab()
+    {
+        return $this->tab;
     }
 }

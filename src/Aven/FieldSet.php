@@ -17,12 +17,14 @@ class FieldSet
     /**
      * @var Collection
      */
-    protected $fields;
+    public $fields;
 
     /**
      * @var
      */
     protected $model;
+
+    protected $tabs;
 
     /**
      * FieldSet constructor.
@@ -31,6 +33,19 @@ class FieldSet
     {
         $this->fieldRegistry = app(FieldRegistry::class);
         $this->fields = new Collection;
+        $this->tabs = collect(['Main']);
+    }
+
+    public function addTab($value)
+    {
+        $this->tabs->push($value);
+
+        return $this;
+    }
+
+    public function tabs()
+    {
+        return $this->tabs;
     }
 
     /**

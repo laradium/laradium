@@ -2,6 +2,7 @@
 
 namespace Netcore\Aven\Aven;
 
+use App\Aven\Fields\Tab;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Netcore\Aven\Aven\Fields\HasMany;
@@ -49,10 +50,20 @@ class Form
         $this->model = $resource->model();
 
         foreach ($fields as $field) {
-            $field->build();
-            $this->setValidationRules($field->getRules());
+            if($field instanceof Tab) {
+                $tabFields = $field->setFieldSet($resource->fieldSet())->build();
+                foreach($tabFields as $tabField) {
+                    $tabField->build();
+                    $this->setValidationRules($tabField->getRules());
 
-            $this->fields->push($field);
+                    $this->fields->push($tabField);
+                }
+            } else {
+                $field->build();
+                $this->setValidationRules($field->getRules());
+
+                $this->fields->push($field);
+            }
         }
 
         return $this;
