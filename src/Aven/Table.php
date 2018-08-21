@@ -2,11 +2,15 @@
 
 namespace Netcore\Aven\Aven;
 
-class Table {
+class Table
+{
 
     protected $relations = [];
     protected $columnSet;
     protected $model;
+    protected $additionalView;
+    protected $additionalViewData;
+    protected $actions = ['create', 'edit', 'delete'];
 
     public function __construct()
     {
@@ -55,5 +59,35 @@ class Table {
     public function columns()
     {
         return $this->columnSet->list;
+    }
+
+    public function actions($value)
+    {
+        $this->actions = $value;
+
+        return $this;
+    }
+
+    public function hasAction($value)
+    {
+        return in_array($value, $this->actions);
+    }
+
+    public function additionalView($value, $data)
+    {
+        $this->additionalView = $value;
+        $this->additionalViewData = $data;
+
+        return $this;
+    }
+
+    public function getAdditionalView()
+    {
+        return $this->additionalView;
+    }
+
+    public function getAdditionalViewData()
+    {
+        return $this->additionalViewData;
     }
 }

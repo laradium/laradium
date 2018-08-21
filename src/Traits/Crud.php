@@ -19,7 +19,7 @@ trait Crud
         $relations = $resourceData['relations'];
         $translations = $resourceData['translations'];
 
-        $model->fill($resourceFields->toArray());
+        $model->fill(array_except($resourceFields->toArray(), ['morph_type', 'morph_name']));
         $model->save();
         $this->putTranslations($model, $translations);
 
@@ -78,7 +78,6 @@ trait Crud
                         foreach ($nonExistingItemSet as $item) {
                             $newItem = $relationModel->create(array_except($item, 'translations'));
                             $this->putTranslations($newItem, array_only($item, 'translations'));
-
                             $this->saveMorphToFields(array_first($item), $newItem);
                         }
                     }
@@ -111,6 +110,7 @@ trait Crud
             $this->updateResource(collect($fields), $morphModel);
             $model->{$fields['morph_name'] . '_id'} = $morphModel->id;
             $model->{$fields['morph_name'] . '_type'} = $fields['morph_type'];
+
             $model->save();
         }
     }

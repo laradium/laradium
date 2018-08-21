@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Http\Controllers\Admin;
+namespace Netcore\Aven\Content\Http\Controllers\Admin;
 
-use App\Models\ContentBlock;
+use Netcore\Aven\Content\Models\ContentBlock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

@@ -102,7 +102,7 @@
         <!-- Start content -->
         <div class="content">
             <br>
-            <div class="container-fluid">
+            <div class="container-fluid" id="app">
                 @yield('content')
             </div> <!-- container -->
 

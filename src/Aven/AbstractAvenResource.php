@@ -113,7 +113,7 @@ abstract class AbstractAvenResource
         if ($request->ajax()) {
             return [
                 'success'  => 'Resource successfully created',
-                'redirect' => $form->getAction('create')
+                'redirect' => url()->previous()
             ];
         }
 

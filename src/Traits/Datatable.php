@@ -81,8 +81,8 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        $dataTable->addColumn('action', function ($item) {
-            return view('aven::admin.resource._partials.action', compact('item'))->render();
+        $dataTable->addColumn('action', function ($item) use ($table) {
+            return view('aven::admin.resource._partials.action', compact('item', 'table'))->render();
         });
 
         if ($editableColumns->count()) {
