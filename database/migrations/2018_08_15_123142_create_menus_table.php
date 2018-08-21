@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTranslationsTable extends Migration
+class CreateMenusTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -13,15 +14,11 @@ class CreateTranslationsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('translations')) {
-            return;
-        }
-        Schema::create('translations', function (Blueprint $table) {
+        Schema::create('menus', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('locale', 2)->index();
-            $table->string('group')->index();
             $table->string('key')->index();
-            $table->text('value')->nullable();
+            $table->boolean('is_active')->default(1);
+            $table->timestamps();
         });
     }
 
@@ -32,6 +29,6 @@ class CreateTranslationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('translations');
+        Schema::dropIfExists('menus');
     }
 }

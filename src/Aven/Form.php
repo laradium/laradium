@@ -2,10 +2,10 @@
 
 namespace Netcore\Aven\Aven;
 
-use App\Aven\Fields\Tab;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Netcore\Aven\Aven\Fields\HasMany;
+use Netcore\Aven\Aven\Fields\Tab;
 
 class Form
 {

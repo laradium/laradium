@@ -2,18 +2,15 @@
 <div id="sidebar-menu">
     <ul>
         <li class="text-muted menu-title">Navigation</li>
-        @foreach(config('aven.resources') as $resource)
-            @php
-                $resourceName = str_replace('_', '-', (new $resource)->getResourceName());
-            @endphp
+        @foreach(menu()->get('admin_menu')->items as $item)
             <li>
-                <a href="{{ url('admin/' . $resourceName ) }}" class="waves-effect"><i
-                            class="mdi mdi-view-dashboard"></i> <span> {{ ucfirst(str_replace('-', ' ', $resourceName)) }} </span>
+                <a href="{{ url($item->url ) }}" class="{{ str_contains(request()->getRequestUri(), $item->url) ? 'active' : '' }}">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span> {{ $item->name }} </span>
                 </a>
             </li>
     @endforeach
-
-
+    </ul>
 </div>
 <!-- Sidebar -->
 <div class="clearfix"></div>

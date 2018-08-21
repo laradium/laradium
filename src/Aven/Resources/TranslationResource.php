@@ -45,7 +45,7 @@ Class TranslationResource extends AbstractAvenResource
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        });
+        })->additionalView('aven::admin.translations.import', compact('channels'));;
     }
 
     /**

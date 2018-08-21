@@ -40,6 +40,12 @@ class ResourceRegistry
             ->post($this->getRouteName('login', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@login')
             ->middleware(['web']);
         $this->router
+            ->post($this->getRouteName('translations/import', false), '\Netcore\Aven\Http\Controllers\Admin\TranslationController@import')
+            ->middleware(['web'])->name('admin.translations.import');
+        $this->router
+            ->get($this->getRouteName('translations/export', false), '\Netcore\Aven\Http\Controllers\Admin\TranslationController@export')
+            ->middleware(['web'])->name('admin.translations.export');
+        $this->router
             ->post($this->getRouteName('logout', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout')
             ->middleware(['web', 'aven']);
         $this->router

@@ -4,16 +4,14 @@
         <div class="col-12">
             <div class="card-box table-responsive">
                 @if($table->hasAction('create'))
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="pull-right">
-                                <a href="/admin/{{ $model->getTable() }}/create" class="btn btn-primary">
-                                    <i class="fa fa-plus"></i> Create
-                                </a>
-                            </div>
-                        </div>
+                    <div class="pull-right">
+                        <a href="/admin/{{ $model->getTable() }}/create" class="btn btn-primary">
+                            <i class="fa fa-plus"></i> Create
+                        </a>
                     </div>
-                    <br>
+                    @if(!$table->getAdditionalView())
+                        <br><br>
+                    @endif
                 @endif
                 @if($table->getAdditionalView())
                     <div class="row">
@@ -21,9 +19,9 @@
                             {!! view($table->getAdditionalView(), $table->getAdditionalViewData() )->render() !!}
                         </div>
                     </div>
-                        <br>
+                    <br>
 
-                    @endif
+                @endif
                 <table class="resource-datatable table table-bordered">
                     <thead>
                     <tr>
@@ -73,9 +71,10 @@
                     },
 
                 ]
-            }).on( 'draw.dt', function () {
+            }).on('draw.dt', function () {
                 $('.js-editable').editable({});
-            } );;
+            });
+            ;
 
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();
