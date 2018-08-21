@@ -51,6 +51,14 @@ class ResourceRegistry
                 '\Netcore\Aven\Http\Controllers\Admin\PageController@contentBlockDelete')
             ->middleware(['web', 'aven']);
         $this->router
+            ->get($this->getRouteName('pages/create/{channel}', false),
+                '\App\Aven\Resources\PageResource@create')
+            ->middleware(['web', 'aven']);
+        $this->router
+            ->get($this->getRouteName('pages/{page}/edit', false),
+                '\App\Aven\Resources\PageResource@edit')
+            ->middleware(['web', 'aven']);
+        $this->router
             ->delete($this->getRouteName('resource/{id}', false),
                 '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete')
             ->middleware(['web', 'aven']);

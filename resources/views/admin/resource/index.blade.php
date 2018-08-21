@@ -10,6 +10,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <br>
+
                 <table class="resource-datatable table table-bordered">
                     <thead>
                     <tr>
@@ -47,12 +48,8 @@
                 columns: [
                         @foreach($table->columns() as $column)
                     {
-                        data: "{{ $column['column_parsed'] }}",
-                        name: "{{ $column['column_parsed'] }}",
-                        @if($column['relation'] == 'translations')
-                        searchable: false,
-                        orderable: false,
-                        @endif
+                        data: "{{ $column['column'] }}",
+                        name: "{{ $column['translatable'] ? 'translations.'.$column['column'] : $column['column'] }}",
                     },
                         @endforeach
                     {

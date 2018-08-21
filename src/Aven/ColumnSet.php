@@ -37,7 +37,9 @@ class ColumnSet
             'column_parsed' => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
             'name'          => $name ?? $column,
             'relation'      => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
-            'editable'      => false
+            'editable'      => false,
+            'translatable'  => false,
+            'modify'        => null,
         ]);
 
         $this->column = $column;
@@ -53,6 +55,39 @@ class ColumnSet
         $this->list = $this->list->map(function ($item) {
             if ($this->column == $item['column']) {
                 $item['editable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function translatable()
+    {
+        $this->list = $this->list->map(function ($item) {
+            if ($this->column == $item['column']) {
+                $item['translatable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param $closure
+     * @return $this
+     */
+    public function modify($closure)
+    {
+        $this->list = $this->list->map(function ($item) use ($closure) {
+            if ($this->column == $item['column']) {
+                $item['modify'] = $closure;
             }
 
             return $item;

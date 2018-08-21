@@ -9,6 +9,11 @@ use App\Http\Controllers\Controller;
 class PageController extends Controller
 {
 
+    public function index()
+    {
+        return view('aven::admin.pages.index');
+    }
+    
     public function contentBlockDelete($id)
     {
         $contentBlock = ContentBlock::find($id);

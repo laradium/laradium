@@ -65,11 +65,25 @@ trait Datatable
             });
         }
 
+        $rawColumns = ['action'];
+
+        foreach ($columns->where('translatable', true) as $column) {
+            $dataTable->addColumn($column['column_parsed'], function ($item) use ($column) {
+                return view('aven::admin.resource._partials.translation', compact('item', 'column'))->render();
+            });
+
+            $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
+        }
+
+        foreach ($columns->where('modify', '!=', null) as $column) {
+            $dataTable->editColumn($column['column_parsed'], $column['modify']);
+
+            $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
+        }
+
         $dataTable->addColumn('action', function ($item) {
             return view('aven::admin.resource._partials.action', compact('item'))->render();
         });
-
-        $rawColumns = ['action'];
 
         if ($editableColumns->count()) {
             $rawColumns = array_merge($rawColumns, $editableColumns->pluck('column')->toArray());
