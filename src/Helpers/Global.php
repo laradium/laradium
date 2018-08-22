@@ -19,3 +19,13 @@ if (!function_exists('menu')) {
         return app(\Netcore\Aven\Repositories\MenuRepository::class);
     }
 }
+
+if (!function_exists('setting')) {
+    /**
+     * @return mixed
+     */
+    function setting()
+    {
+        return app(\App\Repositories\SettingsRepository::class);
+    }
+}

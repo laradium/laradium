@@ -17,10 +17,10 @@ class AvenMiddleware
     public function handle($request, Closure $next)
     {
         if (!auth()->check()) {
-            abort(404);
+            return redirect('/admin/login');
         }
         if(auth()->check() && !auth()->user()->is_admin) {
-            abort(404);
+            return redirect('/admin/login');
         }
 
         return $next($request);
