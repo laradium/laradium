@@ -32,46 +32,6 @@ class ResourceRegistry
     public function __construct()
     {
         $this->router = app('router');
-
-        $this->router
-            ->get($this->getRouteName('login', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@index')
-            ->middleware(['web']);
-        $this->router
-            ->post($this->getRouteName('login', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@login')
-            ->middleware(['web']);
-        $this->router
-            ->post($this->getRouteName('translations/import', false), '\Netcore\Aven\Http\Controllers\Admin\TranslationController@import')
-            ->middleware(['web'])->name('admin.translations.import');
-        $this->router
-            ->get($this->getRouteName('translations/export', false), '\Netcore\Aven\Http\Controllers\Admin\TranslationController@export')
-            ->middleware(['web'])->name('admin.translations.export');
-        $this->router
-            ->post($this->getRouteName('logout', false), '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->get($this->getRouteName('dashboard', false),
-                '\Netcore\Aven\Http\Controllers\Admin\AdminController@dashboard')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->delete($this->getRouteName('content-block/{id}', false),
-                '\Netcore\Aven\Content\Http\Controllers\Admin\PageController@contentBlockDelete')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->get($this->getRouteName('pages/create/{channel}', false),
-                '\Netcore\Aven\Content\Aven\Resources\PageResource@create')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->get($this->getRouteName('pages/{page}/edit', false),
-                '\Netcore\Aven\Content\Aven\Resources\PageResource@edit')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->delete($this->getRouteName('resource/{id}', false),
-                '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete')
-            ->middleware(['web', 'aven']);
-        $this->router
-            ->get($this->getRouteName('', false), '\Netcore\Aven\Http\Controllers\Admin\AdminController@index')
-            ->middleware(['web', 'aven']);
-
     }
 
     /**

@@ -26,6 +26,8 @@ class AvenServiceProvider extends ServiceProvider
         $configPath = __DIR__ . '/../../config/aven.php';
         $this->mergeConfigFrom($configPath, 'aven');
 
+        $this->loadRoutesFrom(__DIR__.'/../../routes/admin.php');
+
         $this->publishes([
             $configPath => config_path('aven.php'),
         ], 'aven');

@@ -17,9 +17,8 @@ class TranslationController extends Controller
     public function import(Request $request)
     {
         $request->validate(['excel' => 'required',]);
-
         try {
-            $existingLanguages = collect(translate()->languages());
+            $rows = [];
             $excel = app('excel');
             $data = $excel->load($request->file('excel'))
                 ->get()
@@ -33,18 +32,32 @@ class TranslationController extends Controller
 
                 $languages = array_keys($item);
                 foreach ($languages as $lang) {
-                    Translation::firstOrCreate([
-                        'locale' => $lang,
-                        'group'  => $group,
-                        'key'    => $key,
-                    ], [
+                    $rows[] = [
                         'locale' => $lang,
                         'group'  => $group,
                         'key'    => $key,
                         'value'  => $item[$lang],
-                    ]);
+                    ];
+
                 }
             }
+            DB::transaction(function () use ($rows) {
+                foreach (array_chunk($rows, 300) as $chunk) {
+                    foreach ($chunk as $item) {
+                        Translation::firstOrCreate([
+                            'locale' => $item['locale'],
+                            'group'  => $item['group'],
+                            'key'    => $item['key'],
+                        ], [
+                            'locale' => $item['locale'],
+                            'group'  => $item['group'],
+                            'key'    => $item['key'],
+                            'value'  => $item['value'],
+                        ]);
+                    }
+                }
+
+            });
         } catch (\Exception $e) {
             return back()->withError('Something went wrong, please try again!');
         }
@@ -52,6 +65,9 @@ class TranslationController extends Controller
         return back()->withSuccess('Translations successfully imported!');
     }
 
+    /**
+     * @return mixed
+     */
     public function export()
     {
         $excel = app('excel');
@@ -70,6 +86,7 @@ class TranslationController extends Controller
         $translations = collect($translations)->map(function ($item) {
             return (object)$item;
         })->sortBy('group');
+
         return $excel->create($filename, function ($excel) use ($translations, $title) {
             $excel->setTitle($title);
             $excel->sheet('Translations', function ($sheet) use ($translations, $title) {
@@ -94,6 +111,7 @@ class TranslationController extends Controller
                         $value = object_get($translation, 'value', '');
                         $item[] = $value;
                     }
+
                     return $item;
                 })->all();
                 $rows = array_merge($rows, ($translations));

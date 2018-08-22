@@ -1,5 +1,7 @@
 <?php
+
 namespace Netcore\Aven\Repositories;
+
 use Exception;
 use Illuminate\Support\Collection;
 use Netcore\Aven\Models\Menu;
@@ -7,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuRepository
 {
+
     /**
      * Menu key.
      *
@@ -19,6 +22,7 @@ class MenuRepository
      * @var \Illuminate\Support\Collection
      */
     protected $cachedMenus;
+
     /**
      * MenuRepository constructor.
      *
@@ -26,10 +30,14 @@ class MenuRepository
      */
     public function __construct()
     {
-        $loadWith = ['translations', 'items' => function(HasMany $hasMany) {
-            return $hasMany->active()->with('translations')->orderBy('sequence_no');
-        }];
+        $loadWith = [
+            'translations',
+            'items' => function (HasMany $hasMany) {
+                return $hasMany->active()->with('translations')->orderBy('sequence_no');
+            }
+        ];
         try {
+
             $this->cachedMenus = cache()->rememberForever(Menu::$cacheKey, function () use ($loadWith) {
                 return Menu::with($loadWith)->get();
             });
@@ -38,6 +46,7 @@ class MenuRepository
         }
         $this->key = '';
     }
+
     /**
      * Set the menu key.
      *
@@ -47,8 +56,10 @@ class MenuRepository
     public function setKey($key)
     {
         $this->key = $key;
+
         return $this;
     }
+
     /**
      * Get the menu with given key.
      *
@@ -60,8 +71,10 @@ class MenuRepository
         if (!$key) {
             return $this->getAll();
         }
+
         return $this->cachedMenus->where('key', $key)->first();
     }
+
     /**
      * Get all menus.
      *
@@ -71,6 +84,7 @@ class MenuRepository
     {
         return $this->cachedMenus;
     }
+
     /**
      * Render menu.
      *
@@ -83,6 +97,7 @@ class MenuRepository
         } else {
             logger()->warning('Couldn\'t render the menu without a key');
         }
+
         return '';
     }
 
@@ -99,7 +114,7 @@ class MenuRepository
             throw new Exception('Invalid data given!');
         }
         foreach ($menus as $name => $menuItems) {
-            $m = \Netcore\Aven\Models\Menu::create([
+            $m = \Netcore\Aven\Models\Menu::firstOrCreate([
                 'key' => str_slug($name, '_')
             ]);
 
@@ -121,5 +136,7 @@ class MenuRepository
                 }
             }
         }
+
+        cache()->forget(Menu::$cacheKey);
     }
 }
