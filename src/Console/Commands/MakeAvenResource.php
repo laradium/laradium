@@ -50,6 +50,8 @@ class MakeAvenResource extends Command
         $dummyResource = File::get(__DIR__.'/../../../stubs/aven-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
         $resource = str_replace('{{resource}}', $name, $resource);
+        $resource = str_replace('{{resource}}', $name, $resource);
+        $resource = str_replace('{{modelNamespace}}', config('aven.default_models_directory', 'App'), $resource);
         $resourceFilePath = app_path('Aven/Resources/' . $name . 'Resource.php');
 
         if (file_exists($resourceFilePath)) {

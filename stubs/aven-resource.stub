@@ -7,7 +7,7 @@ use Netcore\Aven\Aven\FieldSet;
 use Netcore\Aven\Aven\Resource;
 use Netcore\Aven\Aven\ColumnSet;
 use Netcore\Aven\Aven\Table;
-use {{namespace}}\{{resource}};
+use {{modelNamespace}}\{{resource}};
 
 Class {{resource}}Resource extends AbstractAvenResource
 {

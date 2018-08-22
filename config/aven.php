@@ -1,32 +1,26 @@
 <?php
 
 return [
-    'fields_list'    => [
-        'text'     => \Netcore\Aven\Aven\Fields\Text::class,
-        'hidden'   => \Netcore\Aven\Aven\Fields\Hidden::class,
-        'wysiwyg'  => \Netcore\Aven\Aven\Fields\Wysiwyg::class,
-        'boolean'  => \Netcore\Aven\Aven\Fields\Boolean::class,
-        'textarea' => \Netcore\Aven\Aven\Fields\Textarea::class,
-        'select'   => \Netcore\Aven\Aven\Fields\Select::class,
-        'hasMany'  => \Netcore\Aven\Aven\Fields\HasMany::class,
-    ],
-    'resources'      => [
+    'default_models_directory' => 'App\\Models',
+
+    'resources' => [
         \Netcore\Aven\Aven\Resources\TranslationResource::class,
         \Netcore\Aven\Aven\Resources\LanguageResource::class,
+        \Netcore\Aven\Aven\Resources\MenuResource::class,
+        \Netcore\Aven\Content\Aven\Resources\PageResource::class,
+        \App\Aven\Resources\SettingResource::class,
+
         // list of your resources
     ],
 
-    // Default admin account credentials
-    'user'           => [
+
+    'user'      => [
         'email'    => 'admin@netcore.lv',
         'password' => 'aven2018'
     ],
 
-    // Default dashboard view
-    'dashboard-view' => 'aven::admin.dashboard',
-
     // Default language list
-    'languages'      => [
+    'languages' => [
         [
             'iso_code'        => 'en',
             'title'           => 'English',
@@ -41,5 +35,46 @@ return [
             'is_visible'      => true,
             'is_fallback'     => false,
         ],
+    ],
+
+    'dashboard-view' => 'aven::admin.dashboard',
+
+    'fields_list' => [
+        'text'              => \Netcore\Aven\Aven\Fields\Text::class,
+        'hidden'            => \Netcore\Aven\Aven\Fields\Hidden::class,
+        'wysiwyg'           => \Netcore\Aven\Aven\Fields\Wysiwyg::class,
+        'boolean'           => \Netcore\Aven\Aven\Fields\Boolean::class,
+        'textarea'          => \Netcore\Aven\Aven\Fields\Textarea::class,
+        'select'            => \Netcore\Aven\Aven\Fields\Select::class,
+        'hasMany'           => \Netcore\Aven\Aven\Fields\HasMany::class,
+        'morphsTo'          => \Netcore\Aven\Aven\Fields\MorphsTo::class,
+        'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
+        'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
+    ],
+
+    'menus' => [
+        'Admin menu' => [
+            [
+                'is_active'    => 1,
+                'translations' => [
+                    'name' => 'Translations',
+                    'url'  => '/admin/translations',
+                ]
+            ],
+            [
+                'is_active'    => 1,
+                'translations' => [
+                    'name' => 'Languages',
+                    'url'  => '/admin/languages',
+                ]
+            ],
+            [
+                'is_active'    => 1,
+                'translations' => [
+                    'name' => 'Menus',
+                    'url'  => '/admin/menus',
+                ]
+            ],
+        ]
     ]
 ];
