@@ -7,10 +7,11 @@ return [
         \Netcore\Aven\Aven\Resources\TranslationResource::class,
         \Netcore\Aven\Aven\Resources\LanguageResource::class,
         \Netcore\Aven\Aven\Resources\MenuResource::class,
+        \Netcore\Aven\Aven\Resources\SettingResource::class,
         \Netcore\Aven\Content\Aven\Resources\PageResource::class,
-        \App\Aven\Resources\SettingResource::class,
-
         // list of your resources
+//        \App\Aven\Resources\ArticleResource::class,
+
     ],
 
 
@@ -46,12 +47,15 @@ return [
         'boolean'           => \Netcore\Aven\Aven\Fields\Boolean::class,
         'textarea'          => \Netcore\Aven\Aven\Fields\Textarea::class,
         'select'            => \Netcore\Aven\Aven\Fields\Select::class,
+        'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
+        // Relations
+        'hasOne'            => \Netcore\Aven\Aven\Fields\HasOne::class,
         'hasMany'           => \Netcore\Aven\Aven\Fields\HasMany::class,
         'morphsTo'          => \Netcore\Aven\Aven\Fields\MorphsTo::class,
-        'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
-        'hasOne'            => \Netcore\Aven\Aven\Fields\HasOne::class,
         'belongsTo'         => \Netcore\Aven\Aven\Fields\BelongsTo::class,
         'belongsToMany'     => \Netcore\Aven\Aven\Fields\BelongsToMany::class,
+
+        // Aven Content
         'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
     ],
 
@@ -78,6 +82,7 @@ return [
                     'url'  => '/admin/menus',
                 ]
             ],
+
         ]
     ]
 ];

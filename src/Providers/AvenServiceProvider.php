@@ -23,14 +23,12 @@ class AvenServiceProvider extends ServiceProvider
 
         $this->app['router']->aliasMiddleware('aven', AvenMiddleware::class);
 
-        $configPath = __DIR__ . '/../../config/aven.php';
-        $this->mergeConfigFrom($configPath, 'aven');
-
-        $this->loadRoutesFrom(__DIR__.'/../../routes/admin.php');
-
         $this->publishes([
-            $configPath => config_path('aven.php'),
+            __DIR__ . '/../../config/aven-setting.php' => config_path('aven-setting.php'),
+            __DIR__ . '/../../config/aven.php' => config_path('aven.php'),
         ], 'aven');
+
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'aven');
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
