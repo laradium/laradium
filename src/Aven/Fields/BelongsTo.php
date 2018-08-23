@@ -3,30 +3,30 @@
 namespace Netcore\Aven\Aven\Fields;
 
 
+use Illuminate\Database\Eloquent\Model;
 use Netcore\Aven\Aven\Field;
 
-class Select extends Field
+class BelongsTo extends Field
 {
 
     /**
-     * @var string
+     * @var
      */
-    protected $view = 'aven::admin.fields.select';
+    protected $relationModel;
 
     /**
-     * @var array
+     * BelongsTo constructor.
+     * @param $parameters
+     * @param Model $model
      */
-    protected $options = [];
-
-    /**
-     * @param array $options
-     * @return $this
-     */
-    public function options(array $options)
+    public function __construct($parameters, Model $model)
     {
-        $this->options = $options;
+        parent::__construct($parameters, $model);
 
-        return $this;
+        $this->relationModel = new $this->name;
+        $this->label = array_last(explode('\\', $this->name));
+        $this->name = strtolower(array_last(explode('\\', $this->name))) . '_id';
+
     }
 
     /**
@@ -34,9 +34,13 @@ class Select extends Field
      */
     public function getOptions()
     {
-        return $this->options;
+        return $this->relationModel->all()->pluck('title', 'id')->toArray();
     }
 
+    /**
+     * @param null $field
+     * @return array
+     */
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
@@ -56,10 +60,12 @@ class Select extends Field
         });
 
         return [
-            'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
+            'type'                   => 'select',
             'name'                   => $field->getNameAttribute(),
-            'default'                => $field->getDefault(),
+            'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
+            'isHidden'               => $field->isHidden(),
+            'default'                => $field->getDefault(),
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,

@@ -5,7 +5,7 @@
             <div class="card-box table-responsive">
                 @if($table->hasAction('create'))
                     <div class="pull-right">
-                        <a href="/admin/{{ $model->getTable() }}/create" class="btn btn-primary">
+                        <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create" class="btn btn-primary">
                             <i class="fa fa-plus"></i> Create
                         </a>
                     </div>

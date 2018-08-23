@@ -50,9 +50,9 @@ class Form
         $this->model = $resource->model();
 
         foreach ($fields as $field) {
-            if($field instanceof Tab) {
+            if ($field instanceof Tab) {
                 $tabFields = $field->setFieldSet($resource->fieldSet())->build();
-                foreach($tabFields as $tabField) {
+                foreach ($tabFields as $tabField) {
                     $tabField->build();
                     $this->setValidationRules($tabField->getRules());
 
@@ -71,6 +71,7 @@ class Form
 
     public function formatedResponse()
     {
+        $fieldList = [];
         foreach ($this->fields as $field) {
             $fieldList[] = $field->formatedResponse($field);
         }
@@ -99,7 +100,7 @@ class Form
      */
     public function resourceName(): string
     {
-        return $this->model()->getTable();
+        return str_replace('_', '-', $this->model()->getTable());
     }
 
     /**

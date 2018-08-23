@@ -80,6 +80,13 @@ trait Crud
                             $this->putTranslations($newItem, array_only($item, 'translations'));
                             $this->saveMorphToFields(array_first($item), $newItem);
                         }
+                    } elseif ($relationType == 'HasOne') {
+                        if ($model->{$relationName}) {
+                            $relationModel = $model->{$relationName};
+                        } else {
+                            $relationModel = $model->{$relationName}()->firstOrCreate($nonExistingItemSet);
+                        }
+                        $this->updateResource(collect($nonExistingItemSet), $relationModel);
                     }
                 }
 

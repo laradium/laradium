@@ -11,9 +11,24 @@ class Field
     use Translatable;
 
     /**
+     * @var bool
+     */
+    protected $isHidden = false;
+
+    /**
+     * @var
+     */
+    protected $default;
+
+    /**
      * @var string
      */
     protected $ruleSet;
+
+    /**
+     * @var string
+     */
+    protected $label;
 
     /**
      * @var string
@@ -306,7 +321,45 @@ class Field
      */
     public function getLabel()
     {
-        return ucfirst(str_replace('_', ' ', $this->name()));
+        return $this->label ?: ucfirst(str_replace('_', ' ', $this->name()));
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function hideIf($value)
+    {
+        $this->isHidden = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->isHidden;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function default($value)
+    {
+        $this->default = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefault()
+    {
+        return $this->default;
     }
 
     /**

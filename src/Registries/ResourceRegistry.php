@@ -109,13 +109,11 @@ class ResourceRegistry
      */
     protected function getRouteSlug($resource): string
     {
-        $explode = explode('\\',
-            $resource); // we use explode because we want to remove namespace from controller path
-        $resourceName = array_pop($explode); // get the name of the controller
-        $name = str_replace('Resource', '', $resourceName); // remove "Resource" from name
-        $name = $pieces = preg_split('/(?=[A-Z])/', $name);
-        unset($name[0]); // unset empty element
-        $name = str_plural(strtolower(implode('-', $name)));
+        $r = new $resource;
+        $model = $r->model();
+        $model = new $model;
+
+        $name = str_replace('_', '-', $model->getTable());
 
         return $name;
     }

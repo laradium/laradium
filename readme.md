@@ -119,6 +119,22 @@ $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->text('url')->rules('required')->translatable();
                 })->sortable('sequence_no');
 ```
+HasOne
+1. first argument must be the name of the relation
+2. Fields method should contain fields that is required for relation
+```$xslt
+$set->hasOne('author')->fields(function (FieldSet $set) {
+                $set->text('name');
+            });
+```
+BelongsTo 
+1. First argument must be class of relation where items will belong
+```$xslt
+$set->belongsTo(Article::class)
+                ->hideIf(true) // optional if value is true, field will be hidden and value will be set from "default" method
+                ->default(2)
+            ;
+```
 Tab (Lets you put certain field groups under certain tabs for better UI)
 1. First argument must be the name of the tab
 2. Fields method must contain fields that will be under this tab

@@ -49,6 +49,8 @@ return [
         'hasMany'           => \Netcore\Aven\Aven\Fields\HasMany::class,
         'morphsTo'          => \Netcore\Aven\Aven\Fields\MorphsTo::class,
         'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
+        'hasOne'            => \Netcore\Aven\Aven\Fields\HasOne::class,
+        'belongsTo'         => \Netcore\Aven\Aven\Fields\BelongsTo::class,
         'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
     ],
 

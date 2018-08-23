@@ -205,6 +205,11 @@ abstract class AbstractAvenResource
         return $this->model->getTable();
     }
 
+    public function model()
+    {
+        return $this->model;
+    }
+
     /**
      * @return \Netcore\Aven\Aven\Resource
      */

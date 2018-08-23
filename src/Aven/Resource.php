@@ -80,4 +80,9 @@ class Resource
 
         return $this;
     }
+
+    public function closure()
+    {
+        return $this->closure;
+    }
 }
