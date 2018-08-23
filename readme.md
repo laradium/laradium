@@ -1,8 +1,10 @@
 Package allows you to create advanced CRUD views with relations in light wight admin panel. Using plain laravel database structure, models and VueJS which allows to make it very flexible and can be adjusted up to your needs. 
 
-##Installation
+# Installation
 1. Add this to your project repositories list in `composer.json` file
-```$xslt
+
+
+```
 "repositories": [
     {
       "type": "path",
@@ -12,7 +14,7 @@ Package allows you to create advanced CRUD views with relations in light wight a
 ```
 
 Directory structure should look like this
-```$xslt
+```
 -Project
 -packages
 --aven-package
@@ -24,12 +26,12 @@ Directory structure should look like this
 4. Configure `config/aven.php` file with your preferences
 5. Comment out `Illuminate\Translation\TranslationServiceProvider::class,` in `config/app.php` in order to enable translations
 
-##Creating new resource
+# Creating new resource
 
 1. ```php artisan aven:resource Task```
 
 It will create new resource under `App\Aven\Resource`, resource should look like this
-```$xslt
+```
 <?php
 
 namespace App\Aven\Resources;
@@ -75,40 +77,46 @@ You will have 2 methods `resource` and `table`.
 
 2. You need to add created resource in `config/aven.php` under resources
 
-###Resource
+# Resource
 Here you can specify field configuration for your create and edit actions.
 
-####Available field list
+## Available field list
 
-Text
+## Text
+
 ```
 $set->text('name')->rules('required')->translatable();
 ```
-Textarea
-```$xslt
+
+## Textarea
+```
 $set->textarea('name')->rules('required')->translatable();
 ```
-Wysiwyg
-```$xslt
+
+## Wysiwyg
+```
 $set->wysiwy('name')->rules('required')->translatable();
 ```
-Boolean
-```$xslt
+
+## Boolean
+```
 $set->boolean('is_active');
 ```
-Select
 
-```$xslt
+## Select
+
+```
 $set->select('target')->options([
                         '_self'   => 'Self',
                         '_target' => 'Target',
                     ])->rules('required');
 ```
-HasMany
+
+## HasMany
 1. first argument must be the name of the relation
 2. Fields method should contain fields that is required for relation
 3. You can make items sortable, if you add sortable column to your table and specify column name in `sortable` method
-```$xslt
+```
 $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->boolean('is_active');
                     $set->select('target')->options([
@@ -119,27 +127,38 @@ $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->text('url')->rules('required')->translatable();
                 })->sortable('sequence_no');
 ```
-HasOne
+
+## HasOne
 1. first argument must be the name of the relation
 2. Fields method should contain fields that is required for relation
-```$xslt
+```
 $set->hasOne('author')->fields(function (FieldSet $set) {
                 $set->text('name');
             });
 ```
-BelongsTo 
+
+## BelongsTo 
 1. First argument must be class of relation where items will belong
-```$xslt
+```
 $set->belongsTo(Article::class)
                 ->hideIf(true) // optional if value is true, field will be hidden and value will be set from "default" method
                 ->default(2)
             ;
 ```
-Tab (Lets you put certain field groups under certain tabs for better UI)
+
+## BelongsToMany
+1. First argument must be name of the relation in model
+2. Second argument is label for field
+```
+$set->belongsToMany('menuItems', 'Menu items');
+```
+
+
+## Tab (Lets you put certain field groups under certain tabs for better UI)
 1. First argument must be the name of the tab
 2. Fields method must contain fields that will be under this tab
 
-```$xslt
+```
 $set->tab('Items')->fields(function (FieldSet $set) {
                 $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->boolean('is_active');
@@ -153,44 +172,44 @@ $set->tab('Items')->fields(function (FieldSet $set) {
             });
 ```
 
-###Table
+# Table
 
 Available fields for columns
 
-Add
-```$xslt
+## Add
+```
 $column->add('column_name_in_table', 'Nice column name');
 ```
 
-Editable (Allows you to edit database column from index view)
-```$xslt
+## Editable (Allows you to edit database column from index view)
+```
 $column->add('column_name_in_table', 'Nice column name')->editable();
 ```
 
-Modify (Allow you to modify columns data output)
-```$xslt
+## Modify (Allow you to modify columns data output)
+```
 $column->add('is_active', 'Is Visible?')->modify(function ($item) {
                 return $item->is_active ? 'Yes' : 'No';
             });
 ```
 
-Translatable
-```$xslt
+## Translatable
+```
 $column->add('title')->translatable();
 ```
 NOTE: You need to specify additional method for Table `relations(['translations''])` to enable eager loading and improve perfomance
 
 Available methods for Table
 
-Actions (edit, create, delete)
-```$xslt
+## Actions (edit, create, delete)
+```
 ->actions(['edit', 'delete'])
 ```
-Relations
-```$xslt
+## Relations
+```
 ->relations(['translations'])
 ```
-Additional view which will be included above the table
-```$xslt
+## Additional view which will be included above the table
+```
 ->additionalView('aven-content::admin.pages.index-top', compact('channels'));
 ```
