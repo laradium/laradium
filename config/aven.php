@@ -51,6 +51,7 @@ return [
         'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
         'hasOne'            => \Netcore\Aven\Aven\Fields\HasOne::class,
         'belongsTo'         => \Netcore\Aven\Aven\Fields\BelongsTo::class,
+        'belongsToMany'     => \Netcore\Aven\Aven\Fields\BelongsToMany::class,
         'widgetConstructor' => \Netcore\Aven\Content\Aven\Fields\WidgetConstructor::class,
     ],
 

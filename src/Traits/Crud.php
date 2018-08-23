@@ -87,6 +87,8 @@ trait Crud
                             $relationModel = $model->{$relationName}()->firstOrCreate($nonExistingItemSet);
                         }
                         $this->updateResource(collect($nonExistingItemSet), $relationModel);
+                    } elseif($relationType == 'BelongsToMany') {
+                        $relationModel = $model->{$relationName}()->sync($nonExistingItemSet);
                     }
                 }
 

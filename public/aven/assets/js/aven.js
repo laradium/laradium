@@ -14027,6 +14027,7 @@ Vue.component('has-one-field', __webpack_require__(65));
 Vue.component('textarea-field', __webpack_require__(68));
 Vue.component('wysiwyg-field', __webpack_require__(71));
 Vue.component('widget-constructor-field', __webpack_require__(74));
+Vue.component('belongs-to-many-field', __webpack_require__(85));
 Vue.component('draggable', __webpack_require__(77));
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_wysiwyg___default.a, {});
 
@@ -47836,12 +47837,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['input', 'language', 'item'],
-    data: function data() {
-        return {
-            myHtml: '<b>Hellow</b> world!'
-        };
-    }
+    props: ['input', 'language', 'item']
 });
 
 /***/ }),
@@ -51624,6 +51620,138 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**!
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */,
+/* 84 */,
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(86)
+/* template */
+var __vue_template__ = __webpack_require__(87)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\fields\\BelongsToMany.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1cb01a02", Component.options)
+  } else {
+    hotAPI.reload("data-v-1cb01a02", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 86 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['input', 'language', 'item']
+});
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    !_vm.input.isHidden
+      ? _c("div", { staticClass: "form-group" }, [
+          _c("h3", [
+            _vm._v("\n            " + _vm._s(_vm.input.label) + "\n        ")
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "row" },
+            _vm._l(_vm.input.items, function(item) {
+              return _c("div", { staticClass: "col-md-2" }, [
+                _c(
+                  "label",
+                  { attrs: { for: _vm.input.name + "_" + item.id } },
+                  [
+                    _c("input", {
+                      attrs: {
+                        type: "checkbox",
+                        id: _vm.input.name + "_" + item.id,
+                        name: _vm.input.name + "[]"
+                      },
+                      domProps: { checked: item.checked, value: item.id }
+                    }),
+                    _vm._v(" " + _vm._s(item.name) + "\n                ")
+                  ]
+                )
+              ])
+            })
+          )
+        ])
+      : _vm._e()
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-1cb01a02", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

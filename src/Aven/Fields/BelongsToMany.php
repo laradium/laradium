@@ -6,7 +6,7 @@ namespace Netcore\Aven\Aven\Fields;
 use Illuminate\Database\Eloquent\Model;
 use Netcore\Aven\Aven\Field;
 
-class BelongsTo extends Field
+class BelongsToMany extends Field
 {
 
     /**
@@ -15,7 +15,12 @@ class BelongsTo extends Field
     protected $relationModel;
 
     /**
-     * BelongsTo constructor.
+     * @var string
+     */
+    protected $relationName;
+
+    /**
+     * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
      */
@@ -23,18 +28,11 @@ class BelongsTo extends Field
     {
         parent::__construct($parameters, $model);
 
-        $this->relationModel = new $this->name;
-        $this->label = array_last(explode('\\', $this->name));
-        $this->name = strtolower($this->label) . '_id';
+        $this->relationName = $this->name;
 
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->relationModel->all()->pluck('title', 'id')->toArray();
+        if (count($parameters) > 1) {
+            $this->label = array_last($parameters);
+        }
     }
 
     /**
@@ -44,6 +42,11 @@ class BelongsTo extends Field
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
+
+        $relatedItems = $this->relation()->get()->pluck('id')->toArray();
+        $relationModel = $this->relation()->getModel();
+        $items = new $relationModel;
+        $items = $items->get();
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
             if ($item == '__ID__') {
@@ -60,19 +63,25 @@ class BelongsTo extends Field
         });
 
         return [
-            'type'                   => 'select',
+            'type'                   => 'belongs-to-many',
             'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
-            'isHidden'               => $field->isHidden(),
-            'default'                => $field->getDefault(),
-            'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+            'label'                  => $this->label ?: $this->name,
+            'items'                  => $items->map(function ($item) use ($relatedItems) {
                 return [
-                    'value'    => $value,
-                    'text'     => $text,
-                    'selected' => $field->getValue() == $value,
+                    'id'      => $item->id,
+                    'name'    => $item->name,
+                    'checked' => in_array($item->id, $relatedItems),
                 ];
             })->toArray(),
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function relation(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->model()->load($this->relationName)->{$this->relationName}();
     }
 }
