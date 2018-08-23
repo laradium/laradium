@@ -11,6 +11,14 @@ Package allows you to create advanced CRUD views with relations in light wight a
   ]
 ```
 
+Directory structure should look like this
+```$xslt
+-Project
+-packages
+--aven-package
+--aven-content
+```
+
 2. ```composer require netcore/aven dev-master```
 3. ```php artisan vendor:publish --tag=aven```
 4. Configure `config/aven.php` file with your preferences
