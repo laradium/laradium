@@ -27,6 +27,8 @@ class CreateLanguagesTable extends Migration
             foreach($languages as $language) {
                 \Netcore\Aven\Models\Language::create($language);
             }
+
+            cache()->forget('languages');
         }
     }
 

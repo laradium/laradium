@@ -26,6 +26,6 @@ if (!function_exists('setting')) {
      */
     function setting()
     {
-        return app(\App\Repositories\SettingsRepository::class);
+        return app(\Netcore\Aven\Repositories\SettingsRepository::class);
     }
 }

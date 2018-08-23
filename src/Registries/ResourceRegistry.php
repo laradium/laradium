@@ -41,6 +41,9 @@ class ResourceRegistry
     public function register($resourceName)
     {
         $routeSlug = $this->getRouteSlug($resourceName);
+        if(!$routeSlug) {
+            return $this;
+        }
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
         $routeList = [
@@ -109,12 +112,16 @@ class ResourceRegistry
      */
     protected function getRouteSlug($resource): string
     {
-        $r = new $resource;
-        $model = $r->model();
-        $model = new $model;
+        if(class_exists($resource)) {
+            $r = new $resource;
+            $model = $r->model();
+            $model = new $model;
 
-        $name = str_replace('_', '-', $model->getTable());
+            $name = str_replace('_', '-', $model->getTable());
 
-        return $name;
+            return $name;
+        }
+
+        return false;
     }
 }
