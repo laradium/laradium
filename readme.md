@@ -25,6 +25,15 @@ Directory structure should look like this
 3. ```php artisan vendor:publish --tag=aven```
 4. Configure `config/aven.php` file with your preferences
 5. Comment out `Illuminate\Translation\TranslationServiceProvider::class,` in `config/app.php` in order to enable translations
+6. Run `php artisan migrate`
+
+You should be up and running
+
+Admin panel will be under http://your-domain.com/admin
+Default credentials (_can be change in config file_)
+
+email:admin@netcore.lv
+pw: aven2018
 
 # Creating new resource
 
