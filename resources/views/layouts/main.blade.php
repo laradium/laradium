@@ -153,12 +153,6 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-
-    $(document).ready(function () {
-        $('textarea.summer-note').summernote({
-            height: 150
-        });
-    });
 </script>
 
 @stack('scripts')
