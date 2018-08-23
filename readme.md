@@ -65,6 +65,8 @@ Class TaskResource extends AbstractAvenResource
 
 You will have 2 methods `resource` and `table`.
 
+2. You need to add created resource in `config/aven.php` under resources
+
 ###Resource
 Here you can specify field configuration for your create and edit actions.
 
