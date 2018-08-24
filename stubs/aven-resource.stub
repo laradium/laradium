@@ -9,7 +9,7 @@ use Netcore\Aven\Aven\ColumnSet;
 use Netcore\Aven\Aven\Table;
 use {{modelNamespace}}\{{resource}};
 
-Class {{resource}}Resource extends AbstractAvenResource
+class {{resource}}Resource extends AbstractAvenResource
 {
 
     /**
@@ -18,7 +18,7 @@ Class {{resource}}Resource extends AbstractAvenResource
     protected $resource = {{resource}}::class;
 
     /**
-     * @return \Netcore\Aven\Aven\Resource
+     * @return Resource
      */
     public function resource()
     {

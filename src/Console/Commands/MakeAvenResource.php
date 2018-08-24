@@ -2,6 +2,7 @@
 
 namespace Netcore\Aven\Console\Commands;
 
+use Artisan;
 use File;
 use Illuminate\Console\Command;
 
@@ -13,7 +14,7 @@ class MakeAvenResource extends Command
      *
      * @var string
      */
-    protected $signature = 'aven:resource {name}';
+    protected $signature = 'aven:resource {name} {--t}';
 
     /**
      * The console command description.
@@ -40,6 +41,7 @@ class MakeAvenResource extends Command
     public function handle()
     {
         $name = $this->argument('name');
+        $translations = $this->option('t');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
         $resourceDirectory = app_path('Aven/Resources');
@@ -47,6 +49,7 @@ class MakeAvenResource extends Command
             File::makeDirectory($resourceDirectory, 0755, true);
             $this->info('Creating resources directory');
         }
+
         $dummyResource = File::get(__DIR__.'/../../../stubs/aven-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
         $resource = str_replace('{{resource}}', $name, $resource);
@@ -54,14 +57,16 @@ class MakeAvenResource extends Command
         $resource = str_replace('{{modelNamespace}}', config('aven.default_models_directory', 'App'), $resource);
         $resourceFilePath = app_path('Aven/Resources/' . $name . 'Resource.php');
 
-        if (file_exists($resourceFilePath)) {
-            $this->error('Resource already exists!');
-
-            return;
-        } else {
+        if (!file_exists($resourceFilePath)) {
             File::put($resourceFilePath, $resource);
-            $this->info('Resource successfully created!');
         }
+
+        Artisan::call('make:model', ['name' => 'Models/' . $name]);
+        if ($translations) {
+            Artisan::call('make:model', ['name' => 'Models/Translations/' . $name . 'Translation']);
+        }
+
+        $this->info('Resource successfully created!');
 
         return;
     }
