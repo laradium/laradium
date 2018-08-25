@@ -34,7 +34,7 @@ class BelongsTo extends Field
      */
     public function getOptions()
     {
-        return $this->relationModel->all()->pluck('title', 'id')->toArray();
+        return $this->relationModel->all()->pluck($this->relationModel->titleKey ?? 'title', 'id')->toArray();
     }
 
     /**
