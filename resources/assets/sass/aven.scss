@@ -1,0 +1,79 @@
+// Fonts
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+// Variables
+@import "variables";
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+@import "~vue-wysiwyg/dist/vueWysiwyg.css";
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.hidden {
+  display: none;
+}
+
+.dragArea {
+  min-height: 10px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+
+.loader {
+  border: 4px solid #ccc;
+  border-radius: 50%;
+  border-top: 4px solid #000;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+.crud-bottom {
+  width: 100%;
+  background-color: #f8f9fa;
+  line-height: 60px;
+  padding-left: 300px;
+  position: fixed;
+  bottom: 0;
+  left:0;
+  z-index: 5;
+  .language-select {
+    display: inline-block;
+    max-width: 67px;
+  }
+}

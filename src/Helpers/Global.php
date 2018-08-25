@@ -29,3 +29,15 @@ if (!function_exists('setting')) {
         return app(\Netcore\Aven\Repositories\SettingsRepository::class);
     }
 }
+
+if (!function_exists('versionedAsset')) {
+    /**
+     * @param $asset
+     * @return string
+     */
+    function versionedAsset($asset)
+    {
+        $version = @filemtime(public_path($asset)) ?: time();
+        return asset($asset) . '?v=' . $version;
+    }
+}

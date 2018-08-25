@@ -27,7 +27,7 @@
             display: none;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('aven/assets/css/aven.css') }}?t={{ time() }}">
+    <link rel="stylesheet" href="{{ versionedAsset('aven/assets/css/aven.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
@@ -122,7 +122,7 @@
 </div>
 <!-- END wrapper -->
 @yield('crud-url')
-<script src="{{ asset('aven/assets/js/aven.js') }}?t={{ time() }}"></script>
+<script src="{{ versionedAsset('aven/assets/js/aven.js') }}"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"
         integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
         crossorigin="anonymous"></script>
