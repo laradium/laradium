@@ -48,6 +48,7 @@ class Form
         $resource = $this->resource;
         $fields = $resource->fieldSet()->fields();
         $this->model = $resource->model();
+//        dd($fields);
 
         foreach ($fields as $field) {
             if ($field instanceof Tab) {

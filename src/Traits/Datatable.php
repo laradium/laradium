@@ -48,6 +48,10 @@ trait Datatable
             $model = $this->model->select('*');
         }
 
+        if ($table->getWhere()) {
+            $model = $this->model->where($table->getWhere());
+        }
+
         $dataTable = DataTables::of($model);
 
         $columns = $table->columns();

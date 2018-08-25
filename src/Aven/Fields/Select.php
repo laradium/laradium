@@ -60,6 +60,7 @@ class Select extends Field
             'name'                   => $field->getNameAttribute(),
             'default'                => $field->getDefault(),
             'replacemenetAttributes' => $attributes->toArray(),
+            'tab'                    => $this->tab(),
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,

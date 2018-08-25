@@ -15,6 +15,11 @@ class BelongsTo extends Field
     protected $relationModel;
 
     /**
+     * @var
+     */
+    protected $title;
+
+    /**
      * BelongsTo constructor.
      * @param $parameters
      * @param Model $model
@@ -34,7 +39,18 @@ class BelongsTo extends Field
      */
     public function getOptions()
     {
-        return $this->relationModel->all()->pluck('title', 'id')->toArray();
+        return $this->relationModel->all()->pluck(($this->title ?: 'name'), 'id')->toArray();
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function title($value)
+    {
+        $this->title = $value;
+
+        return $this;
     }
 
     /**
@@ -66,6 +82,7 @@ class BelongsTo extends Field
             'replacemenetAttributes' => $attributes->toArray(),
             'isHidden'               => $field->isHidden(),
             'default'                => $field->getDefault(),
+            'tab'                    => $this->tab(),
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,

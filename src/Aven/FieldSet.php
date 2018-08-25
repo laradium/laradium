@@ -36,6 +36,10 @@ class FieldSet
         $this->tabs = collect(['Main']);
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function addTab($value)
     {
         $this->tabs->push($value);
@@ -43,6 +47,9 @@ class FieldSet
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function tabs()
     {
         return $this->tabs;

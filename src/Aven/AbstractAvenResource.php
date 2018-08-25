@@ -40,7 +40,7 @@ abstract class AbstractAvenResource
     public function index()
     {
         $model = $this->model;
-        $table = $this->table()->setModel($this->model);
+        $table = $this->table()->setModel($model);
 
         return view('aven::admin.resource.index', compact('table', 'model'));
     }
