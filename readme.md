@@ -181,6 +181,35 @@ $set->tab('Items')->fields(function (FieldSet $set) {
             });
 ```
 
+## File
+For managing files we use https://github.com/czim/laravel-paperclip package.
+You don't need to set it up individually because it comes with base package. 
+```
+$set->file('image');
+```
+By default package uses Laravel's public storage, we do not like to deal with symlinks that's why we have changed configuration to this:
+Storage configuration in `config/paperclip.php`
+
+```
+'storage' => [
+    // The Laravel storage disk to use.
+    'disk' => 'public_root',
+
+    // Per disk, the base URL where attachments are stored at
+    'base-urls' => [
+        'public_root' => config('app.url') . '/uploads',
+    ],
+],
+```
+
+Add new disk to `config/filesystems.php`
+
+```
+'public_root' => [
+    'driver' => 'local',
+    'root'   => public_path('uploads'),
+],
+```
 # Table
 
 Available fields for columns

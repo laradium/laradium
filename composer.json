@@ -10,7 +10,8 @@
   "minimum-stability": "dev",
   "require": {
     "dimsav/laravel-translatable": "^9.0",
-    "yajra/laravel-datatables-oracle": "~8.0"
+    "yajra/laravel-datatables-oracle": "~8.0",
+    "czim/laravel-paperclip": "~2.5.2"
   },
   "autoload": {
     "psr-4": {

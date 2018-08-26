@@ -24,6 +24,7 @@ Vue.component('select-field', require('./components/fields/Select.vue'));
 Vue.component('morph-to-field', require('./components/fields/MorphTo.vue'));
 Vue.component('has-one-field', require('./components/fields/HasOne.vue'));
 Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
+Vue.component('file-field', require('./components/fields/File.vue'));
 Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
 Vue.component('widget-constructor-field', require('./components/fields/WidgetConstructor.vue'));
 Vue.component('belongs-to-many-field', require('./components/fields/BelongsToMany.vue'));

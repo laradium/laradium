@@ -48,6 +48,7 @@ return [
         'textarea'          => \Netcore\Aven\Aven\Fields\Textarea::class,
         'select'            => \Netcore\Aven\Aven\Fields\Select::class,
         'tab'               => \Netcore\Aven\Aven\Fields\Tab::class,
+        'file'              => \Netcore\Aven\Aven\Fields\File::class,
         // Relations
         'hasOne'            => \Netcore\Aven\Aven\Fields\HasOne::class,
         'hasMany'           => \Netcore\Aven\Aven\Fields\HasMany::class,

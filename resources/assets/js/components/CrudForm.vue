@@ -2,7 +2,6 @@
     <div>
         <transition-group name="fade">
             <div class="loader" key="on" v-if="loading"></div>
-            asduasoihdnioasionds
             <form key="1" :action="url" method="post" @submit.prevent="onSubmit(this)" class="form-horizontal crud-form"
                   v-if="data.languages.length">
 

@@ -25,7 +25,8 @@ class AvenServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../../config/aven-setting.php' => config_path('aven-setting.php'),
-            __DIR__ . '/../../config/aven.php' => config_path('aven.php'),
+            __DIR__ . '/../../config/aven.php'         => config_path('aven.php'),
+            __DIR__ . '/../../config/paperclip.php'    => config_path('paperclip.php'),
         ], 'aven');
 
         $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
