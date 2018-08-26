@@ -41,21 +41,15 @@ class TranslationLoader
      */
     protected function cacheTranslations()
     {
-        $translations = [];
-        foreach (Translation::all() as $item) {
-            $translations[$item->locale][$item->group][$item->key] = $item->value;
-        }
+        if (!$this->translations) {
+            $this->translations = cache()->rememberForever('translations', function () {
+                $translations = [];
+                foreach (Translation::all() as $item) {
+                    $translations[$item->locale][$item->group][$item->key] = $item->value;
+                }
 
-        return $translations;
-//        if (!$this->translations) {
-//            $this->translations = cache()->rememberForever('translations', function () {
-//                $translations = [];
-//                foreach (Translation::all() as $item) {
-//                    $translations[$item->locale][$item->group][$item->key] = $item->value;
-//                }
-//
-//                return $translations;
-//            });
-//        }
+                return $translations;
+            });
+        }
     }
 }

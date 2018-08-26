@@ -11,7 +11,8 @@
   "require": {
     "dimsav/laravel-translatable": "^9.0",
     "yajra/laravel-datatables-oracle": "~8.0",
-    "czim/laravel-paperclip": "~2.5.2"
+    "czim/laravel-paperclip": "~2.5.2",
+    "maatwebsite/excel": "~2.1.18"
   },
   "autoload": {
     "psr-4": {

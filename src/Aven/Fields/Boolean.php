@@ -38,6 +38,7 @@ class Boolean extends Field
             'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
             'checked'                => $field->getValue() == 1,
+            'tab'                    => $this->tab(),
         ];
     }
 }

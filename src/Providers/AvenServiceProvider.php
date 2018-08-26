@@ -2,11 +2,14 @@
 
 namespace Netcore\Aven\Providers;
 
+use Netcore\Aven\Console\Commands\FindTranslations;
+use Netcore\Aven\Console\Commands\ImportTranslations;
 use Netcore\Aven\Console\Commands\MakeAvenResource;
 use Netcore\Aven\Helpers\Translate;
 use Netcore\Aven\Http\Middleware\AvenMiddleware;
 use Netcore\Aven\Registries\FieldRegistry;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AvenServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,10 @@ class AvenServiceProvider extends ServiceProvider
 
         \App::bind('Translate', function () {
             return new Translate;
+        });
+
+        Blade::directive('lg', function ($expression) {
+            return "<?php echo lg($expression); ?>";
         });
 
         $this->app['router']->aliasMiddleware('aven', AvenMiddleware::class);
@@ -37,6 +44,8 @@ class AvenServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeAvenResource::class,
+                ImportTranslations::class,
+                FindTranslations::class,
             ]);
         }
 

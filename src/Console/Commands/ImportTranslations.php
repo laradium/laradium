@@ -44,19 +44,54 @@ class ImportTranslations extends Command
 
         $this->importFromLangFiles();
 
-//        $fileName = config('netcore.module-translate.translations_file');
-//        $excelLocation = resource_path('seed_translations/' . $fileName . '.xlsx');
-//        if (file_exists($excelLocation)) {
-//            try {
-//                $excel = app('excel');
-//                $all_data = $excel->load($excelLocation)
-//                    ->get()
-//                    ->toArray();
-//                $this->import($all_data);
-//            } catch (\Exception $e) {
-//                echo "\n\n Could not import translations from excel file. Perhaps format is wrong. \n\n";
-//            }
-//        }
+        $fileName = config('aven.translations_file');
+        $excelLocation = resource_path('seed_translations/' . $fileName . '.xlsx');
+        if (file_exists($excelLocation)) {
+            try {
+                $rows = [];
+                $excel = app('excel');
+                $data = $excel->load($excelLocation)
+                    ->get()
+                    ->toArray();
+
+                foreach ($data as $item) {
+                    $group = array_first(explode('.', $item['key']));
+                    $key = str_replace($group . '.', '', $item['key']);
+
+                    unset($item['key']);
+
+                    $languages = array_keys($item);
+                    foreach ($languages as $lang) {
+                        $rows[] = [
+                            'locale' => $lang,
+                            'group'  => $group,
+                            'key'    => $key,
+                            'value'  => $item[$lang],
+                        ];
+
+                    }
+                }
+                \DB::transaction(function () use ($rows) {
+                    foreach (array_chunk($rows, 300) as $chunk) {
+                        foreach ($chunk as $item) {
+                            \Netcore\Aven\Models\Translation::firstOrCreate([
+                                'locale' => $item['locale'],
+                                'group'  => $item['group'],
+                                'key'    => $item['key'],
+                            ], [
+                                'locale' => $item['locale'],
+                                'group'  => $item['group'],
+                                'key'    => $item['key'],
+                                'value'  => $item['value'],
+                            ]);
+                        }
+                    }
+
+                });
+            } catch (\Exception $e) {
+                return back()->withError('Something went wrong, please try again!');
+            }
+        }
         cache()->forget('translations');
     }
 

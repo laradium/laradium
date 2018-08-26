@@ -14,6 +14,7 @@ return [
 
     ],
 
+    'translations_file' => 'translations',
 
     'user'      => [
         'email'    => 'admin@netcore.lv',
