@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <title>Aven - Login</title>
+    <title>{{ config('app.name') }} - Login</title>
 
     <!-- App css -->
     <link href="/aven/admin/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />

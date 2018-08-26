@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Aven {{ isset($title) ? '- ' . $title :'' }}</title>
+    <title>{{ config('app.name') }} {{ isset($title) ? '- ' . $title :'' }}</title>
 
     <!-- Styles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"

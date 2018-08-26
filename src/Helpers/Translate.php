@@ -13,7 +13,14 @@ class Translate {
         $languages = cache()->get('languages');
         if(!$languages) {
             $languages = cache()->rememberForever('languages', function () {
-                return Language::get()->toArray();
+                return Language::get()->map(function ($item) {
+                    if($item->icon->exists()) {
+                        $item->image = $item->icon->url();
+                    } else {
+                        $item->image = null;
+                    }
+                    return $item;
+                })->toArray();
             });
         }
 

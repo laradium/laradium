@@ -32,6 +32,7 @@ Class LanguageResource extends AbstractAvenResource
             $set->text('title_localized')->rules('required');
             $set->boolean('is_fallback');
             $set->boolean('is_visible');
+            $set->file('icon');
         });
     }
 

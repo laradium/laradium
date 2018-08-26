@@ -31,8 +31,12 @@ class File extends Field
         });
 
         $url = null;
-        if ($this->model->{$this->name}->exists()) {
+        $size = null;
+        $name = null;
+        if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
             $url = $this->model->{$this->name}->url();
+            $size = number_format($this->model->{$this->name}->size() / 1000, 2);
+            $name = $this->model->{$this->name}->originalFilename();
         }
 
 
@@ -42,9 +46,8 @@ class File extends Field
             'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
             'url'                    => $url,
-            'file_name'              => $this->model->{$this->name}->originalFilename(),
-            'file_size'              => $this->model->{$this->name}->size() ? number_format($this->model->{$this->name}->size() / 1000,
-                2) : 0,
+            'file_name'              => $name,
+            'file_size'              => $size,
         ];
     }
 }
