@@ -17,11 +17,14 @@
           rel="stylesheet"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <link href="/aven/admin/assets/plugins/switchery/switchery.min.css" rel="stylesheet" />
-    <link href="/aven/admin/assets/css/icons.css" rel="stylesheet" type="text/css"/>
-    <link href="/aven/admin/assets/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('/aven/admin/assets/plugins/datetimepicker/css/jquery.datetimepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}" rel="stylesheet">
 
-    <script src="/aven/admin/assets/js/modernizr.min.js"></script>
+    <link href="{{ asset('/aven/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/aven/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
+
+    <script src="{{ asset('/aven/admin/assets/js/modernizr.min.js') }}"></script>
     <style>
         .js-tab:not(.active) {
             display: none;
@@ -64,7 +67,6 @@
     </div>
     <!-- Top Bar End -->
 
-
     <!-- ========== Left Sidebar Start ========== -->
     <div class="left side-menu">
         <div class="sidebar-inner slimscrollleft">
@@ -88,12 +90,9 @@
             <!-- End User -->
 
             @include('aven::admin._partials.menu')
-
         </div>
-
     </div>
     <!-- Left Sidebar End -->
-
 
     <!-- ============================================================== -->
     <!-- Start right Content here -->
@@ -113,8 +112,6 @@
         </footer>
 
     </div>
-
-
     <!-- ============================================================== -->
     <!-- End Right content here -->
     <!-- ============================================================== -->
@@ -127,26 +124,26 @@
         integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 
-
-<script src="/aven/admin/assets/js/detect.js"></script>
-<script src="/aven/admin/assets/js/fastclick.js"></script>
-<script src="/aven/admin/assets/js/jquery.blockUI.js"></script>
-<script src="/aven/admin/assets/js/waves.js"></script>
-<script src="/aven/admin/assets/js/jquery.nicescroll.js"></script>
-<script src="/aven/admin/assets/js/jquery.slimscroll.js"></script>
-<script src="/aven/admin/assets/js/jquery.scrollTo.min.js"></script>
-<script src="/aven/admin/assets/plugins/switchery/switchery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{{ asset('/aven/admin/assets/js/detect.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/fastclick.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.blockUI.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/waves.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.nicescroll.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.slimscroll.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/plugins/datetimepicker/js/jquery.datetimepicker.full.min.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->
-<script src="/aven/admin/assets/js/jquery.core.js"></script>
-<script src="/aven/admin/assets/js/jquery.app.js"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.core.js') }}"></script>
+<script src="{{ asset('/aven/admin/assets/js/jquery.app.js') }}"></script>
 
 <!-- Aven js -->
-
 <script>
     $.ajaxSetup({
         headers: {

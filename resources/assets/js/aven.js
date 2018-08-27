@@ -16,18 +16,26 @@ window.Vue = require('vue');
 
 Vue.component('crud-form', require('./components/CrudForm.vue'));
 Vue.component('text-field', require('./components/fields/Text.vue'));
-Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
-Vue.component('hidden-sortable-field', require('./components/fields/HiddenSortable.vue'));
-Vue.component('has-many-field', require('./components/fields/HasMany.vue'));
-Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
-Vue.component('select-field', require('./components/fields/Select.vue'));
-Vue.component('morph-to-field', require('./components/fields/MorphTo.vue'));
-Vue.component('has-one-field', require('./components/fields/HasOne.vue'));
 Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
+Vue.component('select-field', require('./components/fields/Select.vue'));
+Vue.component('password-field', require('./components/fields/Password.vue'));
+Vue.component('date-field', require('./components/fields/Date.vue'));
+Vue.component('time-field', require('./components/fields/Time.vue'));
+Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
+Vue.component('color-field', require('./components/fields/Color.vue'));
+Vue.component('email-field', require('./components/fields/Email.vue'));
 Vue.component('file-field', require('./components/fields/File.vue'));
 Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
-Vue.component('widget-constructor-field', require('./components/fields/WidgetConstructor.vue'));
+Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
+Vue.component('hidden-sortable-field', require('./components/fields/HiddenSortable.vue'));
+
+Vue.component('has-many-field', require('./components/fields/HasMany.vue'));
+Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
+Vue.component('morph-to-field', require('./components/fields/MorphTo.vue'));
+Vue.component('has-one-field', require('./components/fields/HasOne.vue'));
 Vue.component('belongs-to-many-field', require('./components/fields/BelongsToMany.vue'));
+
+Vue.component('widget-constructor-field', require('./components/fields/WidgetConstructor.vue'));
 Vue.component('draggable', require('vuedraggable'));
 Vue.use(wysiwyg, {});
 
