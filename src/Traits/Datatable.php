@@ -95,7 +95,6 @@ trait Datatable
 
         $dataTable->rawColumns($rawColumns);
 
-
         return $dataTable->make(true);
     }
 }

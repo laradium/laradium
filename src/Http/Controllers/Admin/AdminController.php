@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 class AdminController
 {
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function index()
     {
         return redirect()->to('/admin/dashboard');
@@ -20,6 +23,11 @@ class AdminController
         return view(config('aven.dashboard-view'));
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return array
+     */
     public function resourceDelete(Request $request, $id)
     {
         $resource = $request->get('resource', null);

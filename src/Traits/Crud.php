@@ -48,7 +48,6 @@ trait Crud
 
         $relationList = array_keys($relations->toArray());
 
-
         return compact('resourceFields', 'relations', 'relationList', 'translations');
     }
 
@@ -108,6 +107,11 @@ trait Crud
         }
     }
 
+    /**
+     * @param $fields
+     * @param $model
+     * @throws \ReflectionException
+     */
     protected function saveMorphToFields($fields, $model)
     {
         if (isset($fields['morph_type'])) {

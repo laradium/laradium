@@ -41,8 +41,9 @@ abstract class AbstractAvenResource
     {
         $model = $this->model;
         $table = $this->table()->setModel($model);
+        $resource = $this;
 
-        return view('aven::admin.resource.index', compact('table', 'model'));
+        return view('aven::admin.resource.index', compact('table', 'model', 'resource'));
     }
 
     /**

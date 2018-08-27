@@ -16,6 +16,7 @@ class ResourceRegistry
      * @var Collection
      */
     protected $routes;
+
     /**
      * @var string
      */
@@ -40,41 +41,56 @@ class ResourceRegistry
      */
     public function register($resourceName)
     {
+        $resource = new $resourceName;
         $routeSlug = $this->getRouteSlug($resourceName);
-        if(!$routeSlug) {
+        if (!$routeSlug) {
             return $this;
         }
+
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
+
         $routeList = [
             [
-                'method'     => 'get',
+                'method' => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
                 'middleware' => ['web', 'aven']
             ],
             [
-                'method'     => 'post',
+                'method' => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
                 'middleware' => ['web', 'aven']
             ],
             [
-                'method'     => 'get',
+                'method' => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
                 'middleware' => ['web', 'aven'],
-                'name'       => 'admin.' . $routeSlug . '.form'
+                'name' => 'admin.' . $routeSlug . '.form'
             ],
             [
-                'method'     => 'resource',
+                'method' => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
                 'middleware' => ['web', 'aven'],
             ],
+            // Import
+            [
+                'method' => 'post',
+                'route_slug' => $this->getRouteName('import'),
+                'controller' => $this->getRouteController('import'),
+                'middleware' => ['web', 'aven'],
+                'name' => 'admin.' . $routeSlug . '.import'
+            ],
         ];
 
         foreach ($routeList as $route) {
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource, 'import')) {
+                continue;
+            }
+
             if (isset($route['name'])) {
                 $this->router->{$route['method']}($route['route_slug'],
                     $route['controller'])->middleware($route['middleware'])->name($route['name']);
@@ -112,7 +128,7 @@ class ResourceRegistry
      */
     protected function getRouteSlug($resource): string
     {
-        if(class_exists($resource)) {
+        if (class_exists($resource)) {
             $r = new $resource;
             $model = $r->model();
             $model = new $model;

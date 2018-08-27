@@ -1,8 +1,10 @@
 @extends('aven::layouts.main', ['title' => ucfirst($model->getTable())])
+
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card-box table-responsive">
+                @include('aven::admin._partials.messages')
                 @if($table->hasAction('create'))
                     <div class="pull-right">
                         <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create" class="btn btn-primary">
@@ -20,7 +22,9 @@
                         </div>
                     </div>
                     <br>
-
+                @endif
+                @if (method_exists($resource, 'import'))
+                    @include('aven::admin.resource._partials.import')
                 @endif
                 <table class="resource-datatable table table-bordered">
                     <thead>
@@ -29,7 +33,7 @@
                             <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
                         @endforeach
                         <th>
-                            Action
+                            Actions
                         </th>
                     </tr>
                     </thead>
@@ -38,6 +42,7 @@
         </div>
     </div>
 @endsection
+
 @push('scripts')
     <!-- Required datatable js -->
     <script src="/aven/admin/assets/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -74,7 +79,6 @@
             }).on('draw.dt', function () {
                 $('.js-editable').editable({});
             });
-            ;
 
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();
@@ -114,5 +118,4 @@
     <link href="/aven/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
     <!-- Responsive datatable examples -->
     <link href="/aven/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
-
 @endpush

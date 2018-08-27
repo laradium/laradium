@@ -1,29 +1,22 @@
 <div class="row">
     <div class="col-md-6">
-
-        <form action="{{ route('admin.translations.import') }}" class="form-horizontal" method="POST"
+        <form action="/admin/{{ str_replace('_', '-', $model->getTable()) }}/import" class="form-horizontal" method="POST"
               enctype="multipart/form-data">
 
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
             <div class="row">
                 <div class="col-md-6">
-                    <input type="file" name="excel" class="form-control" required>
+                    <input type="file" name="import" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <button
                             type="submit"
-                            class="btn btn-sm btn-info"
+                            class="btn btn-md btn-info"
                     >Import
                     </button>
-                    or
-                    <a href="{{ route('admin.translations.export') }}" download class="btn btn-success btn-sm">
-                        Export
-                    </a>
                 </div>
             </div>
         </form>
-
     </div>
-
 </div>
