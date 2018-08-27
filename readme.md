@@ -1,4 +1,4 @@
-Package allows you to create advanced CRUD views with relations in light wight admin panel. Using plain laravel database structure, models and VueJS which allows to make it very flexible and can be adjusted up to your needs. 
+Package allows you to create advanced CRUD views with relations in light weight admin panel. Using plain laravel database structure, models and VueJS which allows to make it very flexible and can be adjusted up to your needs. 
 
 # Installation
 1. Add this to your project repositories list in `composer.json` file
@@ -7,18 +7,18 @@ Package allows you to create advanced CRUD views with relations in light wight a
 ```
 "repositories": [
     {
-      "type": "path",
-      "url": "../packages/aven-package"
+        "type": "path",
+        "url": "../packages/aven-package"
     }
-  ]
+]
 ```
 
 Directory structure should look like this
 ```
 -Project
 -packages
---aven-package
---aven-content
+    --aven-package
+    --aven-content
 ```
 
 2. ```composer require netcore/aven dev-master```
@@ -30,10 +30,8 @@ Directory structure should look like this
 You should be up and running
 
 Admin panel will be under http://your-domain.com/admin
-Default credentials (_can be change in config file_)
 
-email:admin@netcore.lv
-pw: aven2018
+Default credentials (_can be change in config file_): email:admin@netcore.lv, pw: aven2018
 
 # Creating new resource
 
@@ -107,6 +105,17 @@ $set->textarea('name')->rules('required')->translatable();
 $set->wysiwy('name')->rules('required')->translatable();
 ```
 
+## Email
+```
+$set->email('email')->rules('required|email');
+```
+
+## Password
+```
+$set->password('password')->rules('required|confirmed|min:3|max:36');
+$set->password('password_confirmation');
+```
+
 ## Boolean
 ```
 $set->boolean('is_active');
@@ -115,10 +124,36 @@ $set->boolean('is_active');
 ## Select
 
 ```
-$set->select('target')->options([
-                        '_self'   => 'Self',
-                        '_target' => 'Target',
-                    ])->rules('required');
+$set->select('target')
+    ->options([
+        '_self'   => 'Self',
+        '_target' => 'Target',
+    ])
+    ->rules('required');
+```
+
+## Date
+
+```
+$set->date('starts_at')->rules('date_format:Y-m-d');
+```
+
+## Time
+
+```
+$set->time('starts_at')->rules('date_format:H:i');
+```
+
+## DateTime
+
+```
+$set->datetime('starts_at')->rules('date_format:Y-m-d H:i');
+```
+
+## Color
+
+```
+$set->color('color');
 ```
 
 ## HasMany
@@ -126,33 +161,35 @@ $set->select('target')->options([
 2. Fields method should contain fields that is required for relation
 3. You can make items sortable, if you add sortable column to your table and specify column name in `sortable` method
 ```
-$set->hasMany('items')->fields(function (FieldSet $set) {
-                    $set->boolean('is_active');
-                    $set->select('target')->options([
-                        '_self'   => 'Self',
-                        '_target' => 'Target',
-                    ])->rules('required');
-                    $set->text('name')->rules('required')->translatable();
-                    $set->text('url')->rules('required')->translatable();
-                })->sortable('sequence_no');
+$set->hasMany('items')
+    ->fields(function (FieldSet $set) {
+        $set->boolean('is_active');
+        $set->select('target')->options([
+            '_self'   => 'Self',
+            '_target' => 'Target',
+        ])->rules('required');
+        $set->text('name')->rules('required')->translatable();
+        $set->text('url')->rules('required')->translatable();
+    })
+    ->sortable('sequence_no');
 ```
 
 ## HasOne
 1. first argument must be the name of the relation
 2. Fields method should contain fields that is required for relation
 ```
-$set->hasOne('author')->fields(function (FieldSet $set) {
-                $set->text('name');
-            });
+$set->hasOne('author')
+    ->fields(function (FieldSet $set) {
+        $set->text('name');
+    });
 ```
 
 ## BelongsTo 
 1. First argument must be class of relation where items will belong
 ```
 $set->belongsTo(Article::class)
-                ->hideIf(true) // optional if value is true, field will be hidden and value will be set from "default" method
-                ->default(2)
-            ;
+    ->hideIf(true) // optional if value is true, field will be hidden and value will be set from "default" method
+    ->default(2);
 ```
 
 ## BelongsToMany
@@ -162,23 +199,22 @@ $set->belongsTo(Article::class)
 $set->belongsToMany('menuItems', 'Menu items');
 ```
 
-
 ## Tab (Lets you put certain field groups under certain tabs for better UI)
 1. First argument must be the name of the tab
 2. Fields method must contain fields that will be under this tab
 
 ```
 $set->tab('Items')->fields(function (FieldSet $set) {
-                $set->hasMany('items')->fields(function (FieldSet $set) {
-                    $set->boolean('is_active');
-                    $set->select('target')->options([
-                        '_self'   => 'Self',
-                        '_target' => 'Target',
-                    ])->rules('required');
-                    $set->text('name')->rules('required')->translatable();
-                    $set->text('url')->rules('required')->translatable();
-                })->sortable('sequence_no');
-            });
+    $set->hasMany('items')->fields(function (FieldSet $set) {
+        $set->boolean('is_active');
+        $set->select('target')->options([
+            '_self'   => 'Self',
+            '_target' => 'Target',
+        ])->rules('required');
+        $set->text('name')->rules('required')->translatable();
+        $set->text('url')->rules('required')->translatable();
+    })->sortable('sequence_no');
+});
 ```
 
 ## File
@@ -226,16 +262,17 @@ $column->add('column_name_in_table', 'Nice column name')->editable();
 
 ## Modify (Allow you to modify columns data output)
 ```
-$column->add('is_active', 'Is Visible?')->modify(function ($item) {
-                return $item->is_active ? 'Yes' : 'No';
-            });
+$column->add('is_active', 'Is Visible?')
+    ->modify(function ($item) {
+        return $item->is_active ? 'Yes' : 'No';
+    });
 ```
 
 ## Translatable
 ```
 $column->add('title')->translatable();
 ```
-NOTE: You need to specify additional method for Table `relations(['translations''])` to enable eager loading and improve perfomance
+NOTE: You need to specify additional method for Table `relations(['translations'])` to enable eager loading and improve perfomance
 
 Available methods for Table
 
