@@ -45,6 +45,10 @@ abstract class AbstractAvenResource
         return view('aven::admin.resource.index', compact('table', 'model'));
     }
 
+    /**
+     * @param null $id
+     * @return array
+     */
     public function getForm($id = null)
     {
         if ($id) {
@@ -193,6 +197,11 @@ abstract class AbstractAvenResource
         return back()->withSuccess('Resource successfully deleted!');
     }
 
+    /**
+     * @param $name
+     * @param \Closure $callable
+     * @return $this
+     */
     protected function registerEvent($name, \Closure $callable)
     {
         $this->events[$name] = $callable;
@@ -200,11 +209,17 @@ abstract class AbstractAvenResource
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getResourceName()
     {
         return $this->model->getTable();
     }
 
+    /**
+     * @return mixed
+     */
     public function model()
     {
         return $this->model;

@@ -2,7 +2,6 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
-
 use Netcore\Aven\Aven\Field;
 
 class File extends Field
@@ -33,12 +32,12 @@ class File extends Field
         $url = null;
         $size = null;
         $name = null;
+
         if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
             $url = $this->model->{$this->name}->url();
             $size = number_format($this->model->{$this->name}->size() / 1000, 2);
             $name = $this->model->{$this->name}->originalFilename();
         }
-
 
         return [
             'type'                   => 'file',

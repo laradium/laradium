@@ -2,20 +2,25 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
-
 use Netcore\Aven\Aven\Field;
 
 class Hidden extends Field
 {
 
-    protected $class = '';
-    protected $params;
-
     /**
      * @var string
      */
-    protected $view = 'aven::admin.fields.hidden';
+    protected $class = '';
 
+    /**
+     * @var
+     */
+    protected $params;
+
+    /**
+     * @param $value
+     * @return $this
+     */
     public function class($value)
     {
         $this->class = $value;
@@ -23,11 +28,18 @@ class Hidden extends Field
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getClass()
     {
         return $this->class;
     }
 
+    /**
+     * @param $params
+     * @return $this
+     */
     public function params($params)
     {
         $this->params = $params;
@@ -35,11 +47,19 @@ class Hidden extends Field
         return $this;
     }
 
+    /**
+     * @param $key
+     * @return mixed
+     */
     public function getParam($key)
     {
         return array_get($this->params, $key, null);
     }
 
+    /**
+     * @param null $field
+     * @return array
+     */
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
@@ -65,6 +85,7 @@ class Hidden extends Field
             'value' => $field->getValue(),
             'replacemenetAttributes' => $attributes->toArray()
         ];
+
         if ($field->getParam('orderable')) {
             $data['orderable'] = true;
         }

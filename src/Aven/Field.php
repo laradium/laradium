@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Field
 {
-
     use Translatable;
 
     /**
@@ -70,6 +69,9 @@ class Field
      */
     protected $parentAttributeList = [];
 
+    /**
+     * @var string
+     */
     protected $tab;
 
     /**
@@ -107,6 +109,9 @@ class Field
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getNameAttribute()
     {
         $attributeList = $this->getNameAttributeList();
@@ -125,7 +130,6 @@ class Field
             $this->nameAttribute = $this->buildNameAttribute($attributeList);
 
         }
-
 
         return $this->nameAttribute;
     }
@@ -254,6 +258,10 @@ class Field
         return $this;
     }
 
+    /**
+     * @param null $field
+     * @return array
+     */
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
@@ -309,6 +317,10 @@ class Field
         return $data;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function isTemplate($value)
     {
         $this->isTemplate = $value;
@@ -322,6 +334,17 @@ class Field
     public function getLabel()
     {
         return $this->label ?: ucfirst(str_replace('_', ' ', $this->name()));
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function label($value)
+    {
+        $this->label = $value;
+
+        return $this;
     }
 
     /**
@@ -406,6 +429,10 @@ class Field
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function setTab($value)
     {
         $this->tab = $value;
@@ -413,6 +440,9 @@ class Field
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function tab()
     {
         return $this->tab;

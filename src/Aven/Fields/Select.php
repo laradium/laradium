@@ -2,16 +2,10 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
-
 use Netcore\Aven\Aven\Field;
 
 class Select extends Field
 {
-
-    /**
-     * @var string
-     */
-    protected $view = 'aven::admin.fields.select';
 
     /**
      * @var array
@@ -37,6 +31,10 @@ class Select extends Field
         return $this->options;
     }
 
+    /**
+     * @param null $field
+     * @return array
+     */
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
@@ -58,6 +56,7 @@ class Select extends Field
         return [
             'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
             'name'                   => $field->getNameAttribute(),
+            'label'                  => $field->getLabel(),
             'default'                => $field->getDefault(),
             'replacemenetAttributes' => $attributes->toArray(),
             'tab'                    => $this->tab(),

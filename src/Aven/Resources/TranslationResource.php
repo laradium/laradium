@@ -51,7 +51,8 @@ Class TranslationResource extends AbstractAvenResource
     /**
      * @return mixed
      */
-    protected function localeList() {
+    protected function localeList()
+    {
         return Language::pluck('iso_code', 'iso_code')->toArray();
     }
 }

@@ -27,11 +27,6 @@ class HasMany extends Field
     protected $fields;
 
     /**
-     * @var string
-     */
-    protected $view = 'aven::admin.fields.has-many';
-
-    /**
      * @var boolean
      */
     protected $sortable = false;
@@ -138,6 +133,10 @@ class HasMany extends Field
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function setMorphType($value)
     {
         $this->morphType = $value;
@@ -217,12 +216,15 @@ class HasMany extends Field
                 'url'      => '/admin/resource/' . $group['id'],
                 'resource' => get_class($this->relation()->getModel())
             ];
+
             if ($this->isSortable()) {
                 $item['order'] = $group[$this->sortableColumn];
             }
+
             foreach ($group['fields'] as $field) {
                 $item['fields'][] = $field->formatedResponse();
             }
+
             $items[] = $item;
         }
 

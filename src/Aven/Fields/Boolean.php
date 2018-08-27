@@ -2,17 +2,15 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
-
 use Netcore\Aven\Aven\Field;
 
 class Boolean extends Field
 {
 
     /**
-     * @var string
+     * @param null $field
+     * @return array
      */
-    protected $view = 'aven::admin.fields.boolean';
-
     public function formatedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
@@ -30,7 +28,6 @@ class Boolean extends Field
         $attributes = $attributes->filter(function ($item) {
             return str_contains($item, '__ID');
         });
-
 
         return [
             'type'                   => strtolower(array_last(explode('\\', get_class($field)))),

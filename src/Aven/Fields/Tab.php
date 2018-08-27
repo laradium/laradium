@@ -8,15 +8,34 @@ use Netcore\Aven\Aven\FieldSet;
 class Tab
 {
 
+    /**
+     * @var
+     */
     protected $closure;
+
+    /**
+     * @var
+     */
     protected $fieldSet;
+
+    /**
+     * @var mixed
+     */
     protected $name;
 
+    /**
+     * Tab constructor.
+     * @param $name
+     */
     public function __construct($name)
     {
         $this->name = array_first($name);
     }
 
+    /**
+     * @param $closure
+     * @return $this
+     */
     public function fields($closure)
     {
         $this->closure = $closure;
@@ -24,6 +43,10 @@ class Tab
         return $this;
     }
 
+    /**
+     * @param FieldSet $set
+     * @return $this
+     */
     public function setFieldSet(FieldSet $set)
     {
         $this->fieldSet = $set;
@@ -31,6 +54,9 @@ class Tab
         return $this;
     }
 
+    /**
+     * @return \Illuminate\Support\Collection
+     */
     public function build()
     {
         $closure = $this->closure;

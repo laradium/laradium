@@ -7,14 +7,41 @@ use Netcore\Aven\Aven\Field;
 use Netcore\Aven\Aven\Fields\Hidden;
 use Netcore\Aven\Aven\FieldSet;
 
+/**
+ * Class MorphsTo
+ * @package Netcore\Aven\Aven\Fields
+ */
 class MorphsTo extends Field
 {
 
+    /**
+     * @var FieldSet
+     */
     protected $fieldSet;
+
+    /**
+     * @var string
+     */
     protected $relationName;
+
+    /**
+     * @var mixed
+     */
     public $morphClass;
+
+    /**
+     * @var
+     */
     protected $morphModel;
+
+    /**
+     * @var
+     */
     protected $fields;
+
+    /**
+     * @var
+     */
     public $morphName;
 
     /**
@@ -31,15 +58,18 @@ class MorphsTo extends Field
         $this->morphModel = new $this->morphClass;
         $this->fieldSet = new FieldSet;
         $this->relationName = $this->name;
-
     }
 
+    /**
+     * @param array $parentAttributeList
+     * @param null $model
+     * @return $this|Field
+     */
     public function build($parentAttributeList = [], $model = null)
     {
         $this->parentAttributeList = $parentAttributeList;
         $fields = $this->fieldSet->fields();
         $fieldList = [];
-
 
         $attributeList = array_merge($this->parentAttributeList, [
             $this->relationName,
@@ -50,6 +80,7 @@ class MorphsTo extends Field
             if (!$model) {
                 $model = $this->model;
             }
+
             $morphModel = $this->morphModel->find($model->{$this->morphName . '_id'});
             if ($morphModel) {
                 $this->morphModel = $morphModel;
@@ -58,10 +89,9 @@ class MorphsTo extends Field
             $clonedField->setModel($this->morphModel);
             $clonedField->build($attributeList, $this->morphModel);
 
-
             $fieldList[] = $clonedField;
-
         }
+
         $fieldList[] = $this->createContentTypeField($this->morphClass, $attributeList);
         $fieldList[] = $this->createMorphNameField($this->morphClass, $attributeList);
 
@@ -70,6 +100,10 @@ class MorphsTo extends Field
         return $this;
     }
 
+    /**
+     * @param null $f
+     * @return array
+     */
     public function formatedResponse($f = null)
     {
         $f = $f ?? $this;
@@ -87,6 +121,10 @@ class MorphsTo extends Field
         ];
     }
 
+    /**
+     * @param $closure
+     * @return $this
+     */
     public function fields($closure)
     {
         $fieldSet = $this->fieldSet;
@@ -96,6 +134,11 @@ class MorphsTo extends Field
         return $this;
     }
 
+    /**
+     * @param $morphClass
+     * @param $attributeList
+     * @return \Netcore\Aven\Aven\Fields\Hidden
+     */
     public function createContentTypeField($morphClass, $attributeList)
     {
         $field = new Hidden('morph_type', $this->model);
@@ -105,6 +148,11 @@ class MorphsTo extends Field
         return $field;
     }
 
+    /**
+     * @param $morphClass
+     * @param $attributeList
+     * @return \Netcore\Aven\Aven\Fields\Hidden
+     */
     public function createMorphNameField($morphClass, $attributeList)
     {
         $field = new Hidden('morph_name', $this->model);
@@ -114,6 +162,10 @@ class MorphsTo extends Field
         return $field;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function morphName($value)
     {
         $this->morphName = $value;

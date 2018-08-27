@@ -2,7 +2,6 @@
 
 namespace Netcore\Aven\Aven\Fields;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Netcore\Aven\Aven\Field;
 

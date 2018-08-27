@@ -102,7 +102,7 @@ $set->textarea('name')->rules('required')->translatable();
 
 ## Wysiwyg
 ```
-$set->wysiwy('name')->rules('required')->translatable();
+$set->wysiwyg('name')->rules('required')->translatable();
 ```
 
 ## Email
