@@ -41,6 +41,11 @@ class Table
     protected $where;
 
     /**
+     * @var
+     */
+    protected $tabs;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -49,12 +54,12 @@ class Table
     }
 
     /**
-     * @param $relatioins
+     * @param $relations
      * @return $this
      */
-    public function relations($relatioins)
+    public function relations($relations)
     {
-        $this->relations = $relatioins;
+        $this->relations = $relations;
 
         return $this;
     }
@@ -169,6 +174,25 @@ class Table
     public function where(\Closure $closure)
     {
         $this->where = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTabs()
+    {
+        return $this->tabs;
+    }
+
+    /**
+     * @param $tabs
+     * @return $this
+     */
+    public function tabs($tabs)
+    {
+        $this->tabs = $tabs;
 
         return $this;
     }

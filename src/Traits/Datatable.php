@@ -42,10 +42,20 @@ trait Datatable
     {
         $table = $this->table();
         $resourceName = $this->model->getTable();
+
         if (count($table->getRelations())) {
             $model = $this->model->with($table->getRelations())->select('*');
         } else {
             $model = $this->model->select('*');
+        }
+
+        if ($table->getTabs()) {
+            foreach ($table->getTabs() as $key => $tabs) {
+                if (request()->has($key)) {
+                    $value = request()->get($key) === '0' ? null : request()->get($key);
+                    $model = $this->model->where($key, $value);
+                }
+            }
         }
 
         if ($table->getWhere()) {
