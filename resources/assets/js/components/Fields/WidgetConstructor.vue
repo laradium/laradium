@@ -1,7 +1,7 @@
 <template>
     <transition name="fade">
         <div>
-            <h3 v-show="input.items.length">Widgets</h3>
+            <h3 v-show="input.items.length">Widgets </h3>
             <draggable class="dragArea" :list="input.items" @update="onUpdate(input.items)" :options="draggable">
                 <div class="col-md-12" v-for="(item, index) in input.items" :key="item.id">
                     <div class="panel">
@@ -11,9 +11,10 @@
                                 <div class="pull-right">
                                     <button class="btn btn-danger btn-sm" @click.prevent="remove(index, item.url)"><i
                                             class="fa fa-trash"></i></button>
+                                    <button class="btn btn-success btn-sm" @click.prevent="toggleWidget(index)">Show / Hide</button>
                                 </div>
                             </h4>
-                            <div class="row">
+                            <div class="row" v-show="item.show">
                                 <div v-for="input in item.fields"
                                      class="col-md-12">
                                     <component :is="input.type + '-field'"
@@ -71,7 +72,6 @@
                 template.order = this.input.items.length + 1;
 
                 for (let field in template.fields) {
-                    console.log(this.replacementIds, 'asd')
                     let repAttr = template.fields[field].replacemenetAttributes;
 
                     let i = 1;
@@ -147,6 +147,9 @@
                         }
                     });
 
+            },
+            toggleWidget(item) {
+                this.input.items[item].show = !this.input.items[item].show ;
             }
         }
     }

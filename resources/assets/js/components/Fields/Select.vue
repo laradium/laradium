@@ -22,11 +22,5 @@
 <script>
     export default {
         props: ['input', 'language', 'item'],
-        mounted() {
-            console.log('Mounted');
-        },
-        created() {
-            console.log('Created');
-        }
     }
 </script>

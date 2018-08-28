@@ -1,38 +1,47 @@
 <template>
     <transition name="fade">
-        <div>
-            <draggable class="dragArea" :list="input.items" @update="onUpdate(input.items)" :options="draggable">
-                <div class="col-md-12" v-for="(item, index) in input.items" :key="item.id">
-                    <div class="panel">
-                        <div class="panel-title">
-                            <h4>
-                                <i class="mdi mdi-arrow-all handle" v-if="input.is_sortable"></i> {{ input.label }}
-                                <div class="pull-right">
-                                    <button class="btn btn-danger btn-sm" @click.prevent="remove(index, item.url, item.resource)"><i
-                                            class="fa fa-trash"></i></button>
-                                </div>
-                            </h4>
-                        </div>
-                        <div class="panel-body border" style="padding: 20px; border-radius: 5px;">
-                            <div class="row">
-                                <div v-for="input in item.fields"
-                                     class="col-md-12">
-                                    <component :is="input.type + '-field'"
-                                               :input="input"
-                                               :item="item"
-                                               :language="language">
-                                    </component>
+        <div class="border"  style="padding: 20px; border-radius: 5px; margin: 5px;">
+            <h4>
+                {{ input.label }}s
+                <div class="pull-right">
+                    <button class="btn btn-success btn-sm" @click.prevent="toggle(index)">Show / Hide</button>
+                </div>
+            </h4>
+            <div v-show="input.show">
+                <draggable class="dragArea" :list="input.items" @update="onUpdate(input.items)" :options="draggable">
+                    <div class="col-md-12" v-for="(item, index) in input.items" :key="item.id">
+                        <div class="panel" style="padding: 5px;">
+                            <div class="panel-title">
+                                <h4>
+                                    <i class="mdi mdi-arrow-all handle" v-if="input.is_sortable"></i>
+                                    <div class="pull-right">
+                                        <button class="btn btn-danger btn-sm" @click.prevent="remove(index, item.url, item.resource)"><i
+                                                class="fa fa-trash"></i></button>
+                                    </div>
+                                </h4>
+                            </div>
+                            <div class="panel-body border" style="padding: 20px; border-radius: 2px;">
+                                <div class="row">
+                                    <div v-for="input in item.fields"
+                                         class="col-md-12">
+                                        <component :is="input.type + '-field'"
+                                                   :input="input"
+                                                   :item="item"
+                                                   :replacementIds="replacementIds"
+                                                   :language="language">
+                                        </component>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <br>
                     </div>
-                    <br>
-                </div>
-            </draggable>
-            <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()">
-                <i class="fa fa-plus"></i> Add item
-            </button>
-            <br><br>
+                </draggable>
+                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()">
+                    <i class="fa fa-plus"></i> Add {{ input.label }}
+                </button>
+                <br><br>
+            </div>
         </div>
     </transition>
 </template>
@@ -57,9 +66,11 @@
                 let template = JSON.parse(JSON.stringify(this.input.template));
                 template.id = randId;
                 template.order = this.input.items.length;
-
+                // console.log(123, template.fields);
                 for (let field in template.fields) {
+                    // console.log(template.fields[field].replacemenetAttributes);
                     let repAttr = template.fields[field].replacemenetAttributes;
+                    // console.log(123, repAttr);
 
                     let i = 1;
                     let idProp = '';
@@ -133,6 +144,10 @@
                         }
                     });
 
+            },
+            toggle(item) {
+                this.input.show = !this.input.show;
+                console.log(this.input);
             }
         }
     }
