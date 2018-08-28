@@ -70,12 +70,6 @@ class ResourceRegistry
                 'middleware' => ['web', 'aven'],
                 'name' => 'admin.' . $routeSlug . '.form'
             ],
-            [
-                'method' => 'resource',
-                'route_slug' => $this->getRouteName(),
-                'controller' => $this->getRouteController(),
-                'middleware' => ['web', 'aven'],
-            ],
             // Import
             [
                 'method' => 'post',
@@ -84,10 +78,28 @@ class ResourceRegistry
                 'middleware' => ['web', 'aven'],
                 'name' => 'admin.' . $routeSlug . '.import'
             ],
+            // Export
+            [
+                'method' => 'get',
+                'route_slug' => $this->getRouteName('export'),
+                'controller' => $this->getRouteController('export'),
+                'middleware' => ['web', 'aven'],
+                'name' => 'admin.' . $routeSlug . '.export'
+            ],
+            [
+                'method' => 'resource',
+                'route_slug' => $this->getRouteName(),
+                'controller' => $this->getRouteController(),
+                'middleware' => ['web', 'aven'],
+            ],
         ];
 
         foreach ($routeList as $route) {
             if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource, 'import')) {
+                continue;
+            }
+
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.export' && !method_exists($resource, 'export')) {
                 continue;
             }
 

@@ -4,19 +4,19 @@
     <div class="row">
         <div class="col-12">
             <div class="card-box">
-                <div class="table-wrapper">
-                    @include('aven::admin._partials.messages')
-                    @if($table->getAdditionalView())
-                        <div class="row">
-                            <div class="col-md-12">
-                                {!! view($table->getAdditionalView(), $table->getAdditionalViewData() )->render() !!}
-                            </div>
+                @include('aven::admin._partials.messages')
+                @include('aven::admin.resource._partials.import_export')
+
+                @if($table->getAdditionalView())
+                    <div class="row">
+                        <div class="col-md-12">
+                            {!! view($table->getAdditionalView(), $table->getAdditionalViewData() )->render() !!}
                         </div>
-                        <br>
-                    @endif
-                    @if (method_exists($resource, 'import'))
-                        @include('aven::admin.resource._partials.import')
-                    @endif
+                    </div>
+                    <hr>
+                @endif
+
+                <div class="table-wrapper">
                     <div class="table-responsive">
                         <table class="resource-datatable table table-bordered">
                             <thead>
