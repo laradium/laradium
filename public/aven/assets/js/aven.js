@@ -49979,6 +49979,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['input', 'language', 'item']
@@ -49993,19 +49995,25 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "form-group" }, [
-    _c("label", { attrs: { for: "" } }, [
-      _vm._v("\n        " + _vm._s(_vm.input.label) + "\n    ")
-    ]),
-    _vm._v(" "),
-    _c("input", {
-      attrs: { type: "hidden", value: "0", name: _vm.input.name }
-    }),
-    _vm._v(" "),
-    _c("input", {
-      staticClass: "form-check-inline",
-      attrs: { type: "checkbox", value: "1", name: _vm.input.name },
-      domProps: { checked: _vm.input.checked }
-    })
+    _c("div", { staticClass: "checkbox checkbox-primary" }, [
+      _c("input", {
+        attrs: { type: "hidden", value: "0", name: _vm.input.name }
+      }),
+      _vm._v(" "),
+      _c("input", {
+        attrs: {
+          type: "checkbox",
+          value: "1",
+          name: _vm.input.name,
+          id: _vm.input.name
+        },
+        domProps: { checked: _vm.input.checked }
+      }),
+      _vm._v(" "),
+      _c("label", { attrs: { for: _vm.input.name } }, [
+        _vm._v("\n            " + _vm._s(_vm.input.label) + "\n        ")
+      ])
+    ])
   ])
 }
 var staticRenderFns = []

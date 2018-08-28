@@ -17,9 +17,11 @@
           rel="stylesheet"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <link href="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('/aven/admin/assets/plugins/datetimepicker/css/jquery.datetimepicker.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('/aven/admin/assets/plugins/datetimepicker/css/jquery.datetimepicker.min.css') }}"
+          rel="stylesheet">
+    <link href="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}"
+          rel="stylesheet">
 
     <link href="{{ asset('/aven/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/aven/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
@@ -34,7 +36,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
-<body class="fixed-left">
+<body>
 <!-- Begin page -->
 <div id="wrapper">
 
@@ -62,6 +64,22 @@
                         <h4 class="page-title">{{ $title ?? 'Aven' }}</h4>
                     </li>
                 </ul>
+
+                @if(isset($table) && $table->hasAction('create'))
+                    <nav class="navbar-custom">
+
+                        <ul class="list-unstyled topbar-right-menu float-right mb-0">
+
+                            <li>
+                                <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create"
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fa fa-plus"></i> Create
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                @endif
             </div><!-- end container -->
         </div><!-- end navbar -->
     </div>
@@ -100,17 +118,12 @@
     <div class="content-page">
         <!-- Start content -->
         <div class="content">
-            <br>
             <div class="container-fluid" id="app">
                 @yield('content')
             </div> <!-- container -->
-
         </div> <!-- content -->
 
-        <footer class="footer text-right">
-            © Aven. <a href="https://netcore.agency">netcore.agency</a>
-        </footer>
-
+        <footer class="footer text-right">© Aven. <a href="https://netcore.agency">netcore.agency</a></footer>
     </div>
     <!-- ============================================================== -->
     <!-- End Right content here -->

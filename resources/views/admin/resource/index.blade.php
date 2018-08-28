@@ -1,43 +1,37 @@
-@extends('aven::layouts.main', ['title' => ucfirst($model->getTable())])
+@extends('aven::layouts.main', ['title' => ucfirst($model->getTable()), 'table' => $table])
 
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card-box table-responsive">
-                @include('aven::admin._partials.messages')
-                @if($table->hasAction('create'))
-                    <div class="pull-right">
-                        <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create" class="btn btn-primary">
-                            <i class="fa fa-plus"></i> Create
-                        </a>
-                    </div>
-                    @if(!$table->getAdditionalView())
-                        <br><br>
-                    @endif
-                @endif
-                @if($table->getAdditionalView())
-                    <div class="row">
-                        <div class="col-md-12">
-                            {!! view($table->getAdditionalView(), $table->getAdditionalViewData() )->render() !!}
+            <div class="card-box">
+                <div class="table-wrapper">
+                    @include('aven::admin._partials.messages')
+                    @if($table->getAdditionalView())
+                        <div class="row">
+                            <div class="col-md-12">
+                                {!! view($table->getAdditionalView(), $table->getAdditionalViewData() )->render() !!}
+                            </div>
                         </div>
+                        <br>
+                    @endif
+                    @if (method_exists($resource, 'import'))
+                        @include('aven::admin.resource._partials.import')
+                    @endif
+                    <div class="table-responsive">
+                        <table class="resource-datatable table table-bordered">
+                            <thead>
+                            <tr>
+                                @foreach($table->columns() as $column)
+                                    <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
+                                @endforeach
+                                <th>
+                                    Actions
+                                </th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
-                    <br>
-                @endif
-                @if (method_exists($resource, 'import'))
-                    @include('aven::admin.resource._partials.import')
-                @endif
-                <table class="resource-datatable table table-bordered">
-                    <thead>
-                    <tr>
-                        @foreach($table->columns() as $column)
-                            <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
-                        @endforeach
-                        <th>
-                            Actions
-                        </th>
-                    </tr>
-                    </thead>
-                </table>
+                </div>
             </div>
         </div>
     </div>
