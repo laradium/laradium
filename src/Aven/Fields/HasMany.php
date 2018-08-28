@@ -45,6 +45,7 @@ class HasMany extends Field
      * @var string
      */
     protected $morphType;
+    protected $test;
 
     /**
      * HasMany constructor.
@@ -66,7 +67,9 @@ class HasMany extends Field
      */
     public function relation(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
+        $model = $this->model()->load($this->relationName);
+
+        return $model->{$this->relationName}();
     }
 
     /**
@@ -78,6 +81,8 @@ class HasMany extends Field
     }
 
     /**
+     * @param array $parentAttributeList
+     * @param null $model
      * @return $this
      */
     public function build($parentAttributeList = [], $model = null)
@@ -110,6 +115,7 @@ class HasMany extends Field
                     ]);
 
                     $clonedField = clone $field;
+                    $clonedField->setModel($item);
                     $clonedField->build($attributeList, $item);
 
                     $fields[$item->id]['fields'][] = $clonedField;
@@ -177,9 +183,11 @@ class HasMany extends Field
      */
     public function template()
     {
+
         $hasManyFields = $this->fieldSet->fields();
 
         $fields = [];
+        $model = $this->model->{$this->relationName}()->getModel();
         foreach ($hasManyFields as $f) {
             $field = clone $f;
             $attributeList = array_merge($this->parentAttributeList, [
@@ -187,7 +195,8 @@ class HasMany extends Field
                 '__ID__',
             ]);
 
-            $field->build($attributeList, null);
+            $field->setModel($model);
+            $field->build($attributeList, $model);
             $field->isTemplate(true);
             $field->setValue(null);
 
@@ -197,7 +206,8 @@ class HasMany extends Field
         return [
             'id'     => 0,
             'order'  => 0,
-            'fields' => $fields
+            'fields' => $fields,
+            'show'   => false
         ];
     }
 
@@ -207,7 +217,7 @@ class HasMany extends Field
      */
     public function formatedResponse($f = null)
     {
-        $f = $f ?? $this;
+        $f = !is_null($f) ? $f : $this;;
         $items = [];
 
         foreach ($f->fieldGroups() as $group) {
@@ -229,14 +239,15 @@ class HasMany extends Field
         }
 
         return [
-            'type'        => 'has-many',
-            'full_column' => true,
-            'name'        => $f->relationName,
-            'label'       => ucfirst(str_singular($f->relationName)),
-            'is_sortable' => $f->isSortable(),
-            'template'    => $f->template(),
-            'tab'         => $this->tab(),
-            'items'       => $items
+            'type'                   => 'has-many',
+            'full_column'            => true,
+            'name'                   => $f->relationName,
+            'label'                  => ucfirst(str_singular($f->relationName)),
+            'is_sortable'            => $f->isSortable(),
+            'template'               => $f->template(),
+            'tab'                    => $this->tab(),
+            'items'                  => $items,
+            'show'                   => false
         ];
     }
 
