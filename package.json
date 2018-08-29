@@ -20,6 +20,7 @@
     "vue": "^2.5.7"
   },
   "dependencies": {
+    "jquery-datetimepicker": "^2.5.20",
     "jquery-ui": "^1.12.1",
     "vue-wysiwyg": "^1.7.2",
     "vuedraggable": "^2.16.0"

@@ -18,8 +18,6 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <link href="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/aven/admin/assets/plugins/datetimepicker/css/jquery.datetimepicker.min.css') }}"
-          rel="stylesheet">
     <link href="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}"
           rel="stylesheet">
 
@@ -149,7 +147,6 @@
 <script src="{{ asset('/aven/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/aven/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/plugins/datetimepicker/js/jquery.datetimepicker.full.min.js') }}"></script>
 <script src="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->
