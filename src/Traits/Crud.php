@@ -77,7 +77,17 @@ trait Crud
                         foreach ($nonExistingItemSet as $item) {
                             $newItem = $relationModel->create(array_except($item, 'translations'));
                             $this->putTranslations($newItem, array_only($item, 'translations'));
-                            $this->saveMorphToFields(array_first($item), $newItem);
+                            $morph = array_first($item);
+                            if (is_array($morph)) {
+
+                                $this->saveMorphToFields(array_first($item), $newItem);
+                            }
+
+                            foreach (array_except($item, 'translations') as $key => $input) {
+                                if (is_array($input)) {
+                                    $this->updateRelations([$key => $input], $newItem);
+                                }
+                            }
                         }
                     } elseif ($relationType == 'HasOne') {
                         if ($model->{$relationName}) {
@@ -86,8 +96,8 @@ trait Crud
                             $relationModel = $model->{$relationName}()->firstOrCreate($nonExistingItemSet);
                         }
                         $this->updateResource(collect($nonExistingItemSet), $relationModel);
-                    } elseif($relationType == 'BelongsToMany') {
-                        $relationModel = $model->{$relationName}()->sync($nonExistingItemSet);
+                    } elseif ($relationType == 'BelongsToMany') {
+                        $model->{$relationName}()->sync($nonExistingItemSet);
                     }
                 }
 
@@ -99,7 +109,19 @@ trait Crud
                             $relationModel->fill(array_except($item, ['translations', 'id']));
                             $relationModel->save();
                             $this->putTranslations($relationModel, array_only($item, 'translations'));
-                            $this->saveMorphToFields(array_first($item), $relationModel);
+
+                            $morph = array_first($item);
+                            if (is_array($morph)) {
+                                $this->saveMorphToFields(array_first($item), $relationModel);
+                            }
+
+                            foreach (array_except($item, 'translations') as $key => $input) {
+                                if (is_array($input)) {
+                                    if (is_integer(key($input))) {
+                                        $this->updateRelations([$key => $input], $relationModel);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

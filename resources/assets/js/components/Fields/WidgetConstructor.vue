@@ -149,7 +149,7 @@
 
             },
             toggleWidget(item) {
-                this.input.items[item].show = !this.input.items[item].show ;
+                this.input.items[item].show = !this.input.items[item].show;
             }
         }
     }

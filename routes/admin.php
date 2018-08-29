@@ -20,7 +20,7 @@ Route::group([
         ]);
 
         Route::delete('resource/{id}', [
-            '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete'
+            'uses' => '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete'
         ]);
     });
 

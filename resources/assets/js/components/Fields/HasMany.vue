@@ -4,7 +4,7 @@
             <h4>
                 {{ input.label }}s
                 <div class="pull-right">
-                    <button class="btn btn-success btn-sm" @click.prevent="toggle(index)">Show / Hide</button>
+                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">Show / Hide</button>
                 </div>
             </h4>
             <div v-show="input.show">
@@ -145,9 +145,8 @@
                     });
 
             },
-            toggle(item) {
+            toggle() {
                 this.input.show = !this.input.show;
-                console.log(this.input);
             }
         }
     }

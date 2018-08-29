@@ -119,6 +119,7 @@
                     url: url,
                     data: formData
                 }).then(res => {
+                    this.data = res.data.data;
                     this.errors = [];
                     $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
                     this.success = res.data.success;

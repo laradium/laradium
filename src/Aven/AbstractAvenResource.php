@@ -172,6 +172,7 @@ abstract class AbstractAvenResource
         if ($request->ajax()) {
             return [
                 'success' => 'Resource successfully updated',
+                'data'    => $this->getForm($model->id)
             ];
         }
 
