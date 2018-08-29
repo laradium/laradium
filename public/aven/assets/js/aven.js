@@ -47506,6 +47506,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 url: url,
                 data: formData
             }).then(function (res) {
+                _this2.data = res.data.data;
                 _this2.errors = [];
                 $('html, body').animate({ 'scrollTop': $('.alert.alert-danger').offset().top - 50 });
                 _this2.success = res.data.success;
@@ -49792,9 +49793,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 }
             });
         },
-        toggle: function toggle(item) {
+        toggle: function toggle() {
             this.input.show = !this.input.show;
-            console.log(this.input);
         }
     }
 });
@@ -49827,7 +49827,7 @@ var render = function() {
                 on: {
                   click: function($event) {
                     $event.preventDefault()
-                    _vm.toggle(_vm.index)
+                    _vm.toggle()
                   }
                 }
               },
