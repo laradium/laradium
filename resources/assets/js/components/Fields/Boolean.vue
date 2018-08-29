@@ -1,10 +1,12 @@
 <template>
     <div class="form-group">
-        <label for="">
-            {{ input.label }}
-        </label>
-        <input type="hidden" value="0" :name="input.name">
-        <input type="checkbox" value="1" :checked="input.checked" :name="input.name" class="form-check-inline">
+        <div class="checkbox checkbox-primary">
+            <input type="hidden" value="0" :name="input.name">
+            <input type="checkbox" value="1" :checked="input.checked" :name="input.name" :id="input.name">
+            <label :for="input.name">
+                {{ input.label }}
+            </label>
+        </div>
     </div>
 </template>
 
