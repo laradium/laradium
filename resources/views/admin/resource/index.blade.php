@@ -106,21 +106,7 @@
                         processing: true,
                         serverSide: true,
                         ajax: $(selector).data('url'),
-                        columns: [
-                                @foreach($table->columns() as $column)
-                            {
-                                data: "{{ $column['column'] }}",
-                                name: "{{ $column['translatable'] ? 'translations.'.$column['column'] : $column['column'] }}",
-                            },
-                                @endforeach
-                            {
-                                data: "action",
-                                name: "action",
-                                searchable: false,
-                                orderable: false
-                            },
-
-                        ]
+                        columns: {!! $table->getColumnConfig()->toJson() !!}
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({});
                     });
@@ -140,21 +126,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: '/admin/{{ $table->model()->getTable() }}/data-table',
-                    columns: [
-                            @foreach($table->columns() as $column)
-                        {
-                            data: "{{ $column['column'] }}",
-                            name: "{{ $column['translatable'] ? 'translations.'.$column['column'] : $column['column'] }}",
-                        },
-                            @endforeach
-                        {
-                            data: "action",
-                            name: "action",
-                            searchable: false,
-                            orderable: false
-                        },
-
-                    ]
+                    columns: {!! $table->getColumnConfig()->toJson() !!}
                 }).on('draw.dt', function () {
                     $('.js-editable').editable({});
                 });
@@ -164,9 +136,9 @@
                 e.preventDefault();
                 let url = $(this).data('url');
                 swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this resource!",
-                    icon: "warning",
+                    title: 'Are you sure?',
+                    text: 'Once deleted, you will not be able to recover this resource!',
+                    icon: 'warning',
                     buttons: true,
                     dangerMode: true,
                 })
@@ -181,9 +153,9 @@
                                 }
                             });
 
-                            dataTable.ajax.reload();
+                            dataTable.ajax.reload(); // TODO: Fix this for multiple dts
 
-                            swal("Item has been deleted!", {
+                            swal('Item has been deleted!', {
                                 icon: "success",
                             });
                         }
