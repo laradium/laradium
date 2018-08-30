@@ -1,4 +1,4 @@
-@extends('aven::layouts.main', ['title' => ucfirst($model->getTable()), 'table' => $table])
+@extends('aven::layouts.main', ['title' => ucfirst(str_replace('_', ' ', $model->getTable())), 'table' => $table])
 
 @section('content')
     <div class="row">
@@ -139,7 +139,7 @@
             let dataTable = $('.resource-datatable').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: '/admin/{{ $table->model()->getTable() }}/data-table',
+                    ajax: '/admin/{{ str_replace('_', '-', $table->model()->getTable()) }}/data-table',
                     columns: [
                             @foreach($table->columns() as $column)
                         {

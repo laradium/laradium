@@ -67,13 +67,11 @@ class HasMany extends Field
      */
     public function relation(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        $model = $this->model()->load($this->relationName);
-
-        return $model->{$this->relationName}();
+        return $this->model()->{$this->relationName}();
     }
 
     /**
-     * @return array
+     * @return Collection
      */
     public function fieldGroups()
     {
