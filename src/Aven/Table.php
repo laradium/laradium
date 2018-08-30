@@ -2,6 +2,8 @@
 
 namespace Netcore\Aven\Aven;
 
+use Illuminate\Support\Collection;
+
 class Table
 {
 
@@ -165,6 +167,34 @@ class Table
     public function getWhere()
     {
         return $this->where;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getColumnConfig(): Collection
+    {
+        $config = collect([]);
+
+        foreach ($this->columns() as $column) {
+            $config->push([
+                'data' => $column['column'],
+                'name' => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'searchable' => $column['translatable'] ? false : true,
+                'orderable' => $column['translatable'] ? false : true,
+            ]);
+        }
+
+        $config->push([
+            'data' => 'action',
+            'name' => 'action',
+            'searchable' => false,
+            'orderable' => false,
+            'width' => '15%',
+            'class' => 'text-center'
+        ]);
+
+        return $config;
     }
 
     /**

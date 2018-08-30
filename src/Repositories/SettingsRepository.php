@@ -11,6 +11,7 @@ class SettingsRepository
      * @var mixed
      */
     protected $cachedSettings;
+
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
@@ -37,6 +38,7 @@ class SettingsRepository
     public function get($keys, $default = null)
     {
         $settings = $this->cachedSettings;
+
         if (is_array($keys)) {
             $array = [];
             foreach ($keys as $index => $key) {
@@ -46,6 +48,7 @@ class SettingsRepository
 
             return $array;
         }
+
         $setting = $settings->get($keys);
 
         return $setting ? $setting->getValue() : (is_array($default) ? (isset($default[0]) ? $default[0] : null) : $default);
@@ -83,14 +86,17 @@ class SettingsRepository
         if (!is_array($data)) {
             throw new \Exception('Passed settings should be an array');
         }
+
         foreach ($data as $item) {
             if (!isset($item['group'])) {
                 throw new \Exception('Group does not exist for key: ' . $item['key']);
             }
+
             $item['key'] = implode('.', [
                 $item['group'],
                 $item['key']
             ]);
+
             $setting = Setting::firstOrCreate([
                 'key' => $item['key']
             ], array_except($item, 'value'));
@@ -115,7 +121,6 @@ class SettingsRepository
             foreach($translations as $translation) {
                 $setting->translations()->firstOrCreate($translation);
             }
-
         }
     }
 
