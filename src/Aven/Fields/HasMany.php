@@ -87,6 +87,7 @@ class HasMany extends Field
     {
         $this->parentAttributeList = $parentAttributeList;
         $relation = $this->relation();
+        $rules = [];
         if ($model) {
             $this->model = $model;
         }
@@ -123,12 +124,17 @@ class HasMany extends Field
                     }
 
                     $fields[$item->id]['id'] = $item->id;
+                    $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
                 }
                 if ($this->isSortable()) {
                     $fields[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
                 }
                 $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
 
+            }
+
+            if ($rules) {
+                $this->validationRules = $rules;
             }
 
             $this->fields = $fields;
@@ -237,15 +243,15 @@ class HasMany extends Field
         }
 
         return [
-            'type'                   => 'has-many',
-            'full_column'            => true,
-            'name'                   => $f->relationName,
-            'label'                  => ucfirst(str_singular($f->relationName)),
-            'is_sortable'            => $f->isSortable(),
-            'template'               => $f->template(),
-            'tab'                    => $this->tab(),
-            'items'                  => $items,
-            'show'                   => false
+            'type'        => 'has-many',
+            'full_column' => true,
+            'name'        => $f->relationName,
+            'label'       => ucfirst(str_singular($f->relationName)),
+            'is_sortable' => $f->isSortable(),
+            'template'    => $f->template(),
+            'tab'         => $this->tab(),
+            'items'       => $items,
+            'show'        => false
         ];
     }
 

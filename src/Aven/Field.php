@@ -248,8 +248,10 @@ class Field
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
             foreach (translate()->languages() as $language) {
-                $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
-                    $attributeList)), $this->getRuleSet());
+                if($language['is_fallback']) {
+                    $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
+                        $attributeList)), $this->getRuleSet());
+                }
             }
         } else {
             $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
@@ -409,7 +411,7 @@ class Field
     public function buildRuleSetKey($attributes): string
     {
         return implode('.', collect($attributes)->map(function ($item, $index) {
-            if (is_integer($item) || is_null($item)) {
+            if (is_null($item)) {
                 $item = '*';
             }
 

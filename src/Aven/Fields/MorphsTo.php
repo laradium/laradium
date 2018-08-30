@@ -70,6 +70,7 @@ class MorphsTo extends Field
         $this->parentAttributeList = $parentAttributeList;
         $fields = $this->fieldSet->fields();
         $fieldList = [];
+        $rules = [];
 
         $attributeList = array_merge($this->parentAttributeList, [
             $this->relationName,
@@ -90,12 +91,19 @@ class MorphsTo extends Field
             $clonedField->build($attributeList, $this->morphModel);
 
             $fieldList[] = $clonedField;
+            $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+
         }
+
 
         $fieldList[] = $this->createContentTypeField($this->morphClass, $attributeList);
         $fieldList[] = $this->createMorphNameField($this->morphClass, $attributeList);
 
         $this->fields = $fieldList;
+
+        if ($rules) {
+            $this->validationRules = $rules;
+        }
 
         return $this;
     }
