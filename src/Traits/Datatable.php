@@ -74,7 +74,7 @@ trait Datatable
                 data-name="' . $column['column_parsed'] . '"
                 data-type="text" 
                 data-pk="' . $item->id . '" 
-                data-url="/admin/' . $resourceName . '/editable" 
+                data-url="/admin/' . str_replace('_', '-', $resourceName) . '/editable" 
                 data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
             });
         }
