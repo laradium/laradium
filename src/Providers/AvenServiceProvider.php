@@ -88,6 +88,7 @@ class AvenServiceProvider extends ServiceProvider
         $aven = app(\Netcore\Aven\Aven\Aven::class);
         foreach ($resources as $resource) {
             $aven->register($resource);
+            $aven->registerApi($resource);
         }
     }
 
