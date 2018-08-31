@@ -110,15 +110,12 @@ class SettingsRepository
                     ];
                 }
             } else {
-                foreach (translate()->languages() as $language) {
-                    $translations[] = [
-                        'locale' => $language['iso_code'],
-                        'value'  => isset($item['value']) ? $item['value'] : '',
-                    ];
-                }
+                $setting->update([
+                    'non_translatable_value' => isset($item['value']) ? $item['value'] : ''
+                ]);
             }
 
-            foreach($translations as $translation) {
+            foreach ($translations as $translation) {
                 $setting->translations()->firstOrCreate($translation);
             }
         }

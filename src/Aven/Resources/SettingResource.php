@@ -23,7 +23,13 @@ Class SettingResource extends AbstractAvenResource
     public function resource()
     {
         return (new Resource)->make(function (FieldSet $set) {
-            $set->text('value')->translatable();
+            $fieldType = $set->model()->type;
+
+            if($set->model()->is_translatable) {
+                $set->$fieldType('value')->translatable();
+            } else {
+                $set->$fieldType('non_translatable_value');
+            }
         });
     }
 
@@ -36,7 +42,13 @@ Class SettingResource extends AbstractAvenResource
             $column->add('group');
             $column->add('name');
             $column->add('is_translatable');
-            $column->add('value')->translatable();
+            $column->add('value')->modify(function ($item) {
+                if($item->is_translatable) {
+                    return view('aven::admin.resource._partials.translation', compact('item'));
+                } else {
+                    return $item->non_translatable_value ? e($item->non_translatable_value) : 'N/A';
+                }
+            });
         })->actions(['edit'])->relations(['translations']);
     }
 }

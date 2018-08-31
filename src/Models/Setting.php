@@ -18,6 +18,7 @@ class Setting extends Model
         'name',
         'type',
         'meta',
+        'non_translatable_value',
         'has_manager',
         'is_translatable'
     ];

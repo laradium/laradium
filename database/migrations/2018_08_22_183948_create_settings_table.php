@@ -24,6 +24,9 @@ class CreateSettingsTable extends Migration
             $table->boolean('has_manager')->default(0);
             $table->boolean('is_translatable')->default(0);
 
+            $table->mediumText('non_translatable_value')->nullable();
+
+
             $table->timestamps();
         });
 
