@@ -41,6 +41,12 @@ return [
         ],
         [
             'group' => 'seo',
+            'name'  => 'Meta title',
+            'key'   => 'meta_title',
+            'type'  => 'text',
+        ],
+        [
+            'group' => 'seo',
             'name'  => 'Meta keywords',
             'key'   => 'meta_keywords',
             'type'  => 'textarea',
@@ -51,67 +57,11 @@ return [
             'key'   => 'meta_description',
             'type'  => 'textarea',
         ],
-        // Facebook OG tags
         [
             'group' => 'seo',
-            'name'  => 'OG title',
-            'key'   => 'og_title',
+            'name'  => 'Meta image',
+            'key'   => 'meta_image',
             'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'OG type',
-            'key'   => 'og_type',
-            'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'OG URL',
-            'key'   => 'og_url',
-            'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'OG description',
-            'key'   => 'og_description',
-            'type'  => 'textarea'
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'OG image',
-            'key'   => 'og_image',
-            'type'  => 'text'
-        ],
-        // Twitter cards
-        [
-            'group' => 'seo',
-            'name'  => 'Twitter Card title',
-            'key'   => 'twitter_title',
-            'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'Twitter Card site',
-            'key'   => 'twitter_site',
-            'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'Twitter Card type',
-            'key'   => 'twitter_card',
-            'type'  => 'text',
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'Twitter Card description',
-            'key'   => 'twitter_description',
-            'type'  => 'textarea'
-        ],
-        [
-            'group' => 'seo',
-            'name'  => 'Twitter Card image',
-            'key'   => 'twitter_image',
-            'type'  => 'text'
         ],
         // Mail
         [
