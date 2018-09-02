@@ -13,6 +13,17 @@ trait Crud
      */
     public function updateResource($fields, $model)
     {
+        // Password
+        if (array_key_exists('password', $fields)) {
+            $password = array_get($fields, 'password');
+
+            if (empty($password)) {
+                $fields = array_except($fields, 'password');
+            } else {
+                $fields['password'] = bcrypt($password);
+            }
+        }
+
         $resourceData = $this->getResourceData(collect($fields));
 
         $resourceFields = $resourceData['resourceFields'];
@@ -21,8 +32,8 @@ trait Crud
 
         $model->fill(array_except($resourceFields->toArray(), ['morph_type', 'morph_name']));
         $model->save();
-        $this->putTranslations($model, $translations);
 
+        $this->putTranslations($model, $translations);
         $this->updateRelations($relations, $model);
 
         return true;
@@ -79,7 +90,6 @@ trait Crud
                             $this->putTranslations($newItem, array_only($item, 'translations'));
                             $morph = array_first($item);
                             if (is_array($morph)) {
-
                                 $this->saveMorphToFields(array_first($item), $newItem);
                             }
 

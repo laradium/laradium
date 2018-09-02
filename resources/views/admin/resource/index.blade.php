@@ -5,6 +5,13 @@
         <div class="col-12">
             <div class="card-box">
                 @include('aven::admin._partials.messages')
+
+                @if($resource->importInProgress())
+                    <div class="alert alert-info">
+                        {{ $resource->importStatus() }}
+                    </div>
+                @endif
+
                 @include('aven::admin.resource._partials.import_export')
 
                 @if($table->getAdditionalView())
