@@ -8,7 +8,6 @@ use Netcore\Aven\Traits\Datatable;
 
 abstract class AbstractAvenResource
 {
-
     use Crud, Datatable;
 
     /**
@@ -101,7 +100,6 @@ abstract class AbstractAvenResource
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
-
         if (isset($this->events['beforeSave'])) {
             $this->events['beforeSave']($this->model, $request);
         }
@@ -177,7 +175,6 @@ abstract class AbstractAvenResource
         }
 
         return back()->withSuccess('Resource successfully updated!');
-
     }
 
     /**
@@ -197,6 +194,127 @@ abstract class AbstractAvenResource
         }
 
         return back()->withSuccess('Resource successfully deleted!');
+    }
+
+    /** -------------- API ---------------------*/
+
+    /**
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function apiIndex()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $this->api()->getData()
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function apiStore(Request $request)
+    {
+        $model = $this->model;
+
+        $resource = $this->resource();
+        $form = new Form($resource->setModel($model)->build());
+        $form->buildForm();
+
+        $request->validate($form->getValidationRules());
+
+        if (isset($this->events['beforeSave'])) {
+            $this->events['beforeSave']($this->model, $request);
+        }
+
+        $this->updateResource($request->except('_token'), $model);
+
+        if (isset($this->events['afterSave'])) {
+            $this->events['afterSave']($this->model, $request);
+        }
+
+        if ($request->ajax()) {
+            return [
+                'success' => true,
+                'message' => 'Resource successfully created',
+            ];
+        }
+    }
+
+    /**
+     * @param $id
+     * @return ApiResource
+     */
+    public function apiShow($id)
+    {
+        $data = $this->api()->getData($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return array
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        $model = $this->model;
+
+        if ($this->getWhere()) {
+            $model = $this->model->where($this->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
+
+        $resource = $this->resource();
+        $form = new Form($resource->setModel($model)->build());
+        $form->buildForm();
+
+        $request->validate($form->getValidationRules());
+
+        if (isset($this->events['beforeSave'])) {
+            $this->events['beforeSave']($this->model, $request);
+        }
+
+        $this->updateResource($request->except('_token'), $model);
+
+        if (isset($this->events['afterSave'])) {
+            $this->events['afterSave']($this->model, $request);
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Resource successfully updated'
+        ];
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return array
+     */
+    public function apiDestroy(Request $request, $id)
+    {
+        $model = $this->model;
+
+        if ($this->getWhere()) {
+            $model = $this->model->where($this->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
+
+        $model->delete();
+
+        if ($request->ajax()) {
+            return [
+                'success' => true,
+                'message' => 'Resource successfully deleted'
+            ];
+        }
     }
 
     /**
