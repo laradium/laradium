@@ -49581,10 +49581,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['input', 'language', 'item'],
-    mounted: function mounted() {}
+	props: ['input', 'language', 'item'],
+	data: function data() {
+		return {
+			plugins: ['advlist autolink lists link image charmap preview anchor textcolor', 'searchreplace visualblocks code fullscreen', 'insertdatetime media table contextmenu paste code directionality template colorpicker textpattern'],
+			toolbar1: 'undo redo | bold italic strikethrough | forecolor backcolor | template link | bullist numlist | ltr rtl | removeformat',
+			options: {
+				height: 300
+			}
+		};
+	}
 });
 
 /***/ }),
@@ -49627,7 +49646,13 @@ var render = function() {
                 [
                   _c("tinymce", {
                     key: index + 1,
-                    attrs: { id: item.name, name: item.name },
+                    attrs: {
+                      id: item.name,
+                      name: item.name,
+                      plugins: _vm.plugins,
+                      toolbar1: _vm.toolbar1,
+                      other: _vm.options
+                    },
                     model: {
                       value: item.value,
                       callback: function($$v) {
@@ -49648,7 +49673,13 @@ var render = function() {
             _c(
               "tinymce",
               {
-                attrs: { id: _vm.input.name, name: _vm.input.name },
+                attrs: {
+                  id: _vm.input.name,
+                  name: _vm.input.name,
+                  plugins: _vm.plugins,
+                  toolbar1: _vm.toolbar1,
+                  other: _vm.options
+                },
                 model: {
                   value: _vm.input.value,
                   callback: function($$v) {
