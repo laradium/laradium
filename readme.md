@@ -98,6 +98,11 @@ You will have 2 methods `resource` and `table`.
 
 2. You need to add created resource in `config/aven.php` under resources
 
+# Creating API resource
+
+1. Just add --api option to aven:resource command
+2. Add this API resource in config/aven.php api_resources list
+
 # Resource
 Here you can specify field configuration for your create and edit actions.
 
