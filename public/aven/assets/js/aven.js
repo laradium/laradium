@@ -47702,6 +47702,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['url', 'method'],
@@ -47709,6 +47711,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             language: '',
             success: '',
+            isTranslatable: false,
             errors: [],
             data: {
                 languages: [],
@@ -47944,56 +47947,61 @@ var render = function() {
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("div", { staticClass: "col-md-1 middle-align" }, [
-                      _vm._v(
-                        "\n                        Language\n                    "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "col-md-2" }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.language,
-                              expression: "language"
-                            }
-                          ],
-                          staticClass: "form-control language-select",
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.language = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            }
-                          }
-                        },
-                        _vm._l(_vm.data.languages, function(language) {
-                          return _c(
-                            "option",
-                            { domProps: { value: language.iso_code } },
-                            [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(language.iso_code) +
-                                  "\n                            "
-                              )
-                            ]
+                    _vm.data.isTranslatable && _vm.data.languages.length
+                      ? _c("div", { staticClass: "col-md-1 middle-align" }, [
+                          _vm._v(
+                            "\n                        Language\n                    "
                           )
-                        })
-                      )
-                    ])
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.data.isTranslatable && _vm.data.languages.length
+                      ? _c("div", { staticClass: "col-md-2" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.language,
+                                  expression: "language"
+                                }
+                              ],
+                              staticClass: "form-control language-select",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.language = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            _vm._l(_vm.data.languages, function(language) {
+                              return _c(
+                                "option",
+                                { domProps: { value: language.iso_code } },
+                                [
+                                  _vm._v(
+                                    "\n                                " +
+                                      _vm._s(language.iso_code) +
+                                      "\n                            "
+                                  )
+                                ]
+                              )
+                            })
+                          )
+                        ])
+                      : _vm._e()
                   ])
                 ])
               ]

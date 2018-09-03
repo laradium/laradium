@@ -21,13 +21,15 @@
                     <div v-if="data.tabs.length > 1" class="col-md-12">
                         <ul class="nav nav-tabs" v-if="data.tabs.length > 1">
                             <li class="nav-item" v-for="(tab, index) in data.tabs">
-                                <a :href="'#' + tab" data-toggle="tab" aria-expanded="false" class="nav-link" :class="{'active': index === 0}">
+                                <a :href="'#' + tab" data-toggle="tab" aria-expanded="false" class="nav-link"
+                                   :class="{'active': index === 0}">
                                     {{ tab }}
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="tab" v-for="(tab, index) in data.tabs">
+                            <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="tab"
+                                 v-for="(tab, index) in data.tabs">
                                 <div v-for="input in data.inputs" v-if="input.tab == tab">
                                     <component :is="input.type + '-field'"
                                                :input="input"
@@ -57,10 +59,10 @@
                                 Save
                             </button>
                         </div>
-                        <div class="col-md-1 middle-align">
+                        <div class="col-md-1 middle-align" v-if="data.isTranslatable && data.languages.length">
                             Language
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-2" v-if="data.isTranslatable && data.languages.length">
 
                             <select class="form-control language-select" v-model="language">
                                 <option :value="language.iso_code" v-for="language in data.languages">
@@ -83,6 +85,7 @@
             return {
                 language: '',
                 success: '',
+                isTranslatable: false,
                 errors: [],
                 data: {
                     languages: [],

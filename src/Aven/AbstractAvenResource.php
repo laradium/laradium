@@ -64,13 +64,10 @@ abstract class AbstractAvenResource
         $response = $form->formatedResponse();
 
         return ([
-            'languages' => collect(translate()->languages())->map(function ($item, $index) {
-                $item['is_current'] = $index == 0;
-
-                return $item;
-            })->toArray(),
-            'inputs'    => $response,
-            'tabs'      => $resource->fieldSet()->tabs()->toArray()
+            'languages'      => $this->languages(),
+            'inputs'         => $response,
+            'tabs'           => $resource->fieldSet()->tabs()->toArray(),
+            'isTranslatable' => $form->isTranslatable()
         ]);
     }
 
@@ -239,6 +236,18 @@ abstract class AbstractAvenResource
     public function importStatus()
     {
         return file_get_contents(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function languages()
+    {
+        return collect(translate()->languages())->map(function ($item, $index) {
+            $item['is_current'] = $index == 0;
+
+            return $item;
+        })->toArray();
     }
 
     /**

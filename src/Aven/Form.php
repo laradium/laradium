@@ -33,6 +33,11 @@ class Form
     protected $validationRules = [];
 
     /**
+     * @var bool
+     */
+    protected $isTranslatable = false;
+
+    /**
      * Form constructor.
      * @param $resource
      */
@@ -59,12 +64,20 @@ class Form
                     $this->setValidationRules($tabField->getRules());
 
                     $this->fields->push($tabField);
+
+                    if($tabField->isTranslatable()) {
+                        $this->isTranslatable = true;
+                    }
                 }
             } else {
                 $field->build();
                 $this->setValidationRules($field->getRules());
 
                 $this->fields->push($field);
+
+                if($field->isTranslatable()) {
+                    $this->isTranslatable = true;
+                }
             }
         }
 
@@ -145,5 +158,13 @@ class Form
         }
 
         return url('/admin/' . $resource);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslatable()
+    {
+        return $this->isTranslatable;
     }
 }
