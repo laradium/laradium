@@ -7,7 +7,7 @@ if (!function_exists('translate')) {
      */
     function translate()
     {
-        return app(\Netcore\Aven\Helpers\Translate::class);
+        return app(\Laradium\Laradium\Helpers\Translate::class);
     }
 }
 
@@ -17,7 +17,7 @@ if (!function_exists('menu')) {
      */
     function menu()
     {
-        return app(\Netcore\Aven\Repositories\MenuRepository::class);
+        return app(\Laradium\Laradium\Repositories\MenuRepository::class);
     }
 }
 
@@ -27,7 +27,7 @@ if (!function_exists('setting')) {
      */
     function setting()
     {
-        return app(\Netcore\Aven\Repositories\SettingsRepository::class);
+        return app(\Laradium\Laradium\Repositories\SettingsRepository::class);
     }
 }
 
@@ -74,7 +74,7 @@ if (!function_exists('lg')) {
      */
     function lg($key, $replace = [], $locale = null, $value = null): String
     {
-        $createTranslations = config('aven.create_translations_on_the_fly', false);
+        $createTranslations = config('laradium.create_translations_on_the_fly', false);
         if ($createTranslations) {
 //            $translations = cache('translations');
 //            $languages = languages();

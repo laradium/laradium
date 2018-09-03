@@ -6,30 +6,30 @@ Route::group([
     'namespace'  => 'Admin',
     'middleware' => ['web'],
 ], function () {
-    Route::group(['middleware' => 'aven'], function () {
+    Route::group(['middleware' => 'laradium'], function () {
         Route::get('/', [
-            'uses' => '\Netcore\Aven\Http\Controllers\Admin\AdminController@index'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@index'
         ]);
 
         Route::get('dashboard', [
-            'uses' => '\Netcore\Aven\Http\Controllers\Admin\AdminController@dashboard'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@dashboard'
         ]);
 
         Route::post('logout', [
-            'uses' => '\Netcore\Aven\Http\Controllers\Admin\LoginController@logout'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@logout'
         ]);
 
         Route::delete('resource/{id}', [
-            'uses' => '\Netcore\Aven\Http\Controllers\Admin\AdminController@resourceDelete'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@resourceDelete'
         ]);
     });
 
     // Auth
     Route::get('login', [
-        'uses' => '\Netcore\Aven\Http\Controllers\Admin\LoginController@index'
+        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@index'
     ]);
 
     Route::post('login', [
-        'uses' => '\Netcore\Aven\Http\Controllers\Admin\LoginController@login'
+        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@login'
     ]);
 });

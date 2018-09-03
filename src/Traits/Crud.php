@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Traits;
+namespace Laradium\Laradium\Traits;
 
 trait Crud
 {

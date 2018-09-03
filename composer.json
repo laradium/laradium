@@ -1,10 +1,14 @@
 {
-  "name": "netcore/aven",
+  "name": "laradium/laradium",
   "license": "MIT",
   "authors": [
     {
       "name": "Daniels Grietins",
       "email": "daniels.grietins@netcore.lv"
+    },
+    {
+      "name": "Dmitrijs Mihailovs",
+      "email": "dmitrijs.mihailovs@netcore.lv"
     }
   ],
   "minimum-stability": "dev",
@@ -17,13 +21,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Netcore\\Aven\\": "src"
+      "Laradium\\Laradium\\": "src"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Netcore\\Aven\\Providers\\AvenServiceProvider"
+        "Laradium\\Laradium\\Providers\\LaradiumServiceProvider"
       ]
     }
   }

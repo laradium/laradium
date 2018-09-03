@@ -12,7 +12,7 @@ allows to make it very flexible and can be adjusted up to your needs.
 "repositories": [
     {
         "type": "path",
-        "url": "../packages/aven-package"
+        "url": "../packages/laradium-package"
     }
 ]
 ```
@@ -21,8 +21,8 @@ Directory structure should look like this
 ```
 -Project
 -packages
-    --aven-package
-    --aven-content
+    --laradium-package
+    --laradium-content
 ```
 ## For global use
 
@@ -30,14 +30,14 @@ Directory structure should look like this
 "repositories": [
         {
             "type": "git",
-            "url": "https://git.netcore.lv/daniels.grietins/aven"
+            "url": "https://github.com/laradium/laradium"
         }
     ]
 ```
 
-2. ```composer require netcore/aven dev-master```
-3. ```php artisan vendor:publish --tag=aven```
-4. Configure `config/aven.php` file with your preferences
+2. ```composer require laradium/laradium dev-master```
+3. ```php artisan vendor:publish --tag=laradium```
+4. Configure `config/laradium.php` file with your preferences
 5. Comment out `Illuminate\Translation\TranslationServiceProvider::class,` in `config/app.php` in order to enable translations
 6. Run `php artisan migrate`
 
@@ -45,26 +45,26 @@ You should be up and running
 
 Admin panel will be under http://your-domain.com/admin
 
-Default credentials (_can be change in config file_): email:admin@netcore.lv, pw: aven2018
+Default credentials (_can be change in config file_): email:admin@laradium.com, pw: laradium2018
 
 # Creating new resource
 
-1. ```php artisan aven:resource Task```
+1. ```php artisan laradium:resource Task```
 
-It will create new resource under `App\Aven\Resource`, resource should look like this
+It will create new resource under `App\Laradium\Resource`, resource should look like this
 ```
 <?php
 
-namespace App\Aven\Resources;
+namespace App\Laradium\Resources;
 
-use Netcore\Aven\Aven\AbstractAvenResource;
-use Netcore\Aven\Aven\FieldSet;
-use Netcore\Aven\Aven\Resource;
-use Netcore\Aven\Aven\ColumnSet;
-use Netcore\Aven\Aven\Table;
+use Laradium\Laradium\Base\AbstractResource;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\Table;
 use App\Models\Task;
 
-Class TaskResource extends AbstractAvenResource
+Class TaskResource extends AbstractResource
 {
 
     /**
@@ -73,7 +73,7 @@ Class TaskResource extends AbstractAvenResource
     protected $resource = Task::class;
 
     /**
-     * @return \Netcore\Aven\Aven\Resource
+     * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
@@ -96,7 +96,7 @@ Class TaskResource extends AbstractAvenResource
 
 You will have 2 methods `resource` and `table`.
 
-2. You need to add created resource in `config/aven.php` under resources
+2. You need to add created resource in `config/laradium.php` under resources
 
 # Resource
 Here you can specify field configuration for your create and edit actions.
@@ -300,5 +300,5 @@ Available methods for Table
 ```
 ## Additional view which will be included above the table
 ```
-->additionalView('aven-content::admin.pages.index-top', compact('channels'));
+->additionalView('laradium-content::admin.pages.index-top', compact('channels'));
 ```

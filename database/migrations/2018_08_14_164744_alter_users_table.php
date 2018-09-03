@@ -21,8 +21,8 @@ class AlterUsersTable extends Migration
         $userClass = config('auth.providers.users.model');
         $user = new $userClass;
         $user->name = 'System Admin';
-        $user->email = config('aven.user.email');
-        $user->password = bcrypt(config('aven.user.password'));
+        $user->email = config('laradium.user.email');
+        $user->password = bcrypt(config('laradium.user.password'));
         $user->is_admin = 1;
         $user->save();
     }

@@ -11,9 +11,9 @@
     <title>{{ config('app.name') }} - Login</title>
 
     <!-- App css -->
-    <link href="/aven/admin/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/aven/admin/assets/css/icons.css" rel="stylesheet" type="text/css" />
-    <link href="/aven/admin/assets/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="/laradium/admin/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/laradium/admin/assets/css/icons.css" rel="stylesheet" type="text/css" />
+    <link href="/laradium/admin/assets/css/style.css" rel="stylesheet" type="text/css" />
 
 
 </head>
@@ -25,7 +25,7 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-            <img src="/aven/logo.svg" alt="Aven" style="max-width: 90%;">
+            <img src="/laradium/logo.svg" alt="Laradium" style="max-width: 90%;">
         </a>
     </div>
     <div class="m-t-40 card-box">
@@ -33,7 +33,7 @@
             <h4 class="text-uppercase font-bold m-b-0">Sign In</h4>
         </div>
         <div class="p-20">
-            @include('aven::admin._partials.messages')
+            @include('laradium::admin._partials.messages')
 
             <form class="form-horizontal m-t-20" action="/admin/login" method="post">
                 {{ csrf_field() }}

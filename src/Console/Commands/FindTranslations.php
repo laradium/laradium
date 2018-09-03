@@ -1,9 +1,9 @@
 <?php
 
-namespace Netcore\Aven\Console\Commands;
+namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
-use Netcore\Aven\Models\Translation;
+use Laradium\Laradium\Models\Translation;
 use File;
 use Symfony\Component\Finder\Finder;
 use PhpParser\Lexer;
@@ -126,7 +126,7 @@ class FindTranslations extends Command
     protected function writeToFile(array $translations): void
     {
         $excel = app('excel');
-        $filename = config('aven.translations_file');
+        $filename = config('laradium.translations_file');
         $excel
             ->create($filename, function (LaravelExcelWriter $writer) use ($translations) {
                 $writer->setTitle('Translations');

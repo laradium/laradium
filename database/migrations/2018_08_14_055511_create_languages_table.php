@@ -31,9 +31,9 @@ class CreateLanguagesTable extends Migration
             $table->timestamps();
         });
 
-        if ($languages = config('aven.languages', [])) {
+        if ($languages = config('laradium.languages', [])) {
             foreach ($languages as $language) {
-                $lang = \Netcore\Aven\Models\Language::create(array_except($language, 'icon'));
+                $lang = \Laradium\Laradium\Models\Language::create(array_except($language, 'icon'));
                 if (isset($language['icon'])) {
                     $image = new \Symfony\Component\HttpFoundation\File\File($language['icon']);
                     $file = new UploadedFile($image, $image->getBasename(), $image->getMimeType(), null, null, true);

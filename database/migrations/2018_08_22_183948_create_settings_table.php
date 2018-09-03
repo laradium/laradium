@@ -54,7 +54,7 @@ class CreateSettingsTable extends Migration
 
         menu()->seed($menus);
 
-        $settings = config('aven-setting.default_settings');
+        $settings = config('laradium-setting.default_settings');
         setting()->seed($settings);
     }
 

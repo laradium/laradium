@@ -1,4 +1,4 @@
-@extends('aven::layouts.main', ['title' => 'Edit ' . str_replace('-', ' ', $form->resourceName())])
+@extends('laradium::layouts.main', ['title' => 'Edit ' . str_replace('-', ' ', $form->resourceName())])
 @section('content')
     <div class="row">
         <div class="col-12">

@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Http\Controllers\Admin;
+namespace Laradium\Laradium\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 
@@ -20,7 +20,7 @@ class AdminController
      */
     public function dashboard()
     {
-        return view(config('aven.dashboard-view'));
+        return view(config('laradium.dashboard-view'));
     }
 
     /**

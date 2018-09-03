@@ -11,5 +11,5 @@ mix.setPublicPath('public');
  |
  */
 
-mix.js('resources/assets/js/aven.js', 'public/aven/assets/js')
-   .sass('resources/assets/sass/aven.scss', 'public/aven/assets/css');
+mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
+   .sass('resources/assets/sass/laradium.scss', 'public/laradium/assets/css');

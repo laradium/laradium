@@ -1,4 +1,4 @@
-@extends('aven::layouts.main', ['title' => 'Create ' . $form->resourceName()])
+@extends('laradium::layouts.main', ['title' => 'Create ' . $form->resourceName()])
 @section('content')
     <div class="row">
         <div class="col-12">

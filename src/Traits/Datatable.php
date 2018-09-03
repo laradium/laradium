@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Traits;
+namespace Laradium\Laradium\Traits;
 
-use Netcore\Aven\Aven\Form;
+use Laradium\Laradium\Base\Form;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 
@@ -83,7 +83,7 @@ trait Datatable
 
         foreach ($columns->where('translatable', true) as $column) {
             $dataTable->addColumn($column['column_parsed'], function ($item) use ($column) {
-                return view('aven::admin.resource._partials.translation', compact('item', 'column'))->render();
+                return view('laradium::admin.resource._partials.translation', compact('item', 'column'))->render();
             });
 
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
@@ -96,7 +96,7 @@ trait Datatable
         }
 
         $dataTable->addColumn('action', function ($item) use ($table) {
-            return view('aven::admin.resource._partials.action', compact('item', 'table'))->render();
+            return view('laradium::admin.resource._partials.action', compact('item', 'table'))->render();
         });
 
         if ($editableColumns->count()) {

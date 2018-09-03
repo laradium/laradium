@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Models;
+namespace Laradium\Laradium\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

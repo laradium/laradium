@@ -16,20 +16,20 @@
           rel="stylesheet"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <link href="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}"
+    <link href="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}"
           rel="stylesheet">
 
-    <link href="{{ asset('/aven/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('/aven/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/laradium/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/laradium/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
 
-    <script src="{{ asset('/aven/admin/assets/js/modernizr.min.js') }}"></script>
+    <script src="{{ asset('/laradium/admin/assets/js/modernizr.min.js') }}"></script>
     <style>
         .js-tab:not(.active) {
             display: none;
         }
     </style>
-    <link rel="stylesheet" href="{{ versionedAsset('aven/assets/css/aven.css') }}">
+    <link rel="stylesheet" href="{{ versionedAsset('laradium/assets/css/laradium.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
@@ -43,7 +43,7 @@
         <!-- LOGO -->
         <div class="topbar-left">
             <a href="{{ url('/') }}" class="logo">
-                <img src="/aven/logo.svg" alt="Aven" style="max-width: 90%;">
+                <img src="/laradium/logo.svg" alt="Laradium" style="max-width: 90%;">
             </a>
         </div>
 
@@ -58,7 +58,7 @@
                         </button>
                     </li>
                     <li class="list-inline-item">
-                        <h4 class="page-title">{{ $title ?? 'Aven' }}</h4>
+                        <h4 class="page-title">{{ $title ?? 'Laradium' }}</h4>
                     </li>
                 </ul>
 
@@ -104,7 +104,7 @@
             </div>
             <!-- End User -->
 
-            @include('aven::admin._partials.menu')
+            @include('laradium::admin._partials.menu')
         </div>
     </div>
     <!-- Left Sidebar End -->
@@ -120,7 +120,7 @@
             </div> <!-- container -->
         </div> <!-- content -->
 
-        <footer class="footer text-right">© Aven. <a href="https://netcore.agency">netcore.agency</a></footer>
+        <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
     </div>
     <!-- ============================================================== -->
     <!-- End Right content here -->
@@ -129,7 +129,7 @@
 </div>
 <!-- END wrapper -->
 @yield('crud-url')
-<script src="{{ versionedAsset('aven/assets/js/aven.js') }}"></script>
+<script src="{{ versionedAsset('laradium/assets/js/laradium.js') }}"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"
         integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
         crossorigin="anonymous"></script>
@@ -137,22 +137,22 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 
-<script src="{{ asset('/aven/admin/assets/js/detect.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/fastclick.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/jquery.blockUI.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/waves.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/jquery.nicescroll.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/jquery.slimscroll.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/detect.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/fastclick.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.blockUI.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/waves.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.nicescroll.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.4/tinymce.min.js"></script>
-<script src="{{ asset('/aven/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->
-<script src="{{ asset('/aven/admin/assets/js/jquery.core.js') }}"></script>
-<script src="{{ asset('/aven/admin/assets/js/jquery.app.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/js/jquery.app.js') }}"></script>
 
-<!-- Aven js -->
+<!-- Laradium js -->
 <script>
     $.ajaxSetup({
         headers: {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Netcore\Aven\Console\Commands;
+namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
-use Netcore\Aven\Models\Translation;
+use Laradium\Laradium\Models\Translation;
 
 class ImportTranslations extends Command
 {
@@ -44,7 +44,7 @@ class ImportTranslations extends Command
 
         $this->importFromLangFiles();
 
-        $fileName = config('aven.translations_file');
+        $fileName = config('laradium.translations_file');
         $excelLocation = resource_path('seed_translations/' . $fileName . '.xlsx');
         if (file_exists($excelLocation)) {
             try {
@@ -74,7 +74,7 @@ class ImportTranslations extends Command
                 \DB::transaction(function () use ($rows) {
                     foreach (array_chunk($rows, 300) as $chunk) {
                         foreach ($chunk as $item) {
-                            \Netcore\Aven\Models\Translation::firstOrCreate([
+                            \Laradium\Laradium\Models\Translation::firstOrCreate([
                                 'locale' => $item['locale'],
                                 'group'  => $item['group'],
                                 'key'    => $item['key'],
@@ -109,7 +109,7 @@ class ImportTranslations extends Command
                 foreach (\File::getRequire($fullPath) as $key => $translation) {
                     if (!is_array($key) && !is_array($group) && !is_array($translation)) {
                         foreach (translate()->languages() as $language) {
-                            \Netcore\Aven\Models\Translation::firstOrCreate([
+                            \Laradium\Laradium\Models\Translation::firstOrCreate([
                                 'locale' => $language['iso_code'],
                                 'group'  => $group,
                                 'key'    => $key,
