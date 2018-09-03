@@ -7,20 +7,18 @@
             </span>
         </label>
         <div v-if="input.isTranslatable">
-                <input type="hidden" v-model="item.value"
-                       :name="item.name"
-                       v-for="item in input.translatedAttributes">
-
-                <wysiwyg
+			<div v-for="(item, index) in input.translatedAttributes">
+				<div v-show="language === item.iso_code">
+                <tinymce
+						:key=(index+1)
+						:id="item.name"
                         v-model="item.value"
-                        :name="item.name"
-                        v-for="item in input.translatedAttributes"
-                        :key="item.name"
-                        v-show="language === item.iso_code"></wysiwyg>
-
+                        :name="item.name"></tinymce>
+						</div>
+			</div>
         </div>
         <div v-else>
-            <textarea :name="input.name" class="form-control">{{ input.value }}</textarea>
+            <tinymce :id="input.name" :name="input.name" v-model="input.value">{{ input.value }}</tinymce>
         </div>
     </div>
 </template>

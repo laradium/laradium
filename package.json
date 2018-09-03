@@ -12,17 +12,18 @@
   "devDependencies": {
     "axios": "^0.18",
     "bootstrap": "^4.0.0",
-    "popper.js": "^1.12",
     "cross-env": "^5.1",
+    "css-loader": "^1.0.0",
     "jquery": "^3.2",
     "laravel-mix": "^2.0",
     "lodash": "^4.17.4",
+    "popper.js": "^1.12",
     "vue": "^2.5.7"
   },
   "dependencies": {
     "jquery-datetimepicker": "^2.5.20",
     "jquery-ui": "^1.12.1",
-    "vue-wysiwyg": "^1.7.2",
+    "vue-easy-tinymce": "^1.0.2",
     "vuedraggable": "^2.16.0"
   }
 }
