@@ -5,8 +5,9 @@
  */
 
 require('./bootstrap');
-import wysiwyg from "vue-wysiwyg";
 window.Vue = require('vue');
+
+import tinymce from 'vue-easy-tinymce';
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -37,7 +38,7 @@ Vue.component('belongs-to-many-field', require('./components/fields/BelongsToMan
 
 Vue.component('widget-constructor-field', require('./components/fields/WidgetConstructor.vue'));
 Vue.component('draggable', require('vuedraggable'));
-Vue.use(wysiwyg, {});
+Vue.component('tinymce', tinymce);
 
 const app = new Vue({
     el: '#app',
