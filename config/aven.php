@@ -11,9 +11,13 @@ return [
         \Netcore\Aven\Aven\Resources\MenuResource::class,
         \Netcore\Aven\Aven\Resources\SettingResource::class,
         \Netcore\Aven\Content\Aven\Resources\PageResource::class,
-        // list of your resources
-//        \App\Aven\Resources\ArticleResource::class,
+        // List of your resources
+        // \App\Aven\Resources\ArticleResource::class,
 
+    ],
+
+    'api_resources' => [
+        // List of API resources
     ],
 
     'translations_file' => 'translations',

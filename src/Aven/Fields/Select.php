@@ -59,7 +59,7 @@ class Select extends Field
             'label'                  => $field->getLabel(),
             'default'                => $field->getDefault(),
             'isHidden'               => $field->isHidden(),
-            'replacemenetAttributes' => $attributes->toArray(),
+            'replacementAttributes'  => $attributes->toArray(),
             'tab'                    => $this->tab(),
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [

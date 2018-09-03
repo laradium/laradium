@@ -2,14 +2,12 @@
 
 namespace Netcore\Aven\Aven;
 
-use File;
 use Illuminate\Http\Request;
 use Netcore\Aven\Traits\Crud;
-use Netcore\Aven\Traits\Datatable;
 
-abstract class AbstractAvenResource
+abstract class AbstractAvenApiResource
 {
-    use Crud, Datatable;
+    use Crud;
 
     /**
      * @var
@@ -40,10 +38,34 @@ abstract class AbstractAvenResource
     public function index()
     {
         $model = $this->model;
-        $table = $this->table()->setModel($model);
-        $resource = $this;
+        $api = $this->api()->setModel($model);
 
-        return view('aven::admin.resource.index', compact('table', 'model', 'resource'));
+        if (count($api->getRelations())) {
+            $model = $model->with($api->getRelations())->select('*');
+        } else {
+            $model = $model->select('*');
+        }
+
+        if ($api->getWhere()) {
+            $model = $model->where($api->getWhere());
+        }
+
+        $model = $model->get();
+
+        $data = $model->map(function ($row, $key) use ($api) {
+            foreach ($api->fields() as $field) {
+                $value = $field['modify'] ?? $row->{$field['name']};
+
+                $attributes[$field['name']] = $value;
+            }
+
+            return $attributes;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
     /**
@@ -69,8 +91,8 @@ abstract class AbstractAvenResource
 
                 return $item;
             })->toArray(),
-            'inputs'    => $response,
-            'tabs'      => $resource->fieldSet()->tabs()->toArray()
+            'inputs' => $response,
+            'tabs' => $resource->fieldSet()->tabs()->toArray()
         ]);
     }
 
@@ -85,7 +107,10 @@ abstract class AbstractAvenResource
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
-        return view('aven::admin.resource.create', compact('form'));
+        return response()->json([
+            'success' => true,
+            'data' => $form->formatedResponse()
+        ]);
     }
 
     /**
@@ -101,12 +126,11 @@ abstract class AbstractAvenResource
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
+        $request->validate($form->getValidationRules());
+
         if (isset($this->events['beforeSave'])) {
             $this->events['beforeSave']($this->model, $request);
         }
-
-        $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
 
         $this->updateResource($request->except('_token'), $model);
 
@@ -116,7 +140,7 @@ abstract class AbstractAvenResource
 
         if ($request->ajax()) {
             return [
-                'success'  => 'Resource successfully created',
+                'success' => 'Resource successfully created!',
                 'redirect' => url()->previous()
             ];
         }
@@ -128,15 +152,58 @@ abstract class AbstractAvenResource
      * @param $id
      * @return mixed
      */
+    public function show($id)
+    {
+        $model = $this->model;
+        $api = $this->api()->setModel($model);
+
+        if (count($api->getRelations())) {
+            $model = $model->with($api->getRelations())->select('*');
+        } else {
+            $model = $model->select('*');
+        }
+
+        if ($api->getWhere()) {
+            $model = $model->where($api->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
+
+        $data = $api->fields()->mapWithKeys(function ($field) use ($model) {
+            $value = $field['modify'] ?? $model->{$field['name']};
+
+            return [$field['name'] => $value];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function edit($id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model;
+        $api = $this->api()->setModel($model);
+
+        if ($api->getWhere()) {
+            $model = $model->where($api->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
-        return view('aven::admin.resource.edit', compact('form'));
+        return response()->json([
+            'success' => true,
+            'data' => $form->formatedResponse()
+        ]);
     }
 
     /**
@@ -147,20 +214,24 @@ abstract class AbstractAvenResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model;
+        $api = $this->api()->setModel($model);
+
+        if ($api->getWhere()) {
+            $model = $model->where($api->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
 
+        $request->validate($form->getValidationRules());
+
         if (isset($this->events['beforeSave'])) {
             $this->events['beforeSave']($this->model, $request);
         }
-
-        $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
-
-        $model = $this->model->find($id);
 
         $this->updateResource($request->except('_token'), $model);
 
@@ -170,8 +241,8 @@ abstract class AbstractAvenResource
 
         if ($request->ajax()) {
             return [
-                'success' => 'Resource successfully updated',
-                'data'    => $this->getForm($model->id)
+                'success' => 'Resource successfully updated!',
+                'data' => $this->getForm($model->id)
             ];
         }
 
@@ -185,12 +256,20 @@ abstract class AbstractAvenResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model;
+
+        if ($api->getWhere()) {
+            $model = $model->where($api->getWhere());
+        }
+
+        $model = $model->findOrFail($id);
+
         $model->delete();
 
         if ($request->ajax()) {
             return [
-                'state' => 'success'
+                'success' => true,
+                'message' => 'Resource successfully deleted!'
             ];
         }
 
@@ -226,28 +305,7 @@ abstract class AbstractAvenResource
     }
 
     /**
-     * @return bool
+     * @return \Netcore\Aven\Aven\Api
      */
-    public function importInProgress(): bool
-    {
-        return !!File::exists(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
-    }
-
-    /**
-     * @return bool|string
-     */
-    public function importStatus()
-    {
-        return file_get_contents(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
-    }
-
-    /**
-     * @return \Netcore\Aven\Aven\Resource
-     */
-    abstract protected function resource();
-
-    /**
-     * @return Table
-     */
-//    abstract protected function table();
+    abstract protected function api();
 }

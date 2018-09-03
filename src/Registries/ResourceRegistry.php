@@ -55,13 +55,15 @@ class ResourceRegistry
                 'method' => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-                'middleware' => ['web', 'aven']
+                'middleware' => ['web', 'aven'],
+                'name' => 'admin.' . $routeSlug . '.data-table'
             ],
             [
                 'method' => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
-                'middleware' => ['web', 'aven']
+                'middleware' => ['web', 'aven'],
+                'name' => 'admin.' . $routeSlug . '.editable'
             ],
             [
                 'method' => 'get',
@@ -90,7 +92,7 @@ class ResourceRegistry
                 'method' => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'aven']
             ],
         ];
 
@@ -108,7 +110,7 @@ class ResourceRegistry
                     $route['controller'])->middleware($route['middleware'])->name($route['name']);
             } else {
                 $this->router->{$route['method']}($route['route_slug'],
-                    $route['controller'])->middleware($route['middleware']);
+                    $route['controller'], ['as' => 'admin'])->middleware($route['middleware']);
             }
         }
 

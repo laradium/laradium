@@ -45,7 +45,6 @@ class HasMany extends Field
      * @var string
      */
     protected $morphType;
-    protected $test;
 
     /**
      * HasMany constructor.

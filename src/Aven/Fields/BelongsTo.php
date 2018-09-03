@@ -78,7 +78,7 @@ class BelongsTo extends Field
             'type'                   => 'select',
             'name'                   => $field->getNameAttribute(),
             'label'                  => $field->getLabel(),
-            'replacemenetAttributes' => $attributes->toArray(),
+            'replacementAttributes'  => $attributes->toArray(),
             'isHidden'               => $field->isHidden(),
             'default'                => $field->getDefault(),
             'tab'                    => $this->tab(),

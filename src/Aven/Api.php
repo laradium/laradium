@@ -17,9 +17,9 @@ class Api
     protected $relations = [];
 
     /**
-     * @var ApiFieldSet
+     * @var DataSet
      */
-    protected $fieldSet;
+    protected $dataSet;
 
     /**
      * @var
@@ -29,7 +29,7 @@ class Api
     /**
      * @var array
      */
-    protected $routes = ['index', 'store', 'show', 'update', 'delete'];
+    protected $routes = ['index', 'create', 'store', 'show', 'edit', 'update', 'delete'];
 
     /**
      * @var array
@@ -49,10 +49,9 @@ class Api
     /**
      * Table constructor.
      */
-    public function __construct($model)
+    public function __construct()
     {
-        $this->model = $model;
-        $this->fieldSet = new ApiFieldSet;
+        $this->dataSet = new DataSet;
     }
 
     /**
@@ -80,7 +79,7 @@ class Api
      */
     public function make(\Closure $closure)
     {
-        $closure($this->fieldSet);
+        $closure($this->dataSet);
 
         return $this;
     }
@@ -107,9 +106,9 @@ class Api
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function columns()
+    public function fields()
     {
-        return $this->fieldSet->list;
+        return $this->dataSet->list;
     }
 
     /**
@@ -186,54 +185,5 @@ class Api
     public function getMiddleware()
     {
         return $this->middleware;
-    }
-
-    /**
-     * @param null $id
-     * @return Collection
-     */
-    public function getData($id = null)
-    {
-        if ($id) {
-            if (count($this->getRelations())) {
-                $model = $this->model->with($this->getRelations())->select('*');
-            } else {
-                $model = $this->model->select('*');
-            }
-
-            if ($this->getWhere()) {
-                $model = $this->model->where($this->getWhere());
-            }
-
-            $model = $model->findOrFail($id);
-
-            return $this->fieldSet->list->mapWithKeys(function ($field) use ($model) {
-                $value = $field['modify'] ?? $model->{$field['name']};
-
-                return [$field['name'] => $value];
-            });
-        }
-
-        if (count($this->getRelations())) {
-            $model = $this->model->with($this->getRelations())->select('*');
-        } else {
-            $model = $this->model->select('*');
-        }
-
-        if ($this->getWhere()) {
-            $model = $this->model->where($this->getWhere());
-        }
-
-        $model = $model->get();
-
-        return $model->map(function ($row, $key) {
-            foreach ($this->fieldSet->list as $field) {
-                $value = $field['modify'] ?? $row->{$field['name']};
-
-                $attributes[$field['name']] = $value;
-            }
-
-            return $attributes;
-        });
     }
 }

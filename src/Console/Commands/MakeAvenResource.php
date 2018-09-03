@@ -14,7 +14,7 @@ class MakeAvenResource extends Command
      *
      * @var string
      */
-    protected $signature = 'aven:resource {name} {--t}';
+    protected $signature = 'aven:resource {name} {--t} {--api}';
 
     /**
      * The console command description.
@@ -42,6 +42,7 @@ class MakeAvenResource extends Command
     {
         $name = $this->argument('name');
         $translations = $this->option('t');
+        $api = $this->option('api');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
         $resourceDirectory = app_path('Aven/Resources');
@@ -50,6 +51,7 @@ class MakeAvenResource extends Command
             $this->info('Creating resources directory');
         }
 
+        // Resource
         $dummyResource = File::get(__DIR__.'/../../../stubs/aven-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
         $resource = str_replace('{{resource}}', $name, $resource);
@@ -59,6 +61,20 @@ class MakeAvenResource extends Command
 
         if (!file_exists($resourceFilePath)) {
             File::put($resourceFilePath, $resource);
+        }
+
+        // API Resource
+        if ($api) {
+            $dummyResource = File::get(__DIR__.'/../../../stubs/aven-api-resource.stub');
+            $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
+            $resource = str_replace('{{resource}}', $name, $resource);
+            $resource = str_replace('{{resource}}', $name, $resource);
+            $resource = str_replace('{{modelNamespace}}', config('aven.default_models_directory', 'App'), $resource);
+            $resourceFilePath = app_path('Aven/Resources/' . $name . 'ApiResource.php');
+
+            if (!file_exists($resourceFilePath)) {
+                File::put($resourceFilePath, $resource);
+            }
         }
 
         Artisan::call('make:model', ['name' => 'Models/' . $name]);

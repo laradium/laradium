@@ -84,11 +84,16 @@ class AvenServiceProvider extends ServiceProvider
     protected function registerResources()
     {
         $resources = config('aven.resources', []);
+        $apiResources = config('aven.api_resources', []);
 
         $aven = app(\Netcore\Aven\Aven\Aven::class);
+
         foreach ($resources as $resource) {
             $aven->register($resource);
-            $aven->registerApi($resource);
+        }
+
+        foreach ($apiResources as $apiResource) {
+            $aven->registerApi($apiResource);
         }
     }
 

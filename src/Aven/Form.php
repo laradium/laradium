@@ -20,13 +20,13 @@ class Form
     /**
      * @var Model
      */
-
     protected $model;
+
     /**
      * @var Resource
      */
-
     protected $resource;
+
     /**
      * @var array
      */
@@ -71,6 +71,9 @@ class Form
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function formatedResponse()
     {
         $fieldList = [];
@@ -109,9 +112,8 @@ class Form
      * @param $rules
      * @return $this
      */
-    public function setValidationRules(
-        $rules
-    ) {
+    public function setValidationRules($rules)
+    {
         $this->validationRules += $rules;
 
         return $this;
@@ -129,7 +131,8 @@ class Form
      * @param string $action
      * @return string
      */
-    public function getAction($action = 'index'): string {
+    public function getAction($action = 'index'): string
+    {
         $resource = $this->resourceName();
         if ($action == 'create') {
             return url('/admin/' . $resource . '/create');

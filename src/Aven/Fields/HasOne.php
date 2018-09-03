@@ -36,7 +36,6 @@ class HasOne extends Field
 
         $this->fieldSet = new FieldSet;
         $this->relationName = $this->name;
-
     }
 
     /**

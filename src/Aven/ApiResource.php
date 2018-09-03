@@ -5,7 +5,7 @@ namespace Netcore\Aven\Aven;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class Resource
+class ApiResource
 {
 
     /**
@@ -63,7 +63,7 @@ class Resource
     }
 
     /**
-     * @return FieldSet
+     * @return DataSet
      */
     public function fieldSet()
     {

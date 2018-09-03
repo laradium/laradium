@@ -33,7 +33,7 @@ class Boolean extends Field
             'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
             'name'                   => $field->getNameAttribute(),
             'label'                  => $field->getLabel(),
-            'replacemenetAttributes' => $attributes->toArray(),
+            'replacementAttributes'  => $attributes->toArray(),
             'checked'                => $field->getValue() == 1,
             'tab'                    => $this->tab(),
         ];

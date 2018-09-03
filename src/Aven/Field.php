@@ -288,7 +288,7 @@ class Field
                 'label'                  => $field->getLabel(),
                 'value'                  => $field->getValue(),
                 'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
+                'replacementAttributes'  => $attributes->toArray(),
                 'tab'                    => $this->tab(),
             ];
         } else {
@@ -297,7 +297,7 @@ class Field
                 'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
                 'label'                  => $field->getLabel(),
                 'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
+                'replacementAttributes'  => $attributes->toArray(),
                 'tab'                    => $this->tab(),
             ];
             $translatedAttributes = [];

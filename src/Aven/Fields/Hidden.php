@@ -83,7 +83,7 @@ class Hidden extends Field
                 get_class($field)))),
             'name'  => $field->getNameAttribute(),
             'value' => $field->getValue(),
-            'replacemenetAttributes' => $attributes->toArray()
+            'replacementAttributes'  => $attributes->toArray(),
         ];
 
         if ($field->getParam('orderable')) {

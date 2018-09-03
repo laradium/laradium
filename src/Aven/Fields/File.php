@@ -43,7 +43,7 @@ class File extends Field
             'type'                   => 'file',
             'name'                   => $field->getNameAttribute(),
             'label'                  => $field->getLabel(),
-            'replacemenetAttributes' => $attributes->toArray(),
+            'replacementAttributes'  => $attributes->toArray(),
             'url'                    => $url,
             'tab'                    => $this->tab(),
             'file_name'              => $name,
