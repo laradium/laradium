@@ -3,6 +3,8 @@
 return [
     'default_models_directory' => 'App\\Models',
 
+    'file_size' => '2024', // default max file upload size 2mb
+
     'resources' => [
         \Netcore\Aven\Aven\Resources\TranslationResource::class,
         \Netcore\Aven\Aven\Resources\LanguageResource::class,

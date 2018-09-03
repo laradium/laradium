@@ -1,6 +1,10 @@
-Package allows you to create advanced CRUD views with relations in light weight admin panel. Using plain laravel database structure, models and VueJS which allows to make it very flexible and can be adjusted up to your needs. 
+Package allows you to create advanced CRUD views with relations in light weight 
+admin panel. Using plain laravel database structure, models and VueJS which 
+allows to make it very flexible and can be adjusted up to your needs. 
 
 # Installation
+
+## For local development
 1. Add this to your project repositories list in `composer.json` file
 
 
@@ -19,6 +23,16 @@ Directory structure should look like this
 -packages
     --aven-package
     --aven-content
+```
+## For global use
+
+```
+"repositories": [
+        {
+            "type": "git",
+            "url": "https://git.netcore.lv/daniels.grietins/aven"
+        }
+    ]
 ```
 
 2. ```composer require netcore/aven dev-master```

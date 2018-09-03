@@ -45,6 +45,7 @@ class File extends Field
             'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
             'url'                    => $url,
+            'tab'                    => $this->tab(),
             'file_name'              => $name,
             'file_size'              => $size,
         ];

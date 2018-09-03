@@ -2,6 +2,7 @@
 
 namespace Netcore\Aven\Aven;
 
+use File;
 use Illuminate\Http\Request;
 use Netcore\Aven\Traits\Crud;
 use Netcore\Aven\Traits\Datatable;
@@ -343,6 +344,22 @@ abstract class AbstractAvenResource
     public function model()
     {
         return $this->model;
+    }
+
+    /**
+     * @return bool
+     */
+    public function importInProgress(): bool
+    {
+        return !!File::exists(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function importStatus()
+    {
+        return file_get_contents(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
     }
 
     /**

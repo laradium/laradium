@@ -96,7 +96,12 @@ class Setting extends Model
         if ($this->is('checkbox')) {
             return $this->value === '1';
         }
-        return $this->value;
+
+        if($this->is_translatable) {
+            return $this->value;
+        } else {
+            return $this->non_translatable_value;
+        }
     }
     /**
      * @return string
