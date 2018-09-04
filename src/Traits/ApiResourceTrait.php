@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Traits;
+namespace Laradium\Laradium\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;

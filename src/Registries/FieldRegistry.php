@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Registries;
+namespace Laradium\Laradium\Registries;
 
 use Illuminate\Support\Collection;
 

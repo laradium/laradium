@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Models;
+namespace Laradium\Laradium\Models;
 
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ class Menu extends Model
     /**
      * @var string
      */
-    public static $cacheKey = 'aven::menus';
+    public static $cacheKey = 'laradium::menus';
 
     /**
      * @var array

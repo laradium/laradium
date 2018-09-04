@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Services;
+namespace Laradium\Laradium\Services;
 
-use Netcore\Aven\Models\Translation;
+use Laradium\Laradium\Models\Translation;
 use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;

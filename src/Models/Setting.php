@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Models;
+namespace Laradium\Laradium\Models;
 
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -91,7 +91,7 @@ class Setting extends Model
     public function getValue()
     {
         if ($this->is('file')) {
-            return asset(config('aven-setting.upload_path') . '/' . $this->value);
+            return asset(config('laradium-setting.upload_path') . '/' . $this->value);
         }
         if ($this->is('checkbox')) {
             return $this->value === '1';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Registries;
+namespace Laradium\Laradium\Registries;
 
 use Illuminate\Support\Collection;
 
@@ -55,21 +55,21 @@ class ResourceRegistry
                 'method' => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.data-table'
             ],
             [
                 'method' => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.editable'
             ],
             [
                 'method' => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.form'
             ],
             // Import
@@ -77,7 +77,7 @@ class ResourceRegistry
                 'method' => 'post',
                 'route_slug' => $this->getRouteName('import'),
                 'controller' => $this->getRouteController('import'),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.import'
             ],
             // Export
@@ -85,14 +85,14 @@ class ResourceRegistry
                 'method' => 'get',
                 'route_slug' => $this->getRouteName('export'),
                 'controller' => $this->getRouteController('export'),
-                'middleware' => ['web', 'aven'],
+                'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.export'
             ],
             [
                 'method' => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'middleware' => ['web', 'aven']
+                'middleware' => ['web', 'laradium']
             ],
         ];
 

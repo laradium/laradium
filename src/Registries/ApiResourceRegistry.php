@@ -1,9 +1,9 @@
 <?php
 
-namespace Netcore\Aven\Registries;
+namespace Laradium\Laradium\Registries;
 
 use Illuminate\Support\Collection;
-use Netcore\Aven\Traits\ApiResourceTrait;
+use Laradium\Laradium\Traits\ApiResourceTrait;
 
 class ApiResourceRegistry
 {

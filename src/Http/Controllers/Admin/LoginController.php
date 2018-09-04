@@ -1,6 +1,6 @@
 <?php
 
-namespace Netcore\Aven\Http\Controllers\Admin;
+namespace Laradium\Laradium\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -41,7 +41,7 @@ class LoginController extends BaseController
      */
     public function index()
     {
-        return view('aven::admin.login');
+        return view('laradium::admin.login');
     }
 
     /**

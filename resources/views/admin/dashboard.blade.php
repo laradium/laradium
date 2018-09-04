@@ -1,3 +1,3 @@
-@extends('aven::layouts.main', ['title' => 'Dashboard'])
+@extends('laradium::layouts.main', ['title' => 'Dashboard'])
 @section('content')
 @endsection

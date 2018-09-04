@@ -1,10 +1,10 @@
-@extends('aven::layouts.main', ['title' => ucfirst(str_replace('_', ' ', $model->getTable())), 'table' => $table])
+@extends('laradium::layouts.main', ['title' => ucfirst(str_replace('_', ' ', $model->getTable())), 'table' => $table])
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card-box">
-                @include('aven::admin._partials.messages')
+                @include('laradium::admin._partials.messages')
 
                 @if($resource->importInProgress())
                     <div class="alert alert-info">
@@ -12,7 +12,7 @@
                     </div>
                 @endif
 
-                @include('aven::admin.resource._partials.import_export')
+                @include('laradium::admin.resource._partials.import_export')
 
                 @if($table->getAdditionalView())
                     <div class="row">
@@ -88,11 +88,11 @@
 
 @push('scripts')
     <!-- Required datatable js -->
-    <script src="/aven/admin/assets/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="/aven/admin/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/laradium/admin/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
     <!-- Responsive examples -->
-    <script src="/aven/admin/assets/plugins/datatables/dataTables.responsive.min.js"></script>
-    <script src="/aven/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
+    <script src="/laradium/admin/assets/plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
     <script>
         $(function () {
             $.fn.editable.defaults.mode = 'inline';
@@ -174,7 +174,7 @@
 
 @push('styles')
     <!-- DataTables -->
-    <link href="/aven/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
     <!-- Responsive datatable examples -->
-    <link href="/aven/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
 @endpush

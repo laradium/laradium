@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Repositories;
+namespace Laradium\Laradium\Repositories;
 
-use Netcore\Aven\Models\Setting;
+use Laradium\Laradium\Models\Setting;
 
 class SettingsRepository
 {
@@ -22,7 +22,7 @@ class SettingsRepository
      */
     public function __construct()
     {
-        $this->cacheKey = config('aven-setting.cache_key', 'settings');
+        $this->cacheKey = config('laradium-setting.cache_key', 'settings');
         $this->cachedSettings = cache()->rememberForever($this->cacheKey, function () {
             return Setting::all()->keyBy('key');
         });

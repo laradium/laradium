@@ -1,0 +1,39 @@
+<?php
+
+namespace {{namespace}}\Laradium\Resources;
+
+use Laradium\Laradium\Base\AbstractResource;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\Table;
+use {{modelNamespace}}\{{resource}};
+
+class {{resource}}Resource extends AbstractResource
+{
+
+    /**
+     * @var string
+     */
+    protected $resource = {{resource}}::class;
+
+    /**
+     * @return Resource
+     */
+    public function resource()
+    {
+        return (new Resource)->make(function (FieldSet $set) {
+            $set->text('type')->rules('required|min:3');
+        });
+    }
+
+     /**
+     * @return Table
+     */
+    public function table()
+    {
+        return (new Table)->make(function (ColumnSet $column) {
+            $column->add('id', '#ID');
+        });
+    }
+}

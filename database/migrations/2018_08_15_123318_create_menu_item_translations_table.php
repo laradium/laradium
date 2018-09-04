@@ -27,9 +27,9 @@ class CreateMenuItemTranslationsTable extends Migration
             $table->timestamps();
         });
 
-        if ($menus = config('aven.menus', [])) {
+        if ($menus = config('laradium.menus', [])) {
             foreach ($menus as $name => $menuItems) {
-                $m = \Netcore\Aven\Models\Menu::create([
+                $m = \Laradium\Laradium\Models\Menu::create([
                     'key' => str_slug($name, '_')
                 ]);
 

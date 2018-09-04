@@ -1,10 +1,10 @@
 <?php
 
-namespace Netcore\Aven\Repositories;
+namespace Laradium\Laradium\Repositories;
 
 use Exception;
 use Illuminate\Support\Collection;
-use Netcore\Aven\Models\Menu;
+use Laradium\Laradium\Models\Menu;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuRepository
@@ -114,7 +114,7 @@ class MenuRepository
             throw new Exception('Invalid data given!');
         }
         foreach ($menus as $name => $menuItems) {
-            $m = \Netcore\Aven\Models\Menu::firstOrCreate([
+            $m = \Laradium\Laradium\Models\Menu::firstOrCreate([
                 'key' => str_slug($name, '_')
             ]);
 

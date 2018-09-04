@@ -1,5 +1,5 @@
 {
-  "name": "netcore/aven",
+  "name": "netcore/laradium",
   "license": "MIT",
   "authors": [
     {
@@ -17,13 +17,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Netcore\\Aven\\": "src"
+      "Laradium\\Laradium\\": "src"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Netcore\\Aven\\Providers\\AvenServiceProvider"
+        "Laradium\\Laradium\\Providers\\LaradiumServiceProvider"
       ]
     }
   }

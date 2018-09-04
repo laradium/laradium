@@ -1,8 +1,8 @@
 <?php
 
-namespace Netcore\Aven\Helpers;
+namespace Laradium\Laradium\Helpers;
 
-use Netcore\Aven\Models\Language;
+use Laradium\Laradium\Models\Language;
 
 class Translate
 {
