@@ -9,8 +9,6 @@ use Laradium\Laradium\Models\Translation;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Resource;
-use Laradium\Laradium\Base\Table;
 
 Class TranslationResource extends AbstractResource
 {
@@ -29,7 +27,7 @@ Class TranslationResource extends AbstractResource
             cache()->forget('translations');
         });
 
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
             $set->select('locale')->options($this->localeList());
             $set->text('group')->rules('required');
             $set->text('key')->rules('required');
@@ -38,11 +36,11 @@ Class TranslationResource extends AbstractResource
     }
 
     /**
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('locale');
             $column->add('group');
             $column->add('key');
