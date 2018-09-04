@@ -49455,6 +49455,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['input', 'language', 'item']
@@ -49470,27 +49482,83 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "form-group" }, [
     _c("label", { attrs: { for: "" } }, [
-      _vm._v("\n        " + _vm._s(_vm.input.label) + "\n    ")
+      _vm._v(_vm._s(_vm.input.label) + "\n        "),
+      _vm.input.isTranslatable
+        ? _c("span", { staticClass: "badge badge-primary" }, [
+            _vm._v("\n            " + _vm._s(_vm.language) + "\n        ")
+          ])
+        : _vm._e()
     ]),
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _vm.input.url
-      ? _c("a", { attrs: { href: _vm.input.url, target: "_blank" } }, [
-          _vm._v(
-            "\n        " +
-              _vm._s(_vm.input.file_name) +
-              " (" +
-              _vm._s(_vm.input.file_size) +
-              " kb)\n    "
-          )
+    _vm.input.isTranslatable
+      ? _c(
+          "div",
+          [
+            _vm._l(_vm.input.translatedAttributes, function(item) {
+              return item.url
+                ? _c(
+                    "a",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.language === item.iso_code,
+                          expression: "language === item.iso_code"
+                        }
+                      ],
+                      attrs: { href: item.url, target: "_blank" }
+                    },
+                    [
+                      _vm._v(
+                        "\n            " +
+                          _vm._s(item.file_name) +
+                          " (" +
+                          _vm._s(item.file_size) +
+                          " kb)\n        "
+                      )
+                    ]
+                  )
+                : _vm._e()
+            }),
+            _vm._v(" "),
+            _vm._l(_vm.input.translatedAttributes, function(item) {
+              return _c("input", {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.language === item.iso_code,
+                    expression: "language === item.iso_code"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "file", name: item.name }
+              })
+            })
+          ],
+          2
+        )
+      : _c("div", [
+          _vm.input.url
+            ? _c("a", { attrs: { href: _vm.input.url, target: "_blank" } }, [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.input.file_name) +
+                    " (" +
+                    _vm._s(_vm.input.file_size) +
+                    " kb)\n        "
+                )
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "form-control",
+            attrs: { type: "file", name: _vm.input.name }
+          })
         ])
-      : _vm._e(),
-    _vm._v(" "),
-    _c("input", {
-      staticClass: "form-control",
-      attrs: { type: "file", name: _vm.input.name }
-    })
   ])
 }
 var staticRenderFns = []
