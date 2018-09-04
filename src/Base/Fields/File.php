@@ -33,21 +33,56 @@ class File extends Field
         $size = null;
         $name = null;
 
-        if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
-            $url = $this->model->{$this->name}->url();
-            $size = number_format($this->model->{$this->name}->size() / 1000, 2);
-            $name = $this->model->{$this->name}->originalFilename();
+        if (!$field->isTranslatable()) {
+            if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
+                $url = $this->model->{$this->name}->url();
+                $size = number_format($this->model->{$this->name}->size() / 1000, 2);
+                $name = $this->model->{$this->name}->originalFilename();
+            }
+
+            $data = [
+                'type'                   => 'file',
+                'name'                   => $field->getNameAttribute(),
+                'label'                  => $field->getLabel(),
+                'isTranslatable'         => $field->isTranslatable(),
+                'replacemenetAttributes' => $attributes->toArray(),
+                'tab'                    => $this->tab(),
+                'url'                    => $url,
+                'file_name'              => $name,
+                'file_size'              => $size,
+            ];
+        } else {
+            $data = [
+                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'                  => $field->getLabel(),
+                'isTranslatable'         => $field->isTranslatable(),
+                'replacemenetAttributes' => $attributes->toArray(),
+                'tab'                    => $this->tab(),
+            ];
+            $translatedAttributes = [];
+
+            foreach (translate()->languages() as $language) {
+                $field->setLocale($language['iso_code']);
+                $model = $field->model()->translations->where('locale', $language['iso_code'])->first();
+                if ($model && $model->{$this->name} && $model->{$this->name}->exists()) {
+                    $url = $model->{$this->name}->url();
+                    $size = number_format($model->{$this->name}->size() / 1000, 2);
+                    $name = $model->{$this->name}->originalFilename();
+                }
+
+                $translatedAttributes[] = [
+                    'iso_code'  => $language['iso_code'],
+                    'value'     => $field->getValue(),
+                    'name'      => $field->getNameAttribute(),
+                    'url'       => $url,
+                    'file_name' => $name,
+                    'file_size' => $size,
+                ];
+            }
+
+            $data['translatedAttributes'] = $translatedAttributes;
         }
 
-        return [
-            'type'                   => 'file',
-            'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
-            'replacementAttributes'  => $attributes->toArray(),
-            'url'                    => $url,
-            'tab'                    => $this->tab(),
-            'file_name'              => $name,
-            'file_size'              => $size,
-        ];
+        return $data;
     }
 }
