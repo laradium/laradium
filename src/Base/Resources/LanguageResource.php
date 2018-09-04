@@ -5,9 +5,7 @@ namespace Laradium\Laradium\Base\Resources;
 use Laradium\Laradium\Models\Language;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\ColumnSet;
-use Laradium\Laradium\Base\Table;
 
 Class LanguageResource extends AbstractResource
 {
@@ -26,7 +24,7 @@ Class LanguageResource extends AbstractResource
             cache()->forget('languages');
         });
 
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
             $set->text('iso_code')->rules('required');
             $set->text('title')->rules('required');
             $set->text('title_localized')->rules('required');
@@ -37,11 +35,11 @@ Class LanguageResource extends AbstractResource
     }
 
     /**
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('iso_code');
             $column->add('title');
             $column->add('title_localized');
