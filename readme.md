@@ -30,7 +30,7 @@ Directory structure should look like this
 "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/laradium/laradium"
+            "url": "https://github.com/laradium/laradium.git"
         }
     ]
 ```
