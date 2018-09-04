@@ -12,7 +12,7 @@ allows to make it very flexible and can be adjusted up to your needs.
 "repositories": [
     {
         "type": "path",
-        "url": "../packages/laradium-package"
+        "url": "../packages/laradium"
     }
 ]
 ```
@@ -21,7 +21,7 @@ Directory structure should look like this
 ```
 -Project
 -packages
-    --laradium-package
+    --laradium
     --laradium-content
 ```
 ## For global use
