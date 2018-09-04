@@ -4,9 +4,7 @@ namespace {{namespace}}\Laradium\Resources;
 
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\ColumnSet;
-use Laradium\Laradium\Base\Table;
 use {{modelNamespace}}\{{resource}};
 
 class {{resource}}Resource extends AbstractResource
@@ -18,21 +16,21 @@ class {{resource}}Resource extends AbstractResource
     protected $resource = {{resource}}::class;
 
     /**
-     * @return Resource
+     * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
             $set->text('type')->rules('required|min:3');
         });
     }
 
      /**
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('id', '#ID');
         });
     }

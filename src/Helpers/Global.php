@@ -1,6 +1,16 @@
 <?php
 use Illuminate\Support\Facades\File;
 
+if (!function_exists('laradium')) {
+    /**
+     * @return mixed
+     */
+    function laradium()
+    {
+        return app(\Laradium\Laradium\Repositories\LaradiumRepository::class);
+    }
+}
+
 if (!function_exists('translate')) {
     /**
      * @return mixed
