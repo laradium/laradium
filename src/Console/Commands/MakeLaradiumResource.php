@@ -68,6 +68,8 @@ class MakeLaradiumResource extends Command
 
         $this->info('Resource successfully created!');
 
+        cache()->forget('laradium::resource-list');
+
         return;
     }
 }

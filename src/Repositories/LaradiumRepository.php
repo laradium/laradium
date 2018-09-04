@@ -5,22 +5,23 @@ namespace Laradium\Laradium\Repositories;
 use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\Table;
 
-class LaradiumRepository {
+class LaradiumRepository
+{
 
     /**
      * @param \Closure $closure
-     * @return Resource
+     * @return \Laradium\Laradium\Base\Resource
      */
-    public function resource(\Closure $closure)
+    public function resource(\Closure $closure): \Laradium\Laradium\Base\Resource
     {
         return (new Resource)->make($closure);
     }
 
     /**
      * @param \Closure $closure
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
-    public function table(\Closure $closure)
+    public function table(\Closure $closure): \Laradium\Laradium\Base\Table
     {
         return (new Table)->make($closure);
     }
