@@ -43,7 +43,7 @@
         <!-- LOGO -->
         <div class="topbar-left">
             <a href="{{ url('/') }}" class="logo">
-                <img src="/laradium/logo.svg" alt="Laradium" style="max-width: 90%;">
+                <span>Lara<span>dium</span></span><i class="mdi mdi-layers"></i>
             </a>
         </div>
 
