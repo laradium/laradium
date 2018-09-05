@@ -20,6 +20,10 @@ Class SettingResource extends AbstractResource
      */
     public function resource()
     {
+        $this->registerEvent('afterSave', function () {
+            setting()->clear_cache();
+        });
+
         return laradium()->resource(function (FieldSet $set) {
             $fieldType = $set->model()->type;
 
