@@ -47,21 +47,8 @@ Class SettingResource extends AbstractResource
             });
 
             $column->add('value')->modify(function ($item) {
-
-                //we do not want to display textarea content in table
-                if( $item->type == 'textarea' ){
-                    return;
-                }
-
-                if( $item->is_translatable ) {
-                    return view('laradium::admin.resource._partials.translation', compact('item'));
-                }
-
-                return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';
-
+                $this->modifyValueColumn($item);
             })->editable();
-
-
 
         })->dataTable(false)
             ->actions(['edit'])
@@ -73,6 +60,25 @@ Class SettingResource extends AbstractResource
 
         return $table;
 
+    }
+
+
+    /**
+     * @param $item
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string|void
+     */
+    public function modifyValueColumn($item)
+    {
+        //we do not want to display textarea content in table
+        if( $item->type == 'textarea' ){
+            return;
+        }
+
+        if( $item->is_translatable ) {
+            return view('laradium::admin.resource._partials.translation', compact('item'));
+        }
+
+        return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';
     }
 
     /**
