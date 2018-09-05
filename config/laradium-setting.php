@@ -99,6 +99,25 @@ return [
             'name'  => 'Name from which to send emails',
             'key'   => 'mail_from_name',
             'type'  => 'text'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme color',
+            'key'   => 'admin_theme_color',
+            'type'  => 'color'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme logo',
+            'key'   => 'admin_theme_logo',
+            'type'  => 'file'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme favicon',
+            'key'   => 'admin_theme_favicon',
+            'type'  => 'file'
         ]
+
     ]
 ];

@@ -39,12 +39,22 @@ Class SettingResource extends AbstractResource
         return laradium()->table(function (ColumnSet $column) {
             $column->add('group');
             $column->add('name');
-            $column->add('is_translatable');
+
+            $column->add('is_translatable')->modify(function ($row) {
+                return $row->is_translatable ? 'Yes' : 'No';
+            });
+
             $column->add('value')->modify(function ($item) {
+
+                //we do not want to display textarea content in table
+                if( $item->type == 'textarea' ){
+                    return;
+                }
+
                 if($item->is_translatable) {
                     return view('laradium::admin.resource._partials.translation', compact('item'));
                 } else {
-                    return $item->non_translatable_value ? e($item->non_translatable_value) : 'N/A';
+                    return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">empty</span>';
                 }
             });
         })->actions(['edit'])->relations(['translations']);
