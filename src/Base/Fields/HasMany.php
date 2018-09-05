@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
-use App\Laradium\Fields\MorphsTo;
 use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;

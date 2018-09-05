@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\Fields\HasMany;
 use Laradium\Laradium\Base\Fields\MorphsTo;
 use Laradium\Laradium\Base\Fields\Tab;
-use Laradium\Laradium\Content\Laradium\Fields\WidgetConstructor;
+use Laradium\Laradium\Content\Base\Fields\WidgetConstructor;
 
 class Form
 {

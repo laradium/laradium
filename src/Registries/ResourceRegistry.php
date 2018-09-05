@@ -55,15 +55,23 @@ class ResourceRegistry
                 'method' => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
+<<<<<<< HEAD
                 'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.data-table'
+=======
+                'middleware' => ['web', 'laradium']
+>>>>>>> master
             ],
             [
                 'method' => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
+<<<<<<< HEAD
                 'middleware' => ['web', 'laradium'],
                 'name' => 'admin.' . $routeSlug . '.editable'
+=======
+                'middleware' => ['web', 'laradium']
+>>>>>>> master
             ],
             [
                 'method' => 'get',
@@ -92,7 +100,11 @@ class ResourceRegistry
                 'method' => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
+<<<<<<< HEAD
                 'middleware' => ['web', 'laradium']
+=======
+                'middleware' => ['web', 'laradium'],
+>>>>>>> master
             ],
         ];
 

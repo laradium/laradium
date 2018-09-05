@@ -14,7 +14,11 @@ class MakeLaradiumResource extends Command
      *
      * @var string
      */
+<<<<<<< HEAD:src/Console/Commands/MakeLaradiumResource.php
     protected $signature = 'laradium:resource {name} {--t} {--api}';
+=======
+    protected $signature = 'laradium:resource {name} {--t}';
+>>>>>>> master:src/Console/Commands/MakeLaradiumResource.php
 
     /**
      * The console command description.
@@ -51,7 +55,10 @@ class MakeLaradiumResource extends Command
             $this->info('Creating resources directory');
         }
 
+<<<<<<< HEAD:src/Console/Commands/MakeLaradiumResource.php
         // Resource
+=======
+>>>>>>> master:src/Console/Commands/MakeLaradiumResource.php
         $dummyResource = File::get(__DIR__.'/../../../stubs/laradium-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
         $resource = str_replace('{{resource}}', $name, $resource);
@@ -83,6 +90,8 @@ class MakeLaradiumResource extends Command
         }
 
         $this->info('Resource successfully created!');
+
+        cache()->forget('laradium::resource-list');
 
         return;
     }

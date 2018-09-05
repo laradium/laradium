@@ -45,7 +45,9 @@ You should be up and running
 
 Admin panel will be under http://your-domain.com/admin
 
-Default credentials (_can be change in config file_): email:admin@laradium.com, pw: laradium2018
+Default credentials (_can be change in config file_): 
+email:admin@laradium.com, 
+pw: laradium2018
 
 # Creating new resource
 
@@ -59,9 +61,7 @@ namespace App\Laradium\Resources;
 
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\ColumnSet;
-use Laradium\Laradium\Base\Table;
 use App\Models\Task;
 
 Class TaskResource extends AbstractResource
@@ -77,17 +77,17 @@ Class TaskResource extends AbstractResource
      */
     public function resource()
     {
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
             $set->text('type')->rules('required|min:3');
         });
     }
 
      /**
-     * @return Table
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('id', '#ID');
         });
     }
@@ -95,13 +95,6 @@ Class TaskResource extends AbstractResource
 ```
 
 You will have 2 methods `resource` and `table`.
-
-2. You need to add created resource in `config/laradium.php` under resources
-
-# Creating API resource
-
-1. Just add --api option to laradium:resource command
-2. Add this API resource in config/laradium.php api_resources list
 
 # Resource
 Here you can specify field configuration for your create and edit actions.

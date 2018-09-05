@@ -1,10 +1,14 @@
 {
-  "name": "netcore/laradium",
+  "name": "laradium/laradium",
   "license": "MIT",
   "authors": [
     {
       "name": "Daniels Grietins",
       "email": "daniels.grietins@netcore.lv"
+    },
+    {
+      "name": "Dmitrijs Mihailovs",
+      "email": "dmitrijs.mihailovs@netcore.lv"
     }
   ],
   "minimum-stability": "dev",

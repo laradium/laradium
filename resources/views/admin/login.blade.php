@@ -14,8 +14,6 @@
     <link href="/laradium/admin/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="/laradium/admin/assets/css/icons.css" rel="stylesheet" type="text/css" />
     <link href="/laradium/admin/assets/css/style.css" rel="stylesheet" type="text/css" />
-
-
 </head>
 
 <body>
@@ -25,7 +23,8 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-            <img src="/laradium/logo.svg" alt="Laradium" style="max-width: 90%;">
+
+            <span>Lara<span>dium</span></span>
         </a>
     </div>
     <div class="m-t-40 card-box">

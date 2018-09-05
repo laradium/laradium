@@ -1,30 +1,22 @@
 <?php
-
 namespace Laradium\Laradium\Base\Resources;
-
 use Laradium\Laradium\Models\Setting;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\ColumnSet;
-use Laradium\Laradium\Base\Table;
-
 Class SettingResource extends AbstractResource
 {
-
     /**
      * @var string
      */
     protected $resource = Setting::class;
-
     /**
      * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
-        return (new Resource)->make(function (FieldSet $set) {
+        return laradium()->resource(function (FieldSet $set) {
             $fieldType = $set->model()->type;
-
             if($set->model()->is_translatable) {
                 $set->$fieldType('value')->translatable();
             } else {
@@ -32,13 +24,12 @@ Class SettingResource extends AbstractResource
             }
         });
     }
-
-     /**
-     * @return Table
+    /**
+     * @return \Laradium\Laradium\Base\Table
      */
     public function table()
     {
-        return (new Table)->make(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
             $column->add('group');
             $column->add('name');
             $column->add('is_translatable');
