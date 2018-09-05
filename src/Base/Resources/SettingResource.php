@@ -47,7 +47,7 @@ Class SettingResource extends AbstractResource
             });
 
             $column->add('value')->modify(function ($item) {
-                $this->modifyValueColumn($item);
+                return $this->modifyValueColumn($item);
             })->editable();
 
         })->dataTable(false)
