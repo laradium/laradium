@@ -67,6 +67,8 @@ trait Datatable
         $columns = $table->columns();
         $editableColumns = $columns->where('editable', true);
 
+        $editableColumnNames = [];
+
         foreach ($editableColumns as $column) {
             $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $resourceName) {
                 return '<a href="#" 
@@ -77,6 +79,8 @@ trait Datatable
                 data-url="/admin/' . str_replace('_', '-', $resourceName) . '/editable" 
                 data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
             });
+
+            $editableColumnNames[] = $column['column_parsed'];
         }
 
         $rawColumns = ['action'];
@@ -90,7 +94,13 @@ trait Datatable
         }
 
         foreach ($columns->where('modify', '!=', null) as $column) {
+
             $dataTable->editColumn($column['column_parsed'], $column['modify']);
+
+            //@TODO: if column is modified AND has editable flag, we need to re-apply it
+            if( in_array( $column['column_parsed'], $editableColumnNames ) ){
+                //$dataTable->editColumn
+            }
 
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }

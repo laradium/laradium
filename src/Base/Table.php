@@ -48,6 +48,11 @@ class Table
     protected $tabs;
 
     /**
+     * @var
+     */
+    protected $dataTable;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -119,6 +124,17 @@ class Table
     public function actions($value)
     {
         $this->actions = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function dataTable($value)
+    {
+        $this->dataTable = $value;
 
         return $this;
     }
