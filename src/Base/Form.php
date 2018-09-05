@@ -65,7 +65,7 @@ class Form
 
                     $this->fields->push($tabField);
 
-                    if($tabField->isTranslatable()) {
+                    if ($tabField->isTranslatable()) {
                         $this->isTranslatable = true;
                     }
                 }
@@ -75,7 +75,7 @@ class Form
 
                 $this->fields->push($field);
 
-                if($field->isTranslatable()) {
+                if ($field->isTranslatable()) {
                     $this->isTranslatable = true;
                 }
             }
@@ -149,11 +149,11 @@ class Form
         $resource = $this->resourceName();
         if ($action == 'create') {
             return url('/admin/' . $resource . '/create');
-        } elseif ($action == 'create') {
+        } else if ($action == 'create') {
             return url('/admin/' . $resource . '/create');
-        } elseif ($action == 'store') {
+        } else if ($action == 'store') {
             return url('/admin/' . $resource);
-        } elseif ($action == 'update') {
+        } else if ($action == 'update') {
             return url('/admin/' . $resource . '/' . $this->model->id);
         }
 

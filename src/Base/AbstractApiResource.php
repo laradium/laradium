@@ -64,35 +64,7 @@ abstract class AbstractApiResource
 
         return response()->json([
             'success' => true,
-            'data' => $data
-        ]);
-    }
-
-    /**
-     * @param null $id
-     * @return array
-     */
-    public function getForm($id = null)
-    {
-        if ($id) {
-            $model = $this->model->find($id);
-        } else {
-            $model = $this->model;
-        }
-
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-        $response = $form->formatedResponse();
-
-        return ([
-            'languages' => collect(translate()->languages())->map(function ($item, $index) {
-                $item['is_current'] = $index == 0;
-
-                return $item;
-            })->toArray(),
-            'inputs' => $response,
-            'tabs' => $resource->fieldSet()->tabs()->toArray()
+            'data'    => $data
         ]);
     }
 
@@ -109,7 +81,7 @@ abstract class AbstractApiResource
 
         return response()->json([
             'success' => true,
-            'data' => $form->formatedResponse()
+            'data'    => $form->formatedResponse()
         ]);
     }
 
@@ -122,11 +94,13 @@ abstract class AbstractApiResource
     {
         $model = $this->model;
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-
-        $request->validate($form->getValidationRules());
+        if (method_exists($this, 'validation')) {
+            $validation = $this->validation()->setModel($model)->build();
+            $request->validate($validation->getValidationRules());
+        } else {
+            $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
+            $request->validate($form->getValidationRules());
+        }
 
         if (isset($this->events['beforeSave'])) {
             $this->events['beforeSave']($this->model, $request);
@@ -140,8 +114,8 @@ abstract class AbstractApiResource
 
         if ($request->ajax()) {
             return [
-                'success' => 'Resource successfully created!',
-                'redirect' => url()->previous()
+                'success' => true,
+                'message' => 'Resource successfully created!'
             ];
         }
 
@@ -177,7 +151,7 @@ abstract class AbstractApiResource
 
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data'    => $data
         ]);
     }
 
@@ -202,7 +176,7 @@ abstract class AbstractApiResource
 
         return response()->json([
             'success' => true,
-            'data' => $form->formatedResponse()
+            'data'    => $form->formatedResponse()
         ]);
     }
 
@@ -223,11 +197,13 @@ abstract class AbstractApiResource
 
         $model = $model->findOrFail($id);
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-
-        $request->validate($form->getValidationRules());
+        if (method_exists($this, 'validation')) {
+            $validation = $this->validation()->setModel($model)->build();
+            $request->validate($validation->getValidationRules());
+        } else {
+            $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
+            $request->validate($form->getValidationRules());
+        }
 
         if (isset($this->events['beforeSave'])) {
             $this->events['beforeSave']($this->model, $request);
@@ -241,8 +217,8 @@ abstract class AbstractApiResource
 
         if ($request->ajax()) {
             return [
-                'success' => 'Resource successfully updated!',
-                'data' => $this->getForm($model->id)
+                'success' => true,
+                'message' => 'Resource successfully updated!'
             ];
         }
 
@@ -257,6 +233,7 @@ abstract class AbstractApiResource
     public function destroy(Request $request, $id)
     {
         $model = $this->model;
+        $api = $this->api()->setModel($model);
 
         if ($api->getWhere()) {
             $model = $model->where($api->getWhere());

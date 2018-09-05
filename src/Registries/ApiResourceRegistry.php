@@ -58,65 +58,65 @@ class ApiResourceRegistry
 
         $routeList = [
             [
-                'method' => 'get',
-                'name' => 'index',
+                'method'     => 'get',
+                'name'       => 'index',
                 'route_slug' => $this->getRoutePath(),
                 'controller' => $this->getRouteController('index'),
-                'middleware' => $middleware['index'] ?? ['web']
+                'middleware' => $middleware['index'] ?? ['auth:api']
             ],
             [
-                'method' => 'get',
-                'name' => 'create',
+                'method'     => 'get',
+                'name'       => 'create',
                 'route_slug' => $this->getRoutePath('create'),
                 'controller' => $this->getRouteController('create'),
-                'middleware' => $middleware['create'] ?? ['web', 'auth']
+                'middleware' => $middleware['create'] ?? ['auth:api']
             ],
             [
-                'method' => 'post',
-                'name' => 'store',
+                'method'     => 'post',
+                'name'       => 'store',
                 'route_slug' => $this->getRoutePath(),
                 'controller' => $this->getRouteController('store'),
-                'middleware' => $middleware['store'] ?? ['web', 'auth']
+                'middleware' => $middleware['store'] ?? ['auth:api']
             ],
             [
-                'method' => 'get',
-                'name' => 'show',
+                'method'     => 'get',
+                'name'       => 'show',
                 'route_slug' => $this->getRoutePath('{id}'),
                 'controller' => $this->getRouteController('show'),
-                'middleware' => $middleware['show'] ?? ['web', 'auth']
+                'middleware' => $middleware['show'] ?? ['auth:api']
             ],
             [
-                'method' => 'get',
-                'name' => 'edit',
+                'method'     => 'get',
+                'name'       => 'edit',
                 'route_slug' => $this->getRoutePath('{id}/edit'),
                 'controller' => $this->getRouteController('edit'),
-                'middleware' => $middleware['edit'] ?? ['web', 'auth']
+                'middleware' => $middleware['edit'] ?? ['auth:api']
             ],
             [
-                'method' => 'put',
-                'name' => 'update',
+                'method'     => 'put',
+                'name'       => 'update',
                 'route_slug' => $this->getRoutePath('{id}'),
                 'controller' => $this->getRouteController('update'),
-                'middleware' => $middleware['update'] ?? ['web', 'auth']
+                'middleware' => $middleware['update'] ?? ['auth:api']
             ],
             [
-                'method' => 'delete',
-                'name' => 'delete',
+                'method'     => 'delete',
+                'name'       => 'delete',
                 'route_slug' => $this->getRoutePath('{id}'),
                 'controller' => $this->getRouteController('delete'),
-                'middleware' => $middleware['delete'] ?? ['web', 'auth']
+                'middleware' => $middleware['delete'] ?? ['auth:api']
             ],
         ];
 
         // Add custom routes
         foreach ($api->getCustomRoutes() as $name => $route) {
             $route = [
-                'method' => $route['method'],
-                'name' => $name,
-                'route_slug' => $this->getRoutePath($route['params'] . '/' . kebab_case($name)),
+                'method'     => $route['method'],
+                'name'       => $name,
+                'route_slug' => $this->getRoutePath(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
-                'middleware' => $middleware[$name] ?? ['web', 'auth'],
-                'prefix' => 'api'
+                'middleware' => $middleware[$name] ?? ['auth:api'],
+                'prefix'     => 'api'
             ];
 
             $this->registerRoute($route, $routeSlug);

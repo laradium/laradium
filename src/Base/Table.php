@@ -178,20 +178,20 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data' => $column['column'],
-                'name' => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'data'       => $column['column'],
+                'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
                 'searchable' => $column['translatable'] ? false : true,
-                'orderable' => $column['translatable'] ? false : true,
+                'orderable'  => $column['translatable'] ? false : true,
             ]);
         }
 
         $config->push([
-            'data' => 'action',
-            'name' => 'action',
+            'data'       => 'action',
+            'name'       => 'action',
             'searchable' => false,
-            'orderable' => false,
-            'width' => '15%',
-            'class' => 'text-center'
+            'orderable'  => false,
+            'width'      => '15%',
+            'class'      => 'text-center'
         ]);
 
         return $config;

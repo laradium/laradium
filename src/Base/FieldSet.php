@@ -10,7 +10,7 @@ class FieldSet
 {
 
     /**
-     * @var
+     * @var \Illuminate\Foundation\Application|mixed
      */
     protected $fieldRegistry;
 
@@ -24,6 +24,9 @@ class FieldSet
      */
     protected $model;
 
+    /**
+     * @var Collection
+     */
     protected $tabs;
 
     /**

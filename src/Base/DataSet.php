@@ -44,9 +44,9 @@ class DataSet
     public function add($field, $name = null)
     {
         $this->list->push([
-            'name'          => $name ?? $field,
-            'relation'      => count(explode('.', $field)) > 1 ? array_first(explode('.', $field)) : '',
-            'modify'        => null,
+            'name'     => $name ?? $field,
+            'relation' => count(explode('.', $field)) > 1 ? array_first(explode('.', $field)) : '',
+            'modify'   => null,
         ]);
 
         $this->field = $field;

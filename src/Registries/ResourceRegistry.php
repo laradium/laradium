@@ -52,59 +52,47 @@ class ResourceRegistry
 
         $routeList = [
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-<<<<<<< HEAD
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.data-table'
-=======
-                'middleware' => ['web', 'laradium']
->>>>>>> master
+                'name'       => 'admin.' . $routeSlug . '.data-table'
             ],
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
-<<<<<<< HEAD
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.editable'
-=======
-                'middleware' => ['web', 'laradium']
->>>>>>> master
+                'name'       => 'admin.' . $routeSlug . '.editable'
             ],
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.form'
+                'name'       => 'admin.' . $routeSlug . '.form'
             ],
             // Import
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('import'),
                 'controller' => $this->getRouteController('import'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.import'
+                'name'       => 'admin.' . $routeSlug . '.import'
             ],
             // Export
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('export'),
                 'controller' => $this->getRouteController('export'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.export'
+                'name'       => 'admin.' . $routeSlug . '.export'
             ],
             [
-                'method' => 'resource',
+                'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-<<<<<<< HEAD
                 'middleware' => ['web', 'laradium']
-=======
-                'middleware' => ['web', 'laradium'],
->>>>>>> master
             ],
         ];
 

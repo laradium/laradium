@@ -14,11 +14,7 @@ class MakeLaradiumResource extends Command
      *
      * @var string
      */
-<<<<<<< HEAD:src/Console/Commands/MakeLaradiumResource.php
     protected $signature = 'laradium:resource {name} {--t} {--api}';
-=======
-    protected $signature = 'laradium:resource {name} {--t}';
->>>>>>> master:src/Console/Commands/MakeLaradiumResource.php
 
     /**
      * The console command description.
@@ -55,11 +51,8 @@ class MakeLaradiumResource extends Command
             $this->info('Creating resources directory');
         }
 
-<<<<<<< HEAD:src/Console/Commands/MakeLaradiumResource.php
         // Resource
-=======
->>>>>>> master:src/Console/Commands/MakeLaradiumResource.php
-        $dummyResource = File::get(__DIR__.'/../../../stubs/laradium-resource.stub');
+        $dummyResource = File::get(__DIR__ . '/../../../stubs/laradium-resource.stub');
         $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
         $resource = str_replace('{{resource}}', $name, $resource);
         $resource = str_replace('{{resource}}', $name, $resource);
@@ -72,12 +65,12 @@ class MakeLaradiumResource extends Command
 
         // API Resource
         if ($api) {
-            $dummyResource = File::get(__DIR__.'/../../../stubs/laradium-api-resource.stub');
+            $dummyResource = File::get(__DIR__ . '/../../../stubs/laradium-api-resource.stub');
             $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
             $resource = str_replace('{{resource}}', $name, $resource);
             $resource = str_replace('{{resource}}', $name, $resource);
             $resource = str_replace('{{modelNamespace}}', config('laradium.default_models_directory', 'App'), $resource);
-            $resourceFilePath = app_path('Laradium/Resources/' . $name . 'ApiResource.php');
+            $resourceFilePath = app_path('Laradium/Resources/Api/' . $name . 'ApiResource.php');
 
             if (!file_exists($resourceFilePath)) {
                 File::put($resourceFilePath, $resource);

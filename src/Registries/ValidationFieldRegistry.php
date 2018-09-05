@@ -3,8 +3,9 @@
 namespace Laradium\Laradium\Registries;
 
 use Illuminate\Support\Collection;
+use Laradium\Laradium\Base\ValidationField;
 
-class FieldRegistry
+class ValidationFieldRegistry
 {
 
     /**
@@ -22,23 +23,13 @@ class FieldRegistry
 
     /**
      * @param $name
-     * @param $class
      * @return $this
      */
-    public function register($name, $class)
+    public function register($name)
     {
-        $this->fields->put($name, $class);
+        $this->fields->put($name);
 
         return $this;
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getClassByName($name)
-    {
-        return $this->all()->get($name);
     }
 
     /**

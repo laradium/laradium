@@ -33,7 +33,7 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
             __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
-            __DIR__ . '/../../config/paperclip.php'    => config_path('paperclip.php'),
+            __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
         ], 'laradium');
 
         $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
@@ -70,8 +70,8 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->app->singleton(FieldRegistry::class, function () {
             $registry = new FieldRegistry();
 
-            foreach (config('laradium.fields_list', []) as $name => $type) {
-                $registry->register($name, $type);
+            foreach ($this->getFieldList() as $name => $path) {
+                $registry->register($name, $path);
             }
 
             return $registry;
@@ -79,22 +79,122 @@ class LaradiumServiceProvider extends ServiceProvider
     }
 
     /**
+     * @return mixed
+     */
+    private function getFieldList()
+    {
+        return cache()->rememberForever('laradium::field-list', function () {
+            $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
+            $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
+
+            $fieldList = [];
+            if (file_exists($fieldPath)) {
+                foreach (\File::allFiles($fieldPath) as $path) {
+                    $field = $path->getPathname();
+                    $baseName = basename($field, '.php');
+                    $field = 'Laradium\\Laradium\\Base\\Fields\\' . $baseName;
+                    $fieldList[lcfirst($baseName)] = $field;
+                }
+
+                if (file_exists($contentFieldPath)) {
+                    foreach (\File::allFiles($contentFieldPath) as $path) {
+                        $field = $path->getPathname();
+                        $baseName = basename($field, '.php');
+                        $field = 'Laradium\\Laradium\\Content\\Base\\Fields\\' . $baseName;
+                        $fieldList[lcfirst($baseName)] = $field;
+                    }
+                }
+            }
+
+            return $fieldList;
+        });
+    }
+
+    /**
      * Registers all resources
      */
-    protected function registerResources()
+    private function registerResources()
     {
-        $resources = config('laradium.resources', []);
-        $apiResources = config('laradium.api_resources', []);
-
         $laradium = app(\Laradium\Laradium\Base\Laradium::class);
 
-        foreach ($resources as $resource) {
+        foreach ($this->getResourceList() as $resource) {
             $laradium->register($resource);
         }
 
-        foreach ($apiResources as $apiResource) {
+        foreach ($this->getApiResourcesList() as $apiResource) {
             $laradium->registerApi($apiResource);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getResourceList()
+    {
+        return cache()->rememberForever('laradium::resource-list', function () {
+            $resourceList = [];
+            $baseResourcePath = base_path('vendor/laradium/laradium/src/Base/Resources');
+            $contentResourcePath = base_path('vendor/laradium/laradium-content/src/Base/Resources');
+            if (file_exists($baseResourcePath)) {
+                foreach (\File::allFiles($baseResourcePath) as $path) {
+                    $resource = $path->getPathname();
+                    $baseName = basename($resource, '.php');
+                    $resource = 'Laradium\\Laradium\\Base\\Resources\\' . $baseName;
+                    $resourceList[] = $resource;
+                }
+                if (file_exists($contentResourcePath)) {
+                    foreach (\File::allFiles($contentResourcePath) as $path) {
+                        $resource = $path->getPathname();
+                        $baseName = basename($resource, '.php');
+                        $resource = 'Laradium\\Laradium\\Content\\Base\\Resources\\' . $baseName;
+                        $resourceList[] = $resource;
+                    }
+                }
+            }
+
+            $resources = config('laradium.resource_path', []);
+            $namespace = app()->getNamespace();
+            $resourcePath = str_replace($namespace, '', $resources);
+            $resourcePath = str_replace('\\', '/', $resourcePath);
+            $resourcePath = app_path($resourcePath);
+
+            if (file_exists($resourcePath)) {
+                foreach (\File::files($resourcePath) as $path) {
+                    $resource = $path->getPathname();
+                    $baseName = basename($resource, '.php');
+                    $resource = $resources . '\\' . $baseName;
+                    $resourceList[] = $resource;
+                }
+            }
+
+            return $resourceList;
+        });
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getApiResourcesList()
+    {
+        return cache()->rememberForever('laradium::api-resource-list', function () {
+            $resourceList = [];
+            $resources = config('laradium.resource_path', []) . '\\Api';
+            $namespace = app()->getNamespace();
+            $resourcePath = str_replace($namespace, '', $resources);
+            $resourcePath = str_replace('\\', '/', $resourcePath);
+            $resourcePath = app_path($resourcePath);
+            if (file_exists($resourcePath)) {
+                foreach (\File::allFiles($resourcePath) as $path) {
+                    $resource = $path->getPathname();
+                    $baseName = basename($resource, '.php');
+                    $resource = $resources . '\\' . $baseName;
+                    $resourceList[] = $resource;
+                }
+            }
+
+            return $resourceList;
+        });
     }
 
     /**
@@ -106,13 +206,14 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         try {
             config([
-                'mail.host' => setting()->get('mail.mail_host', ''),
-                'mail.port' => setting()->get('mail.mail_port', '2525'),
-                'mail.username' => setting()->get('mail.mail_user', ''),
-                'mail.password' => setting()->get('mail.mail_password', ''),
+                'mail.host'         => setting()->get('mail.mail_host', ''),
+                'mail.port'         => setting()->get('mail.mail_port', '2525'),
+                'mail.username'     => setting()->get('mail.mail_user', ''),
+                'mail.password'     => setting()->get('mail.mail_password', ''),
                 'mail.from.address' => setting()->get('mail.mail_from_address', ''),
-                'mail.from.name' => setting()->get('mail.mail_from_name', '')
+                'mail.from.name'    => setting()->get('mail.mail_from_name', '')
             ]);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 }

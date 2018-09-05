@@ -119,7 +119,7 @@ class Field
         if ($this->isTranslatable()) {
             if (count($attributeList) == 1) {
                 $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
-            } elseif (count($attributeList) > 1) {
+            } else if (count($attributeList) > 1) {
                 $count = count($attributeList) - 1;
                 $last = $attributeList[$count];
                 unset($attributeList[$count]);
@@ -248,7 +248,7 @@ class Field
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
             foreach (translate()->languages() as $language) {
-                if($language['is_fallback']) {
+                if ($language['is_fallback']) {
                     $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
                         $attributeList)), $this->getRuleSet());
                 }
@@ -283,22 +283,22 @@ class Field
 
         if (!$field->isTranslatable()) {
             $data = [
-                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-                'name'                   => $field->getNameAttribute(),
-                'label'                  => $field->getLabel(),
-                'value'                  => $field->getValue(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacementAttributes'  => $attributes->toArray(),
-                'tab'                    => $this->tab(),
+                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'name'                  => $field->getNameAttribute(),
+                'label'                 => $field->getLabel(),
+                'value'                 => $field->getValue(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
             ];
         } else {
 
             $data = [
-                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'                  => $field->getLabel(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacementAttributes'  => $attributes->toArray(),
-                'tab'                    => $this->tab(),
+                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'                 => $field->getLabel(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
             ];
             $translatedAttributes = [];
 
