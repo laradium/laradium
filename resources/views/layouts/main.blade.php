@@ -32,34 +32,42 @@
         .js-tab:not(.active) {
             display: none;
         }
+
         /*
         theme styles
 
         @TODO: šo varētu uz atsevišķu view iznest ko pieprasot caur linku atgrieztu atpakaļ kā css
         */
 
-        .navbar-default{
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+        .navbar-default {
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
-        .topbar .topbar-left{
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+
+        .topbar .topbar-left {
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
+
         .user-box ul li a:hover {
             color: {{setting()->get('design.admin_theme_color', '#71b6f9')}};
         }
+
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
+
         #sidebar-menu > ul > li > a.active {
-            border-left: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
+
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
+
         a:hover {
             color: {{setting()->get('design.admin_theme_color', '#71b6f9')}};
         }
+
         a {
             color: {{setting()->get('design.admin_theme_color', '#71b6f9')}};
         }

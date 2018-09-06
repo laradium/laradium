@@ -21,14 +21,16 @@ Class SettingResource extends AbstractResource
     public function resource()
     {
         $this->registerEvent('afterSave', function () {
-            setting()->clear_cache();
+            setting()->clearCache();
         });
 
         return laradium()->resource(function (FieldSet $set) {
             $fieldType = $set->model()->type;
 
-            if($set->model()->is_translatable) {
+            if ($set->model()->is_translatable) {
                 $set->$fieldType('value')->translatable();
+            } elseif ($fieldType == 'file') {
+                $set->$fieldType('file');
             } else {
                 $set->$fieldType('non_translatable_value');
             }
@@ -42,8 +44,8 @@ Class SettingResource extends AbstractResource
     {
         $table = laradium()->table(function (ColumnSet $column) {
 
-            $column->add('name')->modify(function($row){
-                return ( $row->is_translatable ? $this->translatableIcon() : '' ) . $row->name;
+            $column->add('name')->modify(function ($row) {
+                return ($row->is_translatable ? $this->translatableIcon() : '') . $row->name;
             });
 
             $column->add('value')->modify(function ($item) {
@@ -70,11 +72,19 @@ Class SettingResource extends AbstractResource
     public function modifyValueColumn($item)
     {
         //we do not want to display textarea content in table
-        if( $item->type == 'textarea' ){
-            return;
+        if ($item->type == 'textarea') {
+            return '<span style="font-size:80%">- too long to show -</span>';
         }
 
-        if( $item->is_translatable ) {
+        if($item->type == 'file') {
+            if($item->file->exists()) {
+                return $item->file->url();
+            } else {
+                return '<span style="font-size:80%">- empty -</span>';
+            }
+        }
+
+        if ($item->is_translatable) {
             return view('laradium::admin.resource._partials.translation', compact('item'));
         }
 

@@ -24,6 +24,11 @@ class CreateSettingsTable extends Migration
             $table->boolean('has_manager')->default(0);
             $table->boolean('is_translatable')->default(0);
 
+            $table->string('file_file_name')->nullable();
+            $table->integer('file_file_size')->nullable();
+            $table->string('file_content_type')->nullable();
+            $table->timestamp('file_updated_at')->nullable();
+
             $table->mediumText('non_translatable_value')->nullable();
 
 

@@ -2,12 +2,26 @@
 
 namespace Laradium\Laradium\Models;
 
+use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
+use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 use Illuminate\Database\Eloquent\Model;
 
-class Setting extends Model
+class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
-    use Translatable;
+
+    //use Translatable;
+    use PaperclipTrait, PaperclipAndTranslatable;
+
+    use Translatable {
+        PaperclipAndTranslatable::getAttribute insteadof Translatable;
+        PaperclipAndTranslatable::setAttribute insteadof Translatable;
+    }
+
+    use PaperclipTrait {
+        PaperclipAndTranslatable::getAttribute insteadof PaperclipTrait;
+        PaperclipAndTranslatable::setAttribute insteadof PaperclipTrait;
+    }
 
     /**
      * @var array
@@ -20,7 +34,8 @@ class Setting extends Model
         'meta',
         'non_translatable_value',
         'has_manager',
-        'is_translatable'
+        'is_translatable',
+        'file'
     ];
     /**
      * @var array
@@ -42,24 +57,40 @@ class Setting extends Model
      * @var array
      */
     protected $with = ['translations'];
+
+    /**
+     * Setting constructor.
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
+        $this->hasAttachedFile('file', []);
+
+        parent::__construct($attributes);
+    }
+
     /**
      * @return array
      */
     public function getAttributesData()
     {
         $attributes = array_get($this->meta, 'attributes', []);
-        if (! is_array($attributes)) {
+        if (!is_array($attributes)) {
             $attributes = [];
         }
-        if (! isset($attributes['class'])) {
+        if (!isset($attributes['class'])) {
             $attributes['class'] = $this->getClass();
         }
+
         return implode(' ', array_map(
-            function ($v, $k) { return sprintf('%s="%s"', $k, $v); },
+            function ($v, $k) {
+                return sprintf('%s="%s"', $k, $v);
+            },
             $attributes,
             array_keys($attributes)
         ));
     }
+
     /**
      * @return array
      */
@@ -72,11 +103,13 @@ class Setting extends Model
         if (function_exists($options)) {
             $options = $options();
         }
-        if (! is_array($options)) {
+        if (!is_array($options)) {
             return [];
         }
+
         return $options;
     }
+
     /**
      * @param $type
      * @return bool
@@ -85,6 +118,7 @@ class Setting extends Model
     {
         return $this->type === $type;
     }
+
     /**
      * @return string
      */
@@ -97,12 +131,13 @@ class Setting extends Model
             return $this->value === '1';
         }
 
-        if($this->is_translatable) {
-            return $this->value;
+        if ($this->is_translatable) {
+            return $this->value ?? null;
         } else {
             return $this->non_translatable_value;
         }
     }
+
     /**
      * @return string
      */
@@ -115,6 +150,15 @@ class Setting extends Model
             'file'     => 'form-control',
             'select'   => 'form-control'
         ];
+
         return array_get($classes, $this->type, 'form-control');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAttributes()
+    {
+        return parent::getAttributes();
     }
 }

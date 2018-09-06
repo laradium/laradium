@@ -30,4 +30,12 @@ class Language extends Model implements \Czim\Paperclip\Contracts\AttachableInte
 
         parent::__construct($attributes);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAttributes()
+    {
+        return parent::getAttributes();
+    }
 }

@@ -23,8 +23,13 @@ class SettingsRepository
     public function __construct()
     {
         $this->cacheKey = config('laradium-setting.cache_key', 'settings');
+
         $this->cachedSettings = cache()->rememberForever($this->cacheKey, function () {
-            return Setting::all()->keyBy('key');
+            $settings = Setting::all()->keyBy('key')->map(function ($item) {
+                return $item->toArray();
+            });
+
+            return $settings;
         });
     }
 
@@ -43,7 +48,7 @@ class SettingsRepository
             $array = [];
             foreach ($keys as $index => $key) {
                 $setting = $settings->get($key);
-                $array[$key] = $setting ? $setting->value : (is_array($default) ? (isset($default[$index]) ? $default[$index] : null) : $default);
+                $array[$key] = $setting ? $this->getValue($setting) : (is_array($default) ? (isset($default[$index]) ? $default[$index] : null) : $default);
             }
 
             return $array;
@@ -51,7 +56,26 @@ class SettingsRepository
 
         $setting = $settings->get($keys);
 
-        return $setting ? $setting->value : (is_array($default) ? (isset($default[0]) ? $default[0] : null) : $default);
+        return $setting ? $this->getValue($setting) : (is_array($default) ? (isset($default[0]) ? $default[0] : null) : $default);
+    }
+
+    /**
+     * @param $setting
+     * @return null
+     */
+    private function getValue($setting)
+    {
+        $value = null;
+        if ($setting['is_translatable']) {
+            $translation = collect(array_get($setting, 'translations'))->where('locale', app()->getLocale())->first();
+            if ($translation) {
+                $value = $translation['value'];
+            }
+        } else {
+            $value = $setting['non_translatable_value'];
+        }
+
+        return $value;
     }
 
     /**
@@ -127,7 +151,7 @@ class SettingsRepository
      * @return bool
      * @throws \Exception
      */
-    public function clear_cache(): bool
+    public function clearCache(): bool
     {
         return cache()->forget($this->cacheKey);
     }
