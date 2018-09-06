@@ -16,48 +16,33 @@ class LaradiumServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->registerPaperClipConfig();
         $this->registerResources();
-        $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
-        $this->app->register(LaradiumTranslationServiceProvider::class);
-
-        \App::bind('Translate', function () {
-            return new Translate;
-        });
-
-        Blade::directive('lg', function ($expression) {
-            return "<?php echo lg($expression); ?>";
-        });
-
-        $this->app['router']->aliasMiddleware('laradium', LaradiumMiddleware::class);
-
-        $this->publishes([
-            __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
-            __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
-            __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
-        ], 'laradium');
-
-        $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
-
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium');
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                MakeLaradiumResource::class,
-                ImportTranslations::class,
-                FindTranslations::class,
-            ]);
-        }
-
-        $this->publishes([
-            __DIR__ . '/../../public/laradium' => public_path('laradium'),
-        ], 'laradium');
+        $this->registerProviders();
+        $this->registerBindings();
+        $this->registerDirectives();
+        $this->registerMiddleware();
+        $this->registerCommands();
+        $this->publishConfig();
+        $this->publishAssets();
+        $this->loadMigrations();
+        $this->loadViews();
+        $this->loadRoutes();
 
         // Global helpers
         require_once __DIR__ . '/../Helpers/Global.php';
 
         // Mail config
         $this->setMailConfig();
+    }
+
+    /**
+     * @return void
+     */
+    private function registerProviders()
+    {
+        $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
+        $this->app->register(LaradiumTranslationServiceProvider::class);
     }
 
     /**
@@ -79,35 +64,47 @@ class LaradiumServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return mixed
+     * @return void
+     */
+    private function registerPaperClipConfig()
+    {
+        $disk = config('paperclip.storage.disk', 'public') == 'paperclip' ? 'public' : config('paperclip.storage.disk',
+            'public');
+        $url = $disk == 'paperclip' ? config('app.url') . '/storage' : config('paperclip.storage.base-urls.public');
+        config([
+            'paperclip.storage.disk'             => $disk,
+            'paperclip.storage.base-urls.public' => $url,
+        ]);
+    }
+
+    /**
+     * @return array
      */
     private function getFieldList()
     {
-        return cache()->rememberForever('laradium::field-list', function () {
-            $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
-            $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
+        $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
+        $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
 
-            $fieldList = [];
-            if (file_exists($fieldPath)) {
-                foreach (\File::allFiles($fieldPath) as $path) {
-                    $field = $path->getPathname();
-                    $baseName = basename($field, '.php');
-                    $field = 'Laradium\\Laradium\\Base\\Fields\\' . $baseName;
-                    $fieldList[lcfirst($baseName)] = $field;
-                }
-
-                if (file_exists($contentFieldPath)) {
-                    foreach (\File::allFiles($contentFieldPath) as $path) {
-                        $field = $path->getPathname();
-                        $baseName = basename($field, '.php');
-                        $field = 'Laradium\\Laradium\\Content\\Base\\Fields\\' . $baseName;
-                        $fieldList[lcfirst($baseName)] = $field;
-                    }
-                }
+        $fieldList = [];
+        if (file_exists($fieldPath)) {
+            foreach (\File::allFiles($fieldPath) as $path) {
+                $field = $path->getPathname();
+                $baseName = basename($field, '.php');
+                $field = 'Laradium\\Laradium\\Base\\Fields\\' . $baseName;
+                $fieldList[lcfirst($baseName)] = $field;
             }
 
-            return $fieldList;
-        });
+            if (file_exists($contentFieldPath)) {
+                foreach (\File::allFiles($contentFieldPath) as $path) {
+                    $field = $path->getPathname();
+                    $baseName = basename($field, '.php');
+                    $field = 'Laradium\\Laradium\\Content\\Base\\Fields\\' . $baseName;
+                    $fieldList[lcfirst($baseName)] = $field;
+                }
+            }
+        }
+
+        return $fieldList;
     }
 
     /**
@@ -127,48 +124,45 @@ class LaradiumServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     private function getResourceList()
     {
-        return cache()->rememberForever('laradium::resource-list', function () {
-            $resourceList = [];
-            $baseResourcePath = base_path('vendor/laradium/laradium/src/Base/Resources');
-            $contentResourcePath = base_path('vendor/laradium/laradium-content/src/Base/Resources');
-            if (file_exists($baseResourcePath)) {
-                foreach (\File::allFiles($baseResourcePath) as $path) {
-                    $resource = $path->getPathname();
-                    $baseName = basename($resource, '.php');
-                    $resource = 'Laradium\\Laradium\\Base\\Resources\\' . $baseName;
-                    $resourceList[] = $resource;
-                }
-                if (file_exists($contentResourcePath)) {
-                    foreach (\File::allFiles($contentResourcePath) as $path) {
-                        $resource = $path->getPathname();
-                        $baseName = basename($resource, '.php');
-                        $resource = 'Laradium\\Laradium\\Content\\Base\\Resources\\' . $baseName;
-                        $resourceList[] = $resource;
-                    }
-                }
+        $resourceList = [];
+        $baseResourcePath = base_path('vendor/laradium/laradium/src/Base/Resources');
+        $contentResourcePath = base_path('vendor/laradium/laradium-content/src/Base/Resources');
+        if (file_exists($baseResourcePath)) {
+            foreach (\File::allFiles($baseResourcePath) as $path) {
+                $resource = $path->getPathname();
+                $baseName = basename($resource, '.php');
+                $resource = 'Laradium\\Laradium\\Base\\Resources\\' . $baseName;
+                $resourceList[] = $resource;
             }
-
-            $resources = config('laradium.resource_path', []);
-            $namespace = app()->getNamespace();
-            $resourcePath = str_replace($namespace, '', $resources);
-            $resourcePath = str_replace('\\', '/', $resourcePath);
-            $resourcePath = app_path($resourcePath);
-
-            if (file_exists($resourcePath)) {
-                foreach (\File::files($resourcePath) as $path) {
+            if (file_exists($contentResourcePath)) {
+                foreach (\File::allFiles($contentResourcePath) as $path) {
                     $resource = $path->getPathname();
                     $baseName = basename($resource, '.php');
-                    $resource = $resources . '\\' . $baseName;
+                    $resource = 'Laradium\\Laradium\\Content\\Base\\Resources\\' . $baseName;
                     $resourceList[] = $resource;
                 }
             }
+        }
 
-            return $resourceList;
-        });
+        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources');
+        $namespace = app()->getNamespace();
+        $resourcePath = str_replace($namespace, '', $resources);
+        $resourcePath = str_replace('\\', '/', $resourcePath);
+        $resourcePath = app_path($resourcePath);
+        if (file_exists($resourcePath)) {
+            foreach (\File::files($resourcePath) as $path) {
+                $resource = $path->getPathname();
+                $baseName = basename($resource, '.php');
+                $resource = $resources . '\\' . $baseName;
+                $resourceList[] = $resource;
+            }
+        }
+
+        return $resourceList;
     }
 
     /**
@@ -177,24 +171,22 @@ class LaradiumServiceProvider extends ServiceProvider
      */
     private function getApiResourcesList()
     {
-        return cache()->rememberForever('laradium::api-resource-list', function () {
-            $resourceList = [];
-            $resources = config('laradium.resource_path', []) . '\\Api';
-            $namespace = app()->getNamespace();
-            $resourcePath = str_replace($namespace, '', $resources);
-            $resourcePath = str_replace('\\', '/', $resourcePath);
-            $resourcePath = app_path($resourcePath);
-            if (file_exists($resourcePath)) {
-                foreach (\File::allFiles($resourcePath) as $path) {
-                    $resource = $path->getPathname();
-                    $baseName = basename($resource, '.php');
-                    $resource = $resources . '\\' . $baseName;
-                    $resourceList[] = $resource;
-                }
+        $resourceList = [];
+        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources\\Api') . '\\Api';
+        $namespace = app()->getNamespace();
+        $resourcePath = str_replace($namespace, '', $resources);
+        $resourcePath = str_replace('\\', '/', $resourcePath);
+        $resourcePath = app_path($resourcePath);
+        if (file_exists($resourcePath)) {
+            foreach (\File::allFiles($resourcePath) as $path) {
+                $resource = $path->getPathname();
+                $baseName = basename($resource, '.php');
+                $resource = $resources . '\\' . $baseName;
+                $resourceList[] = $resource;
             }
+        }
 
-            return $resourceList;
-        });
+        return $resourceList;
     }
 
     /**
@@ -215,5 +207,93 @@ class LaradiumServiceProvider extends ServiceProvider
             ]);
         } catch (\Exception $e) {
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function registerBindings()
+    {
+        \App::bind('Translate', function () {
+            return new Translate;
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function registerDirectives()
+    {
+        Blade::directive('lg', function ($expression) {
+            return "<?php echo lg($expression); ?>";
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function publishConfig()
+    {
+        $this->publishes([
+            __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
+            __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
+            __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
+        ], 'laradium');
+    }
+
+    /**
+     * @return void
+     */
+    private function registerMiddleware()
+    {
+        $this->app['router']->aliasMiddleware('laradium', LaradiumMiddleware::class);
+    }
+
+    /**
+     * @return void
+     */
+    private function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MakeLaradiumResource::class,
+                ImportTranslations::class,
+                FindTranslations::class,
+            ]);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function loadRoutes()
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
+    }
+
+    /**
+     * @return void
+     */
+    private function loadViews()
+    {
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium');
+    }
+
+    /**
+     * @return void
+     */
+    private function loadMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+    }
+
+    /**
+     * @return void
+     */
+    private function publishAssets()
+    {
+        $this->publishes([
+            __DIR__ . '/../../public/laradium' => public_path('laradium'),
+        ], 'laradium');
     }
 }

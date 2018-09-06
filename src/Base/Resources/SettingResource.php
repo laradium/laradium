@@ -1,33 +1,41 @@
 <?php
+
 namespace Laradium\Laradium\Base\Resources;
+
 use Laradium\Laradium\Models\Setting;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Base\ColumnSet;
+
 Class SettingResource extends AbstractResource
 {
     /**
      * @var string
      */
     protected $resource = Setting::class;
+
     /**
      * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
         $this->registerEvent('afterSave', function () {
-            setting()->clear_cache();
+            setting()->clearCache();
         });
 
         return laradium()->resource(function (FieldSet $set) {
             $fieldType = $set->model()->type;
-            if($set->model()->is_translatable) {
+
+            if ($set->model()->is_translatable) {
                 $set->$fieldType('value')->translatable();
+            } else if ($fieldType === 'file') {
+                $set->$fieldType('file');
             } else {
                 $set->$fieldType('non_translatable_value');
             }
         });
     }
+
     /**
      * @return \Laradium\Laradium\Base\Table
      */
@@ -35,8 +43,8 @@ Class SettingResource extends AbstractResource
     {
         $table = laradium()->table(function (ColumnSet $column) {
 
-            $column->add('name')->modify(function($row){
-                return ( $row->is_translatable ? $this->translatableIcon() : '' ) . $row->name;
+            $column->add('name')->modify(function ($row) {
+                return ($row->is_translatable ? $this->translatableIcon() : '') . $row->name;
             });
 
             $column->add('value')->modify(function ($item) {
@@ -52,22 +60,28 @@ Class SettingResource extends AbstractResource
         ]);
 
         return $table;
-
     }
-
 
     /**
      * @param $item
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string|void
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
      */
     public function modifyValueColumn($item)
     {
         //we do not want to display textarea content in table
-        if( $item->type == 'textarea' ){
-            return;
+        if ($item->type === 'textarea') {
+            return '<span style="font-size:80%">- too long to show -</span>';
         }
 
-        if( $item->is_translatable ) {
+        if ($item->type === 'file') {
+            if ($item->file->exists()) {
+                return $item->file->url();
+            } else {
+                return '<span style="font-size:80%">- empty -</span>';
+            }
+        }
+
+        if ($item->is_translatable) {
             return view('laradium::admin.resource._partials.translation', compact('item'));
         }
 
