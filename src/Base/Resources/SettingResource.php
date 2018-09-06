@@ -15,6 +15,10 @@ Class SettingResource extends AbstractResource
      */
     public function resource()
     {
+        $this->registerEvent('afterSave', function () {
+            setting()->clear_cache();
+        });
+
         return laradium()->resource(function (FieldSet $set) {
             $fieldType = $set->model()->type;
             if($set->model()->is_translatable) {
@@ -29,17 +33,53 @@ Class SettingResource extends AbstractResource
      */
     public function table()
     {
-        return laradium()->table(function (ColumnSet $column) {
-            $column->add('group');
-            $column->add('name');
-            $column->add('is_translatable');
-            $column->add('value')->modify(function ($item) {
-                if($item->is_translatable) {
-                    return view('laradium::admin.resource._partials.translation', compact('item'));
-                } else {
-                    return $item->non_translatable_value ? e($item->non_translatable_value) : 'N/A';
-                }
+        $table = laradium()->table(function (ColumnSet $column) {
+
+            $column->add('name')->modify(function($row){
+                return ( $row->is_translatable ? $this->translatableIcon() : '' ) . $row->name;
             });
-        })->actions(['edit'])->relations(['translations']);
+
+            $column->add('value')->modify(function ($item) {
+                return $this->modifyValueColumn($item);
+            })->editable();
+
+        })->dataTable(false)
+            ->actions(['edit'])
+            ->relations(['translations']);
+
+        $table->tabs([
+            'group' => Setting::select('group')->groupBy('group')->pluck('group', 'group')
+        ]);
+
+        return $table;
+
     }
+
+
+    /**
+     * @param $item
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string|void
+     */
+    public function modifyValueColumn($item)
+    {
+        //we do not want to display textarea content in table
+        if( $item->type == 'textarea' ){
+            return;
+        }
+
+        if( $item->is_translatable ) {
+            return view('laradium::admin.resource._partials.translation', compact('item'));
+        }
+
+        return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';
+    }
+
+    /**
+     * @return string
+     */
+    public function translatableIcon()
+    {
+        return '<span data-toggle="tooltip" data-placement="top" title="" data-original-title="Value is translatable"><i class="fa fa-language"></i></span> ';
+    }
+
 }

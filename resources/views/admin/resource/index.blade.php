@@ -40,46 +40,16 @@
                     @foreach($table->getTabs() as $key => $tabs)
                         <div class="tab-content">
                             @foreach ($tabs as $id => $name)
-                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                     id="tab-{{ $id }}">
-                                    <div class="table-wrapper">
-                                        <div class="table-responsive">
-                                            <table class="resource-datatable table table-bordered"
-                                                   data-url="{{ url('/admin/' . str_replace('_', '-', $table->model()->getTable()) . '/data-table?' . $key . '=' . $id) }}">
-                                                <thead>
-                                                <tr>
-                                                    @foreach($table->columns() as $column)
-                                                        <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
-                                                    @endforeach
-                                                    <th>
-                                                        Actions
-                                                    </th>
-                                                </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
+                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="tab-{{ $id }}">
+
+                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . str_replace('_', '-', $table->model()->getTable()) . '/data-table?' . $key . '=' . $id) ])
+
                                 </div>
                             @endforeach
                         </div>
                     @endforeach
                 @else
-                    <div class="table-wrapper">
-                        <div class="table-responsive">
-                            <table class="resource-datatable table table-bordered">
-                                <thead>
-                                <tr>
-                                    @foreach($table->columns() as $column)
-                                        <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
-                                    @endforeach
-                                    <th>
-                                        Actions
-                                    </th>
-                                </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
+                    @include('laradium::admin.resource._partials.table')
                 @endif
             </div>
         </div>
@@ -100,44 +70,45 @@
                 '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
                 '<button type="button" class="btn editable-cancel btn-mini btn-sm"><i class="fa fa-close"></i></button>';
 
-                    @if ($table->getTabs())
-            let onTabChange = function (activeTab) {
+                @if ($table->getTabs())
+                    let onTabChange = function (activeTab) {
+                        // Entries datatable
+                        let selector = '.tab-pane.active .resource-datatable';
+                        if ($.fn.DataTable.isDataTable(selector)) {
+                            return;
+                        }
 
-                    // Entries datatable
-                    let selector = '.tab-pane.active .resource-datatable';
-                    if ($.fn.DataTable.isDataTable(selector)) {
-                        return;
-                    }
+                        let dataTable = $(selector).DataTable({
+                            processing: true,
+                            serverSide: true,
+                            ajax: $(selector).data('url'),
+                            columns: {!! $table->getColumnConfig()->toJson() !!}
+                        }).on('draw.dt', function () {
+                            $('.js-editable').editable({});
+                            $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+                        });
+                    };
 
-                    let dataTable = $(selector).DataTable({
+                    // When page loads, we initialize first tab
+                    let activeTab = $('.nav-tabs li.active:first');
+                    onTabChange(activeTab);
+
+                    // When tabs are clicked, we load info there
+                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        let activeTab = $('.nav-tabs li.active:first');
+                        onTabChange(activeTab);
+                    });
+                @else
+                    let dataTable = $('.resource-datatable').DataTable({
                         processing: true,
                         serverSide: true,
-                        ajax: $(selector).data('url'),
+                        ajax: '/admin/{{ str_replace('_', '-', $table->model()->getTable()) }}/data-table',
                         columns: {!! $table->getColumnConfig()->toJson() !!}
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({});
+                        $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
                     });
-                };
-
-            // When page loads, we initialize first tab
-            let activeTab = $('.nav-tabs li.active:first');
-            onTabChange(activeTab);
-
-            // When tabs are clicked, we load info there
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                let activeTab = $('.nav-tabs li.active:first');
-                onTabChange(activeTab);
-            });
-                    @else
-            let dataTable = $('.resource-datatable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: '/admin/{{ str_replace('_', '-', $table->model()->getTable()) }}/data-table',
-                    columns: {!! $table->getColumnConfig()->toJson() !!}
-                }).on('draw.dt', function () {
-                    $('.js-editable').editable({});
-                });
-            @endif
+                @endif
 
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();
@@ -169,6 +140,8 @@
                     });
             });
         });
+
+        $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
     </script>
 @endpush
 

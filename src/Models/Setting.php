@@ -88,10 +88,10 @@ class Setting extends Model
     /**
      * @return string
      */
-    public function getValue()
+    public function getValueAttribute()
     {
         if ($this->is('file')) {
-            return asset(config('laradium-setting.upload_path') . '/' . $this->value);
+            return asset(config('laradium-setting.upload_path') . '/' . $this->non_translatable_value);
         }
         if ($this->is('checkbox')) {
             return $this->value === '1';

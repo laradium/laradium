@@ -43,7 +43,7 @@ class SettingsRepository
             $array = [];
             foreach ($keys as $index => $key) {
                 $setting = $settings->get($key);
-                $array[$key] = $setting ? $setting->getValue() : (is_array($default) ? (isset($default[$index]) ? $default[$index] : null) : $default);
+                $array[$key] = $setting ? $setting->value : (is_array($default) ? (isset($default[$index]) ? $default[$index] : null) : $default);
             }
 
             return $array;
@@ -51,7 +51,7 @@ class SettingsRepository
 
         $setting = $settings->get($keys);
 
-        return $setting ? $setting->getValue() : (is_array($default) ? (isset($default[0]) ? $default[0] : null) : $default);
+        return $setting ? $setting->value : (is_array($default) ? (isset($default[0]) ? $default[0] : null) : $default);
     }
 
     /**

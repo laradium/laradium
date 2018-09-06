@@ -44,24 +44,28 @@ return [
             'name'  => 'Meta title',
             'key'   => 'meta_title',
             'type'  => 'text',
+            'is_translatable' => 1,
         ],
         [
             'group' => 'seo',
             'name'  => 'Meta keywords',
             'key'   => 'meta_keywords',
             'type'  => 'textarea',
+            'is_translatable' => 1,
         ],
         [
             'group' => 'seo',
             'name'  => 'Meta description',
             'key'   => 'meta_description',
             'type'  => 'textarea',
+            'is_translatable' => 1,
         ],
         [
             'group' => 'seo',
             'name'  => 'Meta image',
             'key'   => 'meta_image',
             'type'  => 'text',
+            'is_translatable' => 1,
         ],
         // Mail
         [
@@ -99,6 +103,25 @@ return [
             'name'  => 'Name from which to send emails',
             'key'   => 'mail_from_name',
             'type'  => 'text'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme color',
+            'key'   => 'admin_theme_color',
+            'type'  => 'color'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme logo',
+            'key'   => 'admin_theme_logo',
+            'type'  => 'file'
+        ],
+        [
+            'group' => 'design',
+            'name'  => 'Admin theme favicon',
+            'key'   => 'admin_theme_favicon',
+            'type'  => 'file'
         ]
+
     ]
 ];
