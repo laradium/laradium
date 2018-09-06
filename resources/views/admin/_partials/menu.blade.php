@@ -5,7 +5,7 @@
         @foreach(menu()->get('admin_menu')->items as $item)
             <li>
                 <a href="{{ url($item->url ) }}" class="{{ str_contains(request()->getRequestUri(), $item->url) ? 'active' : '' }}">
-                    <i class="mdi mdi-view-dashboard"></i>
+                    <i class="{{ $item->icon ?? 'mdi mdi-view-dashboard' }}"></i>
                     <span> {{ $item->name }} </span>
                 </a>
             </li>
