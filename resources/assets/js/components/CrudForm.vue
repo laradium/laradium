@@ -115,7 +115,26 @@
         methods: {
             onSubmit(el) {
                 let form = document.getElementsByClassName('crud-form')[0];
-                let formData = new FormData(form);
+                let formData = new FormData();
+                /*
+                 * Fix for safari FormData bug
+                 */
+                $(form).find('input[name][type!="file"], select[name], textarea[name]').each(function(i, e) {
+                    if ($(e).attr('type') === 'checkbox' || $(e).attr('type') === 'radio') {
+                        if ($(e).is(':checked')) {
+                            formData.append($(e).attr('name'), $(e).val());
+                        }
+                    } else {
+                        formData.append($(e).attr('name'), $(e).val());
+                    }
+                });
+
+                $(form).find('input[name][type="file"]').each(function(i, e) {
+                    if ($(e)[0].files.length > 0) {
+                        formData.append($(e).attr('name'), $(e)[0].files[0]);
+                    }
+                });
+
                 let url = form.getAttribute('action');
                 axios({
                     method: 'POST',
@@ -140,6 +159,11 @@
 
                     for (let error in errors) {
                         this.errors.push(errors[error][0]);
+                    }
+
+                    if(!errors) {
+                        let status = res.response.status;
+                        this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
                     }
                 });
 

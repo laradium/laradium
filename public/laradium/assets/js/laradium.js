@@ -47753,7 +47753,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this2 = this;
 
             var form = document.getElementsByClassName('crud-form')[0];
-            var formData = new FormData(form);
+            var formData = new FormData();
+            /*
+             * Fix for safari FormData bug
+             */
+            $(form).find('input[name][type!="file"], select[name], textarea[name]').each(function (i, e) {
+                if ($(e).attr('type') === 'checkbox' || $(e).attr('type') === 'radio') {
+                    if ($(e).is(':checked')) {
+                        formData.append($(e).attr('name'), $(e).val());
+                    }
+                } else {
+                    formData.append($(e).attr('name'), $(e).val());
+                }
+            });
+
+            $(form).find('input[name][type="file"]').each(function (i, e) {
+                if ($(e)[0].files.length > 0) {
+                    formData.append($(e).attr('name'), $(e)[0].files[0]);
+                }
+            });
+
             var url = form.getAttribute('action');
             axios({
                 method: 'POST',
@@ -47777,6 +47796,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
                 for (var error in errors) {
                     _this2.errors.push(errors[error][0]);
+                }
+
+                if (!errors) {
+                    var status = res.response.status;
+                    _this2.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
                 }
             });
         }
