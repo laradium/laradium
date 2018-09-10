@@ -110,7 +110,7 @@ class ImportTranslations extends Command
                     if (!is_array($key) && !is_array($group) && !is_array($translation)) {
                         foreach (translate()->languages() as $language) {
                             \Laradium\Laradium\Models\Translation::firstOrCreate([
-                                'locale' => $language['iso_code'],
+                                'locale' => $language->iso_code,
                                 'group'  => $group,
                                 'key'    => $key,
                                 'value'  => $translation,

@@ -248,8 +248,8 @@ class Field
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
             foreach (translate()->languages() as $language) {
-                if($language['is_fallback']) {
-                    $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
+                if($language->is_fallback) {
+                    $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language->iso_code],
                         $attributeList)), $this->getRuleSet());
                 }
             }
@@ -303,9 +303,9 @@ class Field
             $translatedAttributes = [];
 
             foreach (translate()->languages() as $language) {
-                $field->setLocale($language['iso_code']);
+                $field->setLocale($language->iso_code);
                 $translatedAttributes[] = [
-                    'iso_code' => $language['iso_code'],
+                    'iso_code' => $language->iso_code,
                     'value'    => $field->getValue(),
                     'name'     => $field->getNameAttribute(),
                 ];

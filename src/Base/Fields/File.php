@@ -62,8 +62,8 @@ class File extends Field
             $translatedAttributes = [];
 
             foreach (translate()->languages() as $language) {
-                $field->setLocale($language['iso_code']);
-                $model = $field->model()->translations->where('locale', $language['iso_code'])->first();
+                $field->setLocale($language->iso_code);
+                $model = $field->model()->translations->where('locale', $language->iso_code)->first();
                 if ($model && $model->{$this->name} && $model->{$this->name}->exists()) {
                     $url = $model->{$this->name}->url();
                     $size = number_format($model->{$this->name}->size() / 1000, 2);
@@ -71,7 +71,7 @@ class File extends Field
                 }
 
                 $translatedAttributes[] = [
-                    'iso_code'  => $language['iso_code'],
+                    'iso_code'  => $language->iso_code,
                     'value'     => $field->getValue(),
                     'name'      => $field->getNameAttribute(),
                     'url'       => $url,

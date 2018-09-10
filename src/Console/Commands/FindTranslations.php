@@ -85,7 +85,7 @@ class FindTranslations extends Command
         foreach ($translations as $key => $text) {
             $data = compact('key');
             foreach (translate()->languages() as $language) {
-                $data[$language['iso_code']] = $text;
+                $data[$language->iso_code] = $text;
             }
             $mappedTranslations[] = $data;
         }

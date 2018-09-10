@@ -32,7 +32,9 @@ class TranslationRepository
             });
         }
 
-        return collect($languages);
+        return collect($languages)->transform(function ($language) {
+            return (object)$language;
+        });
     }
 
     /**

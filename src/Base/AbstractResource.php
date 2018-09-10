@@ -245,8 +245,8 @@ abstract class AbstractResource
      */
     public function languages()
     {
-        return collect(translate()->languages())->map(function ($item, $index) {
-            $item['is_current'] = $index == 0;
+        return translate()->languages()->map(function ($item, $index) {
+            $item->is_current = $index === 0;
 
             return $item;
         })->toArray();
