@@ -23,7 +23,7 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-            <span>Lara<span>dium</span></span>
+            <img src="{!! setting()->get('design.admin_theme_logo')->url() !!}" alt="">
         </a>
     </div>
     <div class="m-t-40 card-box">

@@ -84,7 +84,8 @@
         <!-- LOGO -->
         <div class="topbar-left">
             <a href="{{ url('/') }}" class="logo">
-                <span>Lara<span>dium</span></span><i class="mdi mdi-layers"></i>
+                <img src="{!! setting()->get('design.admin_theme_logo')->url() !!}" alt="">
+                {{--<span>Lara<span>dium</span></span><i class="mdi mdi-layers"></i>--}}
             </a>
         </div>
 

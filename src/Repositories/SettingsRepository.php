@@ -31,6 +31,12 @@ class SettingsRepository
 
             return $settings;
         });
+
+        $this->cachedSettings = Setting::all()->keyBy('key')->map(function ($item) {
+            return $item->toArray();
+        });
+
+
     }
 
     /**
@@ -65,17 +71,23 @@ class SettingsRepository
      */
     private function getValue($setting)
     {
-        $value = null;
         if ($setting['is_translatable']) {
+
             $translation = collect(array_get($setting, 'translations'))->where('locale', app()->getLocale())->first();
+
             if ($translation) {
-                $value = $translation['value'];
+                return $translation['value'];
             }
-        } else {
-            $value = $setting['non_translatable_value'];
+
+            return null;
         }
 
-        return $value;
+        //yes its ugly. yes it needs to be redone. yes I am a lazy fuck
+        if( $setting['type'] == 'file' ){
+            return Setting::find($setting['id'])->file;
+        }
+
+        return $setting['non_translatable_value'];
     }
 
     /**

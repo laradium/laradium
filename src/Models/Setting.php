@@ -33,7 +33,6 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
         'type',
         'meta',
         'non_translatable_value',
-        'has_manager',
         'is_translatable',
         'file'
     ];
@@ -124,9 +123,6 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
      */
     public function getValueAttribute()
     {
-        if ($this->is('file')) {
-            return asset(config('laradium-setting.upload_path') . '/' . $this->non_translatable_value);
-        }
         if ($this->is('checkbox')) {
             return $this->value === '1';
         }
