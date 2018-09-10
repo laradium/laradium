@@ -23,7 +23,7 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-            <img src="{!! setting()->get('design.admin_theme_logo')->url() !!}" alt="">
+            <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="logo">
         </a>
     </div>
     <div class="m-t-40 card-box">

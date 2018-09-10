@@ -29,7 +29,7 @@ Class SettingResource extends AbstractResource
 
             if ($set->model()->is_translatable) {
                 $set->$fieldType('value')->translatable();
-            } elseif ($fieldType == 'file') {
+            } else if ($fieldType === 'file') {
                 $set->$fieldType('file');
             } else {
                 $set->$fieldType('non_translatable_value');
@@ -57,13 +57,15 @@ Class SettingResource extends AbstractResource
             ->relations(['translations']);
 
         $table->tabs([
-            'group' => Setting::select('group')->groupBy('group')->pluck('group', 'group')
+            'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
+                return [
+                    $setting->group => ucfirst($setting->group)
+                ];
+            })->all()
         ]);
 
         return $table;
-
     }
-
 
     /**
      * @param $item
@@ -72,12 +74,12 @@ Class SettingResource extends AbstractResource
     public function modifyValueColumn($item)
     {
         //we do not want to display textarea content in table
-        if ($item->type == 'textarea') {
+        if ($item->type === 'textarea') {
             return '<span style="font-size:80%">- too long to show -</span>';
         }
 
-        if($item->type == 'file') {
-            if($item->file->exists()) {
+        if ($item->type === 'file') {
+            if ($item->file->exists()) {
                 return $item->file->url();
             } else {
                 return '<span style="font-size:80%">- empty -</span>';
