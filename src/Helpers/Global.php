@@ -17,7 +17,7 @@ if (!function_exists('translate')) {
      */
     function translate()
     {
-        return app(\Laradium\Laradium\Helpers\Translate::class);
+        return app(\Laradium\Laradium\Repositories\TranslationRepository::class);
     }
 }
 

@@ -1,9 +1,8 @@
 <?php
 return [
     // Cache key
-    'cache_key'        => 'settings',
-    // Upload path
-    'upload_path'      => '/uploads/settings',
+    'cache_key'        => 'laradium::settings',
+
     // Default settings to seed
     'default_settings' => [
         [

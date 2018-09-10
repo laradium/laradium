@@ -21,7 +21,7 @@ Class LanguageResource extends AbstractResource
     public function resource()
     {
         $this->registerEvent('afterSave', function () {
-            cache()->forget('languages');
+            cache()->forget('laradium::languages');
         });
 
         return laradium()->resource(function (FieldSet $set) {

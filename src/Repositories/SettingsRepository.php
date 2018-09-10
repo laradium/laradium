@@ -22,7 +22,7 @@ class SettingsRepository
      */
     public function __construct()
     {
-        $this->cacheKey = config('laradium-setting.cache_key', 'settings');
+        $this->cacheKey = config('laradium-setting.cache_key', 'laradium::settings');
 
         $this->cachedSettings = cache()->rememberForever($this->cacheKey, function () {
             $settings = Setting::all()->keyBy('key')->map(function ($item) {
