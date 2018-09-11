@@ -29,8 +29,7 @@ class BelongsTo extends Field
 
         $this->relationModel = new $this->name;
         $this->label = array_last(explode('\\', $this->name));
-        $this->name = strtolower($this->label) . '_id';
-
+        $this->name = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->label)) . '_id';
     }
 
     /**
