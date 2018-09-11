@@ -186,7 +186,7 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.4/tinymce.min.js"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/tinymce/tinymce.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->
