@@ -30,6 +30,10 @@ class CreateMenuItemTranslationsTable extends Migration
         $menus = [];
         $laradium = app(\Laradium\Laradium\Base\Laradium::class);
 
+        foreach ($laradium->resources() as $resource) {
+            $laradium->register($resource);
+        }
+
         if ($laradium->all()) {
             foreach ($laradium->all() as $resource) {
                 $menus['Admin menu'][] = [
@@ -45,11 +49,6 @@ class CreateMenuItemTranslationsTable extends Migration
         menu()->seed($menus);
 
         if ($menus = config('laradium.menus', [])) {
-
-            foreach ($laradium->resources() as $resource) {
-                $laradium->register($resource);
-            }
-
             menu()->seed($menus);
         }
     }
