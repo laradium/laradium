@@ -36,28 +36,13 @@ return [
 
     'menus' => [
         'Admin menu' => [
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Translations',
-                    'url'  => '/admin/translations',
-                ]
-            ],
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Languages',
-                    'url'  => '/admin/languages',
-                ]
-            ],
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Menus',
-                    'url'  => '/admin/menus',
-                ]
-            ],
-
+//            [
+//                'is_active'    => 1,
+//                'translations' => [
+//                    'name' => 'Translations',
+//                    'url'  => '/admin/translations',
+//                ]
+//            ],
         ]
     ]
 ];

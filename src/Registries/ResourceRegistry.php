@@ -28,11 +28,17 @@ class ResourceRegistry
     protected $namespace;
 
     /**
+     * @var Collection
+     */
+    protected $resources;
+
+    /**
      * RouteRegistry constructor.
      */
     public function __construct()
     {
         $this->router = app('router');
+        $this->resources = new Collection;
     }
 
     /**
@@ -41,8 +47,11 @@ class ResourceRegistry
      */
     public function register($resourceName)
     {
+
         $resource = new $resourceName;
         $routeSlug = $this->getRouteSlug($resourceName);
+        $this->resources->push($routeSlug);
+
         if (!$routeSlug) {
             return $this;
         }
@@ -113,6 +122,14 @@ class ResourceRegistry
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function all()
+    {
+        return $this->resources;
     }
 
     /**

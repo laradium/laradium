@@ -27,30 +27,30 @@ class CreateMenuItemTranslationsTable extends Migration
             $table->timestamps();
         });
 
-        if ($menus = config('laradium.menus', [])) {
-            foreach ($menus as $name => $menuItems) {
-                $m = \Laradium\Laradium\Models\Menu::create([
-                    'key' => str_slug($name, '_')
-                ]);
+        $menus = [];
+        $laradium = app(\Laradium\Laradium\Base\Laradium::class);
 
-                foreach (translate()->languages() as $language) {
-                    $m->translations()->firstOrCreate([
-                        'locale' => $language->iso_code,
-                        'name'   => $name
-                    ]);
-                }
-
-                foreach ($menuItems as $item) {
-                    $menuItem = $m->items()->create(array_except($item, 'translations'));
-
-                    foreach (translate()->languages() as $language) {
-                        $translations = $item['translations'];
-                        $translations['locale'] = $language->iso_code;
-
-                        $menuItem->translations()->firstOrCreate($translations);
-                    }
-                }
+        if ($laradium->all()) {
+            foreach ($laradium->all() as $resource) {
+                $menus['Admin menu'][] = [
+                    'is_active'    => 1,
+                    'translations' => [
+                        'name' => ucfirst(str_replace('-', ' ', $resource)),
+                        'url'  => '/admin/' . $resource,
+                    ]
+                ];
             }
+        }
+
+        menu()->seed($menus);
+
+        if ($menus = config('laradium.menus', [])) {
+
+            foreach ($laradium->resources() as $resource) {
+                $laradium->register($resource);
+            }
+
+            menu()->seed($menus);
         }
     }
 

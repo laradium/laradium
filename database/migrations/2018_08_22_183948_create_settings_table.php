@@ -45,20 +45,6 @@ class CreateSettingsTable extends Migration
             $table->mediumText('value')->nullable();
         });
 
-        $menus = [
-            'Admin menu' => [
-                [
-                    'is_active'    => 1,
-                    'translations' => [
-                        'name' => 'Settings',
-                        'url'  => '/admin/settings',
-                    ]
-                ],
-            ]
-        ];
-
-        menu()->seed($menus);
-
         $settings = config('laradium-setting.default_settings');
         setting()->seed($settings);
     }

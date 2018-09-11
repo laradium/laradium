@@ -119,7 +119,7 @@
                 /*
                  * Fix for safari FormData bug
                  */
-                $(form).find('input[name][type!="file"], select[name], textarea[name]').each(function(i, e) {
+                $(form).find('input[name][type!="file"], select[name], textarea[name]').each(function (i, e) {
                     if ($(e).attr('type') === 'checkbox' || $(e).attr('type') === 'radio') {
                         if ($(e).is(':checked')) {
                             formData.append($(e).attr('name'), $(e).val());
@@ -129,7 +129,7 @@
                     }
                 });
 
-                $(form).find('input[name][type="file"]').each(function(i, e) {
+                $(form).find('input[name][type="file"]').each(function (i, e) {
                     if ($(e)[0].files.length > 0) {
                         formData.append($(e).attr('name'), $(e)[0].files[0]);
                     }
@@ -161,7 +161,7 @@
                         this.errors.push(errors[error][0]);
                     }
 
-                    if(!errors) {
+                    if (!errors) {
                         let status = res.response.status;
                         this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
                     }
