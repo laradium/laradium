@@ -19,6 +19,11 @@ class BelongsToMany extends Field
     protected $relationName;
 
     /**
+     * @var string
+     */
+    protected $title;
+
+    /**
      * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
@@ -69,11 +74,22 @@ class BelongsToMany extends Field
             'items'                  => $items->map(function ($item) use ($relatedItems) {
                 return [
                     'id'      => $item->id,
-                    'name'    => $item->name,
+                    'name'    => $this->title ? $item->{$this->title} : $item->name,
                     'checked' => in_array($item->id, $relatedItems),
                 ];
             })->toArray(),
         ];
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function title($value)
+    {
+        $this->title = $value;
+
+        return $this;
     }
 
     /**
