@@ -100,7 +100,7 @@ class ColumnSet
     /**
      * @return $this
      */
-    public function notSerchable()
+    public function notSearchable()
     {
         $this->list = $this->list->map(function ($item) {
             if ($this->column == $item['column']) {
