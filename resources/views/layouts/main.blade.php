@@ -113,7 +113,7 @@
                         <ul class="list-unstyled topbar-right-menu float-right mb-0">
 
                             <li>
-                                <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create"
+                                <a href="/admin/{{ $resource->getSlug() }}/create"
                                    class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i> Create
                                 </a>

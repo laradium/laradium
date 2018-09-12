@@ -49,8 +49,8 @@ class ResourceRegistry
     {
 
         $resource = new $resourceName;
-        $routeSlug = $this->getRouteSlug($resourceName);
-        $this->resources->push($routeSlug);
+        $routeSlug = $resource->getSlug();
+        $this->resources->push($resourceName);
 
         if (!$routeSlug) {
             return $this;
@@ -61,42 +61,42 @@ class ResourceRegistry
 
         $routeList = [
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
                 'middleware' => ['web', 'laradium']
             ],
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
                 'middleware' => ['web', 'laradium']
             ],
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.form'
+                'name'       => 'admin.' . $routeSlug . '.form'
             ],
             // Import
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('import'),
                 'controller' => $this->getRouteController('import'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.import'
+                'name'       => 'admin.' . $routeSlug . '.import'
             ],
             // Export
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('export'),
                 'controller' => $this->getRouteController('export'),
                 'middleware' => ['web', 'laradium'],
-                'name' => 'admin.' . $routeSlug . '.export'
+                'name'       => 'admin.' . $routeSlug . '.export'
             ],
             [
-                'method' => 'resource',
+                'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
                 'middleware' => ['web', 'laradium'],
@@ -104,11 +104,13 @@ class ResourceRegistry
         ];
 
         foreach ($routeList as $route) {
-            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource, 'import')) {
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource,
+                    'import')) {
                 continue;
             }
 
-            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.export' && !method_exists($resource, 'export')) {
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.export' && !method_exists($resource,
+                    'export')) {
                 continue;
             }
 
@@ -116,8 +118,16 @@ class ResourceRegistry
                 $this->router->{$route['method']}($route['route_slug'],
                     $route['controller'])->middleware($route['middleware'])->name($route['name']);
             } else {
-                $this->router->{$route['method']}($route['route_slug'],
-                    $route['controller'])->middleware($route['middleware']);
+                $this->router->name('admin.')->group(function () use ($route) {
+                    if ($route['method'] == 'resource') {
+                        $this->router->{$route['method']}($route['route_slug'],
+                            $route['controller'])->middleware($route['middleware']);
+                    } else {
+                        $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
+                        $this->router->name($name)->{$route['method']}($route['route_slug'],
+                            $route['controller'])->middleware($route['middleware']);
+                    }
+                });
             }
         }
 
@@ -149,24 +159,5 @@ class ResourceRegistry
     protected function getRouteController($method = null)
     {
         return '\\' . $this->namespace . ($method ? '@' . $method : '');
-    }
-
-    /**
-     * @param $resource
-     * @return string
-     */
-    protected function getRouteSlug($resource): string
-    {
-        if (class_exists($resource)) {
-            $r = new $resource;
-            $model = $r->model();
-            $model = new $model;
-
-            $name = str_replace('_', '-', $model->getTable());
-
-            return $name;
-        }
-
-        return false;
     }
 }

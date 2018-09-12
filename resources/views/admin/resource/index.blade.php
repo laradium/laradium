@@ -1,4 +1,4 @@
-@extends('laradium::layouts.main', ['title' => ucfirst(str_replace('_', ' ', $model->getTable())), 'table' => $table])
+@extends('laradium::layouts.main', ['title' => $resource->getName(), 'table' => $table])
 
 @section('content')
     <div class="row">
@@ -42,7 +42,7 @@
                             @foreach ($tabs as $id => $name)
                                 <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="tab-{{ $id }}">
 
-                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . str_replace('_', '-', $table->model()->getTable()) . '/data-table?' . $key . '=' . $id) ])
+                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getSlug() . '/data-table?' . $key . '=' . $id) ])
 
                                 </div>
                             @endforeach
@@ -70,45 +70,45 @@
                 '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
                 '<button type="button" class="btn editable-cancel btn-mini btn-sm"><i class="fa fa-close"></i></button>';
 
-                @if ($table->getTabs())
-                    let onTabChange = function (activeTab) {
-                        // Entries datatable
-                        let selector = '.tab-pane.active .resource-datatable';
-                        if ($.fn.DataTable.isDataTable(selector)) {
-                            return;
-                        }
+                    @if ($table->getTabs())
+            let onTabChange = function (activeTab) {
+                    // Entries datatable
+                    let selector = '.tab-pane.active .resource-datatable';
+                    if ($.fn.DataTable.isDataTable(selector)) {
+                        return;
+                    }
 
-                        let dataTable = $(selector).DataTable({
-                            processing: true,
-                            serverSide: true,
-                            ajax: $(selector).data('url'),
-                            columns: {!! $table->getColumnConfig()->toJson() !!}
-                        }).on('draw.dt', function () {
-                            $('.js-editable').editable({});
-                            $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
-                        });
-                    };
-
-                    // When page loads, we initialize first tab
-                    let activeTab = $('.nav-tabs li.active:first');
-                    onTabChange(activeTab);
-
-                    // When tabs are clicked, we load info there
-                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                        let activeTab = $('.nav-tabs li.active:first');
-                        onTabChange(activeTab);
-                    });
-                @else
-                    let dataTable = $('.resource-datatable').DataTable({
+                    let dataTable = $(selector).DataTable({
                         processing: true,
                         serverSide: true,
-                        ajax: '/admin/{{ str_replace('_', '-', $table->model()->getTable()) }}/data-table',
+                        ajax: $(selector).data('url'),
                         columns: {!! $table->getColumnConfig()->toJson() !!}
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({});
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
                     });
-                @endif
+                };
+
+            // When page loads, we initialize first tab
+            let activeTab = $('.nav-tabs li.active:first');
+            onTabChange(activeTab);
+
+            // When tabs are clicked, we load info there
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                let activeTab = $('.nav-tabs li.active:first');
+                onTabChange(activeTab);
+            });
+                    @else
+            let dataTable = $('.resource-datatable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: '/admin/{{ $resource->getSlug() }}/data-table',
+                    columns: {!! $table->getColumnConfig()->toJson() !!}
+                }).on('draw.dt', function () {
+                    $('.js-editable').editable({});
+                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+                });
+            @endif
 
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();

@@ -28,6 +28,16 @@ abstract class AbstractResource
     protected $events = [];
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $slug;
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -81,9 +91,13 @@ abstract class AbstractResource
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
+        $form->abstractResource($this);
         $form->buildForm();
 
-        return view('laradium::admin.resource.create', compact('form'));
+        $name = $this->getName();
+        $slug = $this->getSlug();
+
+        return view('laradium::admin.resource.create', compact('form', 'name', 'slug'));
     }
 
     /**
@@ -132,9 +146,13 @@ abstract class AbstractResource
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
+        $form->abstractResource($this);
         $form->buildForm();
 
-        return view('laradium::admin.resource.edit', compact('form'));
+        $name = $this->getName();
+        $slug = $this->getSlug();
+
+        return view('laradium::admin.resource.edit', compact('form', 'name', 'slug'));
     }
 
     /**
@@ -250,6 +268,39 @@ abstract class AbstractResource
 
             return $item;
         })->toArray();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        if (!$this->slug && $this->name) {
+            $this->slug = strtolower(str_replace(' ', '-', $this->name));
+
+            return $this->slug;
+        } elseif (!$this->slug && !$this->name) {
+            $this->name = str_replace('_', '-', $this->model->getTable());
+
+            return $this->name;
+        }
+
+
+        return $this->slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        if (!$this->name && !$this->slug) {
+            return ucfirst(str_replace('_', ' ', $this->model->getTable()));
+        } elseif (!$this->name && $this->slug) {
+            return ucfirst(str_replace('-', ' ', $this->slug));
+        }
+
+        return $this->name;
     }
 
     /**

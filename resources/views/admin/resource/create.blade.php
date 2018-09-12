@@ -1,4 +1,4 @@
-@extends('laradium::layouts.main', ['title' => 'Create ' . $form->resourceName()])
+@extends('laradium::layouts.main', ['title' => 'Create ' . $name])
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -13,6 +13,6 @@
 
 @section('crud-url')
     <script>
-        let url = '{{ route('admin.' . $form->resourceName() . '.form') }}';
+        let url = '{{ route('admin.' . $slug . '.form') }}';
     </script>
 @endsection

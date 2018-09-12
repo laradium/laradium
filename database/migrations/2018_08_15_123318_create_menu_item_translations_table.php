@@ -36,11 +36,12 @@ class CreateMenuItemTranslationsTable extends Migration
 
         if ($laradium->all()) {
             foreach ($laradium->all() as $resource) {
+                $resource = new $resource;
                 $menus['Admin menu'][] = [
                     'is_active'    => 1,
                     'translations' => [
-                        'name' => ucfirst(str_replace('-', ' ', $resource)),
-                        'url'  => '/admin/' . $resource,
+                        'name' => $resource->getName(),
+                        'url'  => '/admin/' . $resource->getSlug(),
                     ]
                 ];
             }

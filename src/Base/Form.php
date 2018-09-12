@@ -20,13 +20,13 @@ class Form
     /**
      * @var Model
      */
-
     protected $model;
+
     /**
      * @var Resource
      */
-
     protected $resource;
+
     /**
      * @var array
      */
@@ -36,6 +36,11 @@ class Form
      * @var bool
      */
     protected $isTranslatable = false;
+
+    /**
+     * @var
+     */
+    protected $abstractResource;
 
     /**
      * Form constructor.
@@ -65,7 +70,7 @@ class Form
 
                     $this->fields->push($tabField);
 
-                    if($tabField->isTranslatable()) {
+                    if ($tabField->isTranslatable()) {
                         $this->isTranslatable = true;
                     }
                 }
@@ -75,7 +80,7 @@ class Form
 
                 $this->fields->push($field);
 
-                if($field->isTranslatable()) {
+                if ($field->isTranslatable()) {
                     $this->isTranslatable = true;
                 }
             }
@@ -84,6 +89,9 @@ class Form
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function formatedResponse()
     {
         $fieldList = [];
@@ -92,6 +100,17 @@ class Form
         }
 
         return $fieldList;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function abstractResource($value)
+    {
+        $this->abstractResource = $value;
+
+        return $this;
     }
 
     /**
@@ -142,19 +161,20 @@ class Form
      * @param string $action
      * @return string
      */
-    public function getAction($action = 'index'): string {
-        $resource = $this->resourceName();
+    public function getAction($action = 'index'): string
+    {
+        $slug = $this->abstractResource->getSlug();
         if ($action == 'create') {
-            return url('/admin/' . $resource . '/create');
+            return url('/admin/' . $slug . '/create');
         } elseif ($action == 'create') {
-            return url('/admin/' . $resource . '/create');
+            return url('/admin/' . $slug . '/create');
         } elseif ($action == 'store') {
-            return url('/admin/' . $resource);
+            return url('/admin/' . $slug);
         } elseif ($action == 'update') {
-            return url('/admin/' . $resource . '/' . $this->model->id);
+            return url('/admin/' . $slug . '/' . $this->model->id);
         }
 
-        return url('/admin/' . $resource);
+        return url('/admin/' . $slug);
     }
 
     /**
