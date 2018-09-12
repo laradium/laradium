@@ -194,20 +194,20 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data' => $column['column'],
-                'name' => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
-                'searchable' => $column['translatable'] ? false : true,
-                'orderable' => $column['translatable'] ? false : true,
+                'data'       => $column['column'],
+                'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
+                'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
         }
 
         $config->push([
-            'data' => 'action',
-            'name' => 'action',
+            'data'       => 'action',
+            'name'       => 'action',
             'searchable' => false,
-            'orderable' => false,
-            'width' => '15%',
-            'class' => 'text-center'
+            'orderable'  => false,
+            'width'      => '15%',
+            'class'      => 'text-center'
         ]);
 
         return $config;

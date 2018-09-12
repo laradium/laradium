@@ -33,13 +33,15 @@ class ColumnSet
     public function add($column, $name = null)
     {
         $this->list->push([
-            'column'        => $column,
-            'column_parsed' => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
-            'name'          => $name ?? $column,
-            'relation'      => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
-            'editable'      => false,
-            'translatable'  => false,
-            'modify'        => null,
+            'column'         => $column,
+            'column_parsed'  => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
+            'name'           => $name ?? $column,
+            'relation'       => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
+            'editable'       => false,
+            'translatable'   => false,
+            'modify'         => null,
+            'not_sortable'   => false,
+            'not_searchable' => false,
         ]);
 
         $this->column = $column;
@@ -71,6 +73,38 @@ class ColumnSet
         $this->list = $this->list->map(function ($item) {
             if ($this->column == $item['column']) {
                 $item['translatable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function notSortable()
+    {
+        $this->list = $this->list->map(function ($item) {
+            if ($this->column == $item['column']) {
+                $item['not_sortable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function notSerchable()
+    {
+        $this->list = $this->list->map(function ($item) {
+            if ($this->column == $item['column']) {
+                $item['not_searchable'] = true;
             }
 
             return $item;
