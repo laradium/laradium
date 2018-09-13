@@ -6,7 +6,7 @@
     <meta name="description" content="Super light and easy to use Laradium CMS with powerful CRUD.">
     <meta name="author" content="Coderthemes">
 
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    {{--<link rel="shortcut icon" href="assets/images/favicon.ico">--}}
 
     <title>{{ config('app.name') }} - Login</title>
 
@@ -23,7 +23,11 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-            <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="logo">
+            @if(setting()->get('design.admin_theme_logo'))
+                <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
+            @else
+                Laradium
+            @endif
         </a>
     </div>
     <div class="m-t-40 card-box">
