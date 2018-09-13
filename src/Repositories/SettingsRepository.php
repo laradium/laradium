@@ -2,7 +2,9 @@
 
 namespace Laradium\Laradium\Repositories;
 
+use File;
 use Laradium\Laradium\Models\Setting;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SettingsRepository
 {
@@ -80,7 +82,7 @@ class SettingsRepository
         if ($setting['type'] === 'file') {
             $file = Setting::find($setting['id'])->file;
 
-            return \File::exists($file->path()) ? $file->url() : null;
+            return File::exists(public_path('uploads/' . $file->path())) ? $file->url() : null;
         }
 
         return $setting['non_translatable_value'];
@@ -93,7 +95,13 @@ class SettingsRepository
      */
     public function all(): array
     {
-        return $this->cachedSettings->pluck('value', 'key')->toArray();
+        $settings = [];
+
+        foreach ($this->cachedSettings as $setting) {
+            $settings[$setting['key']] = $this->getValue($setting);
+        }
+
+        return $settings;
     }
 
     /**
@@ -128,6 +136,19 @@ class SettingsRepository
                 $item['group'],
                 $item['key']
             ]);
+
+            // File
+            if ($item['type'] === 'file' && isset($item['file'])) {
+                $file = $item['file']['file'];
+
+                $item['file'] = null;
+
+                if (File::exists($file)) {
+                    $file = new \Symfony\Component\HttpFoundation\File\File($file);
+                    $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
+                    $item['file'] = $file;
+                }
+            }
 
             $setting = Setting::firstOrCreate([
                 'key' => $item['key']
