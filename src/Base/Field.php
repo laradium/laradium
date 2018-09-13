@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Field
 {
+
     use Translatable;
 
     /**
@@ -73,6 +74,14 @@ class Field
      * @var string
      */
     protected $tab;
+
+    /**
+     * @var array
+     */
+    protected $col = [
+        'size' => 12,
+        'type' => 'md'
+    ];
 
     /**
      * Field constructor.
@@ -248,7 +257,7 @@ class Field
             $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
 
             foreach (translate()->languages() as $language) {
-                if($language->is_fallback) {
+                if ($language->is_fallback) {
                     $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language->iso_code],
                         $attributeList)), $this->getRuleSet());
                 }
@@ -290,6 +299,7 @@ class Field
                 'isTranslatable'         => $field->isTranslatable(),
                 'replacemenetAttributes' => $attributes->toArray(),
                 'tab'                    => $this->tab(),
+                'col'                    => $this->col,
             ];
         } else {
 
@@ -299,6 +309,7 @@ class Field
                 'isTranslatable'         => $field->isTranslatable(),
                 'replacemenetAttributes' => $attributes->toArray(),
                 'tab'                    => $this->tab(),
+                'col'                    => $this->col,
             ];
             $translatedAttributes = [];
 
@@ -313,8 +324,6 @@ class Field
 
             $data['translatedAttributes'] = $translatedAttributes;
         }
-
-//        $dataReplacementIds = $attributeList = array_merge($attributeList, ['__ID__']);;
 
         return $data;
     }
@@ -448,5 +457,17 @@ class Field
     public function tab()
     {
         return $this->tab;
+    }
+
+    /**
+     * @param $size
+     * @param string $type
+     * @return $this
+     */
+    public function col($size = 12, $type = 'md')
+    {
+        $this->col = compact('size', 'type');
+
+        return $this;
     }
 }

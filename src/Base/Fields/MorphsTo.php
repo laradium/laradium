@@ -124,6 +124,7 @@ class MorphsTo extends Field
         return [
             'type'   => 'morph-to',
             'tab'    => $this->tab(),
+            'col'    => $this->col,
             'name'   => ucfirst($this->name),
             'fields' => $items
         ];

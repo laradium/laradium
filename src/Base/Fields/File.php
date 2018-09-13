@@ -47,6 +47,7 @@ class File extends Field
                 'isTranslatable'         => $field->isTranslatable(),
                 'replacemenetAttributes' => $attributes->toArray(),
                 'tab'                    => $this->tab(),
+                'col'                    => $this->col,
                 'url'                    => $url,
                 'file_name'              => $name,
                 'file_size'              => $size,
@@ -58,6 +59,7 @@ class File extends Field
                 'isTranslatable'         => $field->isTranslatable(),
                 'replacemenetAttributes' => $attributes->toArray(),
                 'tab'                    => $this->tab(),
+                'col'                    => $this->col,
             ];
             $translatedAttributes = [];
 

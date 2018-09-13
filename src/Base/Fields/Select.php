@@ -61,6 +61,7 @@ class Select extends Field
             'isHidden'               => $field->isHidden(),
             'replacemenetAttributes' => $attributes->toArray(),
             'tab'                    => $this->tab(),
+            'col'                    => $this->col,
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,

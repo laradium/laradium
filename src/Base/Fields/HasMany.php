@@ -249,6 +249,7 @@ class HasMany extends Field
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
             'tab'         => $this->tab(),
+            'col'         => $this->col,
             'items'       => $items,
             'show'        => false
         ];

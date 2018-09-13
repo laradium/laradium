@@ -36,6 +36,7 @@ class Boolean extends Field
             'replacemenetAttributes' => $attributes->toArray(),
             'checked'                => $field->getValue() == 1,
             'tab'                    => $this->tab(),
+            'col'                    => $this->col,
         ];
     }
 }

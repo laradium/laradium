@@ -81,6 +81,7 @@ class BelongsTo extends Field
             'isHidden'               => $field->isHidden(),
             'default'                => $field->getDefault(),
             'tab'                    => $this->tab(),
+            'col'                    => $this->col,
             'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,

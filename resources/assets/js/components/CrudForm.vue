@@ -17,20 +17,21 @@
 
                 <input type="hidden" name="_method" :value="method" v-if="method">
 
-                <div class="row">
-                    <div v-if="data.tabs.length > 1" class="col-md-12">
-                        <ul class="nav nav-tabs" v-if="data.tabs.length > 1">
-                            <li class="nav-item" v-for="(tab, index) in data.tabs">
-                                <a :href="'#' + tab" data-toggle="tab" aria-expanded="false" class="nav-link"
-                                   :class="{'active': index === 0}">
-                                    {{ tab }}
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="tab"
-                                 v-for="(tab, index) in data.tabs">
-                                <div v-for="input in data.inputs" v-if="input.tab == tab">
+
+                <div v-if="data.tabs.length > 1" class="col-md-12">
+                    <ul class="nav nav-tabs" v-if="data.tabs.length > 1">
+                        <li class="nav-item" v-for="(tab, index) in data.tabs">
+                            <a :href="'#' + tab" data-toggle="tab" aria-expanded="false" class="nav-link"
+                               :class="{'active': index === 0}">
+                                {{ tab }}
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="tab"
+                             v-for="(tab, index) in data.tabs">
+                            <div class="row">
+                                <div v-for="input in data.inputs" v-if="input.tab == tab" :class="'col-' + input.col.type + '-' + input.col.size">
                                     <component :is="input.type + '-field'"
                                                :input="input"
                                                :language="language"
@@ -40,9 +41,11 @@
                             </div>
                         </div>
                     </div>
-                    <div v-else class="col-md-12">
+                </div>
+                <div v-else>
+                    <div class="row">
                         <div v-for="input in data.inputs"
-                             class="col-md-12">
+                             :class="'col-' + input.col.type + '-' + input.col.size">
                             <component :is="input.type + '-field'"
                                        :input="input"
                                        :language="language"

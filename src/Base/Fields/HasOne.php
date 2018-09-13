@@ -96,6 +96,7 @@ class HasOne extends Field
         return [
             'type'   => 'has-one',
             'tab'    => $this->tab(),
+            'col'    => $this->col,
             'name'   => ucfirst($this->name),
             'fields' => $items
         ];
