@@ -78,7 +78,9 @@ class SettingsRepository
 
         //yes its ugly. yes it needs to be redone. yes I am a lazy fuck
         if ($setting['type'] === 'file') {
-            return Setting::find($setting['id'])->file->url();
+            $file = Setting::find($setting['id'])->file;
+
+            return \File::exists($file->path()) ? $file->url() : null;
         }
 
         return $setting['non_translatable_value'];
