@@ -31,12 +31,6 @@ class SettingsRepository
 
             return $settings;
         });
-
-        $this->cachedSettings = Setting::all()->keyBy('key')->map(function ($item) {
-            return $item->toArray();
-        });
-
-
     }
 
     /**

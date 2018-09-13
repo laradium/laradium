@@ -32,14 +32,13 @@ Class MenuResource extends AbstractResource
                 $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->boolean('is_active');
                     $set->select('target')->options([
-                        '_self'   => 'Self',
-                        '_target' => 'Target',
+                        '_self'  => 'Self',
+                        '_blank' => 'Blank',
                     ])->rules('required');
                     $set->text('name')->rules('required')->translatable();
                     $set->text('url')->rules('required')->translatable();
                 })->sortable('sequence_no');
             });
-
 
             // TODO needs possibility to add attributes
         });
