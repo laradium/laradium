@@ -138,9 +138,10 @@ class SettingsRepository
             ]);
 
             // File
-            if ($item['type'] === 'file' && isset($item['file'])) {
+            if (isset($item['type']) && $item['type'] === 'file' && isset($item['file']) && isset($item['file']['file'])) {
                 $file = $item['file']['file'];
 
+                $item['type'] = 'file';
                 $item['file'] = null;
 
                 if (File::exists($file)) {
