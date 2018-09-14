@@ -53,6 +53,16 @@ class Table
     protected $dataTable;
 
     /**
+     * @var array
+     */
+    protected $css;
+
+    /**
+     * @var array
+     */
+    protected $js;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -153,7 +163,7 @@ class Table
      * @param $data
      * @return $this
      */
-    public function additionalView($value, $data)
+    public function additionalView($value, $data = [])
     {
         $this->additionalView = $value;
         $this->additionalViewData = $data;
@@ -241,5 +251,43 @@ class Table
         $this->tabs = $tabs;
 
         return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function css($assets = [])
+    {
+        $this->css = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function js($assets = [])
+    {
+        $this->js = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCss()
+    {
+        return $this->css;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJs()
+    {
+        return $this->js;
     }
 }

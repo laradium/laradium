@@ -52,7 +52,7 @@ class MakeLaradiumResource extends Command
                     'is_active'    => 1,
                     'translations' => [
                         'name' => ucfirst(str_replace('-', ' ', $url)),
-                        'url'  => '/admin/' . $url,
+                        'url'  => '/admin/' . str_plural($url),
                     ]
                 ]
             ]
@@ -82,8 +82,6 @@ class MakeLaradiumResource extends Command
         }
 
         $this->info('Resource successfully created!');
-
-        cache()->forget('laradium::resource-list');
 
         return;
     }

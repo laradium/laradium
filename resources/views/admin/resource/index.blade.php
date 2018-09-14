@@ -143,6 +143,9 @@
 
         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
     </script>
+    @foreach($table->getJs() as $asset)
+        <script src="{{ $asset }}"></script>
+    @endforeach
 @endpush
 
 @push('styles')
@@ -150,4 +153,7 @@
     <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
     <!-- Responsive datatable examples -->
     <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    @foreach($table->getCss() as $asset)
+        <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
+    @endforeach
 @endpush
