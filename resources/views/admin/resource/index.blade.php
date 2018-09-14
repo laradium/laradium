@@ -1,4 +1,4 @@
-@extends('laradium::layouts.main', ['title' => $resource->getName(), 'table' => $table])
+@extends('laradium::layouts.main', ['title' => $name, 'table' => $table])
 
 @section('content')
     <div class="row">
