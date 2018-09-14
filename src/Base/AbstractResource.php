@@ -299,7 +299,7 @@ abstract class AbstractResource
             return ucfirst(str_replace('-', ' ', $this->slug));
         }
 
-        return $this->name;
+        return ucfirst($this->name);
     }
 
     /**
