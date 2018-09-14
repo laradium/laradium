@@ -9,7 +9,6 @@ use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
-
     use Crud, Datatable;
 
     /**
@@ -53,8 +52,9 @@ abstract class AbstractResource
         $model = $this->model;
         $table = $this->table()->setModel($model);
         $resource = $this;
+        $name = $this->getName();
 
-        return view('laradium::admin.resource.index', compact('table', 'model', 'resource'));
+        return view('laradium::admin.resource.index', compact('table', 'model', 'resource', 'name'));
     }
 
     /**
@@ -279,12 +279,11 @@ abstract class AbstractResource
             $this->slug = strtolower(str_replace(' ', '-', $this->name));
 
             return $this->slug;
-        } elseif (!$this->slug && !$this->name) {
+        } else if (!$this->slug && !$this->name) {
             $this->name = str_replace('_', '-', $this->model->getTable());
 
             return $this->name;
         }
-
 
         return $this->slug;
     }
@@ -296,7 +295,7 @@ abstract class AbstractResource
     {
         if (!$this->name && !$this->slug) {
             return ucfirst(str_replace('_', ' ', $this->model->getTable()));
-        } elseif (!$this->name && $this->slug) {
+        } else if (!$this->name && $this->slug) {
             return ucfirst(str_replace('-', ' ', $this->slug));
         }
 
