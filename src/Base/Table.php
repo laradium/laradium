@@ -55,12 +55,12 @@ class Table
     /**
      * @var array
      */
-    protected $css;
+    protected $css = [];
 
     /**
      * @var array
      */
-    protected $js;
+    protected $js = [];
 
     /**
      * Table constructor.
