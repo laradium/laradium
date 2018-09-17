@@ -36,6 +36,10 @@ class CreateMenuItemTranslationsTable extends Migration
 
         if ($laradium->all()) {
             foreach ($laradium->all() as $resource) {
+                if (in_array($resource, config('laradium.disable_menus'))) {
+                    continue;
+                }
+
                 $resource = new $resource;
                 $menus['Admin menu'][] = [
                     'is_active'    => 1,
