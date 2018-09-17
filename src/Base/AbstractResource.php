@@ -72,7 +72,7 @@ abstract class AbstractResource
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
-        $response = $form->formatedResponse();
+        $response = $form->formattedResponse();
 
         return ([
             'languages'      => $this->languages(),

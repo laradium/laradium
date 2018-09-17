@@ -273,7 +273,7 @@ class Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {

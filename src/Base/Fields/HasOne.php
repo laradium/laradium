@@ -84,13 +84,13 @@ class HasOne extends Field
      * @param null $f
      * @return array
      */
-    public function formatedResponse($f = null)
+    public function formattedResponse($f = null)
     {
         $f = !is_null($f) ? $f : $this;
 
         $items = [];
         foreach ($f->fields as $field) {
-            $items[] = $field->formatedResponse();
+            $items[] = $field->formattedResponse();
         }
 
         return [

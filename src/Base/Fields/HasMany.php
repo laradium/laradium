@@ -203,7 +203,7 @@ class HasMany extends Field
             $field->isTemplate(true);
             $field->setValue(null);
 
-            $fields[] = $field->formatedResponse($field);
+            $fields[] = $field->formattedResponse($field);
         }
 
         return [
@@ -218,7 +218,7 @@ class HasMany extends Field
      * @param null $f
      * @return array
      */
-    public function formatedResponse($f = null)
+    public function formattedResponse($f = null)
     {
         $f = !is_null($f) ? $f : $this;;
         $items = [];
@@ -235,7 +235,7 @@ class HasMany extends Field
             }
 
             foreach ($group['fields'] as $field) {
-                $item['fields'][] = $field->formatedResponse();
+                $item['fields'][] = $field->formattedResponse();
             }
 
             $items[] = $item;

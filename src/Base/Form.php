@@ -92,11 +92,11 @@ class Form
     /**
      * @return array
      */
-    public function formatedResponse()
+    public function formattedResponse()
     {
         $fieldList = [];
         foreach ($this->fields as $field) {
-            $fieldList[] = $field->formatedResponse($field);
+            $fieldList[] = $field->formattedResponse($field);
         }
 
         return $fieldList;
