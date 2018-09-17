@@ -36,7 +36,7 @@ class CreateMenuItemTranslationsTable extends Migration
 
         if ($laradium->all()) {
             foreach ($laradium->all() as $resource) {
-                if (in_array($resource, config('laradium.disable_menus'))) {
+                if (in_array($resource, config('laradium.disable_menus', []))) {
                     continue;
                 }
 
