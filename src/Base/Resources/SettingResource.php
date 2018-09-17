@@ -87,7 +87,11 @@ Class SettingResource extends AbstractResource
         }
 
         if ($item->is_translatable) {
-            return view('laradium::admin.resource._partials.translation', compact('item'));
+            $column = [
+                'column_parsed' => 'value'
+            ];
+
+            return view('laradium::admin.resource._partials.translation', compact('item', 'column'));
         }
 
         return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';
