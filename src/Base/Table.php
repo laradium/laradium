@@ -211,6 +211,10 @@ class Table
             ]);
         }
 
+        if ($this->columns()->where('column', 'action')->first()) {
+            return $config;
+        }
+
         $config->push([
             'data'       => 'action',
             'name'       => 'action',

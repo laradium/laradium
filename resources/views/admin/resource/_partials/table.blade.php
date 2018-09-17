@@ -6,9 +6,11 @@
                 @foreach($table->columns() as $column)
                     <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
                 @endforeach
-                <th>
-                    Actions
-                </th>
+                @if(!$table->columns()->where('column', 'action')->first())
+                    <th>
+                        Actions
+                    </th>
+                @endif
             </tr>
             </thead>
         </table>
