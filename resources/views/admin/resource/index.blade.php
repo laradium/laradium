@@ -82,7 +82,8 @@
                         processing: true,
                         serverSide: true,
                         ajax: $(selector).data('url'),
-                        columns: {!! $table->getColumnConfig()->toJson() !!}
+                        columns: {!! $table->getColumnConfig()->toJson() !!},
+                        order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({});
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
@@ -103,7 +104,8 @@
                     processing: true,
                     serverSide: true,
                     ajax: '/admin/{{ $resource->getSlug() }}/data-table',
-                    columns: {!! $table->getColumnConfig()->toJson() !!}
+                    columns: {!! $table->getColumnConfig()->toJson() !!},
+                    order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
                     $('.js-editable').editable({});
                     $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()

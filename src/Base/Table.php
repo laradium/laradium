@@ -63,6 +63,11 @@ class Table
     protected $js = [];
 
     /**
+     * @var array
+     */
+    protected $orderBy = [];
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -293,5 +298,41 @@ class Table
     public function getJs()
     {
         return $this->js;
+    }
+
+    /**
+     * @param $column
+     * @param string $direction
+     * @return Table
+     */
+    public function orderBy($column, $direction = 'desc')
+    {
+        //was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
+        $key = -1;
+        foreach ($this->columns() as $itemKey => $item) {
+            if ($item['column'] === $column) {
+                $key = $itemKey;
+                break;
+            }
+        }
+
+        if ($key < 0) {
+            return $this;
+        }
+
+        $this->orderBy = [
+            'key'       => $key,
+            'direction' => $direction
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
     }
 }
