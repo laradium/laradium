@@ -5,7 +5,7 @@
                 {{ input.label }}
             </h3>
             <div class="row">
-                <div class="col-md-2" v-for="item in input.items">
+                <div :class="'col-' + input.fieldCol.type + '-' + input.fieldCol.size" v-for="item in input.items">
                     <div class="checkbox checkbox-primary">
                         <input type="checkbox" :checked="item.checked" :id="input.name + '_' + item.id"
                                :name="input.name + '[]'" :value="item.id">

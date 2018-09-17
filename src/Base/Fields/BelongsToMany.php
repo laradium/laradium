@@ -24,6 +24,14 @@ class BelongsToMany extends Field
     protected $title;
 
     /**
+     * @var
+     */
+    protected $fieldCol = [
+        'size' => 2,
+        'type' => 'md'
+    ];
+
+    /**
      * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
@@ -72,6 +80,7 @@ class BelongsToMany extends Field
             'replacemenetAttributes' => $attributes->toArray(),
             'label'                  => $this->label ?: $this->name,
             'col'                    => $this->col,
+            'fieldCol'               => $this->fieldCol,
             'items'                  => $items->map(function ($item) use ($relatedItems) {
                 return [
                     'id'      => $item->id,
@@ -99,5 +108,17 @@ class BelongsToMany extends Field
     public function relation(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->model()->load($this->relationName)->{$this->relationName}();
+    }
+
+    /**
+     * @param int $size
+     * @param string $type
+     * @return $this
+     */
+    public function fieldCol($size = 2, $type = 'md')
+    {
+        $this->fieldCol = compact('size', 'type');
+
+        return $this;
     }
 }
