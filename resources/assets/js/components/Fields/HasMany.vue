@@ -2,7 +2,7 @@
     <transition name="fade">
         <div class="border"  style="padding: 20px; border-radius: 5px; margin: 5px;">
             <h4>
-                {{ input.label }}s
+                <i class="fa fa-bars"></i> {{ input.label }}s
                 <div class="pull-right">
                     <button class="btn btn-success btn-sm" @click.prevent="toggle()">Show / Hide</button>
                 </div>
@@ -23,7 +23,7 @@
                             <div class="panel-body border" style="padding: 20px; border-radius: 2px;">
                                 <div class="row">
                                     <div v-for="input in item.fields"
-                                         class="col-md-12">
+                                         :class="input.col ? 'col-' + input.col.type + '-' + input.col.size : 'col-md-12'">
                                         <component :is="input.type + '-field'"
                                                    :input="input"
                                                    :item="item"
