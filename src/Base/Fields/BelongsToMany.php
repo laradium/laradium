@@ -77,8 +77,9 @@ class BelongsToMany extends Field
         return [
             'type'                   => 'belongs-to-many',
             'name'                   => $field->getNameAttribute(),
+            'label'                  => $field->getLabel(),
             'replacemenetAttributes' => $attributes->toArray(),
-            'label'                  => $this->label ?: $this->name,
+            'tab'                    => $this->tab(),
             'col'                    => $this->col,
             'fieldCol'               => $this->fieldCol,
             'items'                  => $items->map(function ($item) use ($relatedItems) {
