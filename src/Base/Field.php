@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Field
 {
-
     use Translatable;
 
     /**
@@ -84,6 +83,11 @@ class Field
     ];
 
     /**
+     * @var array
+     */
+    protected $htmlAttributes = [];
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -126,9 +130,9 @@ class Field
         $attributeList = $this->getNameAttributeList();
 
         if ($this->isTranslatable()) {
-            if (count($attributeList) == 1) {
+            if (count($attributeList) === 1) {
                 $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
-            } elseif (count($attributeList) > 1) {
+            } else if (count($attributeList) > 1) {
                 $count = count($attributeList) - 1;
                 $last = $attributeList[$count];
                 unset($attributeList[$count]);
@@ -237,6 +241,8 @@ class Field
     }
 
     /**
+     * @param array $parentAttributeList
+     * @param null $model
      * @return $this
      */
     public function build($parentAttributeList = [], $model = null)
@@ -277,7 +283,7 @@ class Field
     {
         $field = !is_null($field) ? $field : $this;
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -292,25 +298,28 @@ class Field
 
         if (!$field->isTranslatable()) {
             $data = [
-                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-                'name'                   => $field->getNameAttribute(),
-                'label'                  => $field->getLabel(),
-                'value'                  => $field->getValue(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
-                'tab'                    => $this->tab(),
-                'col'                    => $this->col,
+                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'name'                  => $field->getNameAttribute(),
+                'label'                 => $field->getLabel(),
+                'value'                 => $field->getValue(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr()
             ];
         } else {
 
             $data = [
-                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'                  => $field->getLabel(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
-                'tab'                    => $this->tab(),
-                'col'                    => $this->col,
+                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'                 => $field->getLabel(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr()
             ];
+
             $translatedAttributes = [];
 
             foreach (translate()->languages() as $language) {
@@ -405,7 +414,7 @@ class Field
         return implode('', collect($attributes)->filter(function ($item) {
             return !is_null($item);
         })->map(function ($item, $index) {
-            if ($index != 0) {
+            if ($index !== 0) {
                 return '[' . $item . ']';
             }
 
@@ -469,5 +478,24 @@ class Field
         $this->col = compact('size', 'type');
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function attr($value)
+    {
+        $this->htmlAttributes = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttr()
+    {
+        return $this->htmlAttributes;
     }
 }

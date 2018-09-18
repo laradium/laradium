@@ -11,7 +11,9 @@
                                 <div class="pull-right">
                                     <button class="btn btn-danger btn-sm" @click.prevent="remove(index, item.url)"><i
                                             class="fa fa-trash"></i></button>
-                                    <button class="btn btn-success btn-sm" @click.prevent="toggleWidget(index)">Show / Hide</button>
+                                    <button class="btn btn-success btn-sm" @click.prevent="toggleWidget(index)">Show /
+                                        Hide
+                                    </button>
                                 </div>
                             </h4>
                             <div class="row" v-show="item.show">
@@ -34,11 +36,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <select class="form-control" v-model="selectedWidget">
-                            <option v-for="(item, index ) in input.template.widgets" :value="item" :selected="index == 0">{{ item }}</option>
+                            <option v-for="(item, index ) in input.template.widgets" :value="item"
+                                    :selected="index === 0">{{ item }}
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()">
+                        <button class="btn btn-primary btn-md" type="button" @click.prevent="addItem()">
                             <i class="fa fa-plus"></i> Add
                         </button>
                     </div>
@@ -51,6 +55,7 @@
 <script>
     export default {
         props: ['input', 'language'],
+
         data() {
             return {
                 draggable: {
@@ -61,9 +66,11 @@
                 replacementIds: {}
             };
         },
+
         mounted() {
             this.selectedWidget = this.input.template.widgets[0];
         },
+
         methods: {
             addItem() {
                 let randId = Math.random().toString(36).substring(7);
@@ -72,12 +79,12 @@
                 template.order = this.input.items.length + 1;
 
                 for (let field in template.fields) {
-                    let repAttr = template.fields[field].replacemenetAttributes;
+                    let repAttr = template.fields[field].replacementAttributes;
 
                     let i = 1;
                     let idProp = '';
-                    for(let ids in repAttr) {
-                        if(!this.replacementIds[repAttr[ids]]) {
+                    for (let ids in repAttr) {
+                        if (!this.replacementIds[repAttr[ids]]) {
                             this.replacementIds[repAttr[ids]] = Math.random().toString(36).substring(7);
                         }
 
@@ -86,19 +93,19 @@
                         i++;
                     }
 
-                    if(idProp) {
+                    if (idProp) {
                         this.replacementIds[idProp] = randId;
                     }
 
-                    if(template.fields[field].type != 'morph-to') {
+                    if (template.fields[field].type !== 'morph-to') {
                         if (template.fields[field].isTranslatable) {
                             for (let attribute in template.fields[field].translatedAttributes) {
-                                for(let id in this.replacementIds) {
+                                for (let id in this.replacementIds) {
                                     template.fields[field].translatedAttributes[attribute].name = template.fields[field].translatedAttributes[attribute].name.replace(id, this.replacementIds[id]);
                                 }
                             }
                         } else {
-                            for(let id in this.replacementIds) {
+                            for (let id in this.replacementIds) {
                                 template.fields[field].name = template.fields[field].name.replace(id, this.replacementIds[id]);
                             }
                         }
@@ -110,12 +117,14 @@
                 }
                 this.input.items.push(template);
             },
+
             onUpdate(items) {
                 let i = 0;
                 for (let i = 0; i < items.length; i++)
                     items[i].order = i;
                 i++;
             },
+
             remove(item, url) {
                 let id = item.id;
 
@@ -148,6 +157,7 @@
                     });
 
             },
+
             toggleWidget(item) {
                 this.input.items[item].show = !this.input.items[item].show;
             }

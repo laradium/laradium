@@ -61,7 +61,7 @@ class BelongsToMany extends Field
         $items = $items->get();
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -75,14 +75,15 @@ class BelongsToMany extends Field
         });
 
         return [
-            'type'                   => 'belongs-to-many',
-            'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
-            'replacemenetAttributes' => $attributes->toArray(),
-            'tab'                    => $this->tab(),
-            'col'                    => $this->col,
-            'fieldCol'               => $this->fieldCol,
-            'items'                  => $items->map(function ($item) use ($relatedItems) {
+            'type'                  => 'belongs-to-many',
+            'name'                  => $field->getNameAttribute(),
+            'label'                 => $field->getLabel(),
+            'replacementAttributes' => $attributes->toArray(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
+            'fieldCol'              => $this->fieldCol,
+            'attr'                  => $this->getAttr(),
+            'items'                 => $items->map(function ($item) use ($relatedItems) {
                 return [
                     'id'      => $item->id,
                     'name'    => $this->title ? $item->{$this->title} : $item->name,

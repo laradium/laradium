@@ -40,7 +40,7 @@ class Select extends Field
         $field = !is_null($field) ? $field : $this;
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -54,15 +54,16 @@ class Select extends Field
         });
 
         return [
-            'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-            'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
-            'default'                => $field->getDefault(),
-            'isHidden'               => $field->isHidden(),
-            'replacemenetAttributes' => $attributes->toArray(),
-            'tab'                    => $this->tab(),
-            'col'                    => $this->col,
-            'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+            'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+            'name'                  => $field->getNameAttribute(),
+            'label'                 => $field->getLabel(),
+            'default'               => $field->getDefault(),
+            'isHidden'              => $field->isHidden(),
+            'replacementAttributes' => $attributes->toArray(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
+            'attr'                  => $this->getAttr(),
+            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,
                     'text'     => $text,

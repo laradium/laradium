@@ -15,13 +15,19 @@
                    class="form-control">
         </div>
         <div v-else>
-            <input type="text" :value="input.value" :name="input.name" class="form-control">
+            <input type="text" :value="input.value" :name="input.name" class="form-control" v-bind="attributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'item']
+        props: ['input', 'language', 'item'],
+
+        computed: {
+            attributes() {
+                return this.input.attr;
+            }
+        }
     }
 </script>

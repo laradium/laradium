@@ -60,7 +60,7 @@ class BelongsTo extends Field
         $field = !is_null($field) ? $field : $this;
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -74,15 +74,16 @@ class BelongsTo extends Field
         });
 
         return [
-            'type'                   => 'select',
-            'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
-            'replacemenetAttributes' => $attributes->toArray(),
-            'isHidden'               => $field->isHidden(),
-            'default'                => $field->getDefault(),
-            'tab'                    => $this->tab(),
-            'col'                    => $this->col,
-            'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+            'type'                  => 'select',
+            'name'                  => $field->getNameAttribute(),
+            'label'                 => $field->getLabel(),
+            'replacementAttributes' => $attributes->toArray(),
+            'isHidden'              => $field->isHidden(),
+            'default'               => $field->getDefault(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
+            'attr'                  => $this->getAttr(),
+            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,
                     'text'     => $text,

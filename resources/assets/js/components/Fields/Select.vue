@@ -4,7 +4,7 @@
             <label for="">
                 {{ input.label }}
             </label>
-            <select :name="input.name" id="" class="form-control">
+            <select :name="input.name" id="" class="form-control" v-bind="attributes">
                 <option
                         :value="option.value"
                         :selected="option.selected"
@@ -22,5 +22,11 @@
 <script>
     export default {
         props: ['input', 'language', 'item'],
+
+        computed: {
+            attributes() {
+                return this.input.attr;
+            }
+        }
     }
 </script>

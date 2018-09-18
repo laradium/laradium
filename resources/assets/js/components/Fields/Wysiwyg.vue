@@ -34,23 +34,6 @@
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
-        // data: function () {
-		// 	// return {
-		// 	// 	plugins : [
-		// 	// 		'advlist autolink lists link image charmap preview anchor textcolor',
-		// 	// 		'searchreplace visualblocks code fullscreen',
-		// 	// 		'insertdatetime media table contextmenu paste code directionality template colorpicker textpattern'
-		// 	// 	],
-		// 	// 	toolbar1: 'undo redo | bold italic strikethrough | forecolor backcolor | template link | bullist numlist | ltr rtl | removeformat',
-		// 	// 	options: {
-		// 	// 		height: 300
-		// 	// 	}
-         //    return {};
-		// 	}
-		// }
-        mounted() {
-
-        }
+        props: ['input', 'language', 'item']
     }
 </script>
