@@ -4,7 +4,10 @@
             <h4>
                 <i class="fa fa-bars"></i> {{ input.label }}s
                 <div class="pull-right">
-                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">Show / Hide</button>
+                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">
+						<span v-if="input.show"><i class="fa fa-eye-slash"></i> Hide</span>
+						<span v-else><i class="fa fa-eye"></i> Show</span>
+					</button>
                 </div>
             </h4>
             <div v-show="input.show">
