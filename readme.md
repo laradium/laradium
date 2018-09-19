@@ -169,9 +169,10 @@ $set->color('color');
 ```
 
 ## HasMany
-1. first argument must be the name of the relation
+1. First argument must be the name of the relation
 2. Fields method should contain fields that is required for relation
 3. You can make items sortable, if you add sortable column to your table and specify column name in `sortable` method
+4. You can remove create and/or delete actions for items by adding `actions` method
 ```
 $set->hasMany('items')
     ->fields(function (FieldSet $set) {
@@ -183,11 +184,12 @@ $set->hasMany('items')
         $set->text('name')->rules('required')->translatable();
         $set->text('url')->rules('required')->translatable();
     })
-    ->sortable('sequence_no');
+    ->sortable('sequence_no')
+    ->actions([]); // This will remove both create/delete actions
 ```
 
 ## HasOne
-1. first argument must be the name of the relation
+1. First argument must be the name of the relation
 2. Fields method should contain fields that is required for relation
 ```
 $set->hasOne('author')
@@ -258,6 +260,31 @@ Add new disk to `config/filesystems.php`
     'root'   => public_path('uploads'),
 ],
 ```
+
+### Available methods for fields
+
+```
+- attr() // You can pass array of html attributes to add to the field
+$set->text('field')->attr([
+    'required' => 'required'
+]);
+
+- col() // With this method you can change layout of the fields in form
+$set->text('field')->col(6, 'lg'); // Default type is - md, so if you need md, you can only specify col number
+$set->text('field-2')->col(6, 'lg');
+
+- options() // Pass options to the `select` field
+$set->select('field')->options([
+    'key' => 'value'
+]);
+
+- rules() // You can specify validation rules for this field
+$set->text('field')->rules('required|min:1|max:255');
+
+- translatable() // Make field translatable
+$set->text('field')->translatable();
+```
+
 # Table
 
 Available fields for columns
@@ -284,11 +311,11 @@ $column->add('is_active', 'Is Visible?')
 ```
 $column->add('title')->translatable();
 ```
-NOTE: You need to specify additional method for Table `relations(['translations'])` to enable eager loading and improve perfomance
+NOTE: You need to specify additional method for Table `relations(['translations'])` to enable eager loading and improve performance
 
 Available methods for Table
 
-## Actions (edit, create, delete)
+## Actions (create, edit, delete)
 ```
 ->actions(['edit', 'delete'])
 ```
