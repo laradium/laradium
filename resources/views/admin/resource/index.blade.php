@@ -40,7 +40,8 @@
                     @foreach($table->getTabs() as $key => $tabs)
                         <div class="tab-content">
                             @foreach ($tabs as $id => $name)
-                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="tab-{{ $id }}">
+                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                     id="tab-{{ $id }}">
 
                                     @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getSlug() . '/data-table?' . $key . '=' . $id) ])
 
@@ -63,6 +64,7 @@
     <!-- Responsive examples -->
     <script src="/laradium/admin/assets/plugins/datatables/dataTables.responsive.min.js"></script>
     <script src="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/rowreorder/1.2.0/js/dataTables.rowReorder.min.js"></script>
     <script>
         $(function () {
             $.fn.editable.defaults.mode = 'inline';
@@ -83,7 +85,7 @@
                         serverSide: true,
                         ajax: $(selector).data('url'),
                         columns: {!! $table->getColumnConfig()->toJson() !!},
-                        order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+                        order: [{!! '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' !!}]
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({});
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
@@ -100,16 +102,34 @@
                 onTabChange(activeTab);
             });
                     @else
-            let dataTable = $('.resource-datatable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: '/admin/{{ $resource->getSlug() }}/data-table',
-                    columns: {!! $table->getColumnConfig()->toJson() !!},
-                    order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
-                }).on('draw.dt', function () {
+            let dataTable = $('.resource-datatable').DataTable({!! $table->getTableConfig($resource) !!}).on('draw.dt', function () {
                     $('.js-editable').editable({});
                     $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
                 });
+
+            @if ($table->isSortable())
+            dataTable.on('row-reorder', function (e, diff, edit) {
+                var orderData = [];
+
+                for (var i = 0, ien = diff.length; i < ien; i++) {
+                    var rowData = dataTable.row(diff[i].node).data();
+                    orderData.push({
+                        id: rowData.id,
+                        position: (diff[i].newPosition + 1) * (dataTable.page.info().page + 1)
+                    });
+                }
+
+                $.ajax({
+                    url: '/admin/{{ $resource->getSlug() }}/data-table/reorder',
+                    type: 'POST',
+                    data: JSON.stringify(orderData),
+                    dataType: 'json',
+                    success: function (json) {
+                        dataTable.ajax.reload();
+                    }
+                });
+            });
+            @endif
             @endif
 
             $(document).on('click', '.js-delete-resource', function (e) {
@@ -152,9 +172,12 @@
 
 @push('styles')
     <!-- DataTables -->
-    <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+          type="text/css"/>
     <!-- Responsive datatable examples -->
-    <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet"
+          type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.0/css/rowReorder.dataTables.min.css">
     @foreach($table->getCss() as $asset)
         <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
     @endforeach

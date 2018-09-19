@@ -65,8 +65,23 @@ trait Datatable
         $dataTable = DataTables::of($model);
 
         $columns = $table->columns();
-        $editableColumns = $columns->where('editable', true);
 
+        if ($table->isSortable()) {
+            $columns->prepend([
+                'column'         => $table->getSortableColumn(),
+                'column_parsed'  => $table->getSortableColumn(),
+                'name'           => '#',
+                'editable'       => false,
+                'translatable'   => false,
+                'modify'         => function () {
+                    return '<i class="fa fa-arrows"></i>';
+                },
+                'not_sortable'   => false,
+                'not_searchable' => false,
+            ]);
+        }
+
+        $editableColumns = $columns->where('editable', true);
         $editableColumnNames = [];
 
         foreach ($editableColumns as $column) {
@@ -116,5 +131,33 @@ trait Datatable
         $dataTable->rawColumns($rawColumns);
 
         return $dataTable->make(true);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reorder(Request $request)
+    {
+        $ids = $request->json()->all();
+
+        if (count($ids)) {
+            foreach ($ids as $i => $key) {
+                $id = $key['id'];
+                $position = $key['position'];
+
+                $model = $this->model->find($id);
+                $model->{$this->table()->getSortableColumn()} = $position;
+                $model->save();
+            }
+
+            return response()->json([
+                'success' => true
+            ]);
+        }
+
+        return response()->json([
+            'success' => false
+        ]);
     }
 }

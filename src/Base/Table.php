@@ -65,7 +65,20 @@ class Table
     /**
      * @var array
      */
-    protected $orderBy = [];
+    protected $orderBy = [
+        'key'       => 0,
+        'direction' => 'asc'
+    ];
+
+    /**
+     * @var boolean
+     */
+    protected $sortable = false;
+
+    /**
+     * @var string
+     */
+    protected $sortableColumn = 'order';
 
     /**
      * Table constructor.
@@ -207,6 +220,17 @@ class Table
     {
         $config = collect([]);
 
+        if ($this->isSortable()) {
+            $config->push([
+                'data'       => $this->sortableColumn,
+                'name'       => $this->sortableColumn,
+                'searchable' => false,
+                'orderable'  => true,
+                'width'      => '2%',
+                'class'      => 'text-center'
+            ]);
+        }
+
         foreach ($this->columns() as $column) {
             $config->push([
                 'data'       => $column['column'],
@@ -228,6 +252,29 @@ class Table
             'width'      => '15%',
             'class'      => 'text-center'
         ]);
+
+        return $config;
+    }
+
+    /**
+     * @param $resource
+     * @return Collection
+     */
+    public function getTableConfig($resource)
+    {
+        $config = collect([
+            'processing' => true,
+            'serverSide' => true,
+            'ajax'       => '/admin/' . $resource->getSlug() . '/data-table',
+            'columns'    => $this->getColumnConfig(),
+            'order'      => [$this->getOrderBy()['key'], $this->getOrderBy()['direction']]
+        ]);
+
+        if ($this->isSortable()) {
+            $config->put('rowReorder', [
+                'update' => false
+            ]);
+        }
 
         return $config;
     }
@@ -307,7 +354,16 @@ class Table
      */
     public function orderBy($column, $direction = 'desc')
     {
-        //was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
+        if ($this->isSortable()) {
+            $this->orderBy = [
+                'key'       => 0,
+                'direction' => 'asc'
+            ];
+
+            return $this;
+        }
+
+        // Was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
         $key = -1;
         foreach ($this->columns() as $itemKey => $item) {
             if ($item['column'] === $column) {
@@ -334,5 +390,36 @@ class Table
     public function getOrderBy()
     {
         return $this->orderBy;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function sortable($value = null)
+    {
+        $this->sortable = true;
+
+        if ($value) {
+            $this->sortableColumn = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSortable()
+    {
+        return $this->sortable;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSortableColumn()
+    {
+        return $this->sortableColumn;
     }
 }

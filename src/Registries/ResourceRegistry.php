@@ -68,6 +68,12 @@ class ResourceRegistry
             ],
             [
                 'method'     => 'post',
+                'route_slug' => $this->getRouteName('data-table/reorder'),
+                'controller' => $this->getRouteController('reorder'),
+                'middleware' => ['web', 'laradium']
+            ],
+            [
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
                 'middleware' => ['web', 'laradium']

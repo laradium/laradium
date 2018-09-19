@@ -1,8 +1,13 @@
 <div class="table-wrapper">
     <div class="table-responsive">
-        <table class="resource-datatable table table-bordered" <?php echo isset( $dataUrl ) ? 'data-url="' . $dataUrl . '"' : '' ?> >
+        <table class="resource-datatable table table-bordered" {{ isset($dataUrl) ? 'data-url="' . $dataUrl . '"' : '' }}>
             <thead>
             <tr>
+                @if($table->isSortable())
+                    <th>
+                        #
+                    </th>
+                @endif
                 @foreach($table->columns() as $column)
                     <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
                 @endforeach
