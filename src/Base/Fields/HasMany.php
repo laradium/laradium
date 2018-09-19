@@ -44,7 +44,11 @@ class HasMany extends Field
      * @var string
      */
     protected $morphType;
-    protected $test;
+
+    /**
+     * @var array
+     */
+    protected $actions = ['create', 'delete'];
 
     /**
      * HasMany constructor.
@@ -105,6 +109,7 @@ class HasMany extends Field
             } else {
                 $itemList = $relation->get();
             }
+
             foreach ($itemList as $item) {
                 foreach ($this->fieldSet->fields() as $field) {
                     $attributeList = array_merge($this->parentAttributeList, [
@@ -125,11 +130,12 @@ class HasMany extends Field
                     $fields[$item->id]['id'] = $item->id;
                     $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
                 }
+
                 if ($this->isSortable()) {
                     $fields[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
                 }
-                $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
 
+                $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
             }
 
             if ($rules) {
@@ -186,7 +192,6 @@ class HasMany extends Field
      */
     public function template()
     {
-
         $hasManyFields = $this->fieldSet->fields();
 
         $fields = [];
@@ -220,7 +225,7 @@ class HasMany extends Field
      */
     public function formattedResponse($f = null)
     {
-        $f = !is_null($f) ? $f : $this;;
+        $f = !is_null($f) ? $f : $this;
         $items = [];
 
         foreach ($f->fieldGroups() as $group) {
@@ -251,7 +256,8 @@ class HasMany extends Field
             'tab'         => $this->tab(),
             'col'         => $this->col,
             'items'       => $items,
-            'show'        => false
+            'show'        => false,
+            'actions'     => $f->getActions()
         ];
     }
 
@@ -296,6 +302,25 @@ class HasMany extends Field
         $closure($fieldSet);
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function actions($value)
+    {
+        $this->actions = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
 }

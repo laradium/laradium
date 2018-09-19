@@ -17,7 +17,7 @@
                             <div class="panel-title">
                                 <h4>
                                     <i class="mdi mdi-arrow-all handle" v-if="input.is_sortable"></i>
-                                    <div class="pull-right">
+                                    <div class="pull-right" v-if="input.actions.includes('delete')">
                                         <button class="btn btn-danger btn-sm"
                                                 @click.prevent="remove(index, item.url, item.resource)"><i
                                                 class="fa fa-trash"></i></button>
@@ -41,7 +41,7 @@
                         <br>
                     </div>
                 </draggable>
-                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()">
+                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()" v-if="input.actions.includes('create')">
                     <i class="fa fa-plus"></i> Add {{ input.label }}
                 </button>
                 <br><br>
