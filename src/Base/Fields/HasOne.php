@@ -36,7 +36,6 @@ class HasOne extends Field
 
         $this->fieldSet = new FieldSet;
         $this->relationName = $this->name;
-
     }
 
     /**
@@ -66,9 +65,8 @@ class HasOne extends Field
             $clonedField->setModel($model);
             $clonedField->build($attributeList, $model);
 
-
             $fieldList[] = $clonedField;
-            $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+            $rules += $clonedField->getRules();
         }
 
         if ($rules) {
