@@ -260,12 +260,13 @@ class Field
         $this->setValue($this->model->getAttribute($this->name()));
 
         if ($this->isTranslatable()) {
-            $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
-
             foreach (translate()->languages() as $language) {
+                if (is_array($attributeList) && count($attributeList) >= 1) {
+                    $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
+                }
+
                 if ($language->is_fallback) {
-                    $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language->iso_code],
-                        $attributeList)), $this->getRuleSet());
+                    $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
                 }
             }
         } else {
@@ -497,5 +498,39 @@ class Field
     public function getAttr()
     {
         return $this->htmlAttributes;
+    }
+
+    /**
+     * @param $array
+     * @param $index
+     * @param $value
+     * @return array
+     */
+    private function arrayInsert(&$array, $index, $value): array
+    {
+        $size = count($array);
+        if (!is_int($index) || $index < 0 || $index > $size) {
+            return $array;
+        }
+
+        if (count($value) === 2) {
+            foreach ($value as $val) {
+                if ($size === 1) {
+                    $array = array_prepend($array, $val);
+                } else {
+                    $temp = array_slice($array, 0, $index);
+                    $temp[] = $val;
+
+                    $array = array_merge($temp, array_slice($array, $index, $size));
+                }
+            }
+        } else {
+            $temp = array_slice($array, 0, $index);
+            $temp[] = $val;
+
+            $array = array_merge($temp, array_slice($array, $index, $size));
+        }
+
+        return $array;
     }
 }

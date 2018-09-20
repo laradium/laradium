@@ -128,7 +128,7 @@ class HasMany extends Field
                     }
 
                     $fields[$item->id]['id'] = $item->id;
-                    $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+                    $rules += $clonedField->getRules();
                 }
 
                 if ($this->isSortable()) {
