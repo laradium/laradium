@@ -64,7 +64,7 @@ abstract class AbstractResource
     public function getForm($id = null)
     {
         if ($id) {
-            $model = $this->model->find($id);
+            $model = $this->model->findOrFail($id);
         } else {
             $model = $this->model;
         }
@@ -142,7 +142,7 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
@@ -163,7 +163,7 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
@@ -192,7 +192,6 @@ abstract class AbstractResource
         }
 
         return back()->withSuccess('Resource successfully updated!');
-
     }
 
     /**
@@ -202,7 +201,7 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model->findOrFail($id);
         $model->delete();
 
         if ($request->ajax()) {
