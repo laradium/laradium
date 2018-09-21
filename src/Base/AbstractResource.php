@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Base;
 
 use File;
 use Illuminate\Http\Request;
+use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\Datatable;
 
@@ -325,6 +326,10 @@ abstract class AbstractResource
     public function getActions()
     {
         $actions = collect($this->actions)->push('index'); // Index is allowed by default
+
+        if ($this instanceof PageResource) {
+            $actions->push('create');
+        }
 
         $allActions = collect([
             'index'  => 'index',
