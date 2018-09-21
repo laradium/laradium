@@ -107,7 +107,7 @@
                     </li>
                 </ul>
 
-                @if(isset($table) && $table->hasAction('create'))
+                @if(isset($resource) && $resource->hasAction('create'))
                     <nav class="navbar-custom">
 
                         <ul class="list-unstyled topbar-right-menu float-right mb-0">

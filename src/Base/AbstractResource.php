@@ -37,6 +37,15 @@ abstract class AbstractResource
     protected $slug;
 
     /**
+     * @var array
+     */
+    protected $actions = [
+        'create',
+        'edit',
+        'delete'
+    ];
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -299,6 +308,40 @@ abstract class AbstractResource
         }
 
         return ucfirst($this->name);
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function hasAction($value)
+    {
+        return in_array($value, $this->actions);
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        $actions = collect($this->actions)->push('index'); // Index is allowed by default
+
+        $allActions = collect([
+            'index'  => 'index',
+            'create' => [
+                'create',
+                'store'
+            ],
+            'edit'   => [
+                'edit',
+                'update'
+            ],
+            'delete' => 'destroy'
+        ]);
+
+        $availableActions = $actions->diffAssoc($allActions);
+
+        return $allActions->only($availableActions)->flatten()->all();
     }
 
     /**

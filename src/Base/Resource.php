@@ -81,6 +81,9 @@ class Resource
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function closure()
     {
         return $this->closure;

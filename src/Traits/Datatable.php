@@ -40,6 +40,7 @@ trait Datatable
      */
     public function dataTable()
     {
+        $resource = $this;
         $table = $this->table();
         $slug = $this->getSlug();
 
@@ -105,8 +106,8 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        $dataTable->addColumn('action', function ($item) use ($table, $slug) {
-            return view('laradium::admin.resource._partials.action', compact('item', 'table', 'slug'))->render();
+        $dataTable->addColumn('action', function ($item) use ($resource, $slug) {
+            return view('laradium::admin.resource._partials.action', compact('item', 'resource', 'slug'))->render();
         });
 
         if ($editableColumns->count()) {

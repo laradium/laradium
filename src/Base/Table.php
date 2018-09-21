@@ -33,11 +33,6 @@ class Table
     protected $additionalViewData;
 
     /**
-     * @var array
-     */
-    protected $actions = ['create', 'edit', 'delete'];
-
-    /**
      * @var
      */
     protected $where;
@@ -136,31 +131,11 @@ class Table
      * @param $value
      * @return $this
      */
-    public function actions($value)
-    {
-        $this->actions = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
     public function dataTable($value)
     {
         $this->dataTable = $value;
 
         return $this;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function hasAction($value)
-    {
-        return in_array($value, $this->actions);
     }
 
     /**
