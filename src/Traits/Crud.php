@@ -2,6 +2,8 @@
 
 namespace Laradium\Laradium\Traits;
 
+use Illuminate\Http\UploadedFile;
+
 trait Crud
 {
 
@@ -70,11 +72,13 @@ trait Crud
     public function updateRelations($relations, $model)
     {
         foreach (array_except($relations, 'translations') as $relationName => $relationSet) {
+
             $existingItemSet = collect($relationSet)->filter(function ($item) {
-                return isset($item['id']);
+                return $item instanceof UploadedFile ? false : isset($item['id']);
             })->toArray();
+
             $nonExistingItemSet = collect($relationSet)->filter(function ($item) {
-                return !isset($item['id']);
+                return $item instanceof UploadedFile ? false : !isset($item['id']);
             })->toArray();
 
             if (isset($nonExistingItemSet['morph_type'])) {

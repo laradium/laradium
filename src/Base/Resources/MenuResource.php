@@ -26,8 +26,8 @@ Class MenuResource extends AbstractResource
 
         return laradium()->resource(function (FieldSet $set) {
             $set->boolean('is_active');
-            $set->text('key')->rules('required');
-            $set->text('name')->rules('required')->translatable();
+            $set->text('key')->rules('required|min:2|max:255');
+            $set->text('name')->rules('required|min:2|max:255')->translatable();
             $set->tab('Items')->fields(function (FieldSet $set) {
                 $set->hasMany('items')->fields(function (FieldSet $set) {
                     $set->boolean('is_active');
@@ -35,8 +35,8 @@ Class MenuResource extends AbstractResource
                         '_self'  => 'Self',
                         '_blank' => 'Blank',
                     ])->rules('required');
-                    $set->text('name')->rules('required')->translatable();
-                    $set->text('url')->rules('required')->translatable();
+                    $set->text('name')->rules('required|min:2|max:255')->translatable();
+                    $set->text('url')->rules('required|min:2|max:255')->translatable();
                 })->sortable('sequence_no');
             });
 
