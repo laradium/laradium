@@ -74,11 +74,11 @@ trait Crud
         foreach (array_except($relations, 'translations') as $relationName => $relationSet) {
 
             $existingItemSet = collect($relationSet)->filter(function ($item) {
-                return $item instanceof UploadedFile ? false : isset($item['id']);
+                return $item instanceof UploadedFile ? true : isset($item['id']);
             })->toArray();
 
             $nonExistingItemSet = collect($relationSet)->filter(function ($item) {
-                return $item instanceof UploadedFile ? false : !isset($item['id']);
+                return $item instanceof UploadedFile ? true : !isset($item['id']);
             })->toArray();
 
             if (isset($nonExistingItemSet['morph_type'])) {
