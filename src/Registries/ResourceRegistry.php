@@ -47,7 +47,6 @@ class ResourceRegistry
      */
     public function register($resourceName)
     {
-
         $resource = new $resourceName;
         $routeSlug = $resource->getSlug();
         $this->resources->push($resourceName);
@@ -100,6 +99,7 @@ class ResourceRegistry
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
                 'middleware' => ['web', 'laradium'],
+                'only'       => $resource->getActions()
             ],
         ];
 
@@ -119,9 +119,9 @@ class ResourceRegistry
                     $route['controller'])->middleware($route['middleware'])->name($route['name']);
             } else {
                 $this->router->name('admin.')->group(function () use ($route) {
-                    if ($route['method'] == 'resource') {
+                    if ($route['method'] === 'resource') {
                         $this->router->{$route['method']}($route['route_slug'],
-                            $route['controller'])->middleware($route['middleware']);
+                            $route['controller'])->middleware($route['middleware'])->only($route['only']);
                     } else {
                         $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
                         $this->router->name($name)->{$route['method']}($route['route_slug'],
