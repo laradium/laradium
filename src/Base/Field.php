@@ -429,8 +429,15 @@ class Field
      */
     public function buildRuleSetKey($attributes): string
     {
-        return implode('.', collect($attributes)->map(function ($item, $index) {
+        return implode('.', collect($attributes)->map(function ($item, $index) use ($attributes) {
             if (is_null($item)) {
+                $item = '*';
+            }
+
+            // TODO: Find better solutions for this
+            if (isset($attributes[$index - 1]) && $attributes[$index - 1] === 'blocks' && is_numeric($item)) {
+                $item = $item;
+            } else if (is_numeric($item)) {
                 $item = '*';
             }
 
