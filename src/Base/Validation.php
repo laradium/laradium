@@ -10,7 +10,7 @@ class Validation
     /**
      * @var ValidationSet
      */
-    protected $fieldSet;
+    protected $validationSet;
 
     /**
      * @var Model
@@ -27,7 +27,7 @@ class Validation
      */
     public function __construct()
     {
-        $this->fieldSet = new ValidationSet();
+        $this->validationSet = new ValidationSet();
     }
 
     /**
@@ -55,8 +55,8 @@ class Validation
     public function build()
     {
         $closure = $this->closure;
-        $fieldSet = $this->fieldSet->setModel($this->model());
-        $closure($fieldSet);
+        $validationSet = $this->validationSet->setModel($this->model());
+        $closure($validationSet);
 
         return $this;
     }
@@ -64,9 +64,9 @@ class Validation
     /**
      * @return FieldSet
      */
-    public function fieldSet()
+    public function validationSet()
     {
-        return $this->fieldSet;
+        return $this->validationSet;
     }
 
     /**
@@ -93,9 +93,7 @@ class Validation
      */
     public function getValidationRules()
     {
-        $rules = [];
-
-        return $this->fieldSet()->fields()->mapWithKeys(function ($field) {
+        return $this->validationSet()->fields()->mapWithKeys(function ($field) {
             return [
                 $field->name() => $field->getRuleSet()
             ];
