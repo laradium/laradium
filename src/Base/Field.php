@@ -75,6 +75,19 @@ class Field
     protected $tab;
 
     /**
+     * @var array
+     */
+    protected $col = [
+        'size' => 12,
+        'type' => 'md'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $htmlAttributes = [];
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -117,7 +130,7 @@ class Field
         $attributeList = $this->getNameAttributeList();
 
         if ($this->isTranslatable()) {
-            if (count($attributeList) == 1) {
+            if (count($attributeList) === 1) {
                 $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
             } else if (count($attributeList) > 1) {
                 $count = count($attributeList) - 1;
@@ -228,6 +241,8 @@ class Field
     }
 
     /**
+     * @param array $parentAttributeList
+     * @param null $model
      * @return $this
      */
     public function build($parentAttributeList = [], $model = null)
@@ -245,12 +260,13 @@ class Field
         $this->setValue($this->model->getAttribute($this->name()));
 
         if ($this->isTranslatable()) {
-            $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
-
             foreach (translate()->languages() as $language) {
-                if ($language['is_fallback']) {
-                    $this->setValidationRules($this->buildRuleSetKey(array_merge(['translations', $language['iso_code']],
-                        $attributeList)), $this->getRuleSet());
+                if (is_array($attributeList) && count($attributeList) >= 1) {
+                    $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
+                }
+
+                if ($language->is_fallback) {
+                    $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
                 }
             }
         } else {
@@ -264,11 +280,11 @@ class Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -290,6 +306,8 @@ class Field
                 'isTranslatable'        => $field->isTranslatable(),
                 'replacementAttributes' => $attributes->toArray(),
                 'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr()
             ];
         } else {
 
@@ -299,13 +317,16 @@ class Field
                 'isTranslatable'        => $field->isTranslatable(),
                 'replacementAttributes' => $attributes->toArray(),
                 'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr()
             ];
+
             $translatedAttributes = [];
 
             foreach (translate()->languages() as $language) {
-                $field->setLocale($language['iso_code']);
+                $field->setLocale($language->iso_code);
                 $translatedAttributes[] = [
-                    'iso_code' => $language['iso_code'],
+                    'iso_code' => $language->iso_code,
                     'value'    => $field->getValue(),
                     'name'     => $field->getNameAttribute(),
                 ];
@@ -313,8 +334,6 @@ class Field
 
             $data['translatedAttributes'] = $translatedAttributes;
         }
-
-//        $dataReplacementIds = $attributeList = array_merge($attributeList, ['__ID__']);;
 
         return $data;
     }
@@ -396,7 +415,7 @@ class Field
         return implode('', collect($attributes)->filter(function ($item) {
             return !is_null($item);
         })->map(function ($item, $index) {
-            if ($index != 0) {
+            if ($index !== 0) {
                 return '[' . $item . ']';
             }
 
@@ -410,8 +429,15 @@ class Field
      */
     public function buildRuleSetKey($attributes): string
     {
-        return implode('.', collect($attributes)->map(function ($item, $index) {
+        return implode('.', collect($attributes)->map(function ($item, $index) use ($attributes) {
             if (is_null($item)) {
+                $item = '*';
+            }
+
+            // TODO: Find better solutions for this
+            if (isset($attributes[$index - 1]) && $attributes[$index - 1] === 'blocks' && is_numeric($item)) {
+                $item = $item;
+            } else if (is_numeric($item)) {
                 $item = '*';
             }
 
@@ -448,5 +474,70 @@ class Field
     public function tab()
     {
         return $this->tab;
+    }
+
+    /**
+     * @param $size
+     * @param string $type
+     * @return $this
+     */
+    public function col($size = 12, $type = 'md')
+    {
+        $this->col = compact('size', 'type');
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function attr($value)
+    {
+        $this->htmlAttributes = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttr()
+    {
+        return $this->htmlAttributes;
+    }
+
+    /**
+     * @param $array
+     * @param $index
+     * @param $value
+     * @return array
+     */
+    private function arrayInsert(&$array, $index, $value): array
+    {
+        $size = count($array);
+        if (!is_int($index) || $index < 0 || $index > $size) {
+            return $array;
+        }
+
+        if (count($value) === 2) {
+            foreach ($value as $val) {
+                if ($size === 1) {
+                    $array = array_prepend($array, $val);
+                } else {
+                    $temp = array_slice($array, 0, $index);
+                    $temp[] = $val;
+
+                    $array = array_merge($temp, array_slice($array, $index, $size));
+                }
+            }
+        } else {
+            $temp = array_slice($array, 0, $index);
+            $temp[] = $value;
+
+            $array = array_merge($temp, array_slice($array, $index, $size));
+        }
+
+        return $array;
     }
 }

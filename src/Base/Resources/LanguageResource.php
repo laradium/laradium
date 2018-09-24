@@ -16,15 +16,15 @@ Class LanguageResource extends AbstractResource
     public function resource()
     {
         $this->registerEvent('afterSave', function () {
-            cache()->forget('languages');
+            cache()->forget('laradium::languages');
         });
         return laradium()->resource(function (FieldSet $set) {
-            $set->text('iso_code')->rules('required');
-            $set->text('title')->rules('required');
-            $set->text('title_localized')->rules('required');
+            $set->text('iso_code')->rules('required|min:2|max:2');
+            $set->text('title')->rules('required|min:2|max:255');
+            $set->text('title_localized')->rules('required|min:2|max:255');
             $set->boolean('is_fallback');
             $set->boolean('is_visible');
-            $set->file('icon');
+            $set->file('icon')->rules('image|max:' . config('laradium.file_size'));
         });
     }
     /**

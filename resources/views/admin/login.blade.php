@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+    <meta name="description" content="Super light and easy to use Laradium CMS with powerful CRUD.">
     <meta name="author" content="Coderthemes">
 
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    {{--<link rel="shortcut icon" href="assets/images/favicon.ico">--}}
 
     <title>{{ config('app.name') }} - Login</title>
 
@@ -23,8 +23,16 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
+<<<<<<< HEAD
 
             <span>Lara<span>dium</span></span>
+=======
+            @if(setting()->get('design.admin_theme_logo'))
+                <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
+            @else
+                Laradium
+            @endif
+>>>>>>> master
         </a>
     </div>
     <div class="m-t-40 card-box">

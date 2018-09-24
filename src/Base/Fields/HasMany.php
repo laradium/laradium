@@ -46,6 +46,11 @@ class HasMany extends Field
     protected $morphType;
 
     /**
+     * @var array
+     */
+    protected $actions = ['create', 'delete'];
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -104,6 +109,7 @@ class HasMany extends Field
             } else {
                 $itemList = $relation->get();
             }
+
             foreach ($itemList as $item) {
                 foreach ($this->fieldSet->fields() as $field) {
                     $attributeList = array_merge($this->parentAttributeList, [
@@ -122,13 +128,14 @@ class HasMany extends Field
                     }
 
                     $fields[$item->id]['id'] = $item->id;
-                    $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+                    $rules += $clonedField->getRules();
                 }
+
                 if ($this->isSortable()) {
                     $fields[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
                 }
-                $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
 
+                $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
             }
 
             if ($rules) {
@@ -185,7 +192,6 @@ class HasMany extends Field
      */
     public function template()
     {
-
         $hasManyFields = $this->fieldSet->fields();
 
         $fields = [];
@@ -202,7 +208,7 @@ class HasMany extends Field
             $field->isTemplate(true);
             $field->setValue(null);
 
-            $fields[] = $field->formatedResponse($field);
+            $fields[] = $field->formattedResponse($field);
         }
 
         return [
@@ -217,9 +223,9 @@ class HasMany extends Field
      * @param null $f
      * @return array
      */
-    public function formatedResponse($f = null)
+    public function formattedResponse($f = null)
     {
-        $f = !is_null($f) ? $f : $this;;
+        $f = !is_null($f) ? $f : $this;
         $items = [];
 
         foreach ($f->fieldGroups() as $group) {
@@ -234,7 +240,7 @@ class HasMany extends Field
             }
 
             foreach ($group['fields'] as $field) {
-                $item['fields'][] = $field->formatedResponse();
+                $item['fields'][] = $field->formattedResponse();
             }
 
             $items[] = $item;
@@ -248,8 +254,10 @@ class HasMany extends Field
             'is_sortable' => $f->isSortable(),
             'template'    => $f->template(),
             'tab'         => $this->tab(),
+            'col'         => $this->col,
             'items'       => $items,
-            'show'        => false
+            'show'        => false,
+            'actions'     => $f->getActions()
         ];
     }
 
@@ -294,6 +302,25 @@ class HasMany extends Field
         $closure($fieldSet);
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function actions($value)
+    {
+        $this->actions = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
 }

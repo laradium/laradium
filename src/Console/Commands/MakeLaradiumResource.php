@@ -45,6 +45,21 @@ class MakeLaradiumResource extends Command
         $api = $this->option('api');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
+        $url = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $name));
+
+        $menus = [
+            'Admin menu' => [
+                [
+                    'is_active'    => 1,
+                    'translations' => [
+                        'name' => ucfirst(str_replace('-', ' ', $url)),
+                        'url'  => '/admin/' . str_plural($url),
+                    ]
+                ]
+            ]
+        ];
+        menu()->seed($menus);
+
         $resourceDirectory = app_path('Laradium/Resources');
         if (!file_exists($resourceDirectory)) {
             File::makeDirectory($resourceDirectory, 0755, true);
@@ -83,8 +98,6 @@ class MakeLaradiumResource extends Command
         }
 
         $this->info('Resource successfully created!');
-
-        cache()->forget('laradium::resource-list');
 
         return;
     }

@@ -91,19 +91,17 @@ class MorphsTo extends Field
             $clonedField->build($attributeList, $this->morphModel);
 
             $fieldList[] = $clonedField;
-            $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
-
+            $rules += $clonedField->getRules();
         }
-
 
         $fieldList[] = $this->createContentTypeField($this->morphClass, $attributeList);
         $fieldList[] = $this->createMorphNameField($this->morphClass, $attributeList);
 
-        $this->fields = $fieldList;
-
         if ($rules) {
             $this->validationRules = $rules;
         }
+
+        $this->fields = $fieldList;
 
         return $this;
     }
@@ -112,18 +110,19 @@ class MorphsTo extends Field
      * @param null $f
      * @return array
      */
-    public function formatedResponse($f = null)
+    public function formattedResponse($f = null)
     {
         $f = $f ?? $this;
 
         $items = [];
         foreach ($f->fields as $field) {
-            $items[] = $field->formatedResponse();
+            $items[] = $field->formattedResponse();
         }
 
         return [
             'type'   => 'morph-to',
             'tab'    => $this->tab(),
+            'col'    => $this->col,
             'name'   => ucfirst($this->name),
             'fields' => $items
         ];

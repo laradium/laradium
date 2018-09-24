@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Base;
 
 use File;
 use Illuminate\Http\Request;
+use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\Datatable;
 
@@ -27,6 +28,25 @@ abstract class AbstractResource
     protected $events = [];
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $slug;
+
+    /**
+     * @var array
+     */
+    protected $actions = [
+        'create',
+        'edit',
+        'delete'
+    ];
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -42,8 +62,9 @@ abstract class AbstractResource
         $model = $this->model;
         $table = $this->table()->setModel($model);
         $resource = $this;
+        $name = $this->getName();
 
-        return view('laradium::admin.resource.index', compact('table', 'model', 'resource'));
+        return view('laradium::admin.resource.index', compact('table', 'model', 'resource', 'name'));
     }
 
     /**
@@ -53,7 +74,7 @@ abstract class AbstractResource
     public function getForm($id = null)
     {
         if ($id) {
-            $model = $this->model->find($id);
+            $model = $this->model->findOrFail($id);
         } else {
             $model = $this->model;
         }
@@ -61,7 +82,7 @@ abstract class AbstractResource
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
         $form->buildForm();
-        $response = $form->formatedResponse();
+        $response = $form->formattedResponse();
 
         return ([
             'languages'      => $this->languages(),
@@ -80,9 +101,13 @@ abstract class AbstractResource
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
+        $form->abstractResource($this);
         $form->buildForm();
 
-        return view('laradium::admin.resource.create', compact('form'));
+        $name = $this->getName();
+        $slug = $this->getSlug();
+
+        return view('laradium::admin.resource.create', compact('form', 'name', 'slug'));
     }
 
     /**
@@ -127,13 +152,17 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
+        $form->abstractResource($this);
         $form->buildForm();
 
-        return view('laradium::admin.resource.edit', compact('form'));
+        $name = $this->getName();
+        $slug = $this->getSlug();
+
+        return view('laradium::admin.resource.edit', compact('form', 'name', 'slug'));
     }
 
     /**
@@ -144,7 +173,7 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
@@ -182,7 +211,7 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model->findOrFail($id);
         $model->delete();
 
         if ($request->ajax()) {
@@ -243,11 +272,81 @@ abstract class AbstractResource
      */
     public function languages()
     {
-        return collect(translate()->languages())->map(function ($item, $index) {
-            $item['is_current'] = $index == 0;
+        return translate()->languages()->map(function ($item, $index) {
+            $item->is_current = $index === 0;
 
             return $item;
         })->toArray();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        if (!$this->slug && $this->name) {
+            $this->slug = strtolower(str_replace(' ', '-', $this->name));
+
+            return $this->slug;
+        } else if (!$this->slug && !$this->name) {
+            $this->name = str_replace('_', '-', $this->model->getTable());
+
+            return $this->name;
+        }
+
+        return $this->slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        if (!$this->name && !$this->slug) {
+            return ucfirst(str_replace('_', ' ', $this->model->getTable()));
+        } else if (!$this->name && $this->slug) {
+            return ucfirst(str_replace('-', ' ', $this->slug));
+        }
+
+        return ucfirst($this->name);
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function hasAction($value)
+    {
+        return in_array($value, $this->actions);
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        $actions = collect($this->actions)->push('index'); // Index is allowed by default
+
+        if ($this instanceof PageResource) {
+            $actions->push('create');
+        }
+
+        $allActions = collect([
+            'index'  => 'index',
+            'create' => [
+                'create',
+                'store'
+            ],
+            'edit'   => [
+                'edit',
+                'update'
+            ],
+            'delete' => 'destroy'
+        ]);
+
+        $availableActions = $actions->diffAssoc($allActions);
+
+        return $allActions->only($availableActions)->flatten()->all();
     }
 
     /**

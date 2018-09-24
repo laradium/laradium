@@ -65,9 +65,8 @@ class HasOne extends Field
             $clonedField->setModel($model);
             $clonedField->build($attributeList, $model);
 
-
             $fieldList[] = $clonedField;
-            $rules[key($clonedField->getRules())] = array_first($clonedField->getRules());
+            $rules += $clonedField->getRules();
         }
 
         if ($rules) {
@@ -83,18 +82,19 @@ class HasOne extends Field
      * @param null $f
      * @return array
      */
-    public function formatedResponse($f = null)
+    public function formattedResponse($f = null)
     {
         $f = !is_null($f) ? $f : $this;
 
         $items = [];
         foreach ($f->fields as $field) {
-            $items[] = $field->formatedResponse();
+            $items[] = $field->formattedResponse();
         }
 
         return [
             'type'   => 'has-one',
             'tab'    => $this->tab(),
+            'col'    => $this->col,
             'name'   => ucfirst($this->name),
             'fields' => $items
         ];

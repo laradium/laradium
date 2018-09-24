@@ -12,10 +12,10 @@
                    :name="item.name"
                    v-for="item in input.translatedAttributes"
                    v-show="language === item.iso_code"
-                   class="form-control"></textarea>
+                   class="form-control" v-bind="attributes"></textarea>
         </div>
         <div v-else>
-            <textarea :name="input.name" class="form-control">{{ input.value }}</textarea>
+            <textarea :name="input.name" class="form-control" v-bind="attributes">{{ input.value }}</textarea>
         </div>
     </div>
 </template>
@@ -23,6 +23,12 @@
 <script>
     export default {
         props: ['input', 'language', 'item'],
+
+        computed: {
+            attributes() {
+                return this.input.attr;
+            }
+        }
 
     }
 </script>

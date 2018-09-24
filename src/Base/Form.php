@@ -38,6 +38,11 @@ class Form
     protected $isTranslatable = false;
 
     /**
+     * @var
+     */
+    protected $abstractResource;
+
+    /**
      * Form constructor.
      * @param $resource
      */
@@ -87,14 +92,25 @@ class Form
     /**
      * @return array
      */
-    public function formatedResponse()
+    public function formattedResponse()
     {
         $fieldList = [];
         foreach ($this->fields as $field) {
-            $fieldList[] = $field->formatedResponse($field);
+            $fieldList[] = $field->formattedResponse($field);
         }
 
         return $fieldList;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function abstractResource($value)
+    {
+        $this->abstractResource = $value;
+
+        return $this;
     }
 
     /**
@@ -125,8 +141,9 @@ class Form
      * @param $rules
      * @return $this
      */
-    public function setValidationRules($rules)
-    {
+    public function setValidationRules(
+        $rules
+    ) {
         $this->validationRules += $rules;
 
         return $this;
@@ -146,18 +163,18 @@ class Form
      */
     public function getAction($action = 'index'): string
     {
-        $resource = $this->resourceName();
+        $slug = $this->abstractResource->getSlug();
         if ($action == 'create') {
-            return url('/admin/' . $resource . '/create');
-        } else if ($action == 'create') {
-            return url('/admin/' . $resource . '/create');
-        } else if ($action == 'store') {
-            return url('/admin/' . $resource);
-        } else if ($action == 'update') {
-            return url('/admin/' . $resource . '/' . $this->model->id);
+            return url('/admin/' . $slug . '/create');
+        } elseif ($action == 'create') {
+            return url('/admin/' . $slug . '/create');
+        } elseif ($action == 'store') {
+            return url('/admin/' . $slug);
+        } elseif ($action == 'update') {
+            return url('/admin/' . $slug . '/' . $this->model->id);
         }
 
-        return url('/admin/' . $resource);
+        return url('/admin/' . $slug);
     }
 
     /**

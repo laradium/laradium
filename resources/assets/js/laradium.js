@@ -7,7 +7,9 @@
 require('./bootstrap');
 window.Vue = require('vue');
 
-import tinymce from 'vue-easy-tinymce';
+import { VueEditor } from "vue2-editor";
+
+// Any plugins you want to use has to be imported
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -38,7 +40,8 @@ Vue.component('belongs-to-many-field', require('./components/fields/BelongsToMan
 
 Vue.component('widget-constructor-field', require('./components/fields/WidgetConstructor.vue'));
 Vue.component('draggable', require('vuedraggable'));
-Vue.component('tinymce', tinymce);
+Vue.component('VueEditor', VueEditor);
+
 
 const app = new Vue({
     el: '#app',

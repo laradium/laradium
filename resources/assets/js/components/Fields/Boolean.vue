@@ -1,5 +1,6 @@
 <template>
     <div class="form-group">
+        <br>
         <div class="checkbox checkbox-primary">
             <input type="hidden" value="0" :name="input.name">
             <input type="checkbox" value="1" :checked="input.checked" :name="input.name" :id="input.name">

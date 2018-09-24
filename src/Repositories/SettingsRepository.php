@@ -2,7 +2,9 @@
 
 namespace Laradium\Laradium\Repositories;
 
+use File;
 use Laradium\Laradium\Models\Setting;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SettingsRepository
 {
@@ -22,7 +24,7 @@ class SettingsRepository
      */
     public function __construct()
     {
-        $this->cacheKey = config('laradium-setting.cache_key', 'settings');
+        $this->cacheKey = config('laradium-setting.cache_key', 'laradium::settings');
 
         $this->cachedSettings = cache()->rememberForever($this->cacheKey, function () {
             $settings = Setting::all()->keyBy('key')->map(function ($item) {
@@ -65,17 +67,25 @@ class SettingsRepository
      */
     private function getValue($setting)
     {
-        $value = null;
         if ($setting['is_translatable']) {
+
             $translation = collect(array_get($setting, 'translations'))->where('locale', app()->getLocale())->first();
+
             if ($translation) {
-                $value = $translation['value'];
+                return $translation['value'];
             }
-        } else {
-            $value = $setting['non_translatable_value'];
+
+            return null;
         }
 
-        return $value;
+        //yes its ugly. yes it needs to be redone. yes I am a lazy fuck
+        if ($setting['type'] === 'file') {
+            $file = Setting::find($setting['id'])->file;
+
+            return File::exists(public_path('uploads/' . $file->path())) ? $file->url() : null;
+        }
+
+        return $setting['non_translatable_value'];
     }
 
     /**
@@ -85,7 +95,13 @@ class SettingsRepository
      */
     public function all(): array
     {
-        return $this->cachedSettings->pluck('value', 'key')->toArray();
+        $settings = [];
+
+        foreach ($this->cachedSettings as $setting) {
+            $settings[$setting['key']] = $this->getValue($setting);
+        }
+
+        return $settings;
     }
 
     /**
@@ -120,6 +136,20 @@ class SettingsRepository
                 $item['group'],
                 $item['key']
             ]);
+
+            // File
+            if (isset($item['type']) && $item['type'] === 'file' && isset($item['file']) && isset($item['file']['file'])) {
+                $file = $item['file']['file'];
+
+                $item['type'] = 'file';
+                $item['file'] = null;
+
+                if (File::exists($file)) {
+                    $file = new \Symfony\Component\HttpFoundation\File\File($file);
+                    $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
+                    $item['file'] = $file;
+                }
+            }
 
             $setting = Setting::firstOrCreate([
                 'key' => $item['key']

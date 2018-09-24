@@ -49,6 +49,25 @@ class FindTranslations extends Command
         $paths = $this->getPaths();
         $translations = [];
 
+        // Default laravel translations.
+        $files = File::allFiles(
+            resource_path('lang/en')
+        );
+
+        foreach ($files as $file) {
+            $fullPath = $file->getPathname();
+            $group = str_replace('.php', '', $file->getFilename());
+            foreach (File::getRequire($fullPath) as $key => $translation) {
+                foreach ($this->makeRows($group, $key, $translation) as $row) {
+                    if ($row['key'] === 'validation.custom.attribute-name') {
+                        continue;
+                    }
+
+                    $translations[$row['key']] = $row['value'];
+                }
+            }
+        }
+
         // Find translations in files
         $finder = new Finder();
         $finder
@@ -56,6 +75,7 @@ class FindTranslations extends Command
             ->name('*.php')
             ->notName('FindTranslations.php')
             ->files();
+
         // Init parser.
         $parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP7, new Lexer());
         foreach ($finder as $file) {
@@ -80,17 +100,20 @@ class FindTranslations extends Command
                 }
             }
         }
+
         // Map translations.
         $mappedTranslations = [];
         foreach ($translations as $key => $text) {
             $data = compact('key');
             foreach (translate()->languages() as $language) {
-                $data[$language['iso_code']] = $text;
+                $data[$language->iso_code] = $text;
             }
             $mappedTranslations[] = $data;
         }
+
         // Write translations to the file.
         $this->writeToFile($mappedTranslations);
+
         // Import to DB.
         if ($this->option('import')) {
             $this->call('translations:import');
@@ -138,5 +161,32 @@ class FindTranslations extends Command
                 });
             })
             ->store('xlsx', resource_path('seed_translations'));
+    }
+
+    /**
+     * Create translations from array.
+     *
+     * @param $group
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    protected function makeRows($group, $key, $value): array
+    {
+        $rows = [];
+        if (is_array($value)) {
+            foreach ($value as $subKey => $subValue) {
+                $rows[] = [
+                    'key'   => $group . '.' . $key . '.' . $subKey,
+                    'value' => $subValue,
+                ];
+            }
+        } else {
+            $rows[] = [
+                'key'   => $group . '.' . $key,
+                'value' => $value,
+            ];
+        }
+        return $rows;
     }
 }

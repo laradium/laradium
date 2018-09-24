@@ -26,7 +26,7 @@
                 let id = this.input.id;
                 let fields = this.input.fields;
                 for (let field in fields) {
-                    let repAttr = fields[field].replacemenetAttributes;
+                    let repAttr = fields[field].replacementAttributes;
 
                     for(let ids in repAttr) {
                         if(!this.replacementIds[repAttr[ids]]) {

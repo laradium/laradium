@@ -11,12 +11,12 @@ class File extends Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -41,29 +41,33 @@ class File extends Field
             }
 
             $data = [
-                'type'                   => 'file',
-                'name'                   => $field->getNameAttribute(),
-                'label'                  => $field->getLabel(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
-                'tab'                    => $this->tab(),
-                'url'                    => $url,
-                'file_name'              => $name,
-                'file_size'              => $size,
+                'type'                  => 'file',
+                'name'                  => $field->getNameAttribute(),
+                'label'                 => $field->getLabel(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr(),
+                'url'                   => $url,
+                'file_name'             => $name,
+                'file_size'             => $size,
             ];
         } else {
             $data = [
-                'type'                   => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'                  => $field->getLabel(),
-                'isTranslatable'         => $field->isTranslatable(),
-                'replacemenetAttributes' => $attributes->toArray(),
-                'tab'                    => $this->tab(),
+                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'label'                 => $field->getLabel(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr(),
             ];
             $translatedAttributes = [];
 
             foreach (translate()->languages() as $language) {
-                $field->setLocale($language['iso_code']);
-                $model = $field->model()->translations->where('locale', $language['iso_code'])->first();
+                $field->setLocale($language->iso_code);
+                $model = $field->model()->translations->where('locale', $language->iso_code)->first();
                 if ($model && $model->{$this->name} && $model->{$this->name}->exists()) {
                     $url = $model->{$this->name}->url();
                     $size = number_format($model->{$this->name}->size() / 1000, 2);
@@ -71,7 +75,7 @@ class File extends Field
                 }
 
                 $translatedAttributes[] = [
-                    'iso_code'  => $language['iso_code'],
+                    'iso_code'  => $language->iso_code,
                     'value'     => $field->getValue(),
                     'name'      => $field->getNameAttribute(),
                     'url'       => $url,

@@ -19,6 +19,19 @@ class BelongsToMany extends Field
     protected $relationName;
 
     /**
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * @var
+     */
+    protected $fieldCol = [
+        'size' => 2,
+        'type' => 'md'
+    ];
+
+    /**
      * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
@@ -38,7 +51,7 @@ class BelongsToMany extends Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
 
@@ -48,7 +61,7 @@ class BelongsToMany extends Field
         $items = $items->get();
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -62,18 +75,33 @@ class BelongsToMany extends Field
         });
 
         return [
-            'type'                   => 'belongs-to-many',
-            'name'                   => $field->getNameAttribute(),
-            'replacementAttributes'  => $attributes->toArray(),
-            'label'                  => $this->label ?: $this->name,
-            'items'                  => $items->map(function ($item) use ($relatedItems) {
+            'type'                  => 'belongs-to-many',
+            'name'                  => $field->getNameAttribute(),
+            'label'                 => $field->getLabel(),
+            'replacementAttributes' => $attributes->toArray(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
+            'fieldCol'              => $this->fieldCol,
+            'attr'                  => $this->getAttr(),
+            'items'                 => $items->map(function ($item) use ($relatedItems) {
                 return [
                     'id'      => $item->id,
-                    'name'    => $item->name,
+                    'name'    => $this->title ? $item->{$this->title} : $item->name,
                     'checked' => in_array($item->id, $relatedItems),
                 ];
             })->toArray(),
         ];
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function title($value)
+    {
+        $this->title = $value;
+
+        return $this;
     }
 
     /**
@@ -82,5 +110,17 @@ class BelongsToMany extends Field
     public function relation(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->model()->load($this->relationName)->{$this->relationName}();
+    }
+
+    /**
+     * @param int $size
+     * @param string $type
+     * @return $this
+     */
+    public function fieldCol($size = 2, $type = 'md')
+    {
+        $this->fieldCol = compact('size', 'type');
+
+        return $this;
     }
 }

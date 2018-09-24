@@ -1,4 +1,4 @@
-@extends('laradium::layouts.main', ['title' => 'Edit ' . str_replace('-', ' ', $form->resourceName())])
+@extends('laradium::layouts.main', ['title' => 'Edit ' . $name])
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -13,6 +13,6 @@
 
 @section('crud-url')
     <script>
-        let url = '{{ route('admin.' . $form->resourceName() . '.form', $form->model()->id) }}';
+        let url = '{{ route('admin.' . $slug . '.form', $form->model()->id) }}';
     </script>
 @endsection

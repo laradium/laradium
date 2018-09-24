@@ -40,8 +40,9 @@ trait Datatable
      */
     public function dataTable()
     {
+        $resource = $this;
         $table = $this->table();
-        $resourceName = $this->model->getTable();
+        $slug = $this->getSlug();
 
         if (count($table->getRelations())) {
             $model = $this->model->with($table->getRelations())->select('*');
@@ -70,13 +71,13 @@ trait Datatable
         $editableColumnNames = [];
 
         foreach ($editableColumns as $column) {
-            $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $resourceName) {
+            $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                 return '<a href="#" 
                 class="js-editable" 
                 data-name="' . $column['column_parsed'] . '"
                 data-type="text" 
                 data-pk="' . $item->id . '" 
-                data-url="/admin/' . str_replace('_', '-', $resourceName) . '/editable" 
+                data-url="/admin/' . $slug . '/editable" 
                 data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
             });
 
@@ -98,15 +99,15 @@ trait Datatable
             $dataTable->editColumn($column['column_parsed'], $column['modify']);
 
             //@TODO: if column is modified AND has editable flag, we need to re-apply it
-            if( in_array( $column['column_parsed'], $editableColumnNames ) ){
+            if (in_array($column['column_parsed'], $editableColumnNames)) {
                 //$dataTable->editColumn
             }
 
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        $dataTable->addColumn('action', function ($item) use ($table) {
-            return view('laradium::admin.resource._partials.action', compact('item', 'table'))->render();
+        $dataTable->addColumn('action', function ($item) use ($resource, $slug) {
+            return view('laradium::admin.resource._partials.action', compact('item', 'resource', 'slug'))->render();
         });
 
         if ($editableColumns->count()) {

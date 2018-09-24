@@ -15,6 +15,11 @@ Class SettingResource extends AbstractResource
     protected $resource = Setting::class;
 
     /**
+     * @var array
+     */
+    protected $actions = ['edit'];
+
+    /**
      * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
@@ -31,7 +36,7 @@ Class SettingResource extends AbstractResource
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file');
             } else {
-                $set->$fieldType('non_translatable_value');
+                $set->$fieldType('non_translatable_value')->label('Value');
             }
         });
     }
@@ -52,11 +57,14 @@ Class SettingResource extends AbstractResource
             })->editable();
 
         })->dataTable(false)
-            ->actions(['edit'])
             ->relations(['translations']);
 
         $table->tabs([
-            'group' => Setting::select('group')->groupBy('group')->pluck('group', 'group')
+            'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
+                return [
+                    $setting->group => ucfirst(str_replace('-', ' ', $setting->group))
+                ];
+            })->all()
         ]);
 
         return $table;
@@ -82,7 +90,11 @@ Class SettingResource extends AbstractResource
         }
 
         if ($item->is_translatable) {
-            return view('laradium::admin.resource._partials.translation', compact('item'));
+            $column = [
+                'column_parsed' => 'value'
+            ];
+
+            return view('laradium::admin.resource._partials.translation', compact('item', 'column'));
         }
 
         return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';

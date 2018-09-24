@@ -33,11 +33,6 @@ class Table
     protected $additionalViewData;
 
     /**
-     * @var array
-     */
-    protected $actions = ['create', 'edit', 'delete'];
-
-    /**
      * @var
      */
     protected $where;
@@ -51,6 +46,21 @@ class Table
      * @var
      */
     protected $dataTable;
+
+    /**
+     * @var array
+     */
+    protected $css = [];
+
+    /**
+     * @var array
+     */
+    protected $js = [];
+
+    /**
+     * @var array
+     */
+    protected $orderBy = [];
 
     /**
      * Table constructor.
@@ -121,17 +131,6 @@ class Table
      * @param $value
      * @return $this
      */
-    public function actions($value)
-    {
-        $this->actions = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
     public function dataTable($value)
     {
         $this->dataTable = $value;
@@ -141,19 +140,10 @@ class Table
 
     /**
      * @param $value
-     * @return bool
-     */
-    public function hasAction($value)
-    {
-        return in_array($value, $this->actions);
-    }
-
-    /**
-     * @param $value
      * @param $data
      * @return $this
      */
-    public function additionalView($value, $data)
+    public function additionalView($value, $data = [])
     {
         $this->additionalView = $value;
         $this->additionalViewData = $data;
@@ -196,9 +186,13 @@ class Table
             $config->push([
                 'data'       => $column['column'],
                 'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
-                'searchable' => $column['translatable'] ? false : true,
-                'orderable'  => $column['translatable'] ? false : true,
+                'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
+                'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
+        }
+
+        if ($this->columns()->where('column', 'action')->first()) {
+            return $config;
         }
 
         $config->push([
@@ -241,5 +235,79 @@ class Table
         $this->tabs = $tabs;
 
         return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function css($assets = [])
+    {
+        $this->css = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function js($assets = [])
+    {
+        $this->js = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCss()
+    {
+        return $this->css;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJs()
+    {
+        return $this->js;
+    }
+
+    /**
+     * @param $column
+     * @param string $direction
+     * @return Table
+     */
+    public function orderBy($column, $direction = 'desc')
+    {
+        //was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
+        $key = -1;
+        foreach ($this->columns() as $itemKey => $item) {
+            if ($item['column'] === $column) {
+                $key = $itemKey;
+                break;
+            }
+        }
+
+        if ($key < 0) {
+            return $this;
+        }
+
+        $this->orderBy = [
+            'key'       => $key,
+            'direction' => $direction
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
     }
 }

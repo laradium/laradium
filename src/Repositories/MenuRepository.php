@@ -120,7 +120,7 @@ class MenuRepository
 
             foreach (translate()->languages() as $language) {
                 $m->translations()->firstOrCreate([
-                    'locale' => $language['iso_code'],
+                    'locale' => $language->iso_code,
                     'name'   => $name
                 ]);
             }
@@ -130,7 +130,7 @@ class MenuRepository
 
                 foreach (translate()->languages() as $language) {
                     $translations = $item['translations'];
-                    $translations['locale'] = $language['iso_code'];
+                    $translations['locale'] = $language->iso_code;
 
                     $menuItem->translations()->firstOrCreate($translations);
                 }

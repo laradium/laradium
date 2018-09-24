@@ -28,11 +28,17 @@ class ResourceRegistry
     protected $namespace;
 
     /**
+     * @var Collection
+     */
+    protected $resources;
+
+    /**
      * RouteRegistry constructor.
      */
     public function __construct()
     {
         $this->router = app('router');
+        $this->resources = new Collection;
     }
 
     /**
@@ -42,7 +48,9 @@ class ResourceRegistry
     public function register($resourceName)
     {
         $resource = new $resourceName;
-        $routeSlug = $this->getRouteSlug($resourceName);
+        $routeSlug = $resource->getSlug();
+        $this->resources->push($resourceName);
+
         if (!$routeSlug) {
             return $this;
         }
@@ -55,15 +63,13 @@ class ResourceRegistry
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-                'middleware' => ['web', 'laradium'],
-                'name'       => 'admin.' . $routeSlug . '.data-table'
+                'middleware' => ['web', 'laradium']
             ],
             [
                 'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable'),
                 'controller' => $this->getRouteController('editable'),
-                'middleware' => ['web', 'laradium'],
-                'name'       => 'admin.' . $routeSlug . '.editable'
+                'middleware' => ['web', 'laradium']
             ],
             [
                 'method'     => 'get',
@@ -92,16 +98,19 @@ class ResourceRegistry
                 'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'middleware' => ['web', 'laradium']
+                'middleware' => ['web', 'laradium'],
+                'only'       => $resource->getActions()
             ],
         ];
 
         foreach ($routeList as $route) {
-            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource, 'import')) {
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.import' && !method_exists($resource,
+                    'import')) {
                 continue;
             }
 
-            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.export' && !method_exists($resource, 'export')) {
+            if (isset($route['name']) && $route['name'] === 'admin.' . $routeSlug . '.export' && !method_exists($resource,
+                    'export')) {
                 continue;
             }
 
@@ -109,12 +118,28 @@ class ResourceRegistry
                 $this->router->{$route['method']}($route['route_slug'],
                     $route['controller'])->middleware($route['middleware'])->name($route['name']);
             } else {
-                $this->router->{$route['method']}($route['route_slug'],
-                    $route['controller'], ['as' => 'admin'])->middleware($route['middleware']);
+                $this->router->name('admin.')->group(function () use ($route) {
+                    if ($route['method'] === 'resource') {
+                        $this->router->{$route['method']}($route['route_slug'],
+                            $route['controller'])->middleware($route['middleware'])->only($route['only']);
+                    } else {
+                        $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
+                        $this->router->name($name)->{$route['method']}($route['route_slug'],
+                            $route['controller'])->middleware($route['middleware']);
+                    }
+                });
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function all()
+    {
+        return $this->resources;
     }
 
     /**
@@ -134,24 +159,5 @@ class ResourceRegistry
     protected function getRouteController($method = null)
     {
         return '\\' . $this->namespace . ($method ? '@' . $method : '');
-    }
-
-    /**
-     * @param $resource
-     * @return string
-     */
-    protected function getRouteSlug($resource): string
-    {
-        if (class_exists($resource)) {
-            $r = new $resource;
-            $model = $r->model();
-            $model = new $model;
-
-            $name = str_replace('_', '-', $model->getTable());
-
-            return $name;
-        }
-
-        return false;
     }
 }

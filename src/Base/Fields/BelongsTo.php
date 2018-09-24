@@ -29,8 +29,7 @@ class BelongsTo extends Field
 
         $this->relationModel = new $this->name;
         $this->label = array_last(explode('\\', $this->name));
-        $this->name = strtolower($this->label) . '_id';
-
+        $this->name = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->label)) . '_id';
     }
 
     /**
@@ -56,12 +55,12 @@ class BelongsTo extends Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -75,14 +74,16 @@ class BelongsTo extends Field
         });
 
         return [
-            'type'                   => 'select',
-            'name'                   => $field->getNameAttribute(),
-            'label'                  => $field->getLabel(),
-            'replacementAttributes'  => $attributes->toArray(),
-            'isHidden'               => $field->isHidden(),
-            'default'                => $field->getDefault(),
-            'tab'                    => $this->tab(),
-            'options'                => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+            'type'                  => 'select',
+            'name'                  => $field->getNameAttribute(),
+            'label'                 => $field->getLabel(),
+            'replacementAttributes' => $attributes->toArray(),
+            'isHidden'              => $field->isHidden(),
+            'default'               => $field->getDefault(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
+            'attr'                  => $this->getAttr(),
+            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,
                     'text'     => $text,

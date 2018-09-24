@@ -60,12 +60,12 @@ class Hidden extends Field
      * @param null $field
      * @return array
      */
-    public function formatedResponse($field = null)
+    public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
 
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item == '__ID__') {
+            if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
             } else {
                 return $item;
@@ -79,11 +79,12 @@ class Hidden extends Field
         });
 
         $data = [
-            'type'  => $field->getParam('orderable') ? 'hidden-sortable' : strtolower(array_last(explode('\\',
+            'type'                  => $field->getParam('orderable') ? 'hidden-sortable' : strtolower(array_last(explode('\\',
                 get_class($field)))),
-            'name'  => $field->getNameAttribute(),
-            'value' => $field->getValue(),
-            'replacementAttributes'  => $attributes->toArray(),
+            'name'                  => $field->getNameAttribute(),
+            'value'                 => $field->getValue(),
+            'replacementAttributes' => $attributes->toArray(),
+            'attr'                  => $this->getAttr(),
         ];
 
         if ($field->getParam('orderable')) {

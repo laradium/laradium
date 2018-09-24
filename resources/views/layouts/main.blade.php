@@ -40,11 +40,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
 
         .user-box ul li a:hover {
@@ -52,16 +52,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
 
         a:hover {
@@ -84,7 +84,11 @@
         <!-- LOGO -->
         <div class="topbar-left">
             <a href="{{ url('/') }}" class="logo">
-                <span>Lara<span>dium</span></span><i class="mdi mdi-layers"></i>
+                @if(setting()->get('design.admin_theme_logo'))
+                    <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
+                @else
+                    Laradium
+                @endif
             </a>
         </div>
 
@@ -103,13 +107,13 @@
                     </li>
                 </ul>
 
-                @if(isset($table) && $table->hasAction('create'))
+                @if(isset($resource) && $resource->hasAction('create'))
                     <nav class="navbar-custom">
 
                         <ul class="list-unstyled topbar-right-menu float-right mb-0">
 
                             <li>
-                                <a href="/admin/{{ str_replace('_', '-', $model->getTable()) }}/create"
+                                <a href="/admin/{{ $resource->getSlug() }}/create"
                                    class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i> Create
                                 </a>
@@ -186,7 +190,6 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.4/tinymce.min.js"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->

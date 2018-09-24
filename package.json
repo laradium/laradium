@@ -23,7 +23,7 @@
   "dependencies": {
     "jquery-datetimepicker": "^2.5.20",
     "jquery-ui": "^1.12.1",
-    "vue-easy-tinymce": "^1.0.2",
+    "vue2-editor": "^2.6.6",
     "vuedraggable": "^2.16.0"
   }
 }

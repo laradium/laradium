@@ -1,10 +1,13 @@
 <template>
     <transition name="fade">
-        <div class="border"  style="padding: 20px; border-radius: 5px; margin: 5px;">
+        <div class="border" style="padding: 20px; border-radius: 5px; margin: 5px;">
             <h4>
-                {{ input.label }}s
+                <i class="fa fa-bars"></i> {{ input.label }}s
                 <div class="pull-right">
-                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">Show / Hide</button>
+                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">
+                        <span v-if="input.show"><i class="fa fa-eye-slash"></i> Hide</span>
+                        <span v-else><i class="fa fa-eye"></i> Show</span>
+                    </button>
                 </div>
             </h4>
             <div v-show="input.show">
@@ -14,8 +17,9 @@
                             <div class="panel-title">
                                 <h4>
                                     <i class="mdi mdi-arrow-all handle" v-if="input.is_sortable"></i>
-                                    <div class="pull-right">
-                                        <button class="btn btn-danger btn-sm" @click.prevent="remove(index, item.url, item.resource)"><i
+                                    <div class="pull-right" v-if="input.actions.includes('delete')">
+                                        <button class="btn btn-danger btn-sm"
+                                                @click.prevent="remove(index, item.url, item.resource)"><i
                                                 class="fa fa-trash"></i></button>
                                     </div>
                                 </h4>
@@ -23,7 +27,7 @@
                             <div class="panel-body border" style="padding: 20px; border-radius: 2px;">
                                 <div class="row">
                                     <div v-for="input in item.fields"
-                                         class="col-md-12">
+                                         :class="input.col ? 'col-' + input.col.type + '-' + input.col.size : 'col-md-12'">
                                         <component :is="input.type + '-field'"
                                                    :input="input"
                                                    :item="item"
@@ -37,7 +41,7 @@
                         <br>
                     </div>
                 </draggable>
-                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()">
+                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()" v-if="input.actions.includes('create')">
                     <i class="fa fa-plus"></i> Add {{ input.label }}
                 </button>
                 <br><br>
@@ -49,6 +53,7 @@
 <script>
     export default {
         props: ['input', 'language', 'replacementIds'],
+
         data() {
             return {
                 draggable: {
@@ -57,25 +62,27 @@
                 }
             };
         },
+
         mounted() {
             this.draggable.disabled = !this.input.is_sortable;
         },
+
         methods: {
             addItem() {
                 let randId = Math.random().toString(36).substring(7);
                 let template = JSON.parse(JSON.stringify(this.input.template));
                 template.id = randId;
                 template.order = this.input.items.length;
-                // console.log(123, template.fields);
+
                 for (let field in template.fields) {
-                    // console.log(template.fields[field].replacemenetAttributes);
-                    let repAttr = template.fields[field].replacemenetAttributes;
-                    // console.log(123, repAttr);
+
+                    let repAttr = template.fields[field].replacementAttributes;
+
 
                     let i = 1;
                     let idProp = '';
-                    for(let ids in repAttr) {
-                        if(!this.replacementIds[repAttr[ids]]) {
+                    for (let ids in repAttr) {
+                        if (!this.replacementIds[repAttr[ids]]) {
                             this.replacementIds[repAttr[ids]] = Math.random().toString(36).substring(7);
                         }
 
@@ -84,19 +91,19 @@
                         i++;
                     }
 
-                    if(idProp) {
+                    if (idProp) {
                         this.replacementIds[idProp] = randId;
                     }
 
-                    if(template.fields[field].type != 'morph-to') {
+                    if (template.fields[field].type !== 'morph-to') {
                         if (template.fields[field].isTranslatable) {
                             for (let attribute in template.fields[field].translatedAttributes) {
-                                for(let id in this.replacementIds) {
+                                for (let id in this.replacementIds) {
                                     template.fields[field].translatedAttributes[attribute].name = template.fields[field].translatedAttributes[attribute].name.replace(id, this.replacementIds[id]);
                                 }
                             }
                         } else {
-                            for(let id in this.replacementIds) {
+                            for (let id in this.replacementIds) {
                                 template.fields[field].name = template.fields[field].name.replace(id, this.replacementIds[id]);
                             }
                         }
@@ -106,12 +113,14 @@
                 }
                 this.input.items.push(template);
             },
+
             onUpdate(items) {
                 let i = 0;
                 for (let i = 0; i < items.length; i++)
                     items[i].order = i;
                 i++;
             },
+
             remove(item, url, resource) {
                 let id = item.id;
 
@@ -145,6 +154,7 @@
                     });
 
             },
+
             toggle() {
                 this.input.show = !this.input.show;
             }

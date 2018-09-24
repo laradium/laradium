@@ -16,6 +16,7 @@ class MenuItem extends Model
         'is_active',
         'target',
         'sequence_no',
+        'icon'
     ];
 
     /**

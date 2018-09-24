@@ -38,28 +38,20 @@ return [
 
     'menus' => [
         'Admin menu' => [
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Translations',
-                    'url'  => '/admin/translations',
-                ]
-            ],
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Languages',
-                    'url'  => '/admin/languages',
-                ]
-            ],
-            [
-                'is_active'    => 1,
-                'translations' => [
-                    'name' => 'Menus',
-                    'url'  => '/admin/menus',
-                ]
-            ],
-
+//            [
+//                'is_active'    => 1,
+//                'translations' => [
+//                    'name' => 'Translations',
+//                    'url'  => '/admin/translations',
+//                ]
+//            ],
         ]
+    ],
+
+    'disable_menus' => [
+        //\Laradium\Laradium\Base\Resources\LanguageResource::class,
+        //\Laradium\Laradium\Base\Resources\MenuResource::class,
+        //\Laradium\Laradium\Base\Resources\SettingResource::class,
+        //\Laradium\Laradium\Base\Resources\TranslationResource::class,
     ]
 ];
