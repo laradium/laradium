@@ -49,9 +49,9 @@
         methods: {
             deleteFile(input, url) {
                 swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this item!",
-                    icon: "warning",
+                    title: 'Are you sure?',
+                    text: 'Once deleted, you will not be able to recover this item!',
+                    icon: 'warning',
                     buttons: true,
                     dangerMode: true,
                 })
@@ -62,16 +62,22 @@
                                     method: 'DELETE',
                                     url: url
                                 }).then(res => {
-                                    // Remove file
-
-                                    swal("File has been deleted!", {
-                                        icon: "success",
-                                    });
 
                                     input.url = null;
 
+                                    swal('File has been deleted!', {
+                                        icon: 'success',
+                                    });
+
                                 }).catch(res => {
-                                    console.log('error');
+                                    let error = document.createElement('div');
+                                    error.innerHTML = 'Something went wrong! <br> If issue persists, please, contact technical staff.';
+
+                                    swal({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        content: error
+                                    })
                                 });
                             }
                         }
