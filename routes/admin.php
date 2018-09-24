@@ -22,6 +22,11 @@ Route::group([
         Route::delete('resource/{id}', [
             'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@resourceDelete'
         ]);
+
+        Route::delete('resource/{model}/{id}/file/{file}/{locale?}', [
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@destroyFile',
+            'as'   => 'resource.destroy-file'
+        ]);
     });
 
     // Auth

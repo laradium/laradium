@@ -29,15 +29,14 @@ class File extends Field
             return str_contains($item, '__ID');
         });
 
-        $url = null;
-        $size = null;
-        $name = null;
-
         if (!$field->isTranslatable()) {
             if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
                 $url = $this->model->{$this->name}->url();
                 $size = number_format($this->model->{$this->name}->size() / 1000, 2);
                 $name = $this->model->{$this->name}->originalFilename();
+                $deleteUrl = route('admin.resource.destroy-file', [
+                    get_class($this->model), $this->model->id, $this->name
+                ]);
             }
 
             $data = [
@@ -49,13 +48,14 @@ class File extends Field
                 'tab'                   => $this->tab(),
                 'col'                   => $this->col,
                 'attr'                  => $this->getAttr(),
-                'url'                   => $url,
-                'file_name'             => $name,
-                'file_size'             => $size,
+                'url'                   => $url ?? null,
+                'deleteUrl'             => $deleteUrl ?? null,
+                'file_name'             => $name ?? null,
+                'file_size'             => $size ?? null,
             ];
         } else {
             $data = [
-                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
+                'type'                  => 'file',
                 'label'                 => $field->getLabel(),
                 'isTranslatable'        => $field->isTranslatable(),
                 'replacementAttributes' => $attributes->toArray(),
@@ -63,8 +63,8 @@ class File extends Field
                 'col'                   => $this->col,
                 'attr'                  => $this->getAttr(),
             ];
-            $translatedAttributes = [];
 
+            $translatedAttributes = [];
             foreach (translate()->languages() as $language) {
                 $field->setLocale($language->iso_code);
                 $model = $field->model()->translations->where('locale', $language->iso_code)->first();
@@ -72,15 +72,19 @@ class File extends Field
                     $url = $model->{$this->name}->url();
                     $size = number_format($model->{$this->name}->size() / 1000, 2);
                     $name = $model->{$this->name}->originalFilename();
+                    $deleteUrl = route('admin.resource.destroy-file', [
+                        get_class($this->model), $this->model->id, $this->name, $language->iso_code
+                    ]);
                 }
 
                 $translatedAttributes[] = [
                     'iso_code'  => $language->iso_code,
                     'value'     => $field->getValue(),
                     'name'      => $field->getNameAttribute(),
-                    'url'       => $url,
-                    'file_name' => $name,
-                    'file_size' => $size,
+                    'url'       => $url ?? null,
+                    'deleteUrl' => $deleteUrl ?? null,
+                    'file_name' => $name ?? null,
+                    'file_size' => $size ?? null,
                 ];
             }
 

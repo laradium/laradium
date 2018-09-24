@@ -12,7 +12,7 @@
                    :name="item.name"
                    v-for="item in input.translatedAttributes"
                    v-show="language === item.iso_code"
-                   class="form-control">
+                   class="form-control" v-bind="attributes">
         </div>
         <div v-else>
             <input type="text" :value="input.value" :name="input.name" class="form-control" v-bind="attributes">
