@@ -115,7 +115,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function setValue($value)
+    public function setValue($value): self
     {
         $this->value = $value;
 
@@ -125,7 +125,7 @@ class Field
     /**
      * @return string
      */
-    public function getNameAttribute()
+    public function getNameAttribute(): string
     {
         $attributeList = $this->getNameAttributeList();
 
@@ -151,7 +151,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function setNameAttribute($value)
+    public function setNameAttribute($value): self
     {
         $this->nameAttribute = $value;
 
@@ -162,7 +162,7 @@ class Field
      * @param $ruleSet
      * @return $this
      */
-    public function rules($ruleSet)
+    public function rules($ruleSet): self
     {
         $this->ruleSet = $ruleSet;
 
@@ -205,7 +205,7 @@ class Field
      * @param Model $model
      * @return $this
      */
-    public function setModel(Model $model)
+    public function setModel(Model $model): self
     {
         $this->model = $model;
 
@@ -224,7 +224,7 @@ class Field
      * @param array $list
      * @return $this
      */
-    public function setNameAttributeList(array $list)
+    public function setNameAttributeList(array $list): self
     {
         $this->attributeList = $list;
         $this->nameAttribute = $this->buildNameAttribute($list);
@@ -235,7 +235,7 @@ class Field
     /**
      * @return array
      */
-    public function getNameAttributeList()
+    public function getNameAttributeList(): array
     {
         return $this->attributeList;
     }
@@ -245,7 +245,7 @@ class Field
      * @param null $model
      * @return $this
      */
-    public function build($parentAttributeList = [], $model = null)
+    public function build($parentAttributeList = [], $model = null): self
     {
         $this->parentAttributeList = $parentAttributeList;
         if ($model) {
@@ -260,18 +260,17 @@ class Field
         $this->setValue($this->model->getAttribute($this->name()));
 
         if ($this->isTranslatable()) {
-            foreach (translate()->languages() as $language) {
-                if (is_array($attributeList) && count($attributeList) >= 1) {
-                    $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
-                }
-
-                if ($language->is_fallback) {
-                    $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
-                }
+            $language = translate()->languages()->where('is_fallback', 1)->first();
+            if (!$language) {
+                $language = translate()->languages()->first();
             }
-        } else {
-            $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
+
+            if (is_array($attributeList) && count($attributeList) >= 1) {
+                $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
+            }
         }
+
+        $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
 
         return $this;
     }
@@ -280,7 +279,7 @@ class Field
      * @param null $field
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse($field = null): array
     {
         $field = !is_null($field) ? $field : $this;
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
@@ -342,7 +341,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function isTemplate($value)
+    public function isTemplate($value): self
     {
         $this->isTemplate = $value;
 
@@ -352,7 +351,7 @@ class Field
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label ?: ucfirst(str_replace('_', ' ', $this->name()));
     }
@@ -361,7 +360,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function label($value)
+    public function label($value): self
     {
         $this->label = $value;
 
@@ -372,7 +371,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function hideIf($value)
+    public function hideIf($value): self
     {
         $this->isHidden = $value;
 
@@ -382,7 +381,7 @@ class Field
     /**
      * @return bool
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->isHidden;
     }
@@ -391,7 +390,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function default($value)
+    public function default($value): self
     {
         $this->default = $value;
 
@@ -413,7 +412,7 @@ class Field
     public function buildNameAttribute($attributes): string
     {
         return implode('', collect($attributes)->filter(function ($item) {
-            return !is_null($item);
+            return $item !== null;
         })->map(function ($item, $index) {
             if ($index !== 0) {
                 return '[' . $item . ']';
@@ -430,7 +429,7 @@ class Field
     public function buildRuleSetKey($attributes): string
     {
         return implode('.', collect($attributes)->map(function ($item, $index) use ($attributes) {
-            if (is_null($item)) {
+            if ($item === null) {
                 $item = '*';
             }
 
@@ -450,7 +449,7 @@ class Field
      * @param $rules
      * @return $this
      */
-    public function setValidationRules($key, $rules)
+    public function setValidationRules($key, $rules): self
     {
         $this->validationRules += [$key => $rules];
 
@@ -461,7 +460,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function setTab($value)
+    public function setTab($value): self
     {
         $this->tab = $value;
 
@@ -471,7 +470,7 @@ class Field
     /**
      * @return string
      */
-    public function tab()
+    public function tab(): string
     {
         return $this->tab;
     }
@@ -481,7 +480,7 @@ class Field
      * @param string $type
      * @return $this
      */
-    public function col($size = 12, $type = 'md')
+    public function col($size = 12, $type = 'md'): self
     {
         $this->col = compact('size', 'type');
 
@@ -492,7 +491,7 @@ class Field
      * @param $value
      * @return $this
      */
-    public function attr($value)
+    public function attr($value): self
     {
         $this->htmlAttributes = $value;
 
@@ -502,7 +501,7 @@ class Field
     /**
      * @return array
      */
-    public function getAttr()
+    public function getAttr(): array
     {
         return $this->htmlAttributes;
     }
@@ -533,7 +532,7 @@ class Field
             }
         } else {
             $temp = array_slice($array, 0, $index);
-            $temp[] = $val;
+            $temp[] = $value;
 
             $array = array_merge($temp, array_slice($array, $index, $size));
         }
