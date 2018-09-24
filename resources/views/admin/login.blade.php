@@ -23,16 +23,11 @@
 <div class="wrapper-page">
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
-<<<<<<< HEAD
-
-            <span>Lara<span>dium</span></span>
-=======
             @if(setting()->get('design.admin_theme_logo'))
                 <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
             @else
                 Laradium
             @endif
->>>>>>> master
         </a>
     </div>
     <div class="m-t-40 card-box">
