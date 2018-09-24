@@ -4,10 +4,6 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Support\Collection;
 
-/**
- * Class Api
- * @package Laradium\Laradium\Base
- */
 class Api
 {
 
@@ -29,17 +25,7 @@ class Api
     /**
      * @var array
      */
-    protected $routes = ['index', 'create', 'store', 'show', 'edit', 'update', 'delete'];
-
-    /**
-     * @var array
-     */
     protected $customRoutes = [];
-
-    /**
-     * @var array
-     */
-    protected $middleware = [];
 
     /**
      * @var
@@ -134,25 +120,6 @@ class Api
      * @param $routes
      * @return $this
      */
-    public function routes($routes)
-    {
-        $this->routes = $routes;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoutes()
-    {
-        return $this->routes;
-    }
-
-    /**
-     * @param $routes
-     * @return $this
-     */
     public function customRoutes($routes)
     {
         $this->customRoutes = $routes;
@@ -166,24 +133,5 @@ class Api
     public function getCustomRoutes()
     {
         return $this->customRoutes;
-    }
-
-    /**
-     * @param $middleware
-     * @return $this
-     */
-    public function middleware($middleware)
-    {
-        $this->middleware = $middleware;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMiddleware()
-    {
-        return $this->middleware;
     }
 }

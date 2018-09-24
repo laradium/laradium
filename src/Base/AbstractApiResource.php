@@ -25,6 +25,14 @@ abstract class AbstractApiResource
     protected $events = [];
 
     /**
+     * @var array
+     */
+    protected $actions = [
+        'index',
+        'show'
+    ];
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -279,6 +287,23 @@ abstract class AbstractApiResource
     public function model()
     {
         return $this->model;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function hasAction($value)
+    {
+        return in_array($value, $this->actions);
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
     /**

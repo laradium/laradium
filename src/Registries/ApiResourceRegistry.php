@@ -45,68 +45,9 @@ class ApiResourceRegistry
         $resource = new $resourceName;
         $routeSlug = $this->getRouteSlug($resourceName);
 
-        if (!$routeSlug || !method_exists($resource, 'api')) {
-            return $this;
-        }
-
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
         $api = $resource->api();
-
-        $middleware = $api->getMiddleware();
-        $routes = $api->getRoutes();
-
-        $routeList = [
-            [
-                'method'     => 'get',
-                'name'       => 'index',
-                'route_slug' => $this->getRoutePath(),
-                'controller' => $this->getRouteController('index'),
-                'middleware' => $middleware['index'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'get',
-                'name'       => 'create',
-                'route_slug' => $this->getRoutePath('create'),
-                'controller' => $this->getRouteController('create'),
-                'middleware' => $middleware['create'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'post',
-                'name'       => 'store',
-                'route_slug' => $this->getRoutePath(),
-                'controller' => $this->getRouteController('store'),
-                'middleware' => $middleware['store'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'get',
-                'name'       => 'show',
-                'route_slug' => $this->getRoutePath('{id}'),
-                'controller' => $this->getRouteController('show'),
-                'middleware' => $middleware['show'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'get',
-                'name'       => 'edit',
-                'route_slug' => $this->getRoutePath('{id}/edit'),
-                'controller' => $this->getRouteController('edit'),
-                'middleware' => $middleware['edit'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'put',
-                'name'       => 'update',
-                'route_slug' => $this->getRoutePath('{id}'),
-                'controller' => $this->getRouteController('update'),
-                'middleware' => $middleware['update'] ?? ['auth:api']
-            ],
-            [
-                'method'     => 'delete',
-                'name'       => 'delete',
-                'route_slug' => $this->getRoutePath('{id}'),
-                'controller' => $this->getRouteController('delete'),
-                'middleware' => $middleware['delete'] ?? ['auth:api']
-            ],
-        ];
 
         // Add custom routes
         foreach ($api->getCustomRoutes() as $name => $route) {
@@ -115,22 +56,23 @@ class ApiResourceRegistry
                 'name'       => $name,
                 'route_slug' => $this->getRoutePath(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
-                'middleware' => $middleware[$name] ?? ['auth:api'],
+                'middleware' => ['auth:api'],
                 'prefix'     => 'api'
             ];
 
             $this->registerRoute($route, $routeSlug);
         }
 
-        foreach ($routeList as $route) {
-            // Disable route if it is removed from resource
-            $routeMethod = $this->getRouteMethodName($route);
-            if (!in_array($routeMethod, $routes)) {
-                continue;
-            }
+        // Register api resource route
+        $route = [
+            'method'     => 'resource',
+            'route_slug' => $this->getRoutePath(),
+            'controller' => $this->getRouteController(),
+            'middleware' => ['auth:api'],
+            'only'       => $resource->getActions()
+        ];
 
-            $this->registerRoute($route, $routeSlug);
-        }
+        $this->registerRoute($route, $routeSlug);
 
         return $this;
     }
@@ -190,11 +132,21 @@ class ApiResourceRegistry
      */
     protected function registerRoute($route, $routeSlug)
     {
-        $route['middleware'] = $routes[$route['name']]['middleware'] ?? $route['middleware'];
-        $route['name'] = $routeSlug . '.' . $route['name'];
+        if (isset($route['name'])) {
+            $route['middleware'] = $routes[$route['name']]['middleware'] ?? $route['middleware'];
+            $route['name'] = $routeSlug . '.' . $route['name'];
 
-        $this->router->{$route['method']}($route['route_slug'], $route['controller'])
-            ->middleware($route['middleware'])
-            ->name('api.' . $route['name']);
+            $this->router->{$route['method']}($route['route_slug'], $route['controller'])
+                ->middleware($route['middleware'])
+                ->name('api.' . $route['name']);
+        } else {
+            if ($route['method'] === 'resource') {
+                $this->router->{$route['method']}($route['route_slug'], $route['controller'], ['names' => 'api.' . $routeSlug])
+                    ->middleware($route['middleware'])->only($route['only']);
+            } else {
+                $this->router->{$route['method']}($route['route_slug'], $route['controller'])
+                    ->middleware($route['middleware']);
+            }
+        }
     }
 }
