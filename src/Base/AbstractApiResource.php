@@ -2,7 +2,9 @@
 
 namespace Laradium\Laradium\Base;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Laradium\Laradium\Traits\Crud;
 
 abstract class AbstractApiResource
@@ -41,224 +43,224 @@ abstract class AbstractApiResource
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        $model = $this->model;
-        $api = $this->api()->setModel($model);
+        return $this->response(function () {
+            $model = $this->model;
+            $api = $this->api()->setModel($model);
 
-        if (count($api->getRelations())) {
-            $model = $model->with($api->getRelations())->select('*');
-        } else {
-            $model = $model->select('*');
-        }
-
-        if ($api->getWhere()) {
-            $model = $model->where($api->getWhere());
-        }
-
-        $model = $model->get();
-
-        $data = $model->map(function ($row, $key) use ($api) {
-            foreach ($api->fields() as $field) {
-                $value = $field['modify'] ?? $row->{$field['name']};
-
-                $attributes[$field['name']] = $value;
+            if (count($api->getRelations())) {
+                $model = $model->with($api->getRelations())->select('*');
+            } else {
+                $model = $model->select('*');
             }
 
-            return $attributes;
-        });
+            if ($api->getWhere()) {
+                $model = $model->where($api->getWhere());
+            }
 
-        return response()->json([
-            'success' => true,
-            'data'    => $data
-        ]);
+            $model = $model->get();
+
+            $data = $model->map(function ($row, $key) use ($api) {
+                foreach ($api->fields() as $field) {
+                    $value = $field['modify'] ?? $row->{$field['name']};
+
+                    $attributes[$field['name']] = $value;
+                }
+
+                return $attributes;
+            });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $data
+            ]);
+        });
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create()
     {
-        $model = $this->model;
+        return $this->response(function () {
+            $model = $this->model;
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
+            $resource = $this->resource();
+            $form = new Form($resource->setModel($model)->build());
+            $form->buildForm();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $form->formatedResponse()
-        ]);
+            return response()->json([
+                'success' => true,
+                'data'    => $form->formattedResponse()
+            ]);
+        });
     }
 
     /**
      * @param Request $request
-     * @return mixed
-     * @throws \ReflectionException
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        $model = $this->model;
+        return $this->response(function () use ($request) {
+            $model = $this->model;
 
-        if (method_exists($this, 'validation')) {
-            $validation = $this->validation()->setModel($model)->build();
-            $request->validate($validation->getValidationRules());
-        } else {
-            $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
-            $request->validate($form->getValidationRules());
-        }
+            if (method_exists($this, 'validation')) {
+                $validation = $this->validation()->setModel($model)->build();
+                $request->validate($validation->getValidationRules());
+            } else {
+                $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
+                $request->validate($form->getValidationRules());
+            }
 
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+            if (isset($this->events['beforeSave'])) {
+                $this->events['beforeSave']($this->model, $request);
+            }
 
-        $this->updateResource($request->except('_token'), $model);
+            $this->updateResource($request->except('_token'), $model);
 
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+            if (isset($this->events['afterSave'])) {
+                $this->events['afterSave']($this->model, $request);
+            }
 
-        if ($request->ajax()) {
-            return [
+            return response()->json([
                 'success' => true,
                 'message' => 'Resource successfully created!'
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully created!');
+            ]);
+        });
     }
 
     /**
      * @param $id
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        $model = $this->model;
-        $api = $this->api()->setModel($model);
+        return $this->response(function () use ($id) {
+            $model = $this->model;
+            $api = $this->api()->setModel($model);
 
-        if (count($api->getRelations())) {
-            $model = $model->with($api->getRelations())->select('*');
-        } else {
-            $model = $model->select('*');
-        }
+            if (count($api->getRelations())) {
+                $model = $model->with($api->getRelations())->select('*');
+            } else {
+                $model = $model->select('*');
+            }
 
-        if ($api->getWhere()) {
-            $model = $model->where($api->getWhere());
-        }
+            if ($api->getWhere()) {
+                $model = $model->where($api->getWhere());
+            }
 
-        $model = $model->findOrFail($id);
+            $model = $model->findOrFail($id);
 
-        $data = $api->fields()->mapWithKeys(function ($field) use ($model) {
-            $value = $field['modify'] ?? $model->{$field['name']};
+            $data = $api->fields()->mapWithKeys(function ($field) use ($model) {
+                $value = $field['modify'] ?? $model->{$field['name']};
 
-            return [$field['name'] => $value];
+                return [$field['name'] => $value];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $data
+            ]);
         });
-
-        return response()->json([
-            'success' => true,
-            'data'    => $data
-        ]);
     }
 
     /**
      * @param $id
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
     public function edit($id)
     {
-        $model = $this->model;
-        $api = $this->api()->setModel($model);
+        return $this->response(function () use ($id) {
+            $model = $this->model;
+            $api = $this->api()->setModel($model);
 
-        if ($api->getWhere()) {
-            $model = $model->where($api->getWhere());
-        }
+            if ($api->getWhere()) {
+                $model = $model->where($api->getWhere());
+            }
 
-        $model = $model->findOrFail($id);
+            $model = $model->findOrFail($id);
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
+            $resource = $this->resource();
+            $form = new Form($resource->setModel($model)->build());
+            $form->buildForm();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $form->formatedResponse()
-        ]);
+            return response()->json([
+                'success' => true,
+                'data'    => $form->formattedResponse()
+            ]);
+        });
     }
 
     /**
      * @param Request $request
      * @param $id
-     * @return mixed
-     * @throws \ReflectionException
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model;
-        $api = $this->api()->setModel($model);
+        return $this->response(function () use ($request, $id) {
+            $model = $this->model;
+            $api = $this->api()->setModel($model);
 
-        if ($api->getWhere()) {
-            $model = $model->where($api->getWhere());
-        }
+            if ($api->getWhere()) {
+                $model = $model->where($api->getWhere());
+            }
 
-        $model = $model->findOrFail($id);
+            $model = $model->findOrFail($id);
 
-        if (method_exists($this, 'validation')) {
-            $validation = $this->validation()->setModel($model)->build();
-            $request->validate($validation->getValidationRules());
-        } else {
-            $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
-            $request->validate($form->getValidationRules());
-        }
+            if (method_exists($this, 'validation')) {
+                $validation = $this->validation()->setModel($model)->build();
+                $request->validate($validation->getValidationRules());
+            } else {
+                $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
+                $request->validate($form->getValidationRules());
+            }
 
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+            if (isset($this->events['beforeSave'])) {
+                $this->events['beforeSave']($this->model, $request);
+            }
 
-        $this->updateResource($request->except('_token'), $model);
+            $this->updateResource($request->except('_token'), $model);
 
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+            if (isset($this->events['afterSave'])) {
+                $this->events['afterSave']($this->model, $request);
+            }
 
-        if ($request->ajax()) {
-            return [
+            return response()->json([
                 'success' => true,
                 'message' => 'Resource successfully updated!'
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully updated!');
+            ]);
+        });
     }
 
     /**
      * @param Request $request
      * @param $id
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model;
-        $api = $this->api()->setModel($model);
+        return $this->response(function () use ($id) {
+            $model = $this->model;
+            $api = $this->api()->setModel($model);
 
-        if ($api->getWhere()) {
-            $model = $model->where($api->getWhere());
-        }
+            if ($api->getWhere()) {
+                $model = $model->where($api->getWhere());
+            }
 
-        $model = $model->findOrFail($id);
+            $model = $model->findOrFail($id);
 
-        $model->delete();
+            $model->delete();
 
-        if ($request->ajax()) {
-            return [
+            return response()->json([
                 'success' => true,
                 'message' => 'Resource successfully deleted!'
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully deleted!');
+            ]);
+        });
     }
 
     /**
@@ -304,6 +306,39 @@ abstract class AbstractApiResource
     public function getActions()
     {
         return $this->actions;
+    }
+
+    /**
+     * @param callable $func
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function response(callable $func)
+    {
+        try {
+            return call_user_func($func);
+        } catch (\Exception $e) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Not found.'
+                ], 404);
+            }
+
+            if ($e instanceof ValidationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed.',
+                    'errors'  => $e->errors()
+                ], 422);
+            }
+
+            logger()->error($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error! Please, try again.'
+            ], 503);
+        }
     }
 
     /**

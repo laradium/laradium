@@ -28,7 +28,7 @@ class ApiResource
      */
     public function __construct()
     {
-        $this->fieldSet = new FieldSet();
+        $this->fieldSet = new ApiFieldSet();
     }
 
     /**

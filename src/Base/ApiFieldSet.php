@@ -2,62 +2,104 @@
 
 namespace Laradium\Laradium\Base;
 
+use Laradium\Laradium\Registries\FieldRegistry;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class ApiFieldSet
 {
 
     /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
+    protected $fieldRegistry;
+
+    /**
      * @var Collection
      */
-    public $list;
+    public $fields;
 
     /**
-     * @var string
+     * @var
      */
-    public $field;
+    protected $model;
 
     /**
-     * ColumnSet constructor.
+     * @var Collection
+     */
+    protected $tabs;
+
+    /**
+     * FieldSet constructor.
      */
     public function __construct()
     {
-        $this->list = new Collection();
+        $this->fieldRegistry = app(FieldRegistry::class);
+        $this->fields = new Collection;
+        $this->tabs = collect(['Main']);
     }
 
     /**
-     * @param $field
-     * @param null $name
+     * @param $value
      * @return $this
      */
-    public function add($field, $name = null)
+    public function addTab($value)
     {
-        $this->list->push([
-            'name'          => $name ?? $field,
-            'relation'      => count(explode('.', $field)) > 1 ? array_first(explode('.', $field)) : '',
-            'modify'        => null,
-        ]);
-
-        $this->field = $field;
+        $this->tabs->push($value);
 
         return $this;
     }
 
     /**
-     * @param $closure
+     * @return array
+     */
+    public function tabs()
+    {
+        return $this->tabs;
+    }
+
+    /**
+     * @param Model $model
      * @return $this
      */
-    public function modify($closure)
+    public function setModel(Model $model)
     {
-        $this->list = $this->list->map(function ($item) use ($closure) {
-            if ($this->field === $item['name']) {
-                $item['modify'] = $closure;
-            }
-
-            return $item;
-        });
+        $this->model = $model;
 
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function model()
+    {
+        return $this->model;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function fields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param $method
+     * @param $parameters
+     * @return $this
+     */
+    public function __call($method, $parameters)
+    {
+        $class = $this->fieldRegistry->getClassByName($method);
+        if (class_exists($class)) {
+            $field = new $class($parameters, $this->model());
+            $this->fields->push($field);
+
+            return $field;
+        }
+
+        return $this;
+    }
 }
