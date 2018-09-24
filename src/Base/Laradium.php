@@ -90,7 +90,7 @@ class Laradium
     /**
      * @return array
      */
-    private function apiResources(): array
+    public function apiResources(): array
     {
         $resourceList = [];
         $resources = config('laradium.resource_path', 'App\\Laradium\\Resources\\Api') . '\\Api';
