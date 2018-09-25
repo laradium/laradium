@@ -46,7 +46,7 @@ Class SettingResource extends AbstractResource
      */
     public function table()
     {
-        $table = laradium()->table(function (ColumnSet $column) {
+        return laradium()->table(function (ColumnSet $column) {
 
             $column->add('name')->modify(function ($row) {
                 return ($row->is_translatable ? $this->translatableIcon() : '') . $row->name;
@@ -57,17 +57,23 @@ Class SettingResource extends AbstractResource
             })->editable();
 
         })->dataTable(false)
-            ->relations(['translations']);
+            ->relations(['translations'])
+            ->tabs([
+                'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
+                    return [
+                        $setting->group => ucfirst(str_replace('-', ' ', $setting->group))
+                    ];
+                })->all()
+            ])
+            ->search(function ($query) {
+                if (request()->has('search') && isset(request()->input('search')['value']) && !empty(request()->input('search')['value'])) {
+                    $searchTerm = request()->input('search')['value'];
 
-        $table->tabs([
-            'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
-                return [
-                    $setting->group => ucfirst(str_replace('-', ' ', $setting->group))
-                ];
-            })->all()
-        ]);
-
-        return $table;
+                    $query->whereTranslationLike('value', '%' . $searchTerm . '%')
+                        ->orWhere('non_translatable_value', 'LIKE', '%' . $searchTerm . '%')
+                        ->orWhere('name', 'LIKE', '%' . $searchTerm . '%');
+                }
+            });
     }
 
     /**

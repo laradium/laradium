@@ -63,6 +63,11 @@ class Table
     protected $orderBy = [];
 
     /**
+     * @var
+     */
+    protected $search;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -309,5 +314,24 @@ class Table
     public function getOrderBy()
     {
         return $this->orderBy;
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function search(\Closure $closure)
+    {
+        $this->search = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSearch()
+    {
+        return $this->search;
     }
 }

@@ -116,6 +116,37 @@ trait Datatable
 
         $dataTable->rawColumns($rawColumns);
 
+        if ($table->getSearch()) {
+            $dataTable->filter($table->getSearch());
+        } else {
+            $dataTable->filter(function ($query) use ($columns) {
+                if (request()->has('search') && isset(request()->input('search')['value']) && !empty(request()->input('search')['value'])) {
+                    $searchTerm = request()->input('search')['value'];
+
+                    foreach ($columns as $i => $column) {
+                        if ($column['not_searchable']) {
+                            continue;
+                        }
+
+                        if ($column['translatable']) {
+                            if ($i === 0) {
+                                $query->whereTranslationLike($column['column'], '%' . $searchTerm . '%');
+                            } else {
+                                $query->orWhereTranslationLike($column['column'], '%' . $searchTerm . '%');
+                            }
+                        } else {
+                            if ($i === 0) {
+                                $query->where($column['column'], 'LIKE', '%' . $searchTerm . '%');
+                            } else {
+                                $query->orWhere($column['column'], 'LIKE', '%' . $searchTerm . '%');
+                            }
+                        }
+                    }
+
+                }
+            });
+        }
+
         return $dataTable->make(true);
     }
 }
