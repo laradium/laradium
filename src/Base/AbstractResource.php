@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Base;
 use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
+use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\Datatable;
 
@@ -252,19 +253,11 @@ abstract class AbstractResource
     }
 
     /**
-     * @return bool
+     * @return Import
      */
-    public function importInProgress(): bool
+    public function importHelper()
     {
-        return !!File::exists(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
-    }
-
-    /**
-     * @return bool|string
-     */
-    public function importStatus()
-    {
-        return file_get_contents(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
+        return new Import($this);
     }
 
     /**

@@ -6,9 +6,9 @@
             <div class="card-box">
                 @include('laradium::admin._partials.messages')
 
-                @if($resource->importInProgress())
+                @if($resource->importHelper()->inProgress())
                     <div class="alert alert-info">
-                        {{ $resource->importStatus() }}
+                        {{ $resource->importHelper()->status() }}
                     </div>
                 @endif
 
