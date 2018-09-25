@@ -69,9 +69,12 @@ Class SettingResource extends AbstractResource
                 if (request()->has('search') && isset(request()->input('search')['value']) && !empty(request()->input('search')['value'])) {
                     $searchTerm = request()->input('search')['value'];
 
-                    $query->whereTranslationLike('value', '%' . $searchTerm . '%')
-                        ->orWhere('non_translatable_value', 'LIKE', '%' . $searchTerm . '%')
-                        ->orWhere('name', 'LIKE', '%' . $searchTerm . '%');
+                    $query->where('group', request()->input('group'))
+                        ->where(function ($query) use ($searchTerm) {
+                            $query->whereTranslationLike('value', '%' . $searchTerm . '%')
+                                ->orWhere('non_translatable_value', 'LIKE', '%' . $searchTerm . '%')
+                                ->orWhere('name', 'LIKE', '%' . $searchTerm . '%');
+                        });
                 }
             });
     }
