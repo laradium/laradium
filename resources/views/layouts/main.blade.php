@@ -7,6 +7,10 @@
 
     <title>{{ config('app.name') }} {{ isset($title) ? '- ' . $title :'' }}</title>
 
+    @if(setting()->get('design.admin_theme_favicon'))
+        <link rel="shortcut icon" href="{{ setting()->get('design.admin_theme_favicon') }}">
+    @endif
+
     <!-- Styles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
           integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
