@@ -13,6 +13,11 @@ class Select extends Field
     protected $options = [];
 
     /**
+     * @var
+     */
+    protected $onChange;
+
+    /**
      * @param array $options
      * @return $this
      */
@@ -29,6 +34,17 @@ class Select extends Field
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function onChange($value)
+    {
+        $this->onChange = $value;
+
+        return $this;
     }
 
     /**
@@ -63,13 +79,15 @@ class Select extends Field
             'tab'                   => $this->tab(),
             'col'                   => $this->col,
             'attr'                  => $this->getAttr(),
+            'value'                 => $field->getValue(),
             'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
                 return [
                     'value'    => $value,
                     'text'     => $text,
-                    'selected' => $field->getValue() == $value,
+                    'selected' => $field->getValue() === $value,
                 ];
             })->toArray(),
+            'onChange'              => ''
         ];
     }
 }
