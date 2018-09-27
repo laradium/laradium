@@ -305,6 +305,15 @@ abstract class AbstractResource
     }
 
     /**
+     * @param string $action
+     * @return string
+     */
+    public function getRoute($action = 'index')
+    {
+        return 'admin.' . $this->getSlug() . '.' . $action;
+    }
+
+    /**
      * @param $value
      * @return bool
      */
