@@ -16,11 +16,18 @@ class LaradiumMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check()) {
+        $user = auth()->user();
+
+        if (!$user) {
             return redirect('/admin/login');
         }
-        if(auth()->check() && !auth()->user()->is_admin) {
+
+        if (!$user->is_admin) {
             return redirect('/admin/login');
+        }
+
+        if (method_exists($user, 'hasPermission') && !$user->hasPermission($request)) {
+            return redirect('/admin/access-denied');
         }
 
         return $next($request);

@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base;
 
+use Illuminate\Support\Collection;
 use Laradium\Laradium\Registries\ApiResourceRegistry;
 use Laradium\Laradium\Registries\ResourceRegistry;
 
@@ -17,6 +18,15 @@ class Laradium
      * @var \Illuminate\Foundation\Application|mixed
      */
     protected $apiResourceRegistry;
+
+    /**
+     * @var array
+     */
+    protected $baseResources = [
+        'vendor/laradium/laradium/src/Base/Resources'            => 'Laradium\\Laradium\\Base\\Resources\\',
+        'vendor/laradium/laradium-content/src/Base/Resources'    => 'Laradium\\Laradium\\Content\\Base\\Resources\\',
+        'vendor/laradium/laradium-permission/src/Base/Resources' => 'Laradium\\Laradium\\Permission\\Base\\Resources\\',
+    ];
 
     /**
      * Laradium constructor.
@@ -50,7 +60,7 @@ class Laradium
      */
     public function resources(): array
     {
-        $cmsResources = [];
+        $baseResources = [];
         $projectResources = [];
 
         // Project resources
@@ -69,39 +79,26 @@ class Laradium
         }
 
         // CMS resources
-        $baseResourcePath = base_path('vendor/laradium/laradium/src/Base/Resources');
-        $contentResourcePath = base_path('vendor/laradium/laradium-content/src/Base/Resources');
-        if (file_exists($baseResourcePath)) {
-            foreach (\File::allFiles($baseResourcePath) as $path) {
-                $resource = $path->getPathname();
-                $baseName = basename($resource, '.php');
-                $resource = 'Laradium\\Laradium\\Base\\Resources\\' . $baseName;
+        foreach ($this->baseResources as $path => $namespace) {
+            $resourcesPath = base_path($path);
 
-                // Check if there is a overridden resource in the project
-                if ($this->resourceExists($projectResources, $baseName)) {
-                    continue;
+            if (file_exists($resourcesPath)) {
+                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                    $resource = $resourcePath->getPathname();
+                    $baseName = basename($resource, '.php');
+                    $resource = $namespace . $baseName;
+
+                    // Check if there is a overridden resource in the project
+                    if ($this->resourceExists($projectResources, $baseName)) {
+                        continue;
+                    }
+
+                    $baseResources[] = $resource;
                 }
-
-                $cmsResources[] = $resource;
             }
         }
 
-        if (file_exists($contentResourcePath)) {
-            foreach (\File::allFiles($contentResourcePath) as $path) {
-                $resource = $path->getPathname();
-                $baseName = basename($resource, '.php');
-                $resource = 'Laradium\\Laradium\\Content\\Base\\Resources\\' . $baseName;
-
-                // Check if there is a overridden resource in the project
-                if ($this->resourceExists($projectResources, $baseName)) {
-                    continue;
-                }
-
-                $cmsResources[] = $resource;
-            }
-        }
-
-        return array_merge($cmsResources, $projectResources);
+        return array_merge($baseResources, $projectResources);
     }
 
     /**

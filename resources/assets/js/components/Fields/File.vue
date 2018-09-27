@@ -8,8 +8,8 @@
         </label>
         <br>
         <div v-if="input.isTranslatable">
-            <div v-for="item in input.translatedAttributes" v-show="language === item.iso_code" v-if="item.url">
-                <a :href="item.url" target="_blank">
+            <div v-for="item in input.translatedAttributes" v-show="language === item.iso_code">
+                <a :href="item.url" v-if="item.url" target="_blank">
                     {{ item.file_name }} ({{ item.file_size }} kb)
                 </a>
                 <button class="btn btn-danger btn-sm"

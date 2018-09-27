@@ -43,10 +43,12 @@ class CreateMenuItemTranslationsTable extends Migration
                 $resource = new $resource;
                 $menus['Admin menu'][] = [
                     'is_active'    => 1,
+                    'resource'     => get_class($resource),
                     'translations' => [
                         'name' => $resource->getName(),
-                        'url'  => '/admin/' . $resource->getSlug(),
-                    ]
+                        'url'  => ''
+                    ],
+                    'icon'         => $this->getIcon($resource)
                 ];
             }
         }
@@ -66,5 +68,24 @@ class CreateMenuItemTranslationsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('menu_item_translations');
+    }
+
+    /**
+     * @param $resource
+     * @return mixed|string
+     */
+    protected function getIcon($resource)
+    {
+        $icons = [
+            'LanguageResource'    => 'fa fa-language',
+            'TranslationResource' => 'fa fa-globe',
+            'PageResource'        => 'fa fa-file-text-o',
+            'MenuResource'        => 'fa fa-link',
+            'SettingResource'     => 'fa fa-cogs'
+        ];
+
+        $resource = array_last(explode('\\', get_class($resource)));
+
+        return $icons[$resource] ?? null;
     }
 }
