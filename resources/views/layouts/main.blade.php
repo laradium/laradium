@@ -111,7 +111,7 @@
                     </li>
                 </ul>
 
-                @if(isset($resource) && $resource->hasAction('create'))
+                @if(isset($resource) && $resource->hasAction('create') && laradium()->hasPermissionTo(auth()->user(), $resource, 'create'))
                     <nav class="navbar-custom">
 
                         <ul class="list-unstyled topbar-right-menu float-right mb-0">

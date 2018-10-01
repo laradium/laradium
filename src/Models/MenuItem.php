@@ -16,7 +16,8 @@ class MenuItem extends Model
         'is_active',
         'target',
         'sequence_no',
-        'icon'
+        'icon',
+        'resource'
     ];
 
     /**
@@ -35,5 +36,19 @@ class MenuItem extends Model
     public function scopeActive($query)
     {
         return $query->whereIsActive(true);
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getUrlAttribute()
+    {
+        if ($this->resource !== '' && class_exists($this->resource)) {
+            $url = route('admin.' . (new $this->resource)->getSlug() . '.index');
+        } else {
+            $url = $this->translateOrNew(session('locale', config('app.locale')))->url;
+        }
+
+        return $url ?? '#';
     }
 }

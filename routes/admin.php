@@ -8,11 +8,13 @@ Route::group([
 ], function () {
     Route::group(['middleware' => 'laradium'], function () {
         Route::get('/', [
-            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@index'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@index',
+            'as'   => 'index'
         ]);
 
         Route::get('dashboard', [
-            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@dashboard'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@dashboard',
+            'as'   => 'dashboard'
         ]);
 
         Route::post('logout', [
@@ -20,7 +22,8 @@ Route::group([
         ]);
 
         Route::delete('resource/{id}', [
-            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@resourceDelete'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@resourceDelete',
+            'as'   => 'resource.destroy'
         ]);
 
         Route::delete('resource/{model}/{id}/file/{file}/{locale?}', [

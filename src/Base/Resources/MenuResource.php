@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
+use Laradium\Laradium\Base\Laradium;
 use Laradium\Laradium\Models\Menu;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
@@ -24,19 +25,24 @@ Class MenuResource extends AbstractResource
             cache()->forget(Menu::$cacheKey);
         });
 
-        return laradium()->resource(function (FieldSet $set) {
+        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($r) {
+            return [$r => (new $r)->getName()];
+        })->toArray();
+        $resources = array_merge(['' => '- Select -'], $resources);
+
+        return laradium()->resource(function (FieldSet $set) use ($resources) {
             $set->boolean('is_active');
             $set->text('key')->rules('required|max:255');
             $set->text('name')->rules('required|max:255')->translatable();
-            $set->tab('Items')->fields(function (FieldSet $set) {
-                $set->hasMany('items')->fields(function (FieldSet $set) {
-                    $set->boolean('is_active');
+            $set->tab('Items')->fields(function (FieldSet $set) use ($resources) {
+                $set->hasMany('items')->fields(function (FieldSet $set) use ($resources) {
                     $set->select('target')->options([
                         '_self'  => 'Self',
                         '_blank' => 'Blank',
                     ])->rules('required');
                     $set->text('name')->rules('required|max:255')->translatable();
-                    $set->text('url')->rules('required|max:255')->translatable();
+                    $set->text('url')->rules('max:255')->translatable();
+                    $set->select('resource')->options($resources);
                 })->sortable('sequence_no');
             });
 

@@ -45,4 +45,15 @@ class LaradiumRepository
     {
         return (new Validation)->make($closure);
     }
+
+    /**
+     * @param $user
+     * @param null $resource
+     * @param null $route
+     * @return bool
+     */
+    public function hasPermissionTo($user, $resource = null, $action = 'index')
+    {
+        return !method_exists($user, 'hasPermissionTo') || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($resource, $action));
+    }
 }
