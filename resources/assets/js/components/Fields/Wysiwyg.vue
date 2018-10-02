@@ -7,12 +7,10 @@
             </span>
         </label>
         <div v-if="input.isTranslatable">
-
             <input type="hidden"
                    :name="item.name"
                    v-model="item.value"
                    v-for="(item, index) in input.translatedAttributes"
-                   :key="item.name"
                    v-show="language === item.iso_code"
             >
             <VueEditor v-model="item.value"

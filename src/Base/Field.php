@@ -2,8 +2,8 @@
 
 namespace Laradium\Laradium\Base;
 
-use Laradium\Laradium\Traits\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Traits\Translatable;
 
 class Field
 {
@@ -17,7 +17,7 @@ class Field
     /**
      * @var
      */
-    protected $default;
+    protected $default = null;
 
     /**
      * @var string
@@ -108,7 +108,7 @@ class Field
             $this->value = $this->model()->translateOrNew($this->getLocale())->{$this->name()};
         }
 
-        return $this->value;
+        return $this->value ?? '';
     }
 
     /**
@@ -141,7 +141,6 @@ class Field
             }
 
             $this->nameAttribute = $this->buildNameAttribute($attributeList);
-
         }
 
         return $this->nameAttribute;
@@ -260,13 +259,19 @@ class Field
         $this->setValue($this->model->getAttribute($this->name()));
 
         if ($this->isTranslatable()) {
-            $language = translate()->languages()->where('is_fallback', 1)->first();
-            if (!$language) {
-                $language = translate()->languages()->first();
+            if (request()->has('language')) {
+                $language = request()->get('language');
+            } else {
+                $language = translate()->languages()->where('is_fallback', 1)->first();
+                if (!$language) {
+                    $language = translate()->languages()->first();
+                }
+
+                $language = $language->iso_code;
             }
 
             if (is_array($attributeList) && count($attributeList) >= 1) {
-                $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
+                $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language, 'translations']);
             }
         }
 
@@ -402,7 +407,7 @@ class Field
      */
     public function getDefault()
     {
-        return $this->default;
+        return $this->default ?? '';
     }
 
     /**

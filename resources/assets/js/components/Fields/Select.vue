@@ -8,7 +8,8 @@
                 <option
                         :value="option.value"
                         :selected="option.selected"
-                        v-for="option in input.options">
+                        v-for="option in input.options"
+                        :disabled="option.value === ''">
                     {{ option.text }}
                 </option>
             </select>
@@ -29,13 +30,32 @@
             }
         },
 
+        created() {
+            if (!this.input.onChange || this.input.value === '') {
+                return;
+            }
+
+            this.onChange();
+        },
+
         methods: {
             onChange() {
+                let self = this;
                 if (!this.input.onChange) {
                     return;
                 }
 
+                let fields = this.input.onChange.fields[this.input.value];
+                if (fields) {
+                    $.each(fields, function (index, field) {
+                        self.$eventHub.$emit('change-input', field);
+                    })
+                }
 
+                let languages = this.input.onChange.languages[this.input.value];
+                if (languages) {
+                    self.$eventHub.$emit('change-languages', languages);
+                }
             }
         }
     }

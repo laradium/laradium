@@ -42,6 +42,7 @@ Vue.component('widget-constructor-field', require('./components/fields/WidgetCon
 Vue.component('draggable', require('vuedraggable'));
 Vue.component('VueEditor', VueEditor);
 
+Vue.prototype.$eventHub = new Vue(); // Global event bus
 
 const app = new Vue({
     el: '#app',

@@ -17,7 +17,6 @@
 
                 <input type="hidden" name="_method" :value="method" v-if="method">
 
-
                 <div v-if="data.tabs.length > 1" class="col-md-12">
                     <ul class="nav nav-tabs" v-if="data.tabs.length > 1">
                         <li class="nav-item" v-for="(tab, index) in data.tabs">
@@ -28,10 +27,12 @@
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="'tab-' + index"
+                        <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}"
+                             :id="'tab-' + index"
                              v-for="(tab, index) in data.tabs">
                             <div class="row">
-                                <div v-for="input in data.inputs" v-if="input.tab == tab" :class="'col-' + input.col.type + '-' + input.col.size">
+                                <div v-for="input in data.inputs" v-if="input.tab === tab"
+                                     :class="'col-' + input.col.type + '-' + input.col.size">
                                     <component :is="input.type + '-field'"
                                                :input="input"
                                                :language="language"
@@ -62,11 +63,8 @@
                                 Save
                             </button>
                         </div>
-                        <div class="col-md-1 middle-align" v-if="data.isTranslatable && data.languages.length">
-                            Language
-                        </div>
                         <div class="col-md-2" v-if="data.isTranslatable && data.languages.length">
-
+                            Language
                             <select class="form-control language-select" v-model="language">
                                 <option :value="language.iso_code" v-for="language in data.languages">
                                     {{ language.iso_code }}
@@ -84,6 +82,7 @@
 <script>
     export default {
         props: ['url', 'method'],
+
         data() {
             return {
                 language: '',
@@ -94,27 +93,28 @@
                     languages: [],
                     tabs: []
                 },
-                loading: true
+                loading: true,
+                fallbackLanguage: false
             };
         },
+
         created() {
             axios({
                 'method': 'GET',
                 'url': url
             }).then(res => {
                 this.data = res.data;
-                for (let language in this.data.languages) {
-                    if (this.data.languages.hasOwnProperty(language)) {
-                        if (this.data.languages[language].is_current) {
-                            this.language = this.data.languages[language].iso_code;
-                        }
-                    }
-                }
+                this.setLanguage();
             });
+
+            this.$eventHub.$on('change-input', this.changeInput);
+            this.$eventHub.$on('change-languages', this.changeLanguages);
         },
+
         mounted() {
             this.loading = false;
         },
+
         methods: {
             onSubmit(el) {
                 let form = document.getElementsByClassName('crud-form')[0];
@@ -128,7 +128,7 @@
                             formData.append($(e).attr('name'), $(e).val());
                         }
                     } else {
-                        formData.append($(e).attr('name'), $(e).val());
+                        formData.append($(e).attr('name'), $(e).val() ? $(e).val() : '');
                     }
                 });
 
@@ -137,6 +137,10 @@
                         formData.append($(e).attr('name'), $(e)[0].files[0]);
                     }
                 });
+
+                if (this.fallbackLanguage) {
+                    formData.append('language', this.fallbackLanguage)
+                }
 
                 let url = form.getAttribute('action');
                 axios({
@@ -149,7 +153,7 @@
                     $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
                     this.success = res.data.success;
 
-                    if (res.data.redirect != undefined) {
+                    if (res.data.redirect !== undefined) {
                         window.location = res.data.redirect;
                     }
 
@@ -166,10 +170,55 @@
 
                     if (!errors) {
                         let status = res.response.status;
-                        this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
+                        this.errors.push('There was a technical problem with status code ' + status + ', please, contact technical staff!');
                     }
                 });
+            },
 
+            setLanguage() {
+                for (let language in this.data.languages) {
+                    if (this.data.languages.hasOwnProperty(language)) {
+                        if (this.data.languages[language].is_current) {
+                            this.language = this.data.languages[language].iso_code;
+                        }
+                    }
+                }
+            },
+
+            changeInput(inputData) {
+                let input = this.findInput(inputData.name);
+                if (input && input.type === 'select') {
+                    input.value = '';
+                    input.options = inputData.options;
+                }
+            },
+
+            changeLanguages(languages) {
+                let self = this;
+                this.data.languages = languages;
+                this.setLanguage();
+
+                $.each(languages, function (index, language) {
+                    if (language.is_fallback) {
+                        self.fallbackLanguage = language.iso_code;
+                    }
+                })
+            },
+
+            findInput(name) {
+                for (let i = 0, len = this.data.inputs.length; i < len; i++) {
+                    if (this.data.inputs[i].fields) {
+                        for (let j = 0, length = this.data.inputs[i].fields.length; j < length; j++) {
+                            if (this.data.inputs[i].fields[j].name === this.data.inputs[i].name.toLowerCase() + '[' + name + ']')
+                                return this.data.inputs[i].fields[j];
+                        }
+                    }
+
+                    if (this.data.inputs[i].name === name)
+                        return this.data.inputs[i];
+                }
+
+                return null;
             }
         }
     }
