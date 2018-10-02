@@ -65,7 +65,7 @@ abstract class AbstractApiResource
 
             $data = $model->map(function ($row, $key) use ($api) {
                 foreach ($api->fields() as $field) {
-                    $value = $field['modify'] ?? $row->{$field['name']};
+                    $value = $field['modify'] ? $field['modify']($row) : $row->{$field['name']};
 
                     $attributes[$field['name']] = $value;
                 }
@@ -156,7 +156,7 @@ abstract class AbstractApiResource
             $model = $model->findOrFail($id);
 
             $data = $api->fields()->mapWithKeys(function ($field) use ($model) {
-                $value = $field['modify'] ?? $model->{$field['name']};
+                $value = $field['modify'] ? $field['modify']($model) : $model->{$field['name']};
 
                 return [$field['name'] => $value];
             });
