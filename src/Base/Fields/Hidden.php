@@ -85,6 +85,8 @@ class Hidden extends Field
             'value'                 => $field->getValue(),
             'replacementAttributes' => $attributes->toArray(),
             'attr'                  => $this->getAttr(),
+            'tab'                   => $this->tab(),
+            'col'                   => $this->col,
         ];
 
         if ($field->getParam('orderable')) {
