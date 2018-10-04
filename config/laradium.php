@@ -10,7 +10,6 @@ return [
     'translations_file' => 'translations',
 
     'user'      => [
-
         'email'    => 'admin@laradium.com',
         'password' => 'laradium2018'
     ],
@@ -35,7 +34,6 @@ return [
 
     'dashboard-view' => 'laradium::admin.dashboard',
 
-
     'menus' => [
         'Admin menu' => [
 //            [
@@ -53,5 +51,7 @@ return [
         //\Laradium\Laradium\Base\Resources\MenuResource::class,
         //\Laradium\Laradium\Base\Resources\SettingResource::class,
         //\Laradium\Laradium\Base\Resources\TranslationResource::class,
-    ]
+    ],
+
+    'belongsTo' => null
 ];

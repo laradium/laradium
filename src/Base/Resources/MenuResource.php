@@ -31,6 +31,11 @@ Class MenuResource extends AbstractResource
         $resources = array_merge(['' => '- Select -'], $resources);
 
         return laradium()->resource(function (FieldSet $set) use ($resources) {
+
+            if (laradium()->belongsTo()->isEnabled()) {
+                laradium()->belongsTo()->getSelect($set, $languages = true);
+            }
+
             $set->boolean('is_active');
             $set->text('key')->rules('required|max:255');
             $set->text('name')->rules('required|max:255')->translatable();
@@ -55,12 +60,27 @@ Class MenuResource extends AbstractResource
      */
     public function table()
     {
-        return laradium()->table(function (ColumnSet $column) {
+        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
+        $belongsToId = auth()->user()->{$belongsToForeignKey};
+
+        $table = laradium()->table(function (ColumnSet $column) {
             $column->add('key');
             $column->add('is_active')->modify(function ($item) {
                 return $item->is_active ? 'Yes' : 'No';
             });
             $column->add('name')->translatable();
         })->relations(['translations']);
+
+        if ($belongsToId) {
+            $table->where(function ($q) use ($belongsToId) {
+                $q->where($belongsToForeignKey, $belongsToId);
+            });
+        } else {
+            $table->tabs([
+                $belongsToForeignKey => laradium()->belongsTo()->getOptions($global = true)
+            ]);
+        }
+
+        return $table;
     }
 }

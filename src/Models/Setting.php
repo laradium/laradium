@@ -4,13 +4,11 @@ namespace Laradium\Laradium\Models;
 
 use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
-use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
-
-    //use Translatable;
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {

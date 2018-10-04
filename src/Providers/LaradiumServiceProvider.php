@@ -2,15 +2,16 @@
 
 namespace Laradium\Laradium\Providers;
 
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
 use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
+use Laradium\Laradium\Console\Commands\InitializeLaradium;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
@@ -194,7 +195,8 @@ class LaradiumServiceProvider extends ServiceProvider
                 MakeLaradiumResource::class,
                 MakeLaradiumApiResource::class,
                 ImportTranslations::class,
-                FindTranslations::class
+                FindTranslations::class,
+                InitializeLaradium::class
             ]);
         }
     }

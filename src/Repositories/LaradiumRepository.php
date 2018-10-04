@@ -6,6 +6,7 @@ use Laradium\Laradium\Base\ApiResource;
 use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Base\Validation;
+use Laradium\Laradium\Helpers\BelongsTo;
 
 class LaradiumRepository
 {
@@ -44,6 +45,14 @@ class LaradiumRepository
     public function validation(\Closure $closure): \Laradium\Laradium\Base\Validation
     {
         return (new Validation)->make($closure);
+    }
+
+    /**
+     * @return \BelongsTo
+     */
+    public function belongsTo()
+    {
+        return (new BelongsTo());
     }
 
     /**

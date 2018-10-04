@@ -4,15 +4,14 @@ namespace Laradium\Laradium\Base\Resources;
 
 use DB;
 use Illuminate\Http\Request;
-use Laradium\Laradium\Models\Language;
-use Laradium\Laradium\Models\Translation;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Language;
+use Laradium\Laradium\Models\Translation;
 
 Class TranslationResource extends AbstractResource
 {
-
     /**
      * @var string
      */
@@ -40,18 +39,33 @@ Class TranslationResource extends AbstractResource
      */
     public function table()
     {
-        return laradium()->table(function (ColumnSet $column) {
+        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
+        $belongsToId = auth()->user()->{$belongsToForeignKey};
+
+        $table = laradium()->table(function (ColumnSet $column) {
             $column->add('locale');
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        })->tabs([
-            'group' => Translation::select('group')->groupBy('group')->get()->mapWithKeys(function ($translation) {
-                return [
-                    $translation->group => ucfirst(str_replace('-', ' ', $translation->group))
-                ];
-            })->all()
-        ]);
+        });
+
+        if ($belongsToId) {
+            $table->tabs([
+                'group' => Translation::select('group')->groupBy('group')->get()->mapWithKeys(function ($translation) {
+                    return [
+                        $translation->group => ucfirst(str_replace('-', ' ', $translation->group))
+                    ];
+                })->all()
+            ])->where(function ($q) use ($belongsToId) {
+                $q->where($belongsToForeignKey, $belongsToId);
+            });
+        } else {
+            $table->tabs([
+                $belongsToForeignKey => laradium()->belongsTo()->getOptions($global = true)
+            ]);
+        }
+
+        return $table;
     }
 
     /**
@@ -68,14 +82,11 @@ Class TranslationResource extends AbstractResource
             $data = $excel->load($request->file('import'))
                 ->get()
                 ->toArray();
-
             foreach ($data as $item) {
                 $group = array_first(explode('.', $item['key']));
                 $key = str_replace($group . '.', '', $item['key']);
-
                 unset($item['key']);
-
-                $languages = array_keys(array_intersect_key($item, array_flip(array_filter(array_keys($item), 'is_string'))));
+                $languages = array_keys($item);
                 foreach ($languages as $lang) {
                     $rows[] = [
                         'locale' => $lang,
@@ -89,13 +100,16 @@ Class TranslationResource extends AbstractResource
             DB::transaction(function () use ($rows) {
                 foreach (array_chunk($rows, 300) as $chunk) {
                     foreach ($chunk as $item) {
-                        $translation = Translation::where('key', $item['key'])->where('locale', $item['locale'])->where('group', $item['group'])->first();
-                        if ($translation) {
-                            $translation->value = $item['value'];
-                            $translation->save();
-                        } else {
-                            Translation::create($item);
-                        }
+                        Translation::firstOrCreate([
+                            'locale' => $item['locale'],
+                            'group'  => $item['group'],
+                            'key'    => $item['key'],
+                        ], [
+                            'locale' => $item['locale'],
+                            'group'  => $item['group'],
+                            'key'    => $item['key'],
+                            'value'  => $item['value'],
+                        ]);
                     }
                 }
             });
@@ -103,6 +117,7 @@ Class TranslationResource extends AbstractResource
             cache()->forget('translations');
         } catch (\Exception $e) {
             logger()->error($e);
+
             return back()->withError('Something went wrong, please try again!');
         }
 
@@ -120,8 +135,8 @@ Class TranslationResource extends AbstractResource
         $allTranslations = Translation::orderBy('group', 'asc')
             ->orderBy('key', 'asc')
             ->get();
-        $translations = [];
 
+        $translations = [];
         foreach ($allTranslations as $translation) {
             $translations[$translation->group . '.' . $translation->key][$translation->locale] = $translation;
             $translations[$translation->group . '.' . $translation->key]['group'] = $translation->group;
@@ -143,7 +158,6 @@ Class TranslationResource extends AbstractResource
                             'key',
                         ],
                     ];
-
                 foreach ($languages as $language) {
                     $rows[0][] = $language->iso_code;
                 }
@@ -153,6 +167,7 @@ Class TranslationResource extends AbstractResource
                     $item = [
                         $t->group . '.' . $t->key,
                     ];
+
                     foreach ($languages as $language) {
                         $iso_code = $language->iso_code;
                         $translation = object_get($t, $iso_code, new \stdClass());
@@ -162,6 +177,7 @@ Class TranslationResource extends AbstractResource
 
                     return $item;
                 })->all();
+
                 $rows = array_merge($rows, ($translations));
                 $sheet->fromArray($rows, null, 'A1', false, false);
                 $sheet->row(1, function ($row) {
