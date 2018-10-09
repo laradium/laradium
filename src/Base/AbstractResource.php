@@ -85,12 +85,12 @@ abstract class AbstractResource
         $form->buildForm();
         $response = $form->formattedResponse();
 
-        return ([
+        return [
             'languages'      => $this->languages(),
             'inputs'         => $response,
             'tabs'           => $resource->fieldSet()->tabs()->toArray(),
             'isTranslatable' => $form->isTranslatable()
-        ]);
+        ];
     }
 
     /**
@@ -343,6 +343,7 @@ abstract class AbstractResource
                 'edit',
                 'update'
             ],
+            'show'   => 'show',
             'delete' => 'destroy'
         ]);
 

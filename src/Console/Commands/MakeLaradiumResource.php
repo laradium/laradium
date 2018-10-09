@@ -14,7 +14,7 @@ class MakeLaradiumResource extends Command
      *
      * @var string
      */
-    protected $signature = 'laradium:resource {name} {--t} {--api}';
+    protected $signature = 'laradium:resource {name} {--m} {--t} {--api}';
 
     /**
      * The console command description.
@@ -43,22 +43,10 @@ class MakeLaradiumResource extends Command
         $name = $this->argument('name');
         $translations = $this->option('t');
         $api = $this->option('api');
+        $model = $this->option('m');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
         $url = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $name));
-
-        $menus = [
-            'Admin menu' => [
-                [
-                    'is_active'    => 1,
-                    'translations' => [
-                        'name' => ucfirst(str_replace('-', ' ', $url)),
-                        'url'  => '/admin/' . str_plural($url),
-                    ]
-                ]
-            ]
-        ];
-        menu()->seed($menus);
 
         $resourceDirectory = app_path('Laradium/Resources');
         if (!file_exists($resourceDirectory)) {
@@ -80,22 +68,37 @@ class MakeLaradiumResource extends Command
 
         // API Resource
         if ($api) {
-            $dummyResource = File::get(__DIR__ . '/../../../stubs/laradium-api-resource.stub');
-            $resource = str_replace('{{namespace}}', $namespace, $dummyResource);
-            $resource = str_replace('{{resource}}', $name, $resource);
-            $resource = str_replace('{{resource}}', $name, $resource);
-            $resource = str_replace('{{modelNamespace}}', config('laradium.default_models_directory', 'App'), $resource);
-            $resourceFilePath = app_path('Laradium/Resources/Api/' . $name . 'ApiResource.php');
+            Artisan::call('laradium:api-resource', [
+                'name' => $name
+            ]);
+        }
 
-            if (!file_exists($resourceFilePath)) {
-                File::put($resourceFilePath, $resource);
+        if ($model) {
+            Artisan::call('make:model', [
+                'name'        => 'Models/' . $name,
+                '--migration' => true
+            ]);
+
+            if ($translations) {
+                Artisan::call('make:model', [
+                    'name'        => 'Models/Translations/' . $name . 'Translation',
+                    '--migration' => true
+                ]);
             }
         }
 
-        Artisan::call('make:model', ['name' => 'Models/' . $name]);
-        if ($translations) {
-            Artisan::call('make:model', ['name' => 'Models/Translations/' . $name . 'Translation']);
-        }
+        $menus = [
+            'Admin menu' => [
+                [
+                    'is_active'    => 1,
+                    'translations' => [
+                        'name' => ucfirst(str_replace('-', ' ', $url)),
+                        'url'  => '/admin/' . str_plural($url),
+                    ]
+                ]
+            ]
+        ];
+        menu()->seed($menus);
 
         $this->info('Resource successfully created!');
 
