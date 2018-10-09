@@ -27,7 +27,7 @@ Class TranslationResource extends AbstractResource
         });
 
         return laradium()->resource(function (FieldSet $set) {
-            $set->select('locale')->options($this->localeList());
+            $set->select('locale')->options($this->localeList())->rules('required');
             $set->text('group')->rules('required');
             $set->text('key')->rules('required');
             $set->text('value')->rules('required');
@@ -39,31 +39,12 @@ Class TranslationResource extends AbstractResource
      */
     public function table()
     {
-        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
-        $belongsToId = auth()->user()->{$belongsToForeignKey};
-
         $table = laradium()->table(function (ColumnSet $column) {
             $column->add('locale');
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
         });
-
-        if ($belongsToId) {
-            $table->tabs([
-                'group' => Translation::select('group')->groupBy('group')->get()->mapWithKeys(function ($translation) {
-                    return [
-                        $translation->group => ucfirst(str_replace('-', ' ', $translation->group))
-                    ];
-                })->all()
-            ])->where(function ($q) use ($belongsToId) {
-                $q->where($belongsToForeignKey, $belongsToId);
-            });
-        } else {
-            $table->tabs([
-                $belongsToForeignKey => laradium()->belongsTo()->getOptions($global = true)
-            ]);
-        }
 
         return $table;
     }
@@ -193,5 +174,21 @@ Class TranslationResource extends AbstractResource
     protected function localeList()
     {
         return Language::pluck('iso_code', 'iso_code')->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    protected function onChange()
+    {
+        $array = [];
+
+        foreach (laradium()->belongsTo()->getFullClass()::all() as $row) {
+            $array[$row->id] = function (FieldSet $set) use ($row) {
+                $set->select('locale')->options($row->languages->pluck('iso_code', 'iso_code')->toArray() ?? []);
+            };
+        }
+
+        return $array;
     }
 }

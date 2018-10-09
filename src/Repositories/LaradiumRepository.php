@@ -48,7 +48,7 @@ class LaradiumRepository
     }
 
     /**
-     * @return \BelongsTo
+     * @return BelongsTo
      */
     public function belongsTo()
     {
@@ -58,7 +58,7 @@ class LaradiumRepository
     /**
      * @param $user
      * @param null $resource
-     * @param null $route
+     * @param string $action
      * @return bool
      */
     public function hasPermissionTo($user, $resource = null, $action = 'index')

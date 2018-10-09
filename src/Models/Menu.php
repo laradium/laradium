@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Models;
 
 use Dimsav\Translatable\Translatable;
+use Laradium\Laradium\Models\MenuTranslation;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
@@ -21,6 +22,11 @@ class Menu extends Model
         'key',
         'is_active',
     ];
+
+    /**
+     * @var string
+     */
+    public $translationModel = MenuTranslation::class;
 
     /**
      * @var array

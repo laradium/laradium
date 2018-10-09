@@ -24,11 +24,6 @@ Class LanguageResource extends AbstractResource
         });
 
         return laradium()->resource(function (FieldSet $set) {
-
-            if (laradium()->belongsTo()->isEnabled()) {
-                laradium()->belongsTo()->getSelect($set);
-            }
-
             $set->text('iso_code')->rules('required|min:2|max:2');
             $set->text('title')->rules('required|min:2|max:255');
             $set->text('title_localized')->rules('required|min:2|max:255');
@@ -43,9 +38,6 @@ Class LanguageResource extends AbstractResource
      */
     public function table()
     {
-        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
-        $belongsToId = auth()->user()->{$belongsToForeignKey};
-
         $table = laradium()->table(function (ColumnSet $column) {
             $column->add('iso_code');
             $column->add('title');
@@ -53,16 +45,6 @@ Class LanguageResource extends AbstractResource
             $column->add('is_visible');
             $column->add('is_fallback');
         });
-
-        if ($belongsToId) {
-            $table->where(function ($q) use ($belongsToId) {
-                $q->where($belongsToForeignKey, $belongsToId);
-            });
-        } else {
-            $table->tabs([
-                $belongsToForeignKey => laradium()->belongsTo()->getOptions()
-            ]);
-        }
 
         return $table;
     }

@@ -1,0 +1,27 @@
+<?php
+
+namespace {{namespace}}\Laradium\Resources;
+
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\Table;
+use {{modelNamespace}}\{{resource}};
+
+class {{resource}}Resource extends {{extendsResource}}
+{
+    /**
+     * @var string
+     */
+    protected $resource = {{resource}}::class;
+
+    /**
+     * @return Resource
+     */
+    {{resourceMethod}}
+
+     /**
+     * @return Table
+     */
+    {{tableMethod}}
+}

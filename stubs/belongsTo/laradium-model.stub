@@ -1,0 +1,18 @@
+<?php
+
+namespace {{namespace}};
+
+class {{model}} extends \{{extendsModel}}
+{
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        {{fillable}}
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    {{relation}}
+}

@@ -46,11 +46,7 @@ Class SettingResource extends AbstractResource
      */
     public function table()
     {
-        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
-        $belongsToId = auth()->user()->{$belongsToForeignKey};
-
         $table = laradium()->table(function (ColumnSet $column) {
-
             $column->add('name')->modify(function ($row) {
                 return ($row->is_translatable ? $this->translatableIcon() : '') . $row->name;
             });
@@ -73,22 +69,6 @@ Class SettingResource extends AbstractResource
                         });
                 }
             });
-
-        if ($belongsToId) {
-            $table->tabs([
-                'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
-                    return [
-                        $setting->group => ucfirst(str_replace('-', ' ', $setting->group))
-                    ];
-                })->all()
-            ])->where(function ($q) use ($belongsToId) {
-                $q->where($belongsToForeignKey, $belongsToId);
-            });
-        } else {
-            $table->tabs([
-                $belongsToForeignKey => laradium()->belongsTo()->getOptions($global = true)
-            ]);
-        }
 
         return $table;
     }

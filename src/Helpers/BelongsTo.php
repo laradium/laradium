@@ -2,8 +2,6 @@
 
 namespace Laradium\Laradium\Helpers;
 
-use App\Models\Region;
-
 class BelongsTo
 {
     /**
@@ -82,6 +80,14 @@ class BelongsTo
     }
 
     /**
+     * @return mixed
+     */
+    public function getFullClass()
+    {
+        return (new \ReflectionClass($this->class))->getName();
+    }
+
+    /**
      * @return string
      */
     public function getRelation()
@@ -91,15 +97,30 @@ class BelongsTo
 
     /**
      * @param \Laradium\Laradium\Base\FieldSet $set
+     * @param array $onChange
+     * @param bool $languages
      */
-    public function getSelect(\Laradium\Laradium\Base\FieldSet $set, $languages = false)
+    public function getSelect(\Laradium\Laradium\Base\FieldSet $set, $onChange = [], $languages = false, $global = false)
     {
+        $options = $this->getOptions($global);
+
         $select = $set->select($this->foreignKey)
             ->rules('required')
             ->label($this->label)
-            ->options($this->getOptions());
+            ->options($options)
+            ->default($global ? array_keys($options)[1] : array_first(array_keys($options)));
 
-        if ($languages) {
+        if ($onChange && !$languages) {
+            $select->onChange($onChange);
+        } else if ($onChange && $languages) {
+            $array = [];
+
+            foreach ($this->class::all() as $row) {
+                $array[$row->id] = $row->languages ?? [];
+            }
+
+            $select->onChange($onChange, $array);
+        } else if (!$onChange && $languages) {
             $array = [];
 
             foreach ($this->class::all() as $row) {

@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
-use Laradium\Laradium\Base\Laradium;
 use Laradium\Laradium\Models\Menu;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
@@ -10,7 +9,6 @@ use Laradium\Laradium\Base\ColumnSet;
 
 Class MenuResource extends AbstractResource
 {
-
     /**
      * @var string
      */
@@ -25,19 +23,14 @@ Class MenuResource extends AbstractResource
             cache()->forget(Menu::$cacheKey);
         });
 
-        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($r) {
+        $resources = collect((new \Laradium\Laradium\Base\Laradium)->resources())->mapWithKeys(function ($r) {
             return [$r => (new $r)->getName()];
         })->toArray();
         $resources = array_merge(['' => '- Select -'], $resources);
 
         return laradium()->resource(function (FieldSet $set) use ($resources) {
-
-            if (laradium()->belongsTo()->isEnabled()) {
-                laradium()->belongsTo()->getSelect($set, $languages = true);
-            }
-
             $set->boolean('is_active');
-            $set->text('key')->rules('required|max:255');
+            $set->text('key')->rules('required|max:255|unique:menus');
             $set->text('name')->rules('required|max:255')->translatable();
             $set->tab('Items')->fields(function (FieldSet $set) use ($resources) {
                 $set->hasMany('items')->fields(function (FieldSet $set) use ($resources) {
@@ -60,9 +53,6 @@ Class MenuResource extends AbstractResource
      */
     public function table()
     {
-        $belongsToForeignKey = laradium()->belongsTo()->getForeignKey();
-        $belongsToId = auth()->user()->{$belongsToForeignKey};
-
         $table = laradium()->table(function (ColumnSet $column) {
             $column->add('key');
             $column->add('is_active')->modify(function ($item) {
@@ -70,16 +60,6 @@ Class MenuResource extends AbstractResource
             });
             $column->add('name')->translatable();
         })->relations(['translations']);
-
-        if ($belongsToId) {
-            $table->where(function ($q) use ($belongsToId) {
-                $q->where($belongsToForeignKey, $belongsToId);
-            });
-        } else {
-            $table->tabs([
-                $belongsToForeignKey => laradium()->belongsTo()->getOptions($global = true)
-            ]);
-        }
 
         return $table;
     }
