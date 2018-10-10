@@ -2,9 +2,9 @@
 
 namespace Laradium\Laradium\Traits;
 
+use Illuminate\Http\Request;
 use Laradium\Laradium\Base\Form;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Http\Request;
 
 trait Datatable
 {
@@ -50,17 +50,23 @@ trait Datatable
             $model = $this->model->select('*');
         }
 
+        $belongsTo = laradium()->belongsTo();
+        if ($belongsTo->isEnabled()) {
+            $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
+            $model = $model->where($belongsTo->getForeignKey(), $belongsToKey);
+        }
+
         if ($table->getTabs()) {
             foreach ($table->getTabs() as $key => $tabs) {
                 if (request()->has($key)) {
-                    $value = request()->get($key) === '0' ? null : request()->get($key);
-                    $model = $this->model->where($key, $value);
+                    $value = request()->get($key);
+                    $model = $model->where($key, $value);
                 }
             }
         }
 
         if ($table->getWhere()) {
-            $model = $this->model->where($table->getWhere());
+            $model = $model->where($table->getWhere());
         }
 
         $dataTable = DataTables::of($model);

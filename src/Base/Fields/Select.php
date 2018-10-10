@@ -30,7 +30,7 @@ class Select extends Field
      * @var array
      */
     protected $options = [
-        '' => '- Select -'
+        -1 => '- Select -'
     ];
 
     /**

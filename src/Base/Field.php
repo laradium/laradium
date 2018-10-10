@@ -262,9 +262,10 @@ class Field
             if (request()->has('language')) {
                 $language = request()->get('language');
             } else {
-                $language = translate()->languages()->where('is_fallback', 1)->first();
+                $languages = laradium()->belongsTo() ? laradium()->belongsTo()->getLanguages() : translate()->languages();
+                $language = $languages->where('is_fallback', 1)->first();
                 if (!$language) {
-                    $language = translate()->languages()->first();
+                    $language = $languages->first();
                 }
 
                 $language = $language->iso_code;

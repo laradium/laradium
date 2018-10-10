@@ -75,7 +75,14 @@ abstract class AbstractResource
     public function getForm($id = null)
     {
         if ($id) {
-            $model = $this->model->findOrFail($id);
+            $model = $this->model;
+
+            $belongsTo = laradium()->belongsTo();
+            if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
+                $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            }
+
+            $model = $model->findOrFail($id);
         } else {
             $model = $this->model;
         }
@@ -153,7 +160,13 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model->findOrFail($id);
+        $model = $this->model;
+        $belongsTo = laradium()->belongsTo();
+        if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
+            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+        }
+
+        $model = $model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
@@ -174,7 +187,13 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrFail($id);
+        $model = $this->model;
+        $belongsTo = laradium()->belongsTo();
+        if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
+            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+        }
+
+        $model = $model->findOrFail($id);
 
         $resource = $this->resource();
         $form = new Form($resource->setModel($model)->build());
@@ -212,7 +231,13 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->findOrFail($id);
+        $model = $this->model;
+        $belongsTo = laradium()->belongsTo();
+        if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
+            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+        }
+
+        $model = $model->findOrFail($id);
         $model->delete();
 
         if ($request->ajax()) {
@@ -265,6 +290,15 @@ abstract class AbstractResource
      */
     public function languages()
     {
+        $belongsTo = laradium()->belongsTo();
+        if ($belongsTo) {
+            return $belongsTo->getLanguages()->map(function ($item, $index) {
+                $item->is_current = $index === 0;
+
+                return $item;
+            })->values()->all();
+        }
+
         return translate()->languages()->map(function ($item, $index) {
             $item->is_current = $index === 0;
 
