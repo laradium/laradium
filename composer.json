@@ -19,7 +19,7 @@
     "maatwebsite/excel": "~2.1.18",
     "doctrine/dbal": "2.8.*",
     "cviebrock/eloquent-sluggable": "4.5.*",
-    "laracasts/generators": "^1.1",
+    "laracasts/generators": "^1.1"
   },
   "autoload": {
     "psr-4": {

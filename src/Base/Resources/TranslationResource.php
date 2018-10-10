@@ -44,7 +44,13 @@ Class TranslationResource extends AbstractResource
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        });
+        })->tabs([
+            'group' => Translation::select('group')->groupBy('group')->get()->mapWithKeys(function ($translation) {
+                return [
+                    $translation->group => ucfirst(preg_replace('/[-_]+/', ' ', $translation->group))
+                ];
+            })->all()
+        ]);
 
         return $table;
     }
