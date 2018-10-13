@@ -54,7 +54,7 @@ Class SettingResource extends AbstractResource
 
             $column->add('value')->modify(function ($item) {
                 return $this->modifyValueColumn($item);
-            })->editable();
+            })->editable()->notSortable();
 
         })->dataTable(false)
             ->relations(['translations'])
