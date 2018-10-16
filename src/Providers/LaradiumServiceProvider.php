@@ -85,6 +85,7 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
         $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
+        $customFields = config('laradium.custom_field_directory', app_path('Laradium/Fields'));
 
         $fieldList = [];
         if (file_exists($fieldPath)) {
@@ -100,6 +101,15 @@ class LaradiumServiceProvider extends ServiceProvider
                     $field = $path->getPathname();
                     $baseName = basename($field, '.php');
                     $field = 'Laradium\\Laradium\\Content\\Base\\Fields\\' . $baseName;
+                    $fieldList[lcfirst($baseName)] = $field;
+                }
+            }
+
+            if (file_exists($customFields)) {
+                foreach (\File::allFiles($customFields) as $path) {
+                    $field = $path->getPathname();
+                    $baseName = basename($field, '.php');
+                    $field = config('laradium.custom_field_namespace') . '\\' . $baseName;
                     $fieldList[lcfirst($baseName)] = $field;
                 }
             }

@@ -3,6 +3,10 @@
 return [
     'default_models_directory' => 'App\\Models',
 
+    'custom_field_directory' => app_path('Laradium/Fields'),
+
+    'custom_field_namespace' => 'App\\Laradium\\Fields',
+
     'resource_path' => 'App\\Laradium\\Resources',
 
     'file_size' => '2024', // default max file upload size 2mb
