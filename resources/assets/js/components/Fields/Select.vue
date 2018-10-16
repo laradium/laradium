@@ -22,10 +22,7 @@
 				</select>
 			</div>
 			<div v-else>
-				<div class="form-group" v-if="!input.isHidden">
-					<label for="">
-						{{ input.label }}
-					</label>
+				<div v-if="!input.isHidden">
 					<select :name="input.name" id="" class="form-control" v-bind="attributes">
 						<option
 								:value="option.value"
