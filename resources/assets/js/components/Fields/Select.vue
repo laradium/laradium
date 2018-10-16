@@ -15,8 +15,8 @@
 						v-bind="attributes">
 					<option
 							:value="option.value"
-							:selected="option.selected"
-							v-for="option in item.options">
+							:selected="item.value === option.value"
+							v-for="option in input.options">
 						{{ option.text }}
 					</option>
 				</select>

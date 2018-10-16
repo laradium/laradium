@@ -17,7 +17,6 @@
             >
             <VueEditor v-model="item.value"
                        v-for="(item, index) in input.translatedAttributes"
-                       :key="item.name"
                        v-show="language === item.iso_code"
             ></VueEditor>
         </div>

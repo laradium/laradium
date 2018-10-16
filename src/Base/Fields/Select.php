@@ -85,6 +85,12 @@ class Select extends Field
                 'col'                   => $this->col,
                 'attr'                  => $this->getAttr(),
                 'isTranslatable'        => $field->isTranslatable(),
+                'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+                    return [
+                        'value' => $value,
+                        'text'  => $text
+                    ];
+                })->toArray(),
             ];
 
             $translatedAttributes = [];
@@ -94,13 +100,7 @@ class Select extends Field
                 $translatedAttributes[] = [
                     'iso_code' => $language->iso_code,
                     'name'     => $field->getNameAttribute(),
-                    'options'  => collect($field->getOptions())->map(function ($text, $value) use ($field) {
-                        return [
-                            'value'    => $value,
-                            'text'     => $text,
-                            'selected' => $field->getValue() === $value,
-                        ];
-                    })->toArray(),
+                    'value'    => $field->getValue(),
                 ];
             }
 
