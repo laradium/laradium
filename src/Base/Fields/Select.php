@@ -38,7 +38,6 @@ class Select extends Field
     public function formattedResponse($field = null)
     {
         $field = !is_null($field) ? $field : $this;
-
         $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
             if ($item === '__ID__') {
                 return '__ID' . ($index + 1) . '__';
@@ -53,23 +52,61 @@ class Select extends Field
             return str_contains($item, '__ID');
         });
 
-        return [
-            'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'default'               => $field->getDefault(),
-            'isHidden'              => $field->isHidden(),
-            'replacementAttributes' => $attributes->toArray(),
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'attr'                  => $this->getAttr(),
-            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
-                return [
-                    'value'    => $value,
-                    'text'     => $text,
-                    'selected' => $field->getValue() == $value,
+        if (!$field->isTranslatable()) {
+            $data = [
+                'type'                  => 'select',
+                'name'                  => $field->getNameAttribute(),
+                'label'                 => $field->getLabel(),
+                'default'               => $field->getDefault(),
+                'isHidden'              => $field->isHidden(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr(),
+                'isTranslatable'        => $field->isTranslatable(),
+                'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+                    return [
+                        'value'    => $value,
+                        'text'     => $text,
+                        'selected' => $field->getValue() === $value,
+                    ];
+                })->toArray(),
+            ];
+        } else {
+
+            $data = [
+                'type'                  => 'select',
+                'name'                  => $field->getNameAttribute(),
+                'label'                 => $field->getLabel(),
+                'default'               => $field->getDefault(),
+                'isHidden'              => $field->isHidden(),
+                'replacementAttributes' => $attributes->toArray(),
+                'tab'                   => $this->tab(),
+                'col'                   => $this->col,
+                'attr'                  => $this->getAttr(),
+                'isTranslatable'        => $field->isTranslatable(),
+            ];
+
+            $translatedAttributes = [];
+
+            foreach (translate()->languages() as $language) {
+                $field->setLocale($language->iso_code);
+                $translatedAttributes[] = [
+                    'iso_code' => $language->iso_code,
+                    'name'     => $field->getNameAttribute(),
+                    'options'  => collect($field->getOptions())->map(function ($text, $value) use ($field) {
+                        return [
+                            'value'    => $value,
+                            'text'     => $text,
+                            'selected' => $field->getValue() === $value,
+                        ];
+                    })->toArray(),
                 ];
-            })->toArray(),
-        ];
+            }
+
+            $data['translatedAttributes'] = $translatedAttributes;
+        }
+
+        return $data;
     }
 }

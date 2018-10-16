@@ -1,21 +1,45 @@
 <template>
     <div>
-        <div class="form-group" v-if="!input.isHidden">
-            <label for="">
-                {{ input.label }}
-            </label>
-            <select :name="input.name" id="" class="form-control" v-bind="attributes">
-                <option
-                        :value="option.value"
-                        :selected="option.selected"
-                        v-for="option in input.options">
-                    {{ option.text }}
-                </option>
-            </select>
-        </div>
-        <div v-if="input.isHidden">
-            <input type="hidden" :name="input.name" :value="input.default">
-        </div>
+		<div class="form-group">
+			<label for="">{{ input.label }}
+				<span class="badge badge-primary"
+					  v-if="input.isTranslatable">
+					{{ language }}
+				</span>
+			</label>
+			<div v-if="input.isTranslatable">
+				<select :name="item.name" 
+						class="form-control"
+						v-for="item in input.translatedAttributes"
+						v-show="language === item.iso_code"
+						v-bind="attributes">
+					<option
+							:value="option.value"
+							:selected="option.selected"
+							v-for="option in item.options">
+						{{ option.text }}
+					</option>
+				</select>
+			</div>
+			<div v-else>
+				<div class="form-group" v-if="!input.isHidden">
+					<label for="">
+						{{ input.label }}
+					</label>
+					<select :name="input.name" id="" class="form-control" v-bind="attributes">
+						<option
+								:value="option.value"
+								:selected="option.selected"
+								v-for="option in input.options">
+							{{ option.text }}
+						</option>
+					</select>
+				</div>
+				<div v-if="input.isHidden">
+					<input type="hidden" :name="input.name" :value="input.default">
+				</div>
+			</div>
+		</div>
     </div>
 </template>
 
