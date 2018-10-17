@@ -11,6 +11,7 @@ use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
+use Illuminate\Support\Facades\View;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,7 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadMigrations();
         $this->loadViews();
         $this->loadRoutes();
+        $this->registerViewComposers();
 
         // Global helpers
         require_once __DIR__ . '/../Helpers/Global.php';
@@ -183,6 +185,7 @@ class LaradiumServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
             __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
             __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
+            __DIR__ . '/../../config/javascript.php'       => config_path('javascript.php'),
         ], 'laradium');
     }
 
@@ -241,5 +244,15 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
         ], 'laradium');
+    }
+
+    /**
+     * @return void
+     */
+    private function registerViewComposers()
+    {
+        View::composer(
+            'laradium::layouts.main', 'Laradium\Laradium\ViewComposers\VariableComposer'
+        );
     }
 }

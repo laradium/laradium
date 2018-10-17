@@ -39,31 +39,31 @@ return [
             'type'  => 'textarea'
         ],
         [
-            'group' => 'seo',
-            'name'  => 'Meta title',
-            'key'   => 'meta_title',
-            'type'  => 'text',
+            'group'           => 'seo',
+            'name'            => 'Meta title',
+            'key'             => 'meta_title',
+            'type'            => 'text',
             'is_translatable' => 1,
         ],
         [
-            'group' => 'seo',
-            'name'  => 'Meta keywords',
-            'key'   => 'meta_keywords',
-            'type'  => 'textarea',
+            'group'           => 'seo',
+            'name'            => 'Meta keywords',
+            'key'             => 'meta_keywords',
+            'type'            => 'textarea',
             'is_translatable' => 1,
         ],
         [
-            'group' => 'seo',
-            'name'  => 'Meta description',
-            'key'   => 'meta_description',
-            'type'  => 'textarea',
+            'group'           => 'seo',
+            'name'            => 'Meta description',
+            'key'             => 'meta_description',
+            'type'            => 'textarea',
             'is_translatable' => 1,
         ],
         [
-            'group' => 'seo',
-            'name'  => 'Meta image',
-            'key'   => 'meta_image',
-            'type'  => 'text',
+            'group'           => 'seo',
+            'name'            => 'Meta image',
+            'key'             => 'meta_image',
+            'type'            => 'text',
             'is_translatable' => 1,
         ],
         // Mail
@@ -122,5 +122,9 @@ return [
             'type'  => 'file'
         ]
 
+    ],
+
+    'public_settings' => [
+        //'design.admin_theme_color'
     ]
 ];

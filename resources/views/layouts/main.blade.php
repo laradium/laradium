@@ -77,6 +77,8 @@
         }
 
     </style>
+
+    @include('laradium::admin._partials.variables')
 </head>
 <body>
 <!-- Begin page -->
