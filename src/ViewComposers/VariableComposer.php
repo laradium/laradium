@@ -17,7 +17,7 @@ class VariableComposer
     {
         try {
             $publicSettings = [];
-            foreach (config('laradium-setting.public-settings') as $settingKey) {
+            foreach (config('laradium-setting.public_settings') as $settingKey) {
                 $publicSettings[$settingKey] = setting()->get($settingKey);
             }
 
