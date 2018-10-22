@@ -53,13 +53,15 @@ trait Datatable
         $belongsTo = laradium()->belongsTo();
         if ($belongsTo->isEnabled()) {
             $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
-            $model = $model->where($belongsTo->getForeignKey(), $belongsToKey);
+            if ($belongsToKey) {
+                $model = $model->where($belongsTo->getForeignKey(), $belongsToKey);
+            }
         }
 
         if ($table->getTabs()) {
             foreach ($table->getTabs() as $key => $tabs) {
                 if (request()->has($key)) {
-                    $value = request()->get($key);
+                    $value = request()->get($key) === 'null' ? null : request()->get($key);
                     $model = $model->where($key, $value);
                 }
             }

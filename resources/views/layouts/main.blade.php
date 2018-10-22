@@ -137,7 +137,7 @@
 
             <!-- User -->
             <div class="user-box">
-                <h5>{{ auth()->user()->name }}</h5>
+                <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}</h5>
                 <ul class="list-inline">
                     <form id="logout-form" action="/admin/logout" method="POST"
                           style="display: none;">{{ csrf_field() }}</form>

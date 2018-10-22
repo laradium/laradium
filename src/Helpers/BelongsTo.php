@@ -102,7 +102,7 @@ class BelongsTo
      */
     public function getSelect(\Laradium\Laradium\Base\FieldSet $set, $onChange = [], $languages = false, $global = false)
     {
-        $options = $this->getOptions($global);
+        $options = $this->getOptions($global, $forSelect = true);
 
         $select = $set->select($this->foreignKey)
             ->rules('required')
@@ -118,7 +118,13 @@ class BelongsTo
                 $array = [];
 
                 foreach ($this->class::all() as $row) {
-                    $array[$row->id] = $row->languages ?? [];
+                    $array[$row->id] = $row->languages->map(function ($language) {
+                            return (object)[
+                                'id'          => $language->id,
+                                'iso_code'    => $language->iso_code,
+                                'is_fallback' => !!$language->is_fallback,
+                            ];
+                        }) ?? [];
                 }
 
                 $select->onChange($onChange, $array);
@@ -126,7 +132,13 @@ class BelongsTo
                 $array = [];
 
                 foreach ($this->class::all() as $row) {
-                    $array[$row->id] = $row->languages ?? [];
+                    $array[$row->id] = $row->languages->map(function ($language) {
+                            return (object)[
+                                'id'          => $language->id,
+                                'iso_code'    => $language->iso_code,
+                                'is_fallback' => !!$language->is_fallback,
+                            ];
+                        }) ?? [];
                 }
 
                 $select->onChange([], $array);
@@ -137,11 +149,11 @@ class BelongsTo
     /**
      * @return mixed
      */
-    public function getOptions($global = false)
+    public function getOptions($global = false, $forSelect = false)
     {
         $options = $this->class::pluck('name', 'id')->toArray();
 
-        return $global ? array_prepend($options, 'Global') : $options;
+        return $global ? collect($options)->prepend('Global', $forSelect ? '' : 'null')->toArray() : $options;
     }
 
     /**
@@ -149,6 +161,6 @@ class BelongsTo
      */
     public function getLanguages()
     {
-        return auth()->user()->{$this->relation}->languages ?? translate()->languages()->where($this->foreignKey, '!=', null);
+        return auth()->user()->{$this->relation}->languages ?? translate()->languages()->where($this->foreignKey, null);
     }
 }

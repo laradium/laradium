@@ -13,8 +13,14 @@ trait Crud
      * @return bool
      * @throws \ReflectionException
      */
-    public function updateResource($fields, $model)
+    public function updateResource($formFields, $fields, $model)
     {
+        foreach ($formFields as $field) {
+            if (method_exists($field, 'override')) {
+                $fields[$field->getNameAttribute()] = $field->override($fields[$field->getNameAttribute()]);
+            }
+        }
+
         // Password
         if (array_key_exists('password', $fields)) {
             $password = array_get($fields, 'password');
@@ -36,7 +42,7 @@ trait Crud
         $model->save();
 
         $this->putTranslations($model, $translations);
-        $this->updateRelations($relations, $model);
+        $this->updateRelations($formFields, $relations, $model);
 
         return true;
     }
@@ -56,7 +62,7 @@ trait Crud
         });
 
         $translations = $fields->filter(function ($item, $index) {
-            return is_array($item) && $index == 'translations';
+            return is_array($item) && $index === 'translations';
         })->toArray();
 
         $relationList = array_keys($relations->toArray());
@@ -69,7 +75,7 @@ trait Crud
      * @param $model
      * @throws \ReflectionException
      */
-    public function updateRelations($relations, $model)
+    public function updateRelations($formFields, $relations, $model)
     {
         foreach (array_except($relations, 'translations') as $relationName => $relationSet) {
 
@@ -82,7 +88,7 @@ trait Crud
             })->toArray();
 
             if (isset($nonExistingItemSet['morph_type'])) {
-                $this->saveMorphToFields($nonExistingItemSet, $model);
+                $this->saveMorphToFields($formFields, $nonExistingItemSet, $model);
             } else {
                 $relationModel = $model->{$relationName}();
                 $relationType = (new \ReflectionClass($relationModel))->getShortName();
@@ -94,23 +100,23 @@ trait Crud
                             $this->putTranslations($newItem, array_only($item, 'translations'));
                             $morph = array_first($item);
                             if (is_array($morph)) {
-                                $this->saveMorphToFields(array_first($item), $newItem);
+                                $this->saveMorphToFields($formFields, array_first($item), $newItem);
                             }
 
                             foreach (array_except($item, 'translations') as $key => $input) {
                                 if (is_array($input)) {
-                                    $this->updateRelations([$key => $input], $newItem);
+                                    $this->updateRelations($formFields, [$key => $input], $newItem);
                                 }
                             }
                         }
-                    } elseif ($relationType == 'HasOne') {
+                    } else if ($relationType == 'HasOne') {
                         if ($model->{$relationName}) {
                             $relationModel = $model->{$relationName};
                         } else {
                             $relationModel = $model->{$relationName}()->firstOrCreate($nonExistingItemSet);
                         }
-                        $this->updateResource(collect($nonExistingItemSet), $relationModel);
-                    } elseif ($relationType == 'BelongsToMany') {
+                        $this->updateResource($formFields, collect($nonExistingItemSet), $relationModel);
+                    } else if ($relationType == 'BelongsToMany') {
                         $model->{$relationName}()->sync($nonExistingItemSet);
                     }
                 }
@@ -126,13 +132,13 @@ trait Crud
 
                             $morph = array_first($item);
                             if (is_array($morph)) {
-                                $this->saveMorphToFields(array_first($item), $relationModel);
+                                $this->saveMorphToFields($formFields, array_first($item), $relationModel);
                             }
 
                             foreach (array_except($item, 'translations') as $key => $input) {
                                 if (is_array($input)) {
                                     if (is_integer(key($input))) {
-                                        $this->updateRelations([$key => $input], $relationModel);
+                                        $this->updateRelations($formFields, [$key => $input], $relationModel);
                                     }
                                 }
                             }
@@ -148,7 +154,7 @@ trait Crud
      * @param $model
      * @throws \ReflectionException
      */
-    protected function saveMorphToFields($fields, $model)
+    protected function saveMorphToFields($formFields, $fields, $model)
     {
         if (isset($fields['morph_type'])) {
             $morphModel = new $fields['morph_type'];
@@ -156,7 +162,7 @@ trait Crud
                 $morphModel = $morphModel->find($model->{$fields['morph_name'] . '_id'});
             }
 
-            $this->updateResource(collect($fields), $morphModel);
+            $this->updateResource($formFields, collect($fields), $morphModel);
             $model->{$fields['morph_name'] . '_id'} = $morphModel->id;
             $model->{$fields['morph_name'] . '_type'} = $fields['morph_type'];
 

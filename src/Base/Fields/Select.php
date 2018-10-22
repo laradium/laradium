@@ -64,9 +64,10 @@ class Select extends Field
 
     /**
      * @param array $onChange
+     * @param array $languages
      * @return $this
      */
-    public function onChange(array $onChange, array $languages)
+    public function onChange(array $onChange, array $languages = [])
     {
         $this->onChange = $onChange;
         $this->languages = $languages;
@@ -92,6 +93,7 @@ class Select extends Field
                 ];
             }),
             'languages' => collect($this->languages)->mapWithKeys(function ($languages, $index) {
+                $lang = [];
                 foreach ($languages as $i => $language) {
                     $lang[] = [
                         'id'          => $language->id,

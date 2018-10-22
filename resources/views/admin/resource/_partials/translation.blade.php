@@ -1,5 +1,8 @@
 @if ($belongsTo = laradium()->belongsTo())
-    @foreach ($item->{$belongsTo->getRelation()}->languages as $language)
+    @php
+        $languages = $item->{$belongsTo->getRelation()}->languages ?? \App\Models\Language::whereNull($belongsTo->getForeignKey())->get();
+    @endphp
+    @foreach ($languages as $language)
         <li>
             <b>{{ strtoupper($language->iso_code) }}: </b>
             {{ $item->translateOrNew($language->iso_code)->{$column['column_parsed']} ?? 'Not set'}}

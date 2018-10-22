@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 use Laradium\Laradium\Traits\Crud;
 
@@ -61,9 +62,9 @@ abstract class AbstractApiResource
                 $model = $model->where($api->getWhere());
             }
 
-            $model = $model->get();
+            $model = $model->paginate(10);
 
-            $data = $model->map(function ($row, $key) use ($api) {
+            $model->getCollection()->transform(function ($row, $key) use ($api) {
                 foreach ($api->fields() as $field) {
                     $value = $field['modify'] ? $field['modify']($row) : $row->{$field['name']};
 
@@ -75,7 +76,7 @@ abstract class AbstractApiResource
 
             return response()->json([
                 'success' => true,
-                'data'    => $data
+                'data'    => $this->parseData($model)
             ]);
         });
     }
@@ -339,6 +340,26 @@ abstract class AbstractApiResource
                 'message' => 'Internal server error! Please, try again.'
             ], 503);
         }
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function parseData($data)
+    {
+        if ($data instanceof LengthAwarePaginator) {
+            return [
+                'items' => $data->getCollection(),
+                'meta'  => [
+                    'current_page' => $data->currentPage(),
+                    'last_page'    => $data->lastPage(),
+                    'total'        => $data->total()
+                ]
+            ];
+        }
+
+        return $data;
     }
 
     /**

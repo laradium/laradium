@@ -56,7 +56,7 @@ class ApiResourceRegistry
                 'name'       => $name,
                 'route_slug' => $this->getRoutePath(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
-                'middleware' => ['auth:api'],
+                'middleware' => ['auth:api', 'api'],
                 'prefix'     => 'api'
             ];
 
@@ -68,7 +68,7 @@ class ApiResourceRegistry
             'method'     => 'resource',
             'route_slug' => $this->getRoutePath(),
             'controller' => $this->getRouteController(),
-            'middleware' => ['auth:api'],
+            'middleware' => ['auth:api', 'api'],
             'only'       => $resource->getActions()
         ];
 

@@ -71,8 +71,6 @@ class InitializeLaradium extends Command
 
             $bar->advance();
 
-            $this->info('');
-
             foreach ($classes as $class) {
                 if (!class_exists($class)) {
                     continue;

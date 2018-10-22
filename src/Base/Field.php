@@ -104,6 +104,10 @@ class Field
      */
     public function getValue()
     {
+        if (method_exists($this, 'modify')) {
+            return $this->modify();
+        }
+
         if ($this->isTranslatable() && !$this->isTemplate) {
             $this->value = $this->model()->translateOrNew($this->getLocale())->{$this->name()};
         }
@@ -408,7 +412,7 @@ class Field
      */
     public function getDefault()
     {
-        return $this->default ?? '';
+        return $this->default ?? '-1';
     }
 
     /**

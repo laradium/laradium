@@ -79,7 +79,10 @@ abstract class AbstractResource
 
             $belongsTo = laradium()->belongsTo();
             if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
-                $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+                $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
+                if ($belongsToKey) {
+                    $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+                }
             }
 
             $model = $model->findOrFail($id);
@@ -138,7 +141,7 @@ abstract class AbstractResource
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
-        $this->updateResource($request->except('_token'), $model);
+        $this->updateResource($form->fields(), $request->except('_token'), $model);
 
         if (isset($this->events['afterSave'])) {
             $this->events['afterSave']($this->model, $request);
@@ -163,7 +166,10 @@ abstract class AbstractResource
         $model = $this->model;
         $belongsTo = laradium()->belongsTo();
         if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
-            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
+            if ($belongsToKey) {
+                $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            }
         }
 
         $model = $model->findOrFail($id);
@@ -190,7 +196,10 @@ abstract class AbstractResource
         $model = $this->model;
         $belongsTo = laradium()->belongsTo();
         if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
-            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
+            if ($belongsToKey) {
+                $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            }
         }
 
         $model = $model->findOrFail($id);
@@ -206,9 +215,7 @@ abstract class AbstractResource
         $validationRules = $form->getValidationRules();
         $request->validate($validationRules);
 
-        $model = $this->model->find($id);
-
-        $this->updateResource($request->except('_token'), $model);
+        $this->updateResource($form->fields(), $request->except('_token'), $model);
 
         if (isset($this->events['afterSave'])) {
             $this->events['afterSave']($this->model, $request);
@@ -234,7 +241,10 @@ abstract class AbstractResource
         $model = $this->model;
         $belongsTo = laradium()->belongsTo();
         if ($belongsTo->isEnabled() && $model->getTable() !== $belongsTo->getTable()) {
-            $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            $belongsToKey = auth()->user()->{$belongsTo->getForeignKey()};
+            if ($belongsToKey) {
+                $model = $model->where($belongsTo->getForeignKey(), auth()->user()->{$belongsTo->getForeignKey()});
+            }
         }
 
         $model = $model->findOrFail($id);
