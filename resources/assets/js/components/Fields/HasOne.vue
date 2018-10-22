@@ -1,12 +1,26 @@
 <template>
     <transition name="fade">
-        <div>
-            <div v-for="input in input.fields">
-                <component :is="input.type + '-field'"
-                           :input="input"
-                           :replacementIds="replacementIds"
-                           :language="language">
-                </component>
+        <div class="border" style="padding: 20px; border-radius: 5px; margin: 5px;">
+            <h4>
+                <i class="fa fa-bars"></i> {{ input.label }}
+                <div class="pull-right">
+                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">
+                        <span v-if="input.show"><i class="fa fa-eye-slash"></i> Hide</span>
+                        <span v-else><i class="fa fa-eye"></i> Show</span>
+                    </button>
+                </div>
+            </h4>
+            <div v-show="input.show">
+				<div class="row">
+                    <div v-for="input in input.fields"
+                         :class="input.col ? 'col-' + input.col.type + '-' + input.col.size : 'col-md-12'">
+						<component :is="input.type + '-field'"
+								   :input="input"
+								   :replacementIds="replacementIds"
+								   :language="language">
+						</component>
+					</div>
+				</div>
             </div>
         </div>
     </transition>
@@ -15,11 +29,13 @@
 <script>
     export default {
         props: ['input', 'language'],
+		
         data() {
             return {
                 replacementIds: {}
             };
         },
+		
         mounted() {
             if(this.input.id) {
                 let id = this.input.id;
@@ -48,5 +64,11 @@
                 }
             }
         },
+		
+		methods: {
+			toggle() {
+				this.input.show = !this.input.show;
+			}
+		}
     }
 </script>

@@ -4,7 +4,6 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
-use Laradium\Laradium\Base\Fields\Hidden;
 use Laradium\Laradium\Base\FieldSet;
 
 class HasOne extends Field
@@ -50,7 +49,7 @@ class HasOne extends Field
         $fieldList = [];
         $rules = [];
 
-        $model = $this->model->{$this->relationName};
+        $model = $this->model()->{$this->relationName};
 
         $attributeList = array_merge($this->parentAttributeList, [
             $this->relationName,
@@ -59,7 +58,7 @@ class HasOne extends Field
         foreach ($fields as $field) {
             $clonedField = clone $field;
             if (!$model) {
-                $model = $this->model;
+                $model = $this->model()->{$this->relationName}()->getModel();
             }
 
             $clonedField->setModel($model);
@@ -87,6 +86,7 @@ class HasOne extends Field
         $f = !is_null($f) ? $f : $this;
 
         $items = [];
+
         foreach ($f->fields as $field) {
             $items[] = $field->formattedResponse();
         }
@@ -95,7 +95,9 @@ class HasOne extends Field
             'type'   => 'has-one',
             'tab'    => $this->tab(),
             'col'    => $this->col,
-            'name'   => ucfirst($this->name),
+            'name'   => ucfirst($f->relationName),
+            'label'  => ucfirst(str_singular($f->relationName)),
+            'show'   => false,
             'fields' => $items
         ];
     }
@@ -118,6 +120,6 @@ class HasOne extends Field
      */
     public function relation(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
+        return $this->model()->{$this->relationName}();
     }
 }
