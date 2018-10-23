@@ -35,9 +35,9 @@ class Boolean extends Field
             'label'                 => $field->getLabel(),
             'replacementAttributes' => $attributes->toArray(),
             'checked'               => $field->getValue() == 1,
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'attr'                  => $this->getAttr(),
+//            'tab'                   => $this->tab(),
+//            'col'                   => $this->col,
+//            'attr'                  => $this->getAttr(),
         ];
     }
 }

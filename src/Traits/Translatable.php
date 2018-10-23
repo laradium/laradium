@@ -5,12 +5,13 @@ namespace Laradium\Laradium\Traits;
 trait Translatable
 {
 
-    protected $translatable = false;
-    protected $locale;
+    private $translatable = false;
+    private $localeColumn;
 
-    public function translatable()
+    public function translatable($localeColumn = 'locale')
     {
         $this->translatable = true;
+        $this->localeColumn = $localeColumn;
 
         return $this;
     }
@@ -27,8 +28,29 @@ trait Translatable
         return $this;
     }
 
-    public function getLocale()
+    public function getLocaleColumn()
     {
-        return $this->locale;
+        return $this->localeColumn;
+    }
+
+    public function getTranslations()
+    {
+        $translations = [];
+        $model = $this->getModel();
+
+        foreach (translate()->languages() as $language) {
+            $isoCode = $language->iso_code;
+            $this->model(
+                $model->translateOrNew($isoCode)
+            );
+            $this->build(['translations', $isoCode]);
+            $translations[] = [
+                'iso_code' => $isoCode,
+                'value'    => $this->getValue(),
+                'name'     => $this->getNameAttribute(),
+            ];
+        }
+
+        return $translations;
     }
 }
