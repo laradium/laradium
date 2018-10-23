@@ -23,33 +23,47 @@ class TranslationLoader
     /**
      * @param $locale
      * @param $group
-     * @param $key
+     * @param null $namespace
      * @return null
+     * @throws \Exception
      */
-    public function load($locale, $group, $key)
+    public function load($locale, $group, $namespace = null)
     {
-        try {
-            $this->cacheTranslations();
-        } catch (\Exception $e) {
+        $translations = collect($this->cachedTranslations())->where('locale', $locale)->where('group', $group);
+        $translationList = [];
+        foreach ($translations as $item) {
+            $item = (object)$item;
+            $key = str_replace($group . '.', '', $item->key);
+            if (str_contains($key, '.')) {
+
+                $explode = (explode('.', $key));
+                $group = array_first($explode);
+                $key = array_last($explode);
+
+                $translationList[$group][$key] = $item->value;
+
+            } else {
+                $translationList[$key] = $item->value;
+            }
         }
 
-        return isset($this->translations[$locale][$group][$key]) ? $this->translations[$locale][$group][$key] : null;
+        return $translationList;
     }
 
     /**
      * @throws \Exception
      */
-    protected function cacheTranslations()
+    protected function cachedTranslations()
     {
-        if (!$this->translations) {
-            $this->translations = cache()->rememberForever('translations', function () {
-                $translations = [];
-                foreach (Translation::all() as $item) {
-                    $translations[$item->locale][$item->group][$item->key] = $item->value;
-                }
-
-                return $translations;
-            });
-        }
+        return cache()->rememberForever('translations', function () {
+            return Translation::get()->map(function ($item) {
+                return [
+                    'locale' => $item->locale,
+                    'key'    => $item->key,
+                    'group'  => $item->group,
+                    'value'  => $item->value,
+                ];
+            })->toArray();
+        });
     }
 }
