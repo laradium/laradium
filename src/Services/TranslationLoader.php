@@ -33,17 +33,15 @@ class TranslationLoader
         $translationList = [];
         foreach ($translations as $item) {
             $item = (object)$item;
-            $key = str_replace($group . '.', '', $item->key);
-            if (str_contains($key, '.')) {
 
-                $explode = (explode('.', $key));
+            if (str_contains($item->key, '.')) {
+                $explode = (explode('.', $item->key));
                 $group = array_first($explode);
                 $key = array_last($explode);
-
                 $translationList[$group][$key] = $item->value;
-
-            } else {
-                $translationList[$key] = $item->value;
+            }
+            else {
+                $translationList[$item->key] = $item->value;
             }
         }
 
