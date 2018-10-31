@@ -5,50 +5,52 @@ namespace Laradium\Laradium\Traits;
 trait Translatable
 {
 
+    /**
+     * @var bool
+     */
     private $translatable = false;
-    private $localeColumn;
 
-    public function translatable($localeColumn = 'locale')
+    /**
+     * @return $this
+     */
+    public function translatable()
     {
         $this->translatable = true;
-        $this->localeColumn = $localeColumn;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isTranslatable()
     {
         return $this->translatable;
     }
 
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    public function getLocaleColumn()
-    {
-        return $this->localeColumn;
-    }
-
+    /**
+     * @return array
+     */
     public function getTranslations()
     {
         $translations = [];
-        $model = $this->getModel();
 
-        foreach (translate()->languages() as $language) {
-            $isoCode = $language->iso_code;
-            $this->model(
-                $model->translateOrNew($isoCode)
-            );
-            $this->build(['translations', $isoCode]);
-            $translations[] = [
-                'iso_code' => $isoCode,
-                'value'    => $this->getValue(),
-                'name'     => $this->getNameAttribute(),
-            ];
+        if ($this->isTranslatable()) {
+            $model = $this->getModel();
+            $attributes = $this->getAttributes();
+            unset($attributes[count($attributes) - 1]);
+            foreach (translate()->languages() as $language) {
+                $isoCode = $language->iso_code;
+                $this->model(
+                    $model->translateOrNew($isoCode)
+                );
+                $this->build(array_merge($attributes, ['translations', $isoCode]));
+                $translations[] = [
+                    'iso_code' => $isoCode,
+                    'value'    => $this->getValue(),
+                    'name'     => $this->getNameAttribute(),
+                ];
+            }
         }
 
         return $translations;

@@ -6,22 +6,38 @@ use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Traits\Relation;
+use Laradium\Laradium\Traits\Sortable;
 
 class HasMany extends Field
 {
-    protected $relationName;
-    protected $fields;
-    protected $sortable = false;
+
+    use Sortable, Relation;
 
     /**
-     * @var string
+     * @var
      */
-    protected $sortableColumn;
+    private $fields;
+
+    /**
+     * @var
+     */
+    private $fieldName;
+
+    /**
+     * @var
+     */
+    private $actions = ['create', 'delete'];
 
     /**
      * @var FieldSet
      */
-    protected $fieldSet;
+    private $fieldSet;
+
+    /**
+     * @var array
+     */
+    private $templateData = [];
 
     /**
      * HasMany constructor.
@@ -33,66 +49,111 @@ class HasMany extends Field
         parent::__construct($parameters, $model);
 
         $this->relationName = array_first($parameters);
+        $this->fieldName = array_first($parameters);
         $this->fieldSet = new FieldSet;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->getModel()->{$this->relationName}();
-    }
-    
     public function build($attributes = [])
     {
-        
-        return $this;
-    }
+        parent::build($attributes);
 
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function sortable($value)
-    {
-        $this->sortable = true;
-        $this->sortableColumn = $value;
+        $this->templateData = $this->getTemplateData();
+        $this->validationRules($this->templateData['validationRules']);
 
         return $this;
     }
 
     /**
-     * @return bool
+     * @return array
      */
-    public function isSortable()
+    public function formattedResponse()
     {
-        return $this->sortable;
+        $data = parent::formattedResponse();
+        $data['value'] = get_class($this);
+
+        $data['entries'] = $this->getEntries();
+        $data['templateData'] = $this->templateData;
+        $data['config']['isSortable'] = $this->isSortable();
+        $data['config']['actions'] = $this->getActions();
+
+        return $data;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getRelationName()
+    private function getTemplateData()
     {
-        return $this->relationName;
+        $fields = [];
+        $validationRules = [];
+        $this->addReplacementAttribute();
+        $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
+
+        if ($this->isSortable()) {
+            $fields[] = (new Hidden('sequence_no', $this->getRelationBaseModel()))
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->value($this->getRelationCollection()->count())
+                ->formattedResponse(); // Add hidden sortable field
+        }
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $field->model($this->getRelationBaseModel())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->replacementAttributes($this->getReplacementAttributes());
+
+            if ($field->getRules()) {
+                $validationRules[$field->getValidationKey()] = $field->getRules();
+            }
+
+            $fields[] = $field->formattedResponse();
+        }
+
+        return [
+            'fields'          => $fields,
+            'replacementIds'  => $this->getReplacementAttributes(),
+            'validationRules' => $validationRules
+        ];
     }
 
     /**
-     * @param $model
-     * @param $attributeList
-     * @return Hidden
+     * @return array
      */
-    public function createSortableField($model, $attributeList)
+    private function getEntries()
     {
-        $field = new Hidden($this->sortableColumn, $model);
-        $field->build($attributeList);
-        $field->class('js-sortable-item');
-        $field->params([
-            'orderable' => true
-        ]);
+        $entries = [];
 
-        return $field;
+        foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
+            $entry = [
+                'fields' => [],
+                'id'     => $item->id,
+            ];
+
+            $entry['fields'][] = (new Hidden('id', $item))
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse(); // Add hidden ID field
+
+            if ($this->isSortable()) {
+                $entry['fields'][] = (new Hidden('sequence_no', $item))
+                    ->build(array_merge($this->getAttributes(), [$item->id]))
+                    ->formattedResponse(); // Add hidden sortable field
+            }
+
+            foreach ($this->fieldSet->fields as $temporaryField) {
+                $field = clone $temporaryField;
+
+                $entry['fields'][] = $field->model($item)
+                    ->build(array_merge($this->getAttributes(), [$item->id]))
+                    ->formattedResponse();
+            }
+
+            $entries[] = $entry;
+        }
+
+
+        return $entries;
     }
 
     /**

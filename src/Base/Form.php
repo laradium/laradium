@@ -66,7 +66,7 @@ class Form
                 $tabFields = $field->setFieldSet($resource->fieldSet())->build();
                 foreach ($tabFields as $tabField) {
                     $tabField->build();
-                    $this->setValidationRules($tabField->getRules());
+                    $this->setValidationRules($tabField->getValidationRules());
 
                     $this->fields->push($tabField);
 
@@ -76,7 +76,7 @@ class Form
                 }
             } else {
                 $field->build();
-                $this->setValidationRules($field->getRules());
+                $this->setValidationRules($field->getValidationRules());
 
                 $this->fields->push($field);
 
@@ -141,10 +141,8 @@ class Form
      * @param $rules
      * @return $this
      */
-    public function setValidationRules(
-        $rules
-    ) {
-        $this->validationRules += $rules;
+    public function setValidationRules($rules) {
+        $this->validationRules = array_merge($this->validationRules, $rules);
 
         return $this;
     }
