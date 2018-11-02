@@ -45,7 +45,7 @@ class CreateMenuItemTranslationsTable extends Migration
                     'is_active'    => 1,
                     'resource'     => get_class($resource),
                     'translations' => [
-                        'name' => $resource->getName(),
+                        'name' => $resource->getBaseResource()->getName(),
                         'url'  => ''
                     ],
                     'icon'         => $this->getIcon($resource)
