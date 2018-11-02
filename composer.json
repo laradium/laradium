@@ -18,7 +18,7 @@
     "czim/laravel-paperclip": "~2.5.2",
     "maatwebsite/excel": "~2.1.18",
     "doctrine/dbal": "2.8.*",
-    "cviebrock/eloquent-sluggable": "4.5.*",
+    "cviebrock/eloquent-sluggable": "4.6.*",
     "laracasts/utilities": "^3.0"
   },
   "autoload": {
