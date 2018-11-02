@@ -24,28 +24,36 @@ Vue.component('draggable', require('vuedraggable'));
 
 Vue.mixin({
     methods: {
-        generateReplacementIds(replacementIds, replacementIdListOld) {
-            let randId = Math.random().toString(36).substring(7);
-            let replacementIdList = JSON.parse(JSON.stringify(replacementIdListOld));
+        generateReplacementIds(replacement_ids, replacement_id_list_old) {
+            let rand_id = Math.random().toString(36).substring(7);
+            let replacement_id_list = JSON.parse(JSON.stringify(replacement_id_list_old));
 
             let lastId = '';
-            for (let repId in replacementIdList) {
-                if (!replacementIds[replacementIdList[repId]]) {
-                    replacementIds[replacementIdList[repId]] = Math.random().toString(36).substring(7);
+            for (let repId in replacement_id_list) {
+                if (!replacement_ids[replacement_id_list[repId]]) {
+                    replacement_ids[replacement_id_list[repId]] = Math.random().toString(36).substring(7);
                 }
 
-                lastId = replacementIdList[repId];
+                lastId = replacement_id_list[repId];
             }
 
             if (lastId) {
-                replacementIds[lastId] = randId;
+                replacement_ids[lastId] = rand_id;
             }
 
-            return replacementIds;
+            return replacement_ids;
         }
     }
 });
 
 const app = new Vue({
-    el: '#content'
+    el: '#crud-form',
+    data: {
+        selectedPage: false
+    },
+    methods: {
+        redirectToCreatePage() {
+            window.location = '/admin/pages/create/' + this.selectedPage;
+        }
+    }
 });
