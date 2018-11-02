@@ -103,8 +103,11 @@ trait Crud
     {
         foreach ($this->unwantedKeys as $key) {
             unset($array[$key]);
-            foreach ($array as &$value) {
+            foreach ($array as $index => &$value) {
                 if (is_array($value)) {
+                    if(array_get($value, 'remove', null)) {
+                        unset($array[$index]);
+                    }
                     $this->recursiveUnset($value, $this->unwantedKeys);
                 }
             }

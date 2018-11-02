@@ -9,6 +9,11 @@
                 <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
                     <h4>
                         <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+                        <div class="pull-right" v-if="entry.config.is_deleted">
+                            <button class="btn btn-primary btn-sm"
+                                    @click.prevent="restore(index)"
+                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-redo"></i>Restore</button>
+                        </div>
                         <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
                         <div class="pull-right" v-if="!entry.config.is_deleted">
                             <button class="btn btn-danger btn-sm"
@@ -57,7 +62,8 @@
                     disabled: true,
                     handle: '.handle'
                 },
-                new_replacement_ids: {}
+                new_replacement_ids: {},
+                removed_items: {}
             };
         },
 
@@ -117,6 +123,9 @@
                     .then((willDelete) => {
                         if (willDelete) {
                             if (item.id !== undefined) {
+                                let item_copy = _.cloneDeep(this.field.entries[index]);
+                                this.removed_items[index] = item_copy;
+
                                 this.field.entries[index].fields = [{
                                     type: "hidden",
                                     label: "Id",
@@ -145,6 +154,13 @@
                         }
                     });
 
+            },
+
+            restore(index) {
+                this.field.entries[index].fields = this.removed_items[index].fields;
+                this.field.entries[index].config = {
+                    is_deleted: false
+                };
             },
 
             toggle() {
