@@ -1,9 +1,9 @@
 <template>
-    <input type="hidden" :value="input.value" :name="input.name" v-bind="attributes">
+    <input type="hidden" :value="field.value" :name="field.name" v-bind="attributes">
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
+        props: ['field', 'language', 'item', 'attributes'],
     }
 </script>

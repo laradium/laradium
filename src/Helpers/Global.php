@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\File;
 
 if (!function_exists('laradium')) {
@@ -49,6 +50,7 @@ if (!function_exists('versionedAsset')) {
     function versionedAsset($asset)
     {
         $version = @filemtime(public_path($asset)) ?: time();
+
         return asset($asset) . '?v=' . $version;
     }
 }
@@ -122,6 +124,7 @@ if (!function_exists('lg')) {
         if (!is_array($replace)) {
             $replace = [];
         }
+
         return trans($key, $replace, $locale);
     }
 }

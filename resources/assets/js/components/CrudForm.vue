@@ -1,84 +1,34 @@
 <template>
-    <div>
-        <transition-group name="fade">
-            <div class="loader" key="on" v-if="loading"></div>
-            <form key="1" :action="url" method="post" @submit.prevent="onSubmit(this)" class="form-horizontal crud-form"
-                  v-if="data.languages.length">
+    <form class="crud-form"
+          :action="url"
+          method="POST"
+          @submit.prevent="onSubmit(this)">
 
-                <div class="alert alert-danger" v-show="errors.length">
-                    <li v-for="error in errors">
-                        {{ error }}
-                    </li>
-                </div>
+        <input type="hidden" name="_method" :value="method" v-if="method">
 
-                <div class="alert alert-success" v-if="success">
-                    {{ success }}
-                </div>
+        <div class="alert alert-danger" v-show="errors.length">
+            <li v-for="error in errors">
+                {{ error }}
+            </li>
+        </div>
 
-                <input type="hidden" name="_method" :value="method" v-if="method">
+        <div class="alert alert-success" v-if="success">
+            {{ success }}
+        </div>
+        <div class="row">
+            <div v-for="field in data.form" :class="field.config.col">
+                <component :is="field.type + '-field'"
+                           :field="field"
+                           :language="data.default_language"
+                           :replacement_ids="{}"
+                ></component>
+            </div>
+        </div>
 
-
-                <div v-if="data.tabs.length > 1" class="col-md-12">
-                    <ul class="nav nav-tabs" v-if="data.tabs.length > 1">
-                        <li class="nav-item" v-for="(tab, index) in data.tabs">
-                            <a :href="'#tab-' + index" data-toggle="tab" aria-expanded="false" class="nav-link"
-                               :class="{'active': index === 0}">
-                                {{ tab }}
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade show" :class="{'active': index === 0}" :id="'tab-' + index"
-                             v-for="(tab, index) in data.tabs">
-                            <div class="row">
-                                <div v-for="input in data.inputs" v-if="input.tab == tab" :class="'col-' + input.col.type + '-' + input.col.size">
-                                    <component :is="input.type + '-field'"
-                                               :input="input"
-                                               :language="language"
-                                               :replacementIds="{}"
-                                    ></component>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else>
-                    <div class="row">
-                        <div v-for="input in data.inputs"
-                             :class="'col-' + input.col.type + '-' + input.col.size">
-                            <component :is="input.type + '-field'"
-                                       :input="input"
-                                       :language="language"
-                                       :replacementIds="{}"
-                            ></component>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="crud-bottom">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <button class="btn btn-primary">
-                                Save
-                            </button>
-                        </div>
-                        <div class="col-md-1 middle-align" v-if="data.isTranslatable && data.languages.length">
-                            Language
-                        </div>
-                        <div class="col-md-2" v-if="data.isTranslatable && data.languages.length">
-
-                            <select class="form-control language-select" v-model="language">
-                                <option :value="language.iso_code" v-for="language in data.languages">
-                                    {{ language.iso_code }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-        </transition-group>
-    </div>
+        <button class="btn btn-primary">
+            Save
+        </button>
+    </form>
 </template>
 
 <script>
@@ -88,53 +38,36 @@
             return {
                 language: '',
                 success: '',
-                isTranslatable: false,
+                is_translatable: false,
                 errors: [],
-                data: {
-                    languages: [],
-                    tabs: []
-                },
+                data: [],
                 loading: true
             };
         },
         created() {
-            axios({
-                'method': 'GET',
-                'url': url
-            }).then(res => {
-                this.data = res.data;
-                for (let language in this.data.languages) {
-                    if (this.data.languages.hasOwnProperty(language)) {
-                        if (this.data.languages[language].is_current) {
-                            this.language = this.data.languages[language].iso_code;
-                        }
-                    }
-                }
-            });
-        },
-        mounted() {
-            this.loading = false;
+            let data = document.getElementsByName('data');
+            this.data = JSON.parse(data[0].value).data;
         },
         methods: {
             onSubmit(el) {
                 let form = document.getElementsByClassName('crud-form')[0];
-                let formData = new FormData();
+                let form_data = new FormData();
                 /*
                  * Fix for safari FormData bug
                  */
                 $(form).find('input[name][type!="file"], select[name], textarea[name]').each(function (i, e) {
                     if ($(e).attr('type') === 'checkbox' || $(e).attr('type') === 'radio') {
                         if ($(e).is(':checked')) {
-                            formData.append($(e).attr('name'), $(e).val());
+                            form_data.append($(e).attr('name'), $(e).val());
                         }
                     } else {
-                        formData.append($(e).attr('name'), $(e).val());
+                        form_data.append($(e).attr('name'), $(e).val());
                     }
                 });
 
                 $(form).find('input[name][type="file"]').each(function (i, e) {
                     if ($(e)[0].files.length > 0) {
-                        formData.append($(e).attr('name'), $(e)[0].files[0]);
+                        form_data.append($(e).attr('name'), $(e)[0].files[0]);
                     }
                 });
 
@@ -142,9 +75,9 @@
                 axios({
                     method: 'POST',
                     url: url,
-                    data: formData
+                    data: form_data
                 }).then(res => {
-                    this.data = res.data.data;
+                    // this.data = res.data.data;
                     this.errors = [];
                     $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
                     this.success = res.data.success;

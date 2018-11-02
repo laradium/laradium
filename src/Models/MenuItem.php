@@ -44,7 +44,7 @@ class MenuItem extends Model
     public function getUrlAttribute()
     {
         if ($this->resource !== '' && class_exists($this->resource)) {
-            $url = route('admin.' . (new $this->resource)->getSlug() . '.index');
+            $url = route('admin.' . (new $this->resource)->getBaseResource()->getSlug() . '.index');
         } else {
             $url = $this->translateOrNew(session('locale', config('app.locale')))->url;
         }

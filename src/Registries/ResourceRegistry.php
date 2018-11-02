@@ -48,7 +48,7 @@ class ResourceRegistry
     public function register($resourceName)
     {
         $resource = new $resourceName;
-        $routeSlug = $resource->getSlug();
+        $routeSlug = $resource->getBaseResource()->getSlug();
         $this->resources->push($resourceName);
 
         if (!$routeSlug) {

@@ -42,7 +42,7 @@ trait Datatable
     {
         $resource = $this;
         $table = $this->table();
-        $slug = $this->getSlug();
+        $slug = $this->getBaseResource()->getSlug();
 
         if (count($table->getRelations())) {
             $model = $this->model->with($table->getRelations())->select('*');

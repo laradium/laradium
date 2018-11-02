@@ -25,44 +25,19 @@ class FieldSet
     protected $model;
 
     /**
-     * @var Collection
-     */
-    protected $tabs;
-
-    /**
      * FieldSet constructor.
      */
     public function __construct()
     {
         $this->fieldRegistry = app(FieldRegistry::class);
         $this->fields = new Collection;
-        $this->tabs = collect(['Main']);
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function addTab($value)
-    {
-        $this->tabs->push($value);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function tabs()
-    {
-        return $this->tabs;
     }
 
     /**
      * @param Model $model
      * @return $this
      */
-    public function setModel(Model $model)
+    public function model(Model $model)
     {
         $this->model = $model;
 
@@ -72,7 +47,7 @@ class FieldSet
     /**
      * @return mixed
      */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }
@@ -94,7 +69,7 @@ class FieldSet
     {
         $class = $this->fieldRegistry->getClassByName($method);
         if (class_exists($class)) {
-            $field = new $class($parameters, $this->model());
+            $field = new $class($parameters, $this->getModel());
             $this->fields->push($field);
 
             return $field;

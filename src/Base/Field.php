@@ -64,6 +64,11 @@ class Field
     private $tab = 'Main';
 
     /**
+     * @var array
+     */
+    private $validationAttributes = [];
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -83,10 +88,19 @@ class Field
         if ($attributes) {
             $this->attributes = $attributes;
         }
-        $this->attributes = array_merge($this->attributes, [$this->getFieldName()]);
+        $currentAttributes = $this->attributes;
+        $this->attributes = array_merge($currentAttributes, [$this->getFieldName()]);
 
         if ($this->getRules()) {
+            if($this->isTranslatable()) {
+                foreach (translate()->languages() as $language) {
+                    $attributes = array_merge($currentAttributes, ['translations', $language->iso_code, $this->getFieldName()]);
+                    $this->validationKey($attributes);
+                    break;
+                }
+            }
             $this->validationRules = [$this->getValidationKey() => $this->getRules()];
+
         }
 
         return $this;
@@ -104,7 +118,7 @@ class Field
             'value'        => !$this->isTranslatable() ? $this->getValue() : null,
             'translations' => $this->getTranslations(),
             'config'       => [
-                'isTranslatable' => $this->isTranslatable(),
+                'is_translatable' => $this->isTranslatable(),
                 'col'            => $this->getCol(),
                 'tab'            => $this->getTab(),
             ]
@@ -131,11 +145,21 @@ class Field
     }
 
     /**
+     * @param array $attributes
+     */
+    public function validationKey($attributes = [])
+    {
+        $this->validationAttributes = $attributes;
+    }
+
+    /**
      * @return string
      */
     public function getValidationKey()
     {
-        return implode('.', collect($this->getAttributes())
+        $attributes = count($this->validationAttributes) ? $this->validationAttributes : $this->getAttributes();
+
+        return implode('.', collect($attributes)
             ->map(function ($item, $index) {
                 if (is_numeric($item) || is_null($item) || str_contains($item, '__ID')) {
                     $item = '*';

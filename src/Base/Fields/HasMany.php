@@ -58,7 +58,7 @@ class HasMany extends Field
         parent::build($attributes);
 
         $this->templateData = $this->getTemplateData();
-        $this->validationRules($this->templateData['validationRules']);
+        $this->validationRules($this->templateData['validation_rules']);
 
         return $this;
     }
@@ -72,8 +72,8 @@ class HasMany extends Field
         $data['value'] = get_class($this);
 
         $data['entries'] = $this->getEntries();
-        $data['templateData'] = $this->templateData;
-        $data['config']['isSortable'] = $this->isSortable();
+        $data['template_data'] = $this->templateData;
+        $data['config']['is_sortable'] = $this->isSortable();
         $data['config']['actions'] = $this->getActions();
 
         return $data;
@@ -112,9 +112,9 @@ class HasMany extends Field
         }
 
         return [
-            'fields'          => $fields,
-            'replacementIds'  => $this->getReplacementAttributes(),
-            'validationRules' => $validationRules
+            'fields'           => $fields,
+            'replacement_ids'  => $this->getReplacementAttributes(),
+            'validation_rules' => $validationRules
         ];
     }
 
@@ -128,6 +128,9 @@ class HasMany extends Field
         foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
             $entry = [
                 'fields' => [],
+                'config' => [
+                    'is_deleted' => false
+                ],
                 'id'     => $item->id,
             ];
 
@@ -163,7 +166,7 @@ class HasMany extends Field
     public function fields($closure)
     {
         $fieldSet = $this->fieldSet;
-        $fieldSet->setModel($this->getModel());
+        $fieldSet->model($this->getModel());
         $closure($fieldSet);
 
         return $this;

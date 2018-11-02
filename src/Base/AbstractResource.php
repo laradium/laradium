@@ -3,15 +3,18 @@
 namespace Laradium\Laradium\Base;
 
 use File;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Traits\Crud;
+use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
-    use Crud, Datatable;
+
+    use Crud, CrudEvent, Datatable;
 
     /**
      * @var
@@ -22,11 +25,6 @@ abstract class AbstractResource
      * @var string
      */
     protected $resource;
-
-    /**
-     * @var array
-     */
-    protected $events = [];
 
     /**
      * @var string
@@ -46,13 +44,15 @@ abstract class AbstractResource
         'edit',
         'delete'
     ];
+    private $baseResource;
 
     /**
      * AbstractResource constructor.
      */
     public function __construct()
     {
-        $this->model = new $this->resource;
+        $this->model(new $this->resource);
+        $this->events = collect([]);
     }
 
     /**
@@ -60,37 +60,10 @@ abstract class AbstractResource
      */
     public function index()
     {
-        $model = $this->model;
-        $table = $this->table()->setModel($model);
+        $table = $this->table()->setModel($this->getModel());
         $resource = $this;
-        $name = $this->getName();
 
-        return view('laradium::admin.resource.index', compact('table', 'model', 'resource', 'name'));
-    }
-
-    /**
-     * @param null $id
-     * @return array
-     */
-    public function getForm($id = null)
-    {
-        if ($id) {
-            $model = $this->model->findOrFail($id);
-        } else {
-            $model = $this->model;
-        }
-
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-        $response = $form->formattedResponse();
-
-        return [
-            'languages'      => $this->languages(),
-            'inputs'         => $response,
-            'tabs'           => $resource->fieldSet()->tabs()->toArray(),
-            'isTranslatable' => $form->isTranslatable()
-        ];
+        return view('laradium::admin.resource.index', compact('table', 'resource'));
     }
 
     /**
@@ -98,17 +71,9 @@ abstract class AbstractResource
      */
     public function create()
     {
-        $model = $this->model;
+        $form = $this->getForm();
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->abstractResource($this);
-        $form->buildForm();
-
-        $name = $this->getName();
-        $slug = $this->getSlug();
-
-        return view('laradium::admin.resource.create', compact('form', 'name', 'slug'));
+        return view('laradium::admin.resource.create', compact('form'));
     }
 
     /**
@@ -118,29 +83,25 @@ abstract class AbstractResource
      */
     public function store(Request $request)
     {
-        $model = $this->model;
+        $form = $this->getForm();
+        $validationRequest = $this->prepareRequest($request);
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+        $this->fireEvent('beforeSave', $request);
 
         $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
+        $validationRequest->validate($validationRules);
 
-        $this->updateResource($request->except('_token'), $model);
+        $model = $this->saveData($request->all(), $this->getModel());
 
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+        $form->model($model);
+        $this->model($model);
+
+        $this->fireEvent('afterSave', $request);
 
         if ($request->ajax()) {
             return [
                 'success'  => 'Resource successfully created',
-                'redirect' => url()->previous()
+                'redirect' => $form->getAction('edit')
             ];
         }
 
@@ -153,17 +114,10 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model->findOrFail($id);
+        $this->model($this->model->findOrFail($id));
+        $form = $this->getForm();
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->abstractResource($this);
-        $form->buildForm();
-
-        $name = $this->getName();
-        $slug = $this->getSlug();
-
-        return view('laradium::admin.resource.edit', compact('form', 'name', 'slug'));
+        return view('laradium::admin.resource.edit', compact('form'));
     }
 
     /**
@@ -174,31 +128,24 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrFail($id);
+        $this->model($this->model->findOrFail($id));
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
+        $form = $this->getForm();
+        $validationRequest = $this->prepareRequest($request);
 
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+        $this->fireEvent('beforeSave', $request);
 
         $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
+        $validationRequest->validate($validationRules);
 
-        $model = $this->model->find($id);
+        $this->saveData($request->all(), $this->getModel());
 
-        $this->updateResource($request->except('_token'), $model);
-
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+        $this->fireEvent('afterSave', $request);
 
         if ($request->ajax()) {
             return [
-                'success' => 'Resource successfully updated',
-                'data'    => $this->getForm($model->id)
+                'success'  => 'Resource successfully updated!',
+                'redirect' => $form->getAction('edit')
             ];
         }
 
@@ -225,13 +172,40 @@ abstract class AbstractResource
     }
 
     /**
-     * @param $name
-     * @param \Closure $callable
+     * @param null $model
+     * @return Resource
+     */
+    public function getBaseResource($model = null)
+    {
+        $model = $model ?? $this->getModel();
+
+        return (new Resource)->model($model)
+            ->name($this->name)
+            ->slug($this->slug);
+    }
+
+    /**
+     * @return Form
+     */
+    private function getForm()
+    {
+        $form = (new Form(
+            $this
+                ->getBaseResource($this->getModel())
+                ->make($this->resource()->closure())
+                ->build())
+        )->build();
+
+        return $form;
+    }
+
+    /**
+     * @param $value
      * @return $this
      */
-    protected function registerEvent($name, \Closure $callable)
+    public function model($value)
     {
-        $this->events[$name] = $callable;
+        $this->model = $value;
 
         return $this;
     }
@@ -239,15 +213,7 @@ abstract class AbstractResource
     /**
      * @return mixed
      */
-    public function getResourceName()
-    {
-        return $this->model->getTable();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }
@@ -258,59 +224,6 @@ abstract class AbstractResource
     public function importHelper()
     {
         return new Import($this);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function languages()
-    {
-        return translate()->languages()->map(function ($item, $index) {
-            $item->is_current = $index === 0;
-
-            return $item;
-        })->toArray();
-    }
-
-    /**
-     * @return string
-     */
-    public function getSlug()
-    {
-        if (!$this->slug && $this->name) {
-            $this->slug = strtolower(str_replace(' ', '-', $this->name));
-
-            return $this->slug;
-        } else if (!$this->slug && !$this->name) {
-            $this->name = str_replace('_', '-', $this->model->getTable());
-
-            return $this->name;
-        }
-
-        return $this->slug;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        if (!$this->name && !$this->slug) {
-            return ucfirst(str_replace('_', ' ', $this->model->getTable()));
-        } else if (!$this->name && $this->slug) {
-            return ucfirst(str_replace('-', ' ', $this->slug));
-        }
-
-        return ucfirst($this->name);
-    }
-
-    /**
-     * @param string $action
-     * @return string
-     */
-    public function getRoute($action = 'index')
-    {
-        return 'admin.' . $this->getSlug() . '.' . $action;
     }
 
     /**

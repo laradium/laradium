@@ -29,7 +29,7 @@ class Import extends PassThrough
      */
     public function inProgress(): bool
     {
-        return is_file(storage_path('app/import/' . $this->resource->model()->getTable() . '-import.lock'));
+        return is_file(storage_path('app/import/' . $this->resource->getModel()->getTable() . '-import.lock'));
     }
 
     /**
@@ -37,7 +37,7 @@ class Import extends PassThrough
      */
     public function status()
     {
-        return file_get_contents(storage_path('app/import/' . $this->resource->model()->getTable() . '-import.lock'));
+        return file_get_contents(storage_path('app/import/' . $this->resource->getModel()->getTable() . '-import.lock'));
     }
 
 }

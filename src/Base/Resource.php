@@ -24,6 +24,16 @@ class Resource
     protected $closure;
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $slug;
+
+    /**
      * Resource constructor.
      */
     public function __construct()
@@ -31,23 +41,18 @@ class Resource
         $this->fieldSet = new FieldSet();
     }
 
-    /**
-     * @param Model $model
-     * @return $this
-     */
-    public function setModel(Model $model)
+    public function name($value)
     {
-        $this->model = $model;
+        $this->name = $value;
 
         return $this;
     }
 
-    /**
-     * @return Model
-     */
-    public function model()
+    public function slug($value)
     {
-        return $this->model;
+        $this->slug = $value;
+
+        return $this;
     }
 
     /**
@@ -56,10 +61,15 @@ class Resource
     public function build()
     {
         $closure = $this->closure;
-        $fieldSet = $this->fieldSet->setModel($this->model());
+        $fieldSet = $this->fieldSet->model($this->model);
         $closure($fieldSet);
 
         return $this;
+    }
+
+    public function getModel()
+    {
+        return $this->model;
     }
 
     /**
@@ -87,5 +97,57 @@ class Resource
     public function closure()
     {
         return $this->closure;
+    }
+
+    public function model($value)
+    {
+        $this->model = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        if (!$this->slug && $this->name) {
+            $this->slug = strtolower(str_replace(' ', '-', $this->name));
+
+            return $this->slug;
+        } else {
+            if (!$this->slug && !$this->name) {
+                $this->name = str_replace('_', '-', $this->model->getTable());
+
+                return $this->name;
+            }
+        }
+
+        return $this->slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        if (!$this->name && !$this->slug) {
+            return ucfirst(str_replace('_', ' ', $this->model->getTable()));
+        } else {
+            if (!$this->name && $this->slug) {
+                return ucfirst(str_replace('-', ' ', $this->slug));
+            }
+        }
+
+        return ucfirst($this->name);
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getRoute($action = 'index')
+    {
+        return 'admin.' . $this->getSlug() . '.' . $action;
     }
 }

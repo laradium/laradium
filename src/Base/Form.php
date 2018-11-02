@@ -55,11 +55,11 @@ class Form
     /**
      * @return $this
      */
-    public function buildForm()
+    public function build()
     {
-        $resource = $this->resource;
+        $resource = $this->getResource();
         $fields = $resource->fieldSet()->fields();
-        $this->model = $resource->model();
+        $this->model = $resource->getModel();
 
         foreach ($fields as $field) {
             if ($field instanceof Tab) {
@@ -89,10 +89,38 @@ class Form
         return $this;
     }
 
+    public function data()
+    {
+        $languages = $this->languages();
+
+        return [
+            'state' => 'success',
+            'data'  => [
+                'languages'        => $languages,
+                'form'             => $this->response(),
+                'default_language' => array_first($languages)['iso_code']
+            ]
+        ];
+    }
+
+    /**
+     * @return mixed
+     */
+    private function languages()
+    {
+        return translate()->languages()->map(function ($item) {
+            return [
+                'name'     => $item->title_localized,
+                'iso_code' => $item->iso_code,
+                'id'       => $item->id,
+            ];
+        })->toArray();;
+    }
+
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function response()
     {
         $fieldList = [];
         foreach ($this->fields as $field) {
@@ -103,14 +131,11 @@ class Form
     }
 
     /**
-     * @param $value
-     * @return $this
+     * @return Resource
      */
-    public function abstractResource($value)
+    public function getResource()
     {
-        $this->abstractResource = $value;
-
-        return $this;
+        return $this->resource;
     }
 
     /**
@@ -124,7 +149,14 @@ class Form
     /**
      * @return Model
      */
-    public function model(): Model
+    public function model($value)
+    {
+        $this->model = $value;
+
+        return $this;
+    }
+
+    public function getModel()
     {
         return $this->model;
     }
@@ -141,7 +173,8 @@ class Form
      * @param $rules
      * @return $this
      */
-    public function setValidationRules($rules) {
+    public function setValidationRules($rules)
+    {
         $this->validationRules = array_merge($this->validationRules, $rules);
 
         return $this;
@@ -161,11 +194,11 @@ class Form
      */
     public function getAction($action = 'index'): string
     {
-        $slug = $this->abstractResource->getSlug();
+        $slug = $this->getResource()->getSlug();
         if ($action == 'create') {
             return url('/admin/' . $slug . '/create');
-        } elseif ($action == 'create') {
-            return url('/admin/' . $slug . '/create');
+        } elseif ($action == 'edit') {
+            return url('/admin/' . $slug . '/' . $this->getModel()->id . '/edit');
         } elseif ($action == 'store') {
             return url('/admin/' . $slug);
         } elseif ($action == 'update') {

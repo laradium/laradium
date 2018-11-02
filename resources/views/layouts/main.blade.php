@@ -119,7 +119,7 @@
                         <ul class="list-unstyled topbar-right-menu float-right mb-0">
 
                             <li>
-                                <a href="/admin/{{ $resource->getSlug() }}/create"
+                                <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create"
                                    class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i> Create
                                 </a>

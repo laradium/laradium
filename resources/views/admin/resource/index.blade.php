@@ -1,4 +1,4 @@
-@extends('laradium::layouts.main', ['title' => $name, 'table' => $table])
+@extends('laradium::layouts.main', ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
 
 @section('content')
     <div class="row">
@@ -40,9 +40,10 @@
                     @foreach($table->getTabs() as $key => $tabs)
                         <div class="tab-content">
                             @foreach ($tabs as $id => $tabName)
-                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="tab-{{ $id }}">
+                                <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                     id="tab-{{ $id }}">
 
-                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getSlug() . '/data-table?' . $key . '=' . $id) ])
+                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id) ])
 
                                 </div>
                             @endforeach
@@ -71,14 +72,14 @@
                 '<button type="button" class="btn editable-cancel btn-mini btn-sm"><i class="fa fa-close"></i></button>';
 
                     @if ($table->getTabs())
-            let onTabChange = function (activeTab) {
+            var onTabChange = function (activeTab) {
                     // Entries datatable
-                    let selector = '.tab-pane.active .resource-datatable';
+                    var selector = '.tab-pane.active .resource-datatable';
                     if ($.fn.DataTable.isDataTable(selector)) {
                         return;
                     }
 
-                    let dataTable = $(selector).DataTable({
+                    var dataTable = $(selector).DataTable({
                         processing: true,
                         serverSide: true,
                         ajax: $(selector).data('url'),
@@ -91,19 +92,19 @@
                 };
 
             // When page loads, we initialize first tab
-            let activeTab = $('.nav-tabs li.active:first');
+            var activeTab = $('.nav-tabs li.active:first');
             onTabChange(activeTab);
 
             // When tabs are clicked, we load info there
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                let activeTab = $('.nav-tabs li.active:first');
+                var activeTab = $('.nav-tabs li.active:first');
                 onTabChange(activeTab);
             });
                     @else
-            let dataTable = $('.resource-datatable').DataTable({
+            var dataTable = $('.resource-datatable').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: '/admin/{{ $resource->getSlug() }}/data-table',
+                    ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
                     columns: {!! $table->getColumnConfig()->toJson() !!},
                     order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
@@ -114,7 +115,7 @@
 
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();
-                let url = $(this).data('url');
+                var url = $(this).data('url');
                 swal({
                     title: 'Are you sure?',
                     text: 'Once deleted, you will not be able to recover this resource!',
@@ -152,9 +153,11 @@
 
 @push('styles')
     <!-- DataTables -->
-    <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"
+          type="text/css"/>
     <!-- Responsive datatable examples -->
-    <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet"
+          type="text/css"/>
     @foreach($table->getCss() as $asset)
         <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
     @endforeach

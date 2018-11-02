@@ -8,12 +8,13 @@
             <div v-for="(entry, index) in field.entries">
                 <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
                     <h4>
-                        <i class="mdi mdi-arrow-all handle" v-if="field.config.isSortable">HANDLE</i>
-                        <div class="pull-right">
+                        <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+                        <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
+                        <div class="pull-right" v-if="!entry.config.is_deleted">
                             <button class="btn btn-danger btn-sm"
                                     @click.prevent="remove(entry, field.name, index)"
                                     v-if="field.config.actions.includes('delete')"><i
-                                    class="fa fa-trash">Delete</i></button>
+                                    class="fa fa-trash"></i></button>
                         </div>
                     </h4>
                     <div class="row">
@@ -22,7 +23,7 @@
                                     :is="field.type + '-field'"
                                     :field="field"
                                     :language="language"
-                                    :replacementIds="newReplacementIds"
+                                    :replacement_ids="new_replacement_ids"
                                     :key="index"
                             ></component>
                         </div>
@@ -48,7 +49,7 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'replacementIds'],
+        props: ['field', 'language', 'replacement_ids'],
 
         data() {
             return {
@@ -56,27 +57,27 @@
                     disabled: true,
                     handle: '.handle'
                 },
-                newReplacementIds: {}
+                new_replacement_ids: {}
             };
         },
 
         mounted() {
-            this.draggable.disabled = !this.field.config.isSortable;
+            this.draggable.disabled = !this.field.config.is_sortable;
         },
 
         methods: {
             addItem() {
-                this.newReplacementIds = this.generateReplacementIds(this.replacementIds, this.field.templateData.replacementIds);
-                let templateFields = JSON.parse(JSON.stringify(this.field.templateData.fields));
+                this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                let template_fields = JSON.parse(JSON.stringify(this.field.template_data.fields));
 
-                for (let field in templateFields) {
-                    for (let id in this.newReplacementIds) {
-                        if (!templateFields[field].config.isTranslatable) {
-                            templateFields[field].name = templateFields[field].name.replace(id, this.newReplacementIds[id]);
+                for (let field in template_fields) {
+                    for (let id in this.new_replacement_ids) {
+                        if (!template_fields[field].config.is_translatable) {
+                            template_fields[field].name = template_fields[field].name.replace(id, this.new_replacement_ids[id]);
                         } else {
-                            let translations = templateFields[field].translations;
+                            let translations = template_fields[field].translations;
                             for (let translation in translations) {
-                                translations[translation].name = translations[translation].name.replace(id, this.newReplacementIds[id]);
+                                translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
                             }
                         }
                     }
@@ -84,7 +85,10 @@
 
 
                 this.field.entries.push({
-                    fields: templateFields
+                    fields: template_fields,
+                    config: {
+                        is_deleted: false
+                    }
                 });
 
             },
@@ -102,33 +106,45 @@
                 }
             },
 
-            remove(item, fieldName, index) {
-                let alert = confirm("After clicking \"Save\", you will not be able to recover this item!");
-                if (alert) {
-                    if (item.id !== undefined) {
-                        this.field.entries[index].fields = [{
-                            type: "hidden",
-                            label: "Id",
-                            name: fieldName + "[" + item.id + "][remove]",
-                            value: 1,
-                            config: {
-                                isTranslatable: false,
-                            },
-                            translations: []
-                        }, {
-                            type: "hidden",
-                            label: "Id",
-                            name: fieldName + "[" + item.id + "][id]",
-                            value: item.id,
-                            config: {
-                                isTranslatable: false,
-                            },
-                            translations: []
-                        }];
-                    } else {
-                        this.field.entries.splice(index, 1);
-                    }
-                }
+            remove(item, field_name, index) {
+                swal({
+                    title: "Are you sure?",
+                    text: "After clicking \"Save\", you will not be able to recover this item!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            if (item.id !== undefined) {
+                                this.field.entries[index].fields = [{
+                                    type: "hidden",
+                                    label: "Id",
+                                    name: field_name + "[" + item.id + "][remove]",
+                                    value: 1,
+                                    config: {
+                                        is_translatable: false,
+                                    },
+                                    translations: []
+                                }, {
+                                    type: "hidden",
+                                    label: "Id",
+                                    name: field_name + "[" + item.id + "][id]",
+                                    value: item.id,
+                                    config: {
+                                        is_translatable: false,
+                                    },
+                                    translations: []
+                                }];
+                                this.field.entries[index].config = {
+                                    is_deleted: true
+                                };
+                            } else {
+                                this.field.entries.splice(index, 1);
+                            }
+                        }
+                    });
+
             },
 
             toggle() {
