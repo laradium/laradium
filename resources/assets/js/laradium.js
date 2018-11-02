@@ -17,6 +17,7 @@ window.Vue = require('vue');
 
 Vue.component('crud-form', require('./components/CrudForm.vue'));
 Vue.component('text-field', require('./components/fields/Text.vue'));
+Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
 Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));

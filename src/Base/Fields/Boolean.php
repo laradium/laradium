@@ -8,36 +8,22 @@ class Boolean extends Field
 {
 
     /**
-     * @param null $field
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse()
     {
-        $field = !is_null($field) ? $field : $this;
-
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
-
-        $field->setNameAttributeList($attributes->toArray());
-
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
-
         return [
-            'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'replacementAttributes' => $attributes->toArray(),
-            'checked'               => $field->getValue() == 1,
-//            'tab'                   => $this->tab(),
-//            'col'                   => $this->col,
-//            'attr'                  => $this->getAttr(),
+            'type'         => strtolower(array_last(explode('\\', get_class($this)))),
+            'label'        => $this->getLabel(),
+            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
+            'value'        => !$this->isTranslatable() ? $this->getValue() : null,
+            'translations' => $this->getTranslations(),
+            'checked'      => $this->getValue() == 1,
+            'config'       => [
+                'is_translatable' => $this->isTranslatable(),
+                'col'             => $this->getCol(),
+                'tab'             => $this->getTab(),
+            ]
         ];
     }
 }

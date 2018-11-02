@@ -2,10 +2,10 @@
     <div class="form-group">
         <br>
         <div class="checkbox checkbox-primary">
-            <input type="hidden" value="0" :name="input.name">
-            <input type="checkbox" value="1" :checked="input.checked" :name="input.name" :id="input.name">
-            <label :for="input.name">
-                {{ input.label }}
+            <input type="hidden" value="0" :name="field.name">
+            <input type="checkbox" value="1" :checked="field.checked" :name="field.name" :id="field.name">
+            <label :for="field.name">
+                {{ field.label }}
             </label>
         </div>
     </div>
@@ -13,6 +13,6 @@
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
+        props: ['field', 'language', 'item'],
     }
 </script>
