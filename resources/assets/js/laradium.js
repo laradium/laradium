@@ -25,6 +25,9 @@ Vue.component('select-field', require('./components/fields/Select.vue'));
 Vue.component('email-field', require('./components/fields/Email.vue'));
 Vue.component('password-field', require('./components/fields/Password.vue'));
 Vue.component('radio-field', require('./components/fields/Radio.vue'));
+Vue.component('date-field', require('./components/fields/Date.vue'));
+Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
+Vue.component('time-field', require('./components/fields/Time.vue'));
 
 Vue.component('draggable', require('vuedraggable'));
 
