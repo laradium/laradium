@@ -4,7 +4,7 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Laradium\Laradium\Base\Field;
 
-class Select extends Field
+class Radio extends Field
 {
 
     /**
@@ -39,9 +39,9 @@ class Select extends Field
         $data = parent::formattedResponse();
         $data['options'] = collect($this->getOptions())->map(function ($text, $value) {
             return [
-                'value'    => $value,
-                'text'     => $text,
-                'selected' => $this->getValue() === $value,
+                'value'   => $value,
+                'text'    => $text,
+                'checked' => $this->getValue() === $value,
             ];
         })->toArray();
 

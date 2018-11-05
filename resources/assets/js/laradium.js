@@ -21,6 +21,11 @@ Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
 Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
+Vue.component('select-field', require('./components/fields/Select.vue'));
+Vue.component('email-field', require('./components/fields/Email.vue'));
+Vue.component('password-field', require('./components/fields/Password.vue'));
+Vue.component('radio-field', require('./components/fields/Radio.vue'));
+
 Vue.component('draggable', require('vuedraggable'));
 
 Vue.mixin({

@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-6">
             @if (method_exists($resource, 'import'))
-                <form action="{{ route('admin.' . $resource->getSlug() . '.import') }}"
+                <form action="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.import') }}"
                       class="form-horizontal"
                       method="POST"
                       enctype="multipart/form-data">
@@ -25,7 +25,7 @@
             @endif
             @if (method_exists($resource, 'export'))
                 or
-                <a href="{{ route('admin.' . $resource->getSlug() . '.export') }}"
+                <a href="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.export') }}"
                    class="btn btn-success btn-sm">
                     Export
                 </a>

@@ -10,20 +10,11 @@ class Boolean extends Field
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function formattedResponse(): array
     {
-        return [
-            'type'         => strtolower(array_last(explode('\\', get_class($this)))),
-            'label'        => $this->getLabel(),
-            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
-            'value'        => !$this->isTranslatable() ? $this->getValue() : null,
-            'translations' => $this->getTranslations(),
-            'checked'      => $this->getValue() == 1,
-            'config'       => [
-                'is_translatable' => $this->isTranslatable(),
-                'col'             => $this->getCol(),
-                'tab'             => $this->getTab(),
-            ]
-        ];
+        $data = parent::formattedResponse();
+        $data['checked'] = $this->getValue() == 1;
+
+        return $data;
     }
 }

@@ -1,33 +1,33 @@
 <template>
     <div class="form-group">
-        <label for="">{{ input.label }}
+        <label for="">{{ field.label }}
             <span class="badge badge-primary"
-                  v-if="input.isTranslatable">
+                  v-if="field.config.is_translatable">
                 {{ language }}
             </span>
         </label>
-        <div v-if="input.isTranslatable">
+        <div v-if="field.config.is_translatable">
             <input type="email"
                    v-model="item.value"
                    :key="index"
-                   v-for="(item, index) in input.translatedAttributes"
+                   v-for="(item, index) in field.translations"
                    v-show="language === item.iso_code"
                    class="form-control"
                    v-bind="attributes">
         </div>
         <div v-else>
-            <input type="email" :value="input.value" :name="input.name" class="form-control" v-bind="attributes">
+            <input type="email" v-model="field.value" :name="field.name" class="form-control" v-bind="attributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
+        props: ['field', 'language', 'item'],
 
         computed: {
             attributes() {
-                return this.input.attr;
+                return this.field.attr;
             }
         }
     }
