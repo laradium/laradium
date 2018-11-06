@@ -96,6 +96,7 @@ class Form
         return [
             'state' => 'success',
             'data'  => [
+                'is_translatable'  => $this->isTranslatable,
                 'languages'        => $languages,
                 'form'             => $this->response(),
                 'default_language' => array_first($languages)['iso_code']

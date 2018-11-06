@@ -8,13 +8,13 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="form-group">
-                <label :for="field.name + '_confirmation'">{{ field.label }} confirmation</label>
+        <!--<div class="col-lg-6">-->
+            <!--<div class="form-group">-->
+                <!--<label :for="field.name + '_confirmation'">{{ field.label }} confirmation</label>-->
 
-                <input type="password" :name="field.name + '_confirmation'" class="form-control" v-bind="attributes">
-            </div>
-        </div>
+                <!--<input type="password" :name="field.name + '_confirmation'" class="form-control" v-bind="attributes">-->
+            <!--</div>-->
+        <!--</div>-->
     </div>
 </template>
 

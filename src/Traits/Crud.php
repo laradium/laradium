@@ -85,12 +85,20 @@ trait Crud
         }
     }
 
+    /**
+     * @param $data
+     * @param $model
+     */
     private function putTranslations($data, $model)
     {
         $model->fill(array_get($data, 'translations', []));
         $model->save();
     }
 
+    /**
+     * @param $request
+     * @return \Illuminate\Http\Request
+     */
     private function prepareRequest($request)
     {
         $data = $request->all();
@@ -99,6 +107,10 @@ trait Crud
         return (new \Illuminate\Http\Request($data));
     }
 
+    /**
+     * @param $array
+     * @return bool
+     */
     private function recursiveUnset(&$array)
     {
         foreach ($this->unwantedKeys as $key) {

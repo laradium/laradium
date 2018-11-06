@@ -92,9 +92,10 @@ class Field
         $this->attributes = array_merge($currentAttributes, [$this->getFieldName()]);
 
         if ($this->getRules()) {
-            if($this->isTranslatable()) {
+            if ($this->isTranslatable()) {
                 foreach (translate()->languages() as $language) {
-                    $attributes = array_merge($currentAttributes, ['translations', $language->iso_code, $this->getFieldName()]);
+                    $attributes = array_merge($currentAttributes,
+                        ['translations', $language->iso_code, $this->getFieldName()]);
                     $this->validationKey($attributes);
                     break;
                 }
@@ -119,8 +120,8 @@ class Field
             'translations' => $this->getTranslations(),
             'config'       => [
                 'is_translatable' => $this->isTranslatable(),
-                'col'            => $this->getCol(),
-                'tab'            => $this->getTab(),
+                'col'             => $this->getCol(),
+                'tab'             => $this->getTab(),
             ]
         ];
     }
@@ -251,6 +252,17 @@ class Field
     public function getFieldName()
     {
         return $this->fieldName;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function fieldName($value)
+    {
+        $this->fieldName = $value;
+
+        return $this;
     }
 
     /**
