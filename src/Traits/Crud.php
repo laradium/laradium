@@ -91,6 +91,7 @@ trait Crud
      */
     private function putTranslations($data, $model)
     {
+        // TODO: Need to think of better solution, because this doesn't work with dynamically created languages
         $model->fill(array_get($data, 'translations', []));
         $model->save();
     }
