@@ -2,14 +2,14 @@
 
 namespace Laradium\Laradium\Base;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Laradium\Laradium\Traits\ApiResponse;
 use Laradium\Laradium\Traits\Crud;
+use Laradium\Laradium\Traits\CrudEvent;
 
 abstract class AbstractApiResource
 {
-    use Crud;
+    use Crud, CrudEvent, ApiResponse;
 
     /**
      * @var
@@ -22,9 +22,14 @@ abstract class AbstractApiResource
     protected $resource;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $events = [];
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $slug;
 
     /**
      * @var array
@@ -35,11 +40,17 @@ abstract class AbstractApiResource
     ];
 
     /**
-     * AbstractResource constructor.
+     * @var int
+     */
+    protected $paginate = 10;
+
+    /**
+     * AbstractApiResource constructor.
      */
     public function __construct()
     {
-        $this->model = new $this->resource;
+        $this->model(new $this->resource);
+        $this->events = collect([]);
     }
 
     /**
@@ -49,7 +60,7 @@ abstract class AbstractApiResource
     {
         return $this->response(function () {
             $model = $this->model;
-            $api = $this->api()->setModel($model);
+            $api = $this->api()->model($model);
 
             if (count($api->getRelations())) {
                 $model = $model->with($api->getRelations())->select('*');
@@ -61,21 +72,21 @@ abstract class AbstractApiResource
                 $model = $model->where($api->getWhere());
             }
 
-            $model = $model->get();
-
-            $data = $model->map(function ($row, $key) use ($api) {
-                foreach ($api->fields() as $field) {
-                    $value = $field['modify'] ? $field['modify']($row) : $row->{$field['name']};
-
-                    $attributes[$field['name']] = $value;
-                }
-
-                return $attributes;
-            });
+            if ($this->paginate) {
+                $model = $model->paginate($this->paginate);
+                $model->getCollection()->transform(function ($row, $key) use ($api) {
+                    return $this->getFields($row);
+                });
+            } else {
+                $model = $model->get();
+                $model->transform(function ($row) {
+                    return $this->getFields($row);
+                });
+            }
 
             return response()->json([
                 'success' => true,
-                'data'    => $data
+                'data'    => $this->parseData($model)
             ]);
         });
     }
@@ -86,15 +97,13 @@ abstract class AbstractApiResource
     public function create()
     {
         return $this->response(function () {
-            $model = $this->model;
-
-            $resource = $this->resource();
-            $form = new Form($resource->setModel($model)->build());
-            $form->buildForm();
+            $form = $this->getForm();
 
             return response()->json([
                 'success' => true,
-                'data'    => $form->formattedResponse()
+                'data'    => [
+                    'fields' => $form->response()
+                ]
             ]);
         });
     }
@@ -106,25 +115,20 @@ abstract class AbstractApiResource
     public function store(Request $request)
     {
         return $this->response(function () use ($request) {
-            $model = $this->model;
+            $form = $this->getForm();
+            $validationRequest = $this->prepareRequest($request);
 
-            if (method_exists($this, 'validation')) {
-                $validation = $this->validation()->setModel($model)->build();
-                $request->validate($validation->getValidationRules());
-            } else {
-                $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
-                $request->validate($form->getValidationRules());
-            }
+            $this->fireEvent('beforeSave', $request);
 
-            if (isset($this->events['beforeSave'])) {
-                $this->events['beforeSave']($this->model, $request);
-            }
+            $validationRules = $form->getValidationRules();
+            $validationRequest->validate($validationRules);
 
-            $this->updateResource($request->except('_token'), $model);
+            $model = $this->saveData($request->all(), $this->getModel());
 
-            if (isset($this->events['afterSave'])) {
-                $this->events['afterSave']($this->model, $request);
-            }
+            $form->model($model);
+            $this->model($model);
+
+            $this->fireEvent('afterSave', $request);
 
             return response()->json([
                 'success' => true,
@@ -141,7 +145,7 @@ abstract class AbstractApiResource
     {
         return $this->response(function () use ($id) {
             $model = $this->model;
-            $api = $this->api()->setModel($model);
+            $api = $this->api()->model($model);
 
             if (count($api->getRelations())) {
                 $model = $model->with($api->getRelations())->select('*');
@@ -154,16 +158,11 @@ abstract class AbstractApiResource
             }
 
             $model = $model->findOrFail($id);
-
-            $data = $api->fields()->mapWithKeys(function ($field) use ($model) {
-                $value = $field['modify'] ? $field['modify']($model) : $model->{$field['name']};
-
-                return [$field['name'] => $value];
-            });
+            $data = $this->getFields($model);
 
             return response()->json([
                 'success' => true,
-                'data'    => $data
+                'data'    => $this->parseData($data)
             ]);
         });
     }
@@ -176,7 +175,7 @@ abstract class AbstractApiResource
     {
         return $this->response(function () use ($id) {
             $model = $this->model;
-            $api = $this->api()->setModel($model);
+            $api = $this->api()->model($model);
 
             if ($api->getWhere()) {
                 $model = $model->where($api->getWhere());
@@ -184,13 +183,13 @@ abstract class AbstractApiResource
 
             $model = $model->findOrFail($id);
 
-            $resource = $this->resource();
-            $form = new Form($resource->setModel($model)->build());
-            $form->buildForm();
+            $form = $this->getForm($model);
 
             return response()->json([
                 'success' => true,
-                'data'    => $form->formattedResponse()
+                'data'    => [
+                    'fields' => $form->response()
+                ]
             ]);
         });
     }
@@ -204,31 +203,25 @@ abstract class AbstractApiResource
     {
         return $this->response(function () use ($request, $id) {
             $model = $this->model;
-            $api = $this->api()->setModel($model);
+            $api = $this->api()->model($model);
 
             if ($api->getWhere()) {
                 $model = $model->where($api->getWhere());
             }
 
-            $model = $model->findOrFail($id);
+            $this->model($model = $model->findOrFail($id));
 
-            if (method_exists($this, 'validation')) {
-                $validation = $this->validation()->setModel($model)->build();
-                $request->validate($validation->getValidationRules());
-            } else {
-                $form = (new Form($this->resource()->setModel($model)->build()))->buildForm();
-                $request->validate($form->getValidationRules());
-            }
+            $form = $this->getForm();
+            $validationRequest = $this->prepareRequest($request);
 
-            if (isset($this->events['beforeSave'])) {
-                $this->events['beforeSave']($this->model, $request);
-            }
+            $this->fireEvent('beforeSave', $request);
 
-            $this->updateResource($request->except('_token'), $model);
+            $validationRules = $form->getValidationRules();
+            $validationRequest->validate($validationRules);
 
-            if (isset($this->events['afterSave'])) {
-                $this->events['afterSave']($this->model, $request);
-            }
+            $this->saveData($request->all(), $this->getModel());
+
+            $this->fireEvent('afterSave', $request);
 
             return response()->json([
                 'success' => true,
@@ -246,7 +239,7 @@ abstract class AbstractApiResource
     {
         return $this->response(function () use ($id) {
             $model = $this->model;
-            $api = $this->api()->setModel($model);
+            $api = $this->api()->model($model);
 
             if ($api->getWhere()) {
                 $model = $model->where($api->getWhere());
@@ -264,13 +257,41 @@ abstract class AbstractApiResource
     }
 
     /**
-     * @param $name
-     * @param \Closure $callable
+     * @param null $model
+     * @return Resource
+     */
+    public function getBaseResource($model = null)
+    {
+        $model = $model ?? $this->getModel();
+
+        return (new ApiResource)->model($model)
+            ->name($this->name)
+            ->slug($this->slug);
+    }
+
+    /**
+     * @param null $model
+     * @return Form
+     */
+    private function getForm($model = null)
+    {
+        $form = (new Form(
+            $this
+                ->getBaseResource($model ?? $this->getModel())
+                ->make($this->resource()->closure())
+                ->build())
+        )->build();
+
+        return $form;
+    }
+
+    /**
+     * @param $value
      * @return $this
      */
-    protected function registerEvent($name, \Closure $callable)
+    public function model($value)
     {
-        $this->events[$name] = $callable;
+        $this->model = $value;
 
         return $this;
     }
@@ -278,15 +299,7 @@ abstract class AbstractApiResource
     /**
      * @return mixed
      */
-    public function getResourceName()
-    {
-        return $this->model->getTable();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }
@@ -309,36 +322,21 @@ abstract class AbstractApiResource
     }
 
     /**
-     * @param callable $func
-     * @return \Illuminate\Http\JsonResponse
+     * @param $row
+     * @return array
      */
-    protected function response(callable $func)
+    protected function getFields($row)
     {
-        try {
-            return call_user_func($func);
-        } catch (\Exception $e) {
-            if ($e instanceof ModelNotFoundException) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Not found.'
-                ], 404);
-            }
+        $fields = [];
+        $api = $this->api()->model($this->model);
 
-            if ($e instanceof ValidationException) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed.',
-                    'errors'  => $e->errors()
-                ], 422);
-            }
+        foreach ($api->fields() as $field) {
+            $value = $field['modify'] ? $field['modify']($row) : $row->{$field['name']};
 
-            logger()->error($e);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal server error! Please, try again.'
-            ], 503);
+            $fields[$field['name']] = $value;
         }
+
+        return $fields;
     }
 
     /**

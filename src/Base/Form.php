@@ -4,10 +4,7 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Base\Fields\HasMany;
-use Laradium\Laradium\Base\Fields\MorphsTo;
 use Laradium\Laradium\Base\Fields\Tab;
-use Laradium\Laradium\Content\Base\Fields\WidgetConstructor;
 
 class Form
 {
@@ -89,6 +86,9 @@ class Form
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function data()
     {
         $languages = $this->languages();
@@ -105,9 +105,9 @@ class Form
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    private function languages()
+    private function languages(): array
     {
         return translate()->languages()->map(function ($item) {
             return [
@@ -115,7 +115,7 @@ class Form
                 'iso_code' => $item->iso_code,
                 'id'       => $item->id,
             ];
-        })->toArray();;
+        })->toArray();
     }
 
     /**
@@ -124,6 +124,7 @@ class Form
     public function response()
     {
         $fieldList = [];
+
         foreach ($this->fields as $field) {
             $fieldList[] = $field->formattedResponse($field);
         }
@@ -157,6 +158,9 @@ class Form
         return $this;
     }
 
+    /**
+     * @return Model
+     */
     public function getModel()
     {
         return $this->model;
@@ -198,11 +202,11 @@ class Form
         $slug = $this->getResource()->getSlug();
         if ($action == 'create') {
             return url('/admin/' . $slug . '/create');
-        } elseif ($action == 'edit') {
+        } else if ($action == 'edit') {
             return url('/admin/' . $slug . '/' . $this->getModel()->id . '/edit');
-        } elseif ($action == 'store') {
+        } else if ($action == 'store') {
             return url('/admin/' . $slug);
-        } elseif ($action == 'update') {
+        } else if ($action == 'update') {
             return url('/admin/' . $slug . '/' . $this->model->id);
         }
 

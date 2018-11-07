@@ -43,6 +43,12 @@ class MakeLaradiumApiResource extends Command
         $name = $this->argument('name');
         $namespace = str_replace('\\', '', app()->getNamespace());
 
+        $resourceDirectory = app_path('Laradium/Resources/Api');
+        if (!file_exists($resourceDirectory)) {
+            File::makeDirectory($resourceDirectory, 0755, true);
+            $this->info('Creating API resources directory');
+        }
+
         $dummyApiResource = File::get(__DIR__ . '/../../../stubs/laradium-api-resource.stub');
         $apiResource = str_replace('{{namespace}}', $namespace, $dummyApiResource);
         $apiResource = str_replace('{{resource}}', $name, $apiResource);
@@ -53,6 +59,8 @@ class MakeLaradiumApiResource extends Command
         if (!file_exists($apiResourceFilePath)) {
             File::put($apiResourceFilePath, $apiResource);
         }
+
+        $this->info('API resource successfully created!');
 
         return;
     }

@@ -43,7 +43,7 @@ class ApiResourceRegistry
     public function register($resourceName)
     {
         $resource = new $resourceName;
-        $routeSlug = $this->getRouteSlug($resourceName);
+        $routeSlug = $resource->getBaseResource()->getSlug();
 
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
@@ -56,7 +56,7 @@ class ApiResourceRegistry
                 'name'       => $name,
                 'route_slug' => $this->getRoutePath(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
-                'middleware' => ['auth:api'],
+                'middleware' => ['api', 'auth:api'],
                 'prefix'     => 'api'
             ];
 
@@ -68,7 +68,7 @@ class ApiResourceRegistry
             'method'     => 'resource',
             'route_slug' => $this->getRoutePath(),
             'controller' => $this->getRouteController(),
-            'middleware' => ['auth:api'],
+            'middleware' => ['api', 'auth:api'],
             'only'       => $resource->getActions()
         ];
 
@@ -104,7 +104,7 @@ class ApiResourceRegistry
     {
         if (class_exists($resource)) {
             $r = new $resource;
-            $model = $r->model();
+            $model = $r->getModel();
             $model = new $model;
 
             $name = str_replace('_', '-', $model->getTable());
