@@ -69,6 +69,11 @@ class Field
     private $validationAttributes = [];
 
     /**
+     * @var
+     */
+    private $type;
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -113,7 +118,7 @@ class Field
     public function formattedResponse()
     {
         return [
-            'type'         => strtolower(array_last(explode('\\', get_class($this)))),
+            'type'         => $this->getType(),
             'label'        => $this->getLabel(),
             'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
             'value'        => !$this->isTranslatable() ? $this->getValue() : null,
@@ -361,5 +366,24 @@ class Field
     public function getTab()
     {
         return $this->tab;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function type($value)
+    {
+        $this->type = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type ?: strtolower(array_last(explode('\\', get_class($this))));
     }
 }

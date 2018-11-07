@@ -45,8 +45,10 @@ trait Crud
 
         foreach ($workers as $key => $worker) {
             if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
-                if ($crudWorkerClass == \Laradium\Laradium\Base\Fields\HasMany::class) {
+                if ($crudWorkerClass == \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key, ['password'])) {
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass == \Laradium\Laradium\Base\Fields\Password::class) {
+                    $this->passwordWorker($model, array_except($worker, 'crud_worker'));
                 }
             }
         }
@@ -54,6 +56,12 @@ trait Crud
         return $model;
     }
 
+    /**
+     * @param $model
+     * @param $relation
+     * @param $items
+     * @throws \ReflectionException
+     */
     private function hasManyWorker($model, $relation, $items)
     {
         foreach ($items as $item) {
@@ -83,6 +91,11 @@ trait Crud
             // save data recursively
             $this->saveData(array_except($item, 'id'), $relationModel);
         }
+    }
+
+    private function passwordWorker($model, $data)
+    {
+        dd($data);
     }
 
     /**

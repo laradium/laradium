@@ -53,6 +53,10 @@ class HasMany extends Field
         $this->fieldSet = new FieldSet;
     }
 
+    /**
+     * @param array $attributes
+     * @return $this|Field
+     */
     public function build($attributes = [])
     {
         parent::build($attributes);
