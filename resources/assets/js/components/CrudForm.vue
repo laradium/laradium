@@ -15,10 +15,24 @@
         <div class="alert alert-success" v-if="success">
             {{ success }}
         </div>
-        <div class="row">
+        <div class="row" v-if="tabs.length > 1">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item" v-for="(tab, index) in tabs">
+                        <a :href="'#tab-' + tab.slug" data-toggle="tab" @click.prevent="current_tab = tab.slug"
+                           aria-expanded="false" class="nav-link"
+                           :class="{'active': index === 0}">
+                            {{ tab.name }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length }">
             <div v-for="field in data.form" :class="field.config.col">
                 <component :is="field.type + '-field'"
                            :field="field"
+                           :current_tab="current_tab"
                            :language="data.default_language"
                            :replacement_ids="{}"
                 ></component>
@@ -53,16 +67,36 @@
         data() {
             return {
                 language: '',
+                current_tab: '',
                 success: '',
                 is_translatable: false,
                 errors: [],
                 data: [],
+                tabs: [],
                 loading: true
             };
         },
         created() {
             let data = document.getElementsByName('data');
             this.data = JSON.parse(data[0].value).data;
+
+            let fields = this.data.form;
+            let i = 0;
+            for (let field in fields) {
+                if (fields[field].type === 'tab') {
+                    if (i === 0) {
+                        this.current_tab = fields[field].slug;
+                    }
+                    this.tabs.push({
+                        slug: fields[field].slug,
+                        name: fields[field].name,
+                    });
+                }
+                i++;
+            }
+
+
+            console.log(this.tabs);
         },
         methods: {
             onSubmit(el) {

@@ -30,6 +30,7 @@ Vue.component('radio-field', require('./components/fields/Radio.vue'));
 Vue.component('date-field', require('./components/fields/Date.vue'));
 Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
 Vue.component('time-field', require('./components/fields/Time.vue'));
+Vue.component('tab-field', require('./components/fields/Tab.vue'));
 
 Vue.component('draggable', require('vuedraggable'));
 

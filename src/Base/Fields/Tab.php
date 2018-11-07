@@ -11,26 +11,30 @@ class Tab
     /**
      * @var
      */
-    protected $closure;
+    private $fieldSet;
+    private $name;
+    private $closure;
 
-    /**
-     * @var
-     */
-    protected $fieldSet;
-
-    /**
-     * @var mixed
-     */
-    protected $name;
-
-    /**
-     * Tab constructor.
-     * @param $name
-     */
     public function __construct($name)
     {
         $this->name = array_first($name);
+        $this->fieldSet = new FieldSet;
     }
+
+    /**
+     * @param Model $model
+     * @return $this
+     */
+    public function build(Model $model)
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->model($model);
+        $closure = $this->closure;
+        $closure($fieldSet);
+
+        return $this;
+    }
+
 
     /**
      * @param $closure
@@ -43,35 +47,22 @@ class Tab
         return $this;
     }
 
-    /**
-     * @param FieldSet $set
-     * @return $this
-     */
-    public function setFieldSet(FieldSet $set)
+    public function formattedResponse()
     {
-        $this->fieldSet = $set;
-
-        return $this;
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    public function build()
-    {
-        $closure = $this->closure;
-        $fieldSet = $this->fieldSet;
-        $fieldSet->addTab($this->name);
-        $tabFieldSet = new FieldSet();
-        $tabFieldSet->setModel($fieldSet->model());
-        $closure($tabFieldSet);
-        $fields = $tabFieldSet->fields();
-
-        foreach ($fields as $field) {
-            $field->setTab($this->name);
-            $this->fieldSet->fields->push($field);
+        $fields = [];
+        foreach ($this->fieldSet->fields() as $field) {
+            $fields[] = $field->formattedResponse();
         }
 
-        return $tabFieldSet->fields();
+        return [
+            'name'   => $this->name,
+            'slug'   => str_slug($this->name, '_'),
+            'type'   => 'tab',
+            'fields' => $fields,
+            'config' => [
+                'is_translatable' => false,
+                'col'             => 'col-md-12',
+            ]
+        ];
     }
 }

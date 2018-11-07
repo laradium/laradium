@@ -56,31 +56,22 @@ class Form
     {
         $resource = $this->getResource();
         $fields = $resource->fieldSet()->fields();
-        $this->model = $resource->getModel();
+        $this->model($resource->getModel());
 
         foreach ($fields as $field) {
-            if ($field instanceof Tab) {
-                $tabFields = $field->setFieldSet($resource->fieldSet())->build();
-                foreach ($tabFields as $tabField) {
-                    $tabField->build();
-                    $this->setValidationRules($tabField->getValidationRules());
-
-                    $this->fields->push($tabField);
-
-                    if ($tabField->isTranslatable()) {
-                        $this->isTranslatable = true;
-                    }
-                }
-            } else {
+            if (!$field instanceof Tab) {
                 $field->build();
                 $this->setValidationRules($field->getValidationRules());
-
-                $this->fields->push($field);
 
                 if ($field->isTranslatable()) {
                     $this->isTranslatable = true;
                 }
+            } else {
+                $field->build($this->getModel());
             }
+
+            $this->fields->push($field);
+
         }
 
         return $this;
