@@ -1,20 +1,13 @@
 <template>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="form-group">
-                <label :for="field.name">{{ field.label }}</label>
+    <div class="form-group">
+        <label :for="field.name">{{ field.label }}</label>
 
-                <input type="password" :name="field.name" class="form-control" v-bind="attributes">
-            </div>
-        </div>
-
-        <!--<div class="col-lg-6">-->
-            <!--<div class="form-group">-->
-                <!--<label :for="field.name + '_confirmation'">{{ field.label }} confirmation</label>-->
-
-                <!--<input type="password" :name="field.name + '_confirmation'" class="form-control" v-bind="attributes">-->
-            <!--</div>-->
-        <!--</div>-->
+        <input type="password" :name="field.name" class="form-control" v-bind="attributes">
+        <component :is="field.worker.type + '-field'"
+                   :field="field.worker"
+                   :language="language"
+                   :replacement_ids="{}"
+        ></component>
     </div>
 </template>
 

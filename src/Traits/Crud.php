@@ -91,9 +91,19 @@ trait Crud
         }
     }
 
-    private function passwordWorker($model, $data)
+    /**
+     * @param $model
+     * @param $passwords
+     */
+    private function passwordWorker($model, $passwords)
     {
-        dd($data);
+        foreach ($passwords as $fieldName => $value) {
+            if(!str_contains($fieldName, '_confirmation') && $value) {
+                $model->update([
+                    $fieldName => bcrypt($value)
+                ]);
+            }
+        }
     }
 
     /**
