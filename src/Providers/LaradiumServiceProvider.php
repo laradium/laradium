@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
@@ -11,11 +12,13 @@ use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
-use Illuminate\Support\Facades\View;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
 
+    /**
+     * @return void
+     */
     public function boot()
     {
         $this->registerPaperClipConfig();
@@ -37,6 +40,8 @@ class LaradiumServiceProvider extends ServiceProvider
 
         // Mail config
         $this->setMailConfig();
+
+        $this->setTranslatableConfig();
     }
 
     /**
@@ -157,6 +162,21 @@ class LaradiumServiceProvider extends ServiceProvider
     }
 
     /**
+     * Set translatable config
+     *
+     * @return void
+     */
+    private function setTranslatableConfig()
+    {
+        try {
+            config([
+                'translatable.locales' => translate()->languages()->pluck('iso_code')->toArray()
+            ]);
+        } catch (\Exception $e) {
+        }
+    }
+
+    /**
      * @return void
      */
     private function registerBindings()
@@ -186,6 +206,7 @@ class LaradiumServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
             __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
             __DIR__ . '/../../config/javascript.php'       => config_path('javascript.php'),
+            __DIR__ . '/../../config/translatable.php'     => config_path('translatable.php'),
         ], 'laradium');
     }
 

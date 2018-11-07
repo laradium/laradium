@@ -2,8 +2,8 @@
 
 namespace Laradium\Laradium\Base;
 
-use Laradium\Laradium\Traits\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Traits\Translatable;
 
 class Field
 {
@@ -94,8 +94,7 @@ class Field
         if ($this->getRules()) {
             if ($this->isTranslatable()) {
                 foreach (translate()->languages() as $language) {
-                    $attributes = array_merge($currentAttributes,
-                        ['translations', $language->iso_code, $this->getFieldName()]);
+                    $attributes = array_merge($currentAttributes, ['translations', $language->iso_code, $this->getFieldName()]);
                     $this->validationKey($attributes);
                     break;
                 }

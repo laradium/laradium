@@ -4,29 +4,35 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
-use Laradium\Laradium\Base\Fields\Hidden;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Traits\Relation;
 
 class HasOne extends Field
 {
-
-    /**
-     * @var FieldSet
-     */
-    protected $fieldSet;
-
-    /**
-     * @var string
-     */
-    protected $relationName;
+    use Relation;
 
     /**
      * @var
      */
-    protected $fields;
+    private $fields;
 
     /**
-     * MorphsTo constructor.
+     * @var
+     */
+    private $fieldName;
+
+    /**
+     * @var FieldSet
+     */
+    private $fieldSet;
+
+    /**
+     * @var array
+     */
+    private $templateData = [];
+
+    /**
+     * HasMany constructor.
      * @param $parameters
      * @param Model $model
      */
@@ -34,70 +40,103 @@ class HasOne extends Field
     {
         parent::__construct($parameters, $model);
 
+        $this->relationName = array_first($parameters);
+        $this->fieldName = array_first($parameters);
         $this->fieldSet = new FieldSet;
-        $this->relationName = $this->name;
     }
 
     /**
-     * @param array $parentAttributeList
-     * @param null $model
+     * @param array $attributes
      * @return $this|Field
      */
-    public function build($parentAttributeList = [], $model = null)
+    public function build($attributes = [])
     {
-        $this->parentAttributeList = $parentAttributeList;
-        $fields = $this->fieldSet->fields();
-        $fieldList = [];
-        $rules = [];
+        parent::build($attributes);
 
-        $model = $this->model->{$this->relationName};
-
-        $attributeList = array_merge($this->parentAttributeList, [
-            $this->relationName,
-        ]);
-
-        foreach ($fields as $field) {
-            $clonedField = clone $field;
-            if (!$model) {
-                $model = $this->model;
-            }
-
-            $clonedField->setModel($model);
-            $clonedField->build($attributeList, $model);
-
-            $fieldList[] = $clonedField;
-            $rules += $clonedField->getRules();
-        }
-
-        if ($rules) {
-            $this->validationRules = $rules;
-        }
-
-        $this->fields = $fieldList;
+        $this->templateData = $this->getTemplateData();
+        $this->validationRules($this->templateData['validation_rules']);
 
         return $this;
     }
 
     /**
-     * @param null $f
      * @return array
      */
-    public function formattedResponse($f = null)
+    public function formattedResponse()
     {
-        $f = !is_null($f) ? $f : $this;
+        $data = parent::formattedResponse();
+        $data['value'] = get_class($this);
 
-        $items = [];
-        foreach ($f->fields as $field) {
-            $items[] = $field->formattedResponse();
+        $data['entries'] = $this->getEntries();
+        $data['template_data'] = $this->templateData;
+
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTemplateData()
+    {
+        $fields = [];
+        $validationRules = [];
+        $this->addReplacementAttribute();
+        $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $field->model($this->getRelationBaseModel())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->replacementAttributes($this->getReplacementAttributes());
+
+            if ($field->getRules()) {
+                $validationRules[$field->getValidationKey()] = $field->getRules();
+            }
+
+            $fields[] = $field->formattedResponse();
         }
 
         return [
-            'type'   => 'has-one',
-            'tab'    => $this->tab(),
-            'col'    => $this->col,
-            'name'   => ucfirst($this->name),
-            'fields' => $items
+            'fields'           => $fields,
+            'replacement_ids'  => $this->getReplacementAttributes(),
+            'validation_rules' => $validationRules
         ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getEntries()
+    {
+        $entries = [];
+
+        foreach ($this->getRelationCollection() as $item) {
+            $entry = [
+                'fields' => [],
+                'config' => [
+                    'is_deleted' => false
+                ],
+                'id'     => $item->id,
+            ];
+
+            $entry['fields'][] = (new Hidden('id', $item))
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse(); // Add hidden ID field
+
+            foreach ($this->fieldSet->fields as $temporaryField) {
+                $field = clone $temporaryField;
+
+                $entry['fields'][] = $field->model($item)
+                    ->build(array_merge($this->getAttributes(), [$item->id]))
+                    ->formattedResponse();
+            }
+
+            $entries[] = $entry;
+        }
+
+
+        return $entries;
     }
 
     /**
@@ -107,17 +146,10 @@ class HasOne extends Field
     public function fields($closure)
     {
         $fieldSet = $this->fieldSet;
-        $fieldSet->setModel($this->model());
+        $fieldSet->model($this->getModel());
         $closure($fieldSet);
 
         return $this;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
-    }
 }

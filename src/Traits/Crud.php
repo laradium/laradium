@@ -2,8 +2,6 @@
 
 namespace Laradium\Laradium\Traits;
 
-use Illuminate\Http\UploadedFile;
-
 trait Crud
 {
 
@@ -21,7 +19,7 @@ trait Crud
     public function saveData($inputs, $model)
     {
         // Update or create base model
-        $baseData = $workers = collect($inputs)->filter(function ($value, $index) {
+        $baseData = collect($inputs)->filter(function ($value, $index) {
             return $index !== 'translations' && !is_array($value);
         })->toArray();
 
@@ -45,7 +43,7 @@ trait Crud
 
         foreach ($workers as $key => $worker) {
             if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
-                if ($crudWorkerClass == \Laradium\Laradium\Base\Fields\HasMany::class) {
+                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class) {
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 }
             }
@@ -54,6 +52,12 @@ trait Crud
         return $model;
     }
 
+    /**
+     * @param $model
+     * @param $relation
+     * @param $items
+     * @throws \ReflectionException
+     */
     private function hasManyWorker($model, $relation, $items)
     {
         foreach ($items as $item) {
@@ -91,7 +95,6 @@ trait Crud
      */
     private function putTranslations($data, $model)
     {
-        // TODO: Need to think of better solution, because this doesn't work with dynamically created languages
         $model->fill(array_get($data, 'translations', []));
         $model->save();
     }
@@ -118,13 +121,14 @@ trait Crud
             unset($array[$key]);
             foreach ($array as $index => &$value) {
                 if (is_array($value)) {
-                    if(array_get($value, 'remove', null)) {
+                    if (array_get($value, 'remove', null)) {
                         unset($array[$index]);
                     }
                     $this->recursiveUnset($value, $this->unwantedKeys);
                 }
             }
         }
+        
         return true;
     }
 }

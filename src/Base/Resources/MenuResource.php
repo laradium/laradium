@@ -21,12 +21,12 @@ Class MenuResource extends AbstractResource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event('afterSave', function () {
             cache()->forget(Menu::$cacheKey);
         });
 
         $resources = collect((new Laradium)->resources())->mapWithKeys(function ($r) {
-            return [$r => (new $r)->getName()];
+            return [$r => (new $r)->getBaseResource()->getName()];
         })->toArray();
         $resources = array_merge(['' => '- Select -'], $resources);
 
