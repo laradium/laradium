@@ -13,7 +13,7 @@ trait Translatable
     /**
      * @return $this
      */
-    public function translatable()
+    public function translatable(): self
     {
         $this->translatable = true;
 
@@ -23,7 +23,7 @@ trait Translatable
     /**
      * @return bool
      */
-    public function isTranslatable()
+    public function isTranslatable(): bool
     {
         return $this->translatable;
     }
@@ -31,7 +31,7 @@ trait Translatable
     /**
      * @return array
      */
-    public function getTranslations()
+    public function getTranslations(): array
     {
         $translations = [];
 
@@ -51,6 +51,8 @@ trait Translatable
                     'name'     => $this->getNameAttribute(),
                 ];
             }
+
+            $this->model($model);
         }
 
         return $translations;

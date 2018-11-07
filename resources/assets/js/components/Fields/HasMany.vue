@@ -12,7 +12,7 @@
                         <div class="pull-right" v-if="entry.config.is_deleted">
                             <button class="btn btn-primary btn-sm"
                                     @click.prevent="restore(index)"
-                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-redo"></i>Restore</button>
+                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-undo"></i> Restore</button>
                         </div>
                         <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
                         <div class="pull-right" v-if="!entry.config.is_deleted">
@@ -89,14 +89,12 @@
                     }
                 }
 
-
                 this.field.entries.push({
                     fields: template_fields,
                     config: {
                         is_deleted: false
                     }
                 });
-
             },
 
             onUpdate(items) {
@@ -115,7 +113,6 @@
             remove(item, field_name, index) {
                 swal({
                     title: "Are you sure?",
-                    text: "After clicking \"Save\", you will not be able to recover this item!",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
@@ -153,7 +150,6 @@
                             }
                         }
                     });
-
             },
 
             restore(index) {

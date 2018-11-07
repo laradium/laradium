@@ -1,15 +1,15 @@
 <?php
 
-namespace {{namespace}}\Laradium\Resources;
+namespace {{namespace}}\Laradium\Resources\Api;
 
-use Laradium\Laradium\Base\AbstractLaradiumApiResource;
-use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\AbstractApiResource;
+use Laradium\Laradium\Base\ApiFieldSet;
 use Laradium\Laradium\Base\ApiResource;
 use Laradium\Laradium\Base\DataSet;
 use Laradium\Laradium\Base\Api;
 use {{modelNamespace}}\{{resource}};
 
-class {{resource}}ApiResource extends AbstractLaradiumApiResource
+class {{resource}}ApiResource extends AbstractApiResource
 {
 
     /**
@@ -17,24 +17,24 @@ class {{resource}}ApiResource extends AbstractLaradiumApiResource
      */
     protected $resource = {{resource}}::class;
 
-    /**
-     * @return ApiResource
-     */
-    public function resource()
-    {
-        return (new ApiResource)->make(function (FieldSet $set) {
-            $set->text('type')->rules('required|min:3');
-        });
-    }
-
      /**
      * @return Api
      */
-    public function table()
+    public function api(): Api
     {
         return (new Api)->make(function (DataSet $set) {
             $set->add('id');
             $set->add('title');
+        });
+    }
+
+    /**
+     * @return ApiResource
+     */
+    public function resource(): ApiResource
+    {
+        return (new ApiResource)->make(function (ApiFieldSet $set) {
+            $set->text('title');
         });
     }
 }

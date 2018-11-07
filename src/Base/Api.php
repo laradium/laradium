@@ -74,7 +74,7 @@ class Api
      * @param $model
      * @return $this
      */
-    public function setModel($model)
+    public function model($model)
     {
         $this->model = $model;
 
@@ -84,7 +84,7 @@ class Api
     /**
      * @return mixed
      */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }

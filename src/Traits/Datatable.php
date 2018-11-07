@@ -53,7 +53,7 @@ trait Datatable
         if ($table->getTabs()) {
             foreach ($table->getTabs() as $key => $tabs) {
                 if (request()->has($key)) {
-                    $value = request()->get($key) === '0' ? null : request()->get($key);
+                    $value = request()->get($key) === 'null' ? null : request()->get($key);
                     $model = $this->model->where($key, $value);
                 }
             }
