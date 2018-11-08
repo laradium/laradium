@@ -94,9 +94,6 @@
                 }
                 i++;
             }
-
-
-            console.log(this.tabs);
         },
         methods: {
             onSubmit(el) {

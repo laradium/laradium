@@ -16,7 +16,7 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'item', 'current_tab'],
+        props: ['field', 'language', 'item', 'current_tab', 'replacement_ids'],
 
         data() {
             return {

@@ -12,7 +12,7 @@
                         <div class="pull-right" v-if="entry.config.is_deleted">
                             <button class="btn btn-primary btn-sm"
                                     @click.prevent="restore(index)"
-                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-undo"></i> Restore</button>
+                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-redo"></i>Restore</button>
                         </div>
                         <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
                         <div class="pull-right" v-if="!entry.config.is_deleted">
@@ -74,7 +74,8 @@
         methods: {
             addItem() {
                 this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
-                let template_fields = JSON.parse(JSON.stringify(this.field.template_data.fields));
+                let template_fields = _.cloneDeep(this.field.template_data.fields)
+                ;
 
                 for (let field in template_fields) {
                     for (let id in this.new_replacement_ids) {
@@ -89,12 +90,14 @@
                     }
                 }
 
+
                 this.field.entries.push({
                     fields: template_fields,
                     config: {
                         is_deleted: false
                     }
                 });
+
             },
 
             onUpdate(items) {
@@ -113,6 +116,7 @@
             remove(item, field_name, index) {
                 swal({
                     title: "Are you sure?",
+                    text: "After clicking \"Save\", you will not be able to recover this item!",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
@@ -150,6 +154,7 @@
                             }
                         }
                     });
+
             },
 
             restore(index) {

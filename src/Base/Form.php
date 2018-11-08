@@ -62,7 +62,6 @@ class Form
             if (!$field instanceof Tab) {
                 $field->build();
                 $this->setValidationRules($field->getValidationRules());
-
                 if ($field->isTranslatable()) {
                     $this->isTranslatable = true;
                 }
@@ -87,9 +86,9 @@ class Form
         return [
             'state' => 'success',
             'data'  => [
-                'is_translatable'  => $this->isTranslatable,
                 'languages'        => $languages,
                 'form'             => $this->response(),
+                'is_translatable'  => $this->isTranslatable,
                 'default_language' => array_first($languages)['iso_code']
             ]
         ];
@@ -117,7 +116,11 @@ class Form
         $fieldList = [];
 
         foreach ($this->fields as $field) {
-            $fieldList[] = $field->formattedResponse($field);
+            $response = $field->formattedResponse($field);
+            $fieldList[] = $response;
+            if($field instanceof Tab && $response['config']['is_translatable']) {
+                $this->isTranslatable = true;
+            }
         }
 
         return $fieldList;

@@ -14,6 +14,7 @@ class Tab
     private $fieldSet;
     private $name;
     private $closure;
+    private $isTranslatable = false;
 
     public function __construct($name)
     {
@@ -51,6 +52,12 @@ class Tab
     {
         $fields = [];
         foreach ($this->fieldSet->fields() as $field) {
+            $field->build();
+
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
+
             $fields[] = $field->formattedResponse();
         }
 
@@ -60,9 +67,17 @@ class Tab
             'type'   => 'tab',
             'fields' => $fields,
             'config' => [
-                'is_translatable' => false,
+                'is_translatable' => $this->isTranslatable,
                 'col'             => 'col-md-12',
             ]
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslatable()
+    {
+        return $this->isTranslatable;
     }
 }
