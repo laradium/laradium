@@ -12,7 +12,7 @@
                         <div class="pull-right" v-if="entry.config.is_deleted">
                             <button class="btn btn-primary btn-sm"
                                     @click.prevent="restore(index)"
-                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-redo"></i>Restore</button>
+                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-undo"></i>Restore</button>
                         </div>
                         <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
                         <div class="pull-right" v-if="!entry.config.is_deleted">
