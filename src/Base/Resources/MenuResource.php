@@ -31,9 +31,11 @@ Class MenuResource extends AbstractResource
         $resources = array_merge(['' => '- Select -'], $resources);
 
         return laradium()->resource(function (FieldSet $set) use ($resources) {
-            $set->boolean('is_active');
-            $set->text('key')->rules('required|max:255');
-            $set->text('name')->rules('required|max:255')->translatable();
+            $set->tab('Main')->fields(function (FieldSet $set) {
+                $set->boolean('is_active');
+                $set->text('key')->rules('required|max:255');
+                $set->text('name')->rules('required|max:255')->translatable();
+            });
             $set->tab('Items')->fields(function (FieldSet $set) use ($resources) {
                 $set->hasMany('items')->fields(function (FieldSet $set) use ($resources) {
                     $set->select('target')->options([

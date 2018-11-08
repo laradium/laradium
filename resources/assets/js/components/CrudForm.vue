@@ -15,7 +15,7 @@
         <div class="alert alert-success" v-if="success">
             {{ success }}
         </div>
-        <div class="row" v-if="tabs.length > 1">
+        <div class="row" v-if="tabs.length">
             <div class="col-md-12">
                 <ul class="nav nav-tabs">
                     <li class="nav-item" v-for="(tab, index) in tabs">
