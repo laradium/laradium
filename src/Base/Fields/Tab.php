@@ -53,8 +53,6 @@ class Tab
         $this->fieldSet = new FieldSet;
     }
 
-
-
     /**
      * @return array
      */

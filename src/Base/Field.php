@@ -99,7 +99,8 @@ class Field
         if ($this->getRules()) {
             if ($this->isTranslatable()) {
                 foreach (translate()->languages() as $language) {
-                    $attributes = array_merge($currentAttributes, ['translations', $language->iso_code, $this->getFieldName()]);
+                    $attributes = array_merge($currentAttributes,
+                        ['translations', $language->iso_code, $this->getFieldName()]);
                     $this->validationKey($attributes);
                     break;
                 }
@@ -125,7 +126,6 @@ class Field
             'config'       => [
                 'is_translatable' => $this->isTranslatable(),
                 'col'             => $this->getCol(),
-                'tab'             => $this->getTab(),
             ]
         ];
     }

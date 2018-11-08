@@ -8,21 +8,33 @@
             <div v-for="(entry, index) in field.entries">
                 <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
                     <h4>
-                        <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+                        <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
+
+                        {{ entry.label }} <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+
                         <div class="pull-right" v-if="entry.config.is_deleted">
                             <button class="btn btn-primary btn-sm"
                                     @click.prevent="restore(index)"
-                                    v-if="field.config.actions.includes('delete')"><i class="fa fa-undo"></i>Restore</button>
+                                    v-if="field.config.actions.includes('delete')">
+                                <i class="fa fa-undo"></i> Restore
+                            </button>
                         </div>
-                        <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
+
                         <div class="pull-right" v-if="!entry.config.is_deleted">
                             <button class="btn btn-danger btn-sm"
                                     @click.prevent="remove(entry, field.name, index)"
                                     v-if="field.config.actions.includes('delete')"><i
                                     class="fa fa-trash"></i></button>
                         </div>
+
+                        <div class="pull-right">
+                            <button class="btn btn-success btn-sm" @click.prevent="toggle(index)" style="margin-right: 5px;">
+                                <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i> Hide</span>
+                                <span v-else><i class="fa fa-eye"></i> Show</span>
+                            </button>
+                        </div>
                     </h4>
-                    <div class="row">
+                    <div class="row" v-show="!entry.config.is_collapsed">
                         <div v-for="(field, index) in entry.fields" :class="field.config.col">
                             <component
                                     :is="field.type + '-field'"
@@ -94,7 +106,8 @@
                 this.field.entries.push({
                     fields: template_fields,
                     config: {
-                        is_deleted: false
+                        is_deleted: false,
+                        is_collapsed: false
                     }
                 });
 
@@ -146,9 +159,9 @@
                                     },
                                     translations: []
                                 }];
-                                this.field.entries[index].config = {
-                                    is_deleted: true
-                                };
+                                if(this.field.entries[index].config.is_deleted !== undefined) {
+                                    this.field.entries[index].config.is_deleted = true;
+                                }
                             } else {
                                 this.field.entries.splice(index, 1);
                             }
@@ -159,13 +172,16 @@
 
             restore(index) {
                 this.field.entries[index].fields = this.removed_items[index].fields;
-                this.field.entries[index].config = {
-                    is_deleted: false
-                };
+                if(this.field.entries[index].config.is_deleted !== undefined) {
+                    this.field.entries[index].config.is_deleted = false;
+                }
             },
 
-            toggle() {
-                this.field.show = !this.field.show;
+            toggle(index) {
+                let config = this.field.entries[index].config;
+                if(config.is_collapsed !== undefined) {
+                    this.field.entries[index].config.is_collapsed = !config.is_collapsed;
+                }
             }
         }
     }

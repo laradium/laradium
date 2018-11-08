@@ -40,6 +40,16 @@ class HasMany extends Field
     private $templateData = [];
 
     /**
+     * @var bool
+     */
+    private $isCollapsed = true;
+
+    /**
+     * @var string
+     */
+    private $entryLabel = 'name';
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -131,9 +141,11 @@ class HasMany extends Field
 
         foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
             $entry = [
+                'label' => $item->{$this->getEntryLabel()} ?: 'Entry',
                 'fields' => [],
                 'config' => [
-                    'is_deleted' => false
+                    'is_deleted'   => false,
+                    'is_collapsed' => $this->isCollapsed(),
                 ],
                 'id'     => $item->id,
             ];
@@ -193,6 +205,44 @@ class HasMany extends Field
     public function getActions()
     {
         return $this->actions;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function collapse($value)
+    {
+        $this->isCollapsed = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCollapsed()
+    {
+        return $this->isCollapsed;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function entryLabel($value)
+    {
+        $this->entryLabel = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntryLabel()
+    {
+        return $this->entryLabel;
     }
 
 }
