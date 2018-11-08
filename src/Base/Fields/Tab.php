@@ -12,26 +12,89 @@ class Tab
      * @var
      */
     private $fieldSet;
+
+    /**
+     * @var
+     */
     private $name;
+
+    /**
+     * @var
+     */
     private $closure;
+
+    /**
+     * @var bool
+     */
     private $isTranslatable = false;
 
+    /**
+     * @var
+     */
+    private $model;
+
+    /**
+     * @var
+     */
+    private $fields;
+
+    /**
+     * @var array
+     */
+    private $validationRules = [];
+
+    /**
+     * Tab constructor.
+     * @param $name
+     */
     public function __construct($name)
     {
         $this->name = array_first($name);
         $this->fieldSet = new FieldSet;
     }
 
+
+
     /**
-     * @param Model $model
+     * @return array
+     */
+    public function formattedResponse()
+    {
+        return [
+            'name'   => $this->name,
+            'slug'   => str_slug($this->name, '_'),
+            'type'   => 'tab',
+            'fields' => $this->fields,
+            'config' => [
+                'is_translatable' => $this->isTranslatable,
+                'col'             => 'col-md-12',
+            ]
+        ];
+    }
+
+    /**
      * @return $this
      */
-    public function build(Model $model)
+    public function build()
     {
         $fieldSet = $this->fieldSet;
-        $fieldSet->model($model);
+        $fieldSet->model($this->model);
         $closure = $this->closure;
         $closure($fieldSet);
+        $fields = [];
+        foreach ($fieldSet->fields() as $field) {
+            $field->build();
+
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
+
+            $this->validationRules = array_merge($this->validationRules, $field->getValidationRules());
+
+            $fields[] = $field->formattedResponse();
+        }
+
+        $this->fields = $fields;
 
         return $this;
     }
@@ -48,29 +111,12 @@ class Tab
         return $this;
     }
 
-    public function formattedResponse()
+    /**
+     * @return array
+     */
+    public function getValidationRules()
     {
-        $fields = [];
-        foreach ($this->fieldSet->fields() as $field) {
-            $field->build();
-
-            if ($field->isTranslatable()) {
-                $this->isTranslatable = true;
-            }
-
-            $fields[] = $field->formattedResponse();
-        }
-
-        return [
-            'name'   => $this->name,
-            'slug'   => str_slug($this->name, '_'),
-            'type'   => 'tab',
-            'fields' => $fields,
-            'config' => [
-                'is_translatable' => $this->isTranslatable,
-                'col'             => 'col-md-12',
-            ]
-        ];
+        return $this->validationRules;
     }
 
     /**
@@ -79,5 +125,16 @@ class Tab
     public function isTranslatable()
     {
         return $this->isTranslatable;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function model($value)
+    {
+        $this->model = $value;
+
+        return $this;
     }
 }

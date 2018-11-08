@@ -59,14 +59,14 @@ class Form
         $this->model($resource->getModel());
 
         foreach ($fields as $field) {
-            if (!$field instanceof Tab) {
-                $field->build();
-                $this->setValidationRules($field->getValidationRules());
-                if ($field->isTranslatable()) {
-                    $this->isTranslatable = true;
-                }
-            } else {
-                $field->build($this->getModel());
+            if ($field instanceof Tab) {
+                $field->model($this->getModel());
+            }
+
+            $field->build();
+            $this->setValidationRules($field->getValidationRules());
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
             }
 
             $this->fields->push($field);
@@ -88,7 +88,7 @@ class Form
             'data'  => [
                 'languages'        => $languages,
                 'form'             => $this->response(),
-                'is_translatable'  => $this->isTranslatable,
+                'is_translatable'  => $this->isTranslatable(),
                 'default_language' => array_first($languages)['iso_code']
             ]
         ];
