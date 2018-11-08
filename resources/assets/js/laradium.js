@@ -19,8 +19,9 @@ Vue.component('crud-form', require('./components/CrudForm.vue'));
 Vue.component('text-field', require('./components/fields/Text.vue'));
 Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
 Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
-Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
+Vue.component('tab-field', require('./components/fields/Tab.vue'));
 Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
+Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
 Vue.component('select-field', require('./components/fields/Select.vue'));
 Vue.component('file-field', require('./components/fields/File.vue'));
@@ -30,7 +31,6 @@ Vue.component('radio-field', require('./components/fields/Radio.vue'));
 Vue.component('date-field', require('./components/fields/Date.vue'));
 Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
 Vue.component('time-field', require('./components/fields/Time.vue'));
-Vue.component('tab-field', require('./components/fields/Tab.vue'));
 
 Vue.component('draggable', require('vuedraggable'));
 
@@ -38,7 +38,7 @@ Vue.mixin({
     methods: {
         generateReplacementIds(replacement_ids, replacement_id_list_old) {
             let rand_id = Math.random().toString(36).substring(7);
-            let replacement_id_list = JSON.parse(JSON.stringify(replacement_id_list_old));
+            let replacement_id_list = _.cloneDeep(replacement_id_list_old);
 
             let lastId = '';
             for (let repId in replacement_id_list) {
