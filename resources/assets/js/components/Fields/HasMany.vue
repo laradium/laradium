@@ -27,7 +27,7 @@
                                     class="fa fa-trash"></i></button>
                         </div>
 
-                        <div class="pull-right">
+                        <div class="pull-right" v-if="!entry.config.is_deleted">
                             <button class="btn btn-success btn-sm" @click.prevent="toggle(index)" style="margin-right: 5px;">
                                 <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i> Hide</span>
                                 <span v-else><i class="fa fa-eye"></i> Show</span>
@@ -128,14 +128,16 @@
 
             remove(item, field_name, index) {
                 swal({
-                    title: "Are you sure?",
-                    text: "After clicking \"Save\", you will not be able to recover this item!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this after you press 'Save'!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
                 })
-                    .then((willDelete) => {
-                        if (willDelete) {
+                    .then((result) => {
+                        if (result.value) {
                             if (item.id !== undefined) {
                                 let item_copy = _.cloneDeep(this.field.entries[index]);
                                 this.removed_items[index] = item_copy;

@@ -53,15 +53,8 @@ class AdminController
     public function destroyFile(Request $request, $model, $id, $file, $locale = null)
     {
         $model = $model::findOrFail($id);
-
-        if ($locale) {
-            $model = $model->translations()->where('locale', $locale)->first();
-            $model->{$file} = Attachment::NULL_ATTACHMENT;
-            $model->save();
-        } else {
-            $model->{$file} = Attachment::NULL_ATTACHMENT;
-            $model->save();
-        }
+        $model->{$file} = Attachment::NULL_ATTACHMENT;
+        $model->save();
 
         if ($request->ajax()) {
             return [

@@ -10,7 +10,7 @@
                     <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
                     <div class="pull-right" v-if="entry.config.is_deleted">
                         <button class="btn btn-primary btn-sm"
-                                @click.prevent="restore(index)"><i class="fa fa-undo"></i></button>
+                                @click.prevent="restore(index)"><i class="fa fa-undo"></i> Restore</button>
                     </div>
                     <div class="pull-right" v-if="!entry.config.is_deleted">
                         <button class="btn btn-danger btn-sm"
@@ -100,13 +100,16 @@
 
             remove(item, field_name, index) {
                 swal({
-                    title: "Are you sure?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this after you press 'Save'!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
                 })
-                    .then((willDelete) => {
-                        if (willDelete) {
+                    .then((result) => {
+                        if (result.value) {
                             if (item.id !== undefined) {
                                 this.removed_items[index] = _.cloneDeep(this.field.entries[index]);
 

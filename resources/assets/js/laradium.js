@@ -9,6 +9,8 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+import { VueEditor } from "vue2-editor";
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -20,8 +22,6 @@ Vue.component('text-field', require('./components/fields/Text.vue'));
 Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
 Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('tab-field', require('./components/fields/Tab.vue'));
-Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
-Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
 Vue.component('select-field', require('./components/fields/Select.vue'));
 Vue.component('file-field', require('./components/fields/File.vue'));
@@ -31,8 +31,14 @@ Vue.component('radio-field', require('./components/fields/Radio.vue'));
 Vue.component('date-field', require('./components/fields/Date.vue'));
 Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
 Vue.component('time-field', require('./components/fields/Time.vue'));
+Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
+
+Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
+Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
+Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue'));
 
 Vue.component('draggable', require('vuedraggable'));
+Vue.component('VueEditor', VueEditor);
 
 Vue.mixin({
     methods: {
