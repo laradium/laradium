@@ -40,3 +40,9 @@ if (token) {
 
 window.datetimepicker = require('jquery-datetimepicker');
 window.swal = require('sweetalert2');
+
+$.ajaxSetup({
+	headers: {
+		'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	}
+});

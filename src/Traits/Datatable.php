@@ -2,13 +2,12 @@
 
 namespace Laradium\Laradium\Traits;
 
+use Illuminate\Http\Request;
 use Laradium\Laradium\Base\Form;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Http\Request;
 
 trait Datatable
 {
-
     /**
      * @param Request $request
      * @return array
@@ -17,18 +16,23 @@ trait Datatable
     {
         $model = $this->model;
         $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
+        $form = (new Form(
+            $this
+                ->getBaseResource($model)
+                ->make($resource->closure())
+                ->build())
+        )->build();
 
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+        $this->fireEvent('beforeSave', $request);
+
+        $validationRules = $form->getValidationRules();
+        $validationRules = array_only($validationRules, $request->get('name'));
+        $validationRules['value'] = $validationRules[$request->get('name')];
+        $request->validate($validationRules);
 
         $model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
 
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+        $this->fireEvent('afterSave', $request);
 
         return [
             'state' => 'success'

@@ -12,4 +12,5 @@ mix.setPublicPath('public');
  */
 
 mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
-   .sass('resources/assets/sass/laradium.scss', 'public/laradium/assets/css');
+	.extract(['jquery', 'bootstrap', 'vue', 'jquery-datetimepicker'])
+	.sass('resources/assets/sass/laradium.scss', 'public/laradium/assets/css');
