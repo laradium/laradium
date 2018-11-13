@@ -4,11 +4,11 @@ namespace Laradium\Laradium\Base\Resources;
 
 use DB;
 use Illuminate\Http\Request;
-use Laradium\Laradium\Models\Language;
-use Laradium\Laradium\Models\Translation;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Language;
+use Laradium\Laradium\Models\Translation;
 
 Class TranslationResource extends AbstractResource
 {
@@ -23,7 +23,7 @@ Class TranslationResource extends AbstractResource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event('afterSave', function () {
             cache()->forget('translations');
         });
 
