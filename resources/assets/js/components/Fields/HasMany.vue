@@ -108,7 +108,8 @@
                     config: {
                         is_deleted: false,
                         is_collapsed: false
-                    }
+                    },
+                    label: 'Entry'
                 });
 
             },

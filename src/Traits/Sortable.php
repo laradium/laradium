@@ -2,6 +2,8 @@
 
 namespace Laradium\Laradium\Traits;
 
+use Laradium\Laradium\Base\Fields\Hidden;
+
 trait Sortable
 {
 
@@ -41,5 +43,16 @@ trait Sortable
     public function getSortableColumn()
     {
         return $this->sortableColumn;
+    }
+
+    /**
+     * @param $model
+     * @return array
+     */
+    public function sortableField($model)
+    {
+        return (new Hidden('sequence_no', $model))
+            ->build(array_merge($this->getAttributes(), [$model->id]))
+            ->formattedResponse();
     }
 }

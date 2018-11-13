@@ -8,7 +8,7 @@ trait Crud
     /**
      * @var array
      */
-    private $unwantedKeys = ['crud_worker'];
+    private $unwantedKeys = ['crud_worker', 'morphable_type', 'morphable_name'];
 
     /**
      * @param $inputs
@@ -43,15 +43,43 @@ trait Crud
 
         foreach ($workers as $key => $worker) {
             if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
-                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key, ['password']) || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class && !in_array($key, ['password'])) {
+                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key,
+                        ['password']) || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class && !in_array($key,
+                        ['password'])) {
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 } elseif ($crudWorkerClass == \Laradium\Laradium\Base\Fields\Password::class) {
                     $this->passwordWorker($model, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
+                    $this->morphToWorker($model, array_except($worker, 'crud_worker'));
                 }
             }
         }
 
         return $model;
+    }
+
+    /**
+     * @param $model
+     * @param $data
+     * @throws \ReflectionException
+     */
+    private function morphToWorker($model, $data)
+    {
+        $morphableName = array_get($data, 'morphable_name');
+        $morphableType = array_get($data, 'morphable_type');
+
+        foreach (array_except($data, ['morphable_name', 'morphable_type']) as $key => $value) {
+            if ($id = array_get($value, 'id', null)) {
+                $this->saveData($value, $model->{$morphableName});
+            } else {
+                $morphableModel = new $morphableType;
+                $createdMorphableModel = $this->saveData($value, $morphableModel);
+
+                $model->{$morphableName . '_id'} = $createdMorphableModel->id;
+                $model->{$morphableName . '_type'} = $morphableType;
+                $model->save();
+            }
+        }
     }
 
     /**
@@ -98,7 +126,7 @@ trait Crud
     private function passwordWorker($model, $passwords)
     {
         foreach ($passwords as $fieldName => $value) {
-            if(!str_contains($fieldName, '_confirmation') && $value) {
+            if (!str_contains($fieldName, '_confirmation') && $value) {
                 $model->update([
                     $fieldName => bcrypt($value)
                 ]);
