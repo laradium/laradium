@@ -86,8 +86,7 @@
         methods: {
             addItem() {
                 this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
-                let template_fields = _.cloneDeep(this.field.template_data.fields)
-                ;
+                let template_fields = _.cloneDeep(this.field.template_data.fields);
 
                 for (let field in template_fields) {
                     for (let id in this.new_replacement_ids) {
@@ -101,7 +100,6 @@
                         }
                     }
                 }
-
 
                 this.field.entries.push({
                     fields: template_fields,
@@ -137,8 +135,8 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then((result) => {
-                        if (result.value) {
+                    .then((willDelete) => {
+                        if (willDelete) {
                             if (item.id !== undefined) {
                                 let item_copy = _.cloneDeep(this.field.entries[index]);
                                 this.removed_items[index] = item_copy;
