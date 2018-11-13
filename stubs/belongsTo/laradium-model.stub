@@ -1,0 +1,22 @@
+<?php
+
+namespace {{namespace}};
+
+use Laradium\Laradium\Traits\ModelBoot;
+
+class {{model}} extends \{{extendsModel}}
+{
+    use ModelBoot;
+
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        {{fillable}}
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    {{relation}}
+}

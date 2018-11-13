@@ -15,7 +15,7 @@ class BelongsTo
     protected $class;
 
     /**
-     * @var
+     * @var string
      */
     protected $tableName;
 
@@ -27,7 +27,7 @@ class BelongsTo
     /**
      * @var string
      */
-    protected $label;
+    protected $name;
 
     /**
      * @var string
@@ -43,7 +43,7 @@ class BelongsTo
         $this->class = class_exists($this->config) ? (new $this->config) : '';
         $this->tableName = $this->class ? $this->class->getTable() : '';
         $this->foreignKey = str_singular($this->tableName) . '_id';
-        $this->label = str_singular(ucfirst($this->tableName));
+        $this->name = str_singular(ucfirst($this->tableName));
         $this->relation = str_singular($this->tableName);
     }
 
@@ -96,12 +96,20 @@ class BelongsTo
     }
 
     /**
-     * @param int $id
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param null|int $id
      * @return mixed
      */
-    public function set(int $id): int
+    public function set($id): ?int
     {
-        $_SESSION[$this->getRelation()] = $id;
+        session([$this->getRelation() => $id]);
 
         return $id;
     }
@@ -111,68 +119,46 @@ class BelongsTo
      */
     public function getCurrent()
     {
-        return $_SESSION[$this->getRelation()] ?? null;
-    }
-
-    /**
-     * @param \Laradium\Laradium\Base\FieldSet $set
-     * @param array $onChange
-     * @param bool $languages
-     */
-    public function getSelect(\Laradium\Laradium\Base\FieldSet $set, $onChange = [], $languages = false, $global = false)
-    {
-        $options = $this->getOptions($global, $forSelect = true);
-
-        $select = $set->select($this->foreignKey)
-            ->rules('required')
-            ->label($this->label)
-            ->options($options)
-            ->default($global ? array_keys($options)[1] : array_first(array_keys($options)))
-            ->hideIf(auth()->user()->{$this->foreignKey});
-
-        if (!auth()->user()->{$this->foreignKey}) {
-            if ($onChange && !$languages) {
-                $select->onChange($onChange);
-            } else if ($onChange && $languages) {
-                $array = [];
-
-                foreach ($this->class::all() as $row) {
-                    $array[$row->id] = $row->languages->map(function ($language) {
-                            return (object)[
-                                'id'          => $language->id,
-                                'iso_code'    => $language->iso_code,
-                                'is_fallback' => !!$language->is_fallback,
-                            ];
-                        }) ?? [];
-                }
-
-                $select->onChange($onChange, $array);
-            } else if (!$onChange && $languages) {
-                $array = [];
-
-                foreach ($this->class::all() as $row) {
-                    $array[$row->id] = $row->languages->map(function ($language) {
-                            return (object)[
-                                'id'          => $language->id,
-                                'iso_code'    => $language->iso_code,
-                                'is_fallback' => !!$language->is_fallback,
-                            ];
-                        }) ?? [];
-                }
-
-                $select->onChange([], $array);
-            }
-        }
+        return session()->get($this->getRelation(), null);
     }
 
     /**
      * @return mixed
      */
-    public function getOptions($global = false, $forSelect = false)
+    public function getCurrentObject()
     {
-        $options = $this->class::pluck('name', 'id')->toArray();
+        if ($this->getCurrent()) {
+            return $this->class::where('id', $this->getCurrent())->first();
+        }
 
-        return $global ? collect($options)->prepend('Global', $forSelect ? '' : 'null')->toArray() : $options;
+        return new $this->class([
+            'id'   => null,
+            'key'  => 'global',
+            'name' => 'Global'
+        ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getItems()
+    {
+        $global = new $this->class([
+            'id'   => null,
+            'key'  => 'global',
+            'name' => 'Global'
+        ]);
+
+        $items = $this->class::all()->prepend($global);
+
+        return $items->reject(function ($item) {
+            $userForeignKey = auth()->user()->{$this->getForeignKey()};
+            if (is_null($userForeignKey)) {
+                return false;
+            }
+
+            return $item->id !== $userForeignKey;
+        });
     }
 
     /**

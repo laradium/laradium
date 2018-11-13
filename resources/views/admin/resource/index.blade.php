@@ -23,7 +23,7 @@
                     <hr>
                 @endif
 
-                @if ($table->getTabs())
+                @if ($table->getTabs() && count(array_first($table->getTabs())))
                     @foreach($table->getTabs() as $key => $tabs)
                         <ul class="nav nav-tabs">
                             @foreach($tabs as $id => $tabName)
@@ -71,7 +71,7 @@
                 '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
                 '<button type="button" class="btn editable-cancel btn-mini btn-sm"><i class="fa fa-close"></i></button>';
 
-                    @if ($table->getTabs())
+                    @if ($table->getTabs() && count(array_first($table->getTabs())))
             var onTabChange = function (activeTab) {
                     // Entries datatable
                     var selector = '.tab-pane.active .resource-datatable';

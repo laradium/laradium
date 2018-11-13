@@ -24,6 +24,11 @@ class Menu extends Model
     ];
 
     /**
+     * @var string
+     */
+    protected $translationModel = MenuTranslation::class;
+
+    /**
      * @var array
      */
     protected $translatedAttributes = [
