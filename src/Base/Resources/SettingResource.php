@@ -2,10 +2,10 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
-use Laradium\Laradium\Models\Setting;
 use Laradium\Laradium\Base\AbstractResource;
-use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Setting;
 
 Class SettingResource extends AbstractResource
 {
@@ -24,14 +24,14 @@ Class SettingResource extends AbstractResource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event('afterSave', function () {
             setting()->clearCache();
         });
 
         return laradium()->resource(function (FieldSet $set) {
-            $fieldType = $set->model()->type;
+            $fieldType = $set->getModel()->type;
 
-            if ($set->model()->is_translatable) {
+            if ($set->getModel()->is_translatable) {
                 $set->$fieldType('value')->translatable();
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file');

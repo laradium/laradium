@@ -86,7 +86,15 @@
                         columns: {!! $table->getColumnConfig()->toJson() !!},
                         order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                     }).on('draw.dt', function () {
-                        $('.js-editable').editable({});
+                        $('.js-editable').editable({
+                            error: function(response, newValue) {
+                                if (response.status !== 422) {
+                                    return 'Something went wrong, please, try again later.';
+                                }
+
+                                return response.responseJSON.message;
+                            }
+                        });
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
                     });
                 };
@@ -108,7 +116,15 @@
                     columns: {!! $table->getColumnConfig()->toJson() !!},
                     order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
-                    $('.js-editable').editable({});
+                    $('.js-editable').editable({
+                        error: function(response, newValue) {
+                            if (response.status !== 422) {
+                                return 'Something went wrong, please, try again later.';
+                            }
+
+                            return response.responseJSON.message;
+                        }
+                    });
                     $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
                 });
             @endif

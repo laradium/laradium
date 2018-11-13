@@ -180,12 +180,9 @@
 </div>
 <!-- END wrapper -->
 @yield('crud-url')
+<script src="{{ versionedAsset('laradium/assets/js/manifest.js') }}"></script>
+<script src="{{ versionedAsset('laradium/assets/js/vendor.js') }}"></script>
 <script src="{{ versionedAsset('laradium/assets/js/laradium.js') }}"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"
-        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
-        crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 
 <script src="{{ asset('/laradium/admin/assets/js/detect.js') }}"></script>
@@ -195,21 +192,10 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.nicescroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <!-- App js -->
 <script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.app.js') }}"></script>
-
-<!-- Laradium js -->
-<script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-</script>
 
 @stack('scripts')
 

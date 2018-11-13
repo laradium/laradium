@@ -1,23 +1,28 @@
 <?php
+
 namespace Laradium\Laradium\Base\Resources;
-use Laradium\Laradium\Models\Language;
+
 use Laradium\Laradium\Base\AbstractResource;
-use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Language;
+
 Class LanguageResource extends AbstractResource
 {
     /**
      * @var string
      */
     protected $resource = Language::class;
+
     /**
      * @return \Laradium\Laradium\Base\Resource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event('afterSave', function () {
             cache()->forget('laradium::languages');
         });
+
         return laradium()->resource(function (FieldSet $set) {
             $set->text('iso_code')->rules('required|min:2|max:2');
             $set->text('title')->rules('required|min:2|max:255');
@@ -27,6 +32,7 @@ Class LanguageResource extends AbstractResource
             $set->file('icon')->rules('image|max:' . config('laradium.file_size'));
         });
     }
+
     /**
      * @return \Laradium\Laradium\Base\Table
      */

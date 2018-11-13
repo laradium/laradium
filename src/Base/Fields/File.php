@@ -15,18 +15,26 @@ class File extends Field
         $data = parent::formattedResponse();
         $model = $this->getModel();
 
+        $data['worker'] = (new Hidden('crud_worker', $this->getModel()))
+            ->build([$this->getNameAttribute()])
+            ->value(get_class($this))
+            ->formattedResponse();
+
         if (!$this->isTranslatable()) {
             if ($model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
                 $url = $model->{$this->getFieldName()}->url();
                 $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
                 $name = $model->{$this->getFieldName()}->originalFilename();
+                $deleteUrl = route('admin.resource.destroy-file', [
+                    get_class($model), $model->id, $this->getFieldName()
+                ]);
             }
 
             $data['file'] = [
-                'url'        => $url ?? null,
-                'file_name'  => $name ?? null,
-                'file_size'  => $size ?? null,
-                'is_deleted' => false,
+                'url'       => $url ?? null,
+                'file_name' => $name ?? null,
+                'file_size' => $size ?? null,
+                'deleteUrl' => $deleteUrl ?? null
             ];
         }
 
@@ -50,11 +58,15 @@ class File extends Field
                 $url = null;
                 $size = null;
                 $name = null;
+                $deleteUrl = null;
 
                 if ($model && $model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
                     $url = $model->{$this->getFieldName()}->url();
                     $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
                     $name = $model->{$this->getFieldName()}->originalFilename();
+                    $deleteUrl = route('admin.resource.destroy-file', [
+                        get_class($model), $model->id, $this->getFieldName(), $language->iso_code
+                    ]);
                 }
 
                 $translations[] = [
@@ -62,10 +74,10 @@ class File extends Field
                     'value'    => $this->getValue(),
                     'name'     => $this->getNameAttribute(),
                     'file'     => [
-                        'url'        => $url,
-                        'file_name'  => $name,
-                        'file_size'  => $size,
-                        'is_deleted' => false,
+                        'url'       => $url,
+                        'file_name' => $name,
+                        'file_size' => $size,
+                        'deleteUrl' => $deleteUrl
                     ]
                 ];
             }
