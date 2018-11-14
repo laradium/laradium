@@ -64,4 +64,15 @@ class AdminController
 
         return back()->withSuccess('Resource file successfully deleted!');
     }
+
+    /**
+     * @param $value
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function setBelongsTo($value = null)
+    {
+        laradium()->belongsTo()->set($value);
+
+        return back();
+    }
 }

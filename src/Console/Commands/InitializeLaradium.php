@@ -78,8 +78,9 @@ class InitializeLaradium extends Command
                     $bar->advance();
                 }
 
-                // Copy model to project
+                // Copy model&resource to project
                 $this->copyModel($class);
+                $this->copyResource($class);
 
                 $table = (new $class)->getTable();
                 $name = 'add_' . $foreignKey . '_to_' . $table . '_table';
@@ -216,5 +217,46 @@ class InitializeLaradium extends Command
 
         // Write to file
         file_put_contents(app_path('Models/' . $model->getShortName() . '.php'), $stub);
+    }
+
+    /**
+     * @param $model
+     * @throws \ReflectionException
+     */
+    protected function copyResource($model): void
+    {
+        $class = new \ReflectionClass($model);
+        $resource = $this->getResourceNamespace($class->getShortName());
+        $namespace = str_replace('\\', '', app()->getNamespace());
+        $stub = File::get(__DIR__ . '/../../../stubs/belongsTo/laradium-resource.stub');
+        $stub = str_replace([
+            '{{namespace}}', '{{resource}}', '{{extendsResource}}', '{{modelNamespace}}'
+        ], [
+            $namespace, $class->getShortName(), '\\' . $resource, config('laradium.default_models_directory', 'App')
+        ], $stub);
+        $resourcePath = app_path('Laradium/Resources/');
+
+        if (!is_dir($resourcePath)) {
+            File::makeDirectory($resourcePath, 0755, true);
+        }
+
+        // Write to file
+        file_put_contents($resourcePath . $class->getShortName() . 'Resource.php', $stub);
+    }
+
+    /**
+     * @param $class
+     * @return string
+     */
+    protected function getResourceNamespace($class): string
+    {
+        $resources = [
+            'Language'    => 'Laradium\Laradium\Base\Resources\\',
+            'Menu'        => 'Laradium\Laradium\Base\Resources\\',
+            'Setting'     => 'Laradium\Laradium\Base\Resources\\',
+            'Translation' => 'Laradium\Laradium\Base\Resources\\',
+            'Page'        => 'Laradium\Laradium\Content\Base\Resources\\',
+        ];
+        return array_get($resources, $class, '') . $class . 'Resource';
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Laradium\Laradium\Helpers;
 
+use Laradium\Laradium\Base\AbstractResource;
+
 class BelongsTo
 {
     /**
@@ -104,22 +106,35 @@ class BelongsTo
     }
 
     /**
-     * @param null|int $id
+     * @param null|int $value
      * @return mixed
      */
-    public function set($id): ?int
+    public function set($value): ?int
     {
-        session([$this->getRelation() => $id]);
+        session([$this->getRelation() => $value]);
 
-        return $id;
+        return $value;
     }
 
     /**
+     * @param null $user
      * @return mixed
      */
-    public function getCurrent()
+    public function getCurrent($user = null)
     {
-        return session()->get($this->getRelation(), null);
+        $user = $user ?? auth()->user();
+        $value = session()->get($this->getRelation(), null);
+
+        // If admin belongs to domain/region etc.,
+        // but session value is null,
+        // set it to user's domain/region value
+        $belongsToKey = $user->{$this->getForeignKey()} ?? null;
+        if ($belongsToKey && !$value || ($belongsToKey && $belongsToKey !== $value)) {
+            $value = $belongsToKey;
+            $this->set($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -153,7 +168,7 @@ class BelongsTo
 
         return $items->reject(function ($item) {
             $userForeignKey = auth()->user()->{$this->getForeignKey()};
-            if (is_null($userForeignKey)) {
+            if ($userForeignKey === null) {
                 return false;
             }
 
@@ -167,5 +182,19 @@ class BelongsTo
     public function getLanguages()
     {
         return auth()->user()->{$this->relation}->languages ?? translate()->languages()->where($this->foreignKey, null);
+    }
+
+    /**
+     * @param $resource
+     * @return bool
+     */
+    public function hasAccess($resource): bool
+    {
+        $resource = $resource instanceof AbstractResource ? $resource : (class_exists($resource) ? (new $resource) : null);
+        if (!$resource || $this->getCurrent()) {
+            return true;
+        }
+
+        return $resource && $resource->hasGlobalActions() && !$this->getCurrent();
     }
 }

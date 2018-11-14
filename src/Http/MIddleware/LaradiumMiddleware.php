@@ -36,6 +36,10 @@ class LaradiumMiddleware
             return redirect('/admin/access-denied');
         }
 
+        if ($belongsTo = laradium()->belongsTo()) {
+            $belongsTo->set($belongsTo->getCurrent());
+        }
+
         return $next($request);
     }
 }

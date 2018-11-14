@@ -30,6 +30,11 @@ Route::group([
             'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@destroyFile',
             'as'   => 'resource.destroy-file'
         ]);
+
+        Route::get('change-belongsto/{value?}', [
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@setBelongsTo',
+            'as'   => 'change-belongsto'
+        ]);
     });
 
     // Auth

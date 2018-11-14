@@ -3,7 +3,7 @@
     <ul>
         <li class="text-muted menu-title">Navigation</li>
         @foreach(menu()->get('admin_menu')->items as $item)
-            @if (laradium()->hasPermissionTo(auth()->user(), $item->resource))
+            @if (laradium()->hasPermissionTo(auth()->user(), $item->resource) && laradium()->belongsTo()->hasAccess($item->resource))
                 <li>
                     <a href="{{ url($item->url) }}"
                        class="{{ str_contains(request()->getRequestUri(), $item->url) ? 'active' : '' }}">
@@ -19,8 +19,9 @@
 
             @foreach ($belongsTo->getItems() as $item)
                 <li>
-                    <a href="#" class="{{ $item->id === $belongsTo->getCurrent() ? 'active' : '' }}">
-                        <span>{{ $item->name }}</span>
+                    <a href="{{ route('admin.change-belongsto', $item->id) }}"
+                       class="{{ $item->id == $belongsTo->getCurrent() ? 'active' : '' }}">
+                        <span>@if ($item->id == $belongsTo->getCurrent()) <i class="fa fa-check"></i>@endif {{ $item->name }}</span>
                     </a>
                 </li>
             @endforeach
