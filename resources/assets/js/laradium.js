@@ -32,6 +32,7 @@ Vue.component('date-field', require('./components/fields/Date.vue'));
 Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
 Vue.component('time-field', require('./components/fields/Time.vue'));
 Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
+Vue.component('color-field', require('./components/fields/Color.vue'));
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
@@ -72,8 +73,6 @@ const app = new Vue({
         selectedPage: false
     }
 });
-
-
 
 new Vue({
     el: '#channel-select',
