@@ -49,7 +49,7 @@ class BelongsToMany extends Field
      */
     public function build($attributes = [])
     {
-        parent::build();
+        parent::build($attributes);
 
         $model = $this->getModel();
         $relationModel = $model->{$this->relationName}()->getModel();
