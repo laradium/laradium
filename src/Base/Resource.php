@@ -46,6 +46,10 @@ class Resource
         $this->fieldSet = new FieldSet();
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function name($value)
     {
         $this->name = $value;
@@ -53,6 +57,10 @@ class Resource
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function slug($value)
     {
         $this->slug = $value;
@@ -72,6 +80,9 @@ class Resource
         return $this;
     }
 
+    /**
+     * @return Model
+     */
     public function getModel()
     {
         return $this->model;

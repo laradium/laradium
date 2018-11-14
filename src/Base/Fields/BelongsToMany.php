@@ -9,22 +9,22 @@ class BelongsToMany extends Field
 {
 
     /**
-     * @var
+     * @var string
      */
-    protected $relationModel;
+    private $relationName;
 
     /**
      * @var string
      */
-    protected $relationName;
-
-    /**
-     * @var string
-     */
-    protected $title;
+    private $title = 'name';
 
     /**
      * @var
+     */
+    private $items;
+
+    /**
+     * @var array
      */
     protected $fieldCol = [
         'size' => 2,
@@ -40,57 +40,46 @@ class BelongsToMany extends Field
     {
         parent::__construct($parameters, $model);
 
-        $this->relationName = $this->name;
-
-        if (count($parameters) > 1) {
-            $this->label = array_last($parameters);
-        }
+        $this->relationName = array_first($parameters);
     }
 
     /**
-     * @param null $field
+     * @param array $attributes
+     * @return Field
+     */
+    public function build($attributes = [])
+    {
+        parent::build();
+
+        $model = $this->getModel();
+        $relationModel = $model->{$this->relationName}()->getModel();
+
+        $this->items = $relationModel->all()->map(function ($item) use($model) {
+            $isChecked = false;
+            if($checkedCategory = $model->{$this->relationName}->where('id', $item->id)->first()) {
+                $isChecked = true;
+            }
+            return [
+                'id' => $item->id,
+                'name' => $item->{$this->title},
+                'is_checked' => $isChecked,
+            ];
+        });
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse(): array
     {
-        $field = !is_null($field) ? $field : $this;
+        $data = parent::formattedResponse();
+        $data['value'] = get_class($this);
+        $data['items'] = $this->items;
+        $data['config']['field_col'] = $this->fieldCol;
 
-        $relatedItems = $this->relation()->get()->pluck('id')->toArray();
-        $relationModel = $this->relation()->getModel();
-        $items = new $relationModel;
-        $items = $items->get();
-
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
-
-        $field->setNameAttributeList($attributes->toArray());
-
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
-
-        return [
-            'type'                  => 'belongs-to-many',
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'replacementAttributes' => $attributes->toArray(),
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'fieldCol'              => $this->fieldCol,
-            'attr'                  => $this->getAttr(),
-            'items'                 => $items->map(function ($item) use ($relatedItems) {
-                return [
-                    'id'      => $item->id,
-                    'name'    => $this->title ? $item->{$this->title} : $item->name,
-                    'checked' => in_array($item->id, $relatedItems),
-                ];
-            })->toArray(),
-        ];
+        return $data;
     }
 
     /**
@@ -104,13 +93,6 @@ class BelongsToMany extends Field
         return $this;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
-    }
 
     /**
      * @param int $size
@@ -120,7 +102,6 @@ class BelongsToMany extends Field
     public function fieldCol($size = 2, $type = 'md')
     {
         $this->fieldCol = compact('size', 'type');
-
         return $this;
     }
 }

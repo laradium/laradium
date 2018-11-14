@@ -44,14 +44,14 @@ trait Crud
 
         foreach ($workers as $key => $worker) {
             if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
-                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key,
-                        ['password']) || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class && !in_array($key,
-                        ['password'])) {
+                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class) {
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\Password::class) {
                     $this->passwordWorker($model, array_except($worker, 'crud_worker'));
                 } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
                     $this->morphToWorker($model, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
+                    $this->belongsToManyToWorker($model, $key, array_except($worker, 'crud_worker'));
                 }
             }
         }
@@ -88,9 +88,10 @@ trait Crud
      */
     private function recursiveUnset(&$array)
     {
-        foreach ($this->unwantedKeys as $key) {
-            unset($array[$key]);
             foreach ($array as $index => &$value) {
+                if(in_array($index, $this->unwantedKeys)) {
+                    unset($array[$index]);
+                }
                 if (is_array($value)) {
                     if (array_get($value, 'remove', null)) {
                         unset($array[$index]);
@@ -98,8 +99,8 @@ trait Crud
                     $this->recursiveUnset($value, $this->unwantedKeys);
                 }
             }
-        }
 
         return true;
     }
+
 }
