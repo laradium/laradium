@@ -286,6 +286,17 @@ class Field
     }
 
     /**
+     * @param $value
+     * @return $this
+     */
+    public function attributes($value)
+    {
+        $this->attributes = $value;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getAttributes()

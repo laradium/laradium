@@ -9,7 +9,7 @@ trait Crud
     /**
      * @var array
      */
-    private $unwantedKeys = ['crud_worker'];
+    private $unwantedKeys = ['crud_worker', 'morphable_type', 'morphable_name'];
 
     /**
      * @param $inputs
@@ -44,16 +44,21 @@ trait Crud
 
         foreach ($workers as $key => $worker) {
             if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
-                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key, ['password']) || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class && !in_array($key, ['password'])) {
+                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class && !in_array($key,
+                        ['password']) || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class && !in_array($key,
+                        ['password'])) {
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\Password::class) {
                     $this->passwordWorker($model, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
+                    $this->morphToWorker($model, array_except($worker, 'crud_worker'));
                 }
             }
         }
 
         return $model;
     }
+
 
     /**
      * @param $data

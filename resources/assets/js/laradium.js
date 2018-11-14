@@ -32,10 +32,13 @@ Vue.component('date-field', require('./components/fields/Date.vue'));
 Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
 Vue.component('time-field', require('./components/fields/Time.vue'));
 Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
+Vue.component('color-field', require('./components/fields/Color.vue'));
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue'));
+Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
+Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue'));
 
 Vue.component('draggable', require('vuedraggable'));
 Vue.component('VueEditor', VueEditor);
@@ -68,10 +71,17 @@ const app = new Vue({
     el: '#crud-form',
     data: {
         selectedPage: false
+    }
+});
+
+new Vue({
+    el: '#channel-select',
+    data: {
+        selectedPage: false
     },
     methods: {
         redirectToCreatePage() {
-            window.location = '/admin/pages/create/' + this.selectedPage;
+            window.location = '/admin/pages/create?channel=' + this.selectedPage;
         }
     }
 });

@@ -45,13 +45,7 @@ Class TranslationResource extends AbstractResource
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        })->tabs([
-            'group' => Translation::select('group')->groupBy('group')->get()->mapWithKeys(function ($translation) {
-                return [
-                    $translation->group => ucfirst(preg_replace('/[-_]+/', ' ', $translation->group))
-                ];
-            })->all()
-        ]);
+        });
     }
 
     /**
@@ -75,7 +69,8 @@ Class TranslationResource extends AbstractResource
 
                 unset($item['key']);
 
-                $languages = array_keys(array_intersect_key($item, array_flip(array_filter(array_keys($item), 'is_string'))));
+                $languages = array_keys(array_intersect_key($item,
+                    array_flip(array_filter(array_keys($item), 'is_string'))));
                 foreach ($languages as $lang) {
                     $rows[] = [
                         'locale' => $lang,
@@ -89,7 +84,8 @@ Class TranslationResource extends AbstractResource
             DB::transaction(function () use ($rows) {
                 foreach (array_chunk($rows, 300) as $chunk) {
                     foreach ($chunk as $item) {
-                        $translation = Translation::where('key', $item['key'])->where('locale', $item['locale'])->where('group', $item['group'])->first();
+                        $translation = Translation::where('key', $item['key'])->where('locale',
+                            $item['locale'])->where('group', $item['group'])->first();
                         if ($translation) {
                             $translation->value = $item['value'];
                             $translation->save();
@@ -103,6 +99,7 @@ Class TranslationResource extends AbstractResource
             cache()->forget('translations');
         } catch (\Exception $e) {
             logger()->error($e);
+
             return back()->withError('Something went wrong, please try again!');
         }
 

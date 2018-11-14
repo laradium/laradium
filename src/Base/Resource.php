@@ -34,6 +34,11 @@ class Resource
     private $slug;
 
     /**
+     * @var array
+     */
+    private $requestParams = [];
+
+    /**
      * Resource constructor.
      */
     public function __construct()
@@ -164,5 +169,24 @@ class Resource
     public function getRoute($action = 'index')
     {
         return 'admin.' . $this->getSlug() . '.' . $action;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function requestParams($value)
+    {
+        $this->requestParams = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestQuery()
+    {
+        return $this->requestParams ? '?' . http_build_query($this->requestParams) : '';
     }
 }

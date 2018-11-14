@@ -6,6 +6,7 @@ use Czim\Paperclip\Attachment\Attachment;
 
 trait Worker
 {
+
     /**
      * @param $model
      * @param $relation
@@ -54,6 +55,30 @@ trait Worker
                 $model->update([
                     $fieldName => bcrypt($value)
                 ]);
+            }
+        }
+    }
+
+    /**
+     * @param $model
+     * @param $data
+     * @throws \ReflectionException
+     */
+    private function morphToWorker($model, $data)
+    {
+        $morphableName = array_get($data, 'morphable_name');
+        $morphableType = array_get($data, 'morphable_type');
+
+        foreach (array_except($data, ['morphable_name', 'morphable_type']) as $key => $value) {
+            if ($id = array_get($value, 'id', null)) {
+                $this->saveData($value, $model->{$morphableName});
+            } else {
+                $morphableModel = new $morphableType;
+                $createdMorphableModel = $this->saveData($value, $morphableModel);
+
+                $model->{$morphableName . '_id'} = $createdMorphableModel->id;
+                $model->{$morphableName . '_type'} = $morphableType;
+                $model->save();
             }
         }
     }

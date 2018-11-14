@@ -105,8 +105,8 @@ class HasMany extends Field
 
         if ($this->isSortable()) {
             $fields[] = (new Hidden('sequence_no', $this->getRelationBaseModel()))
-                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->replacementAttributes($this->getReplacementAttributes())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
                 ->value($this->getRelationCollection()->count())
                 ->formattedResponse(); // Add hidden sortable field
         }
@@ -115,8 +115,8 @@ class HasMany extends Field
             $field = clone $temporaryField;
 
             $field->model($this->getRelationBaseModel())
-                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
-                ->replacementAttributes($this->getReplacementAttributes());
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute));
 
             if ($field->getRules()) {
                 $validationRules[$field->getValidationKey()] = $field->getRules();
@@ -126,6 +126,7 @@ class HasMany extends Field
         }
 
         return [
+            'label'            => 'Entry',
             'fields'           => $fields,
             'replacement_ids'  => $this->getReplacementAttributes(),
             'validation_rules' => $validationRules
@@ -141,7 +142,7 @@ class HasMany extends Field
 
         foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
             $entry = [
-                'label' => $item->{$this->getEntryLabel()} ?: 'Entry',
+                'label'  => $item->{$this->getEntryLabel()} ?: 'Entry',
                 'fields' => [],
                 'config' => [
                     'is_deleted'   => false,
@@ -155,9 +156,7 @@ class HasMany extends Field
                 ->formattedResponse(); // Add hidden ID field
 
             if ($this->isSortable()) {
-                $entry['fields'][] = (new Hidden('sequence_no', $item))
-                    ->build(array_merge($this->getAttributes(), [$item->id]))
-                    ->formattedResponse(); // Add hidden sortable field
+                $entry['fields'][] = $this->sortableField($item); // Add hidden sortable field
             }
 
             foreach ($this->fieldSet->fields as $temporaryField) {
