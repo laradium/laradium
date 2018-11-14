@@ -191,10 +191,15 @@ class BelongsTo
     public function hasAccess($resource): bool
     {
         $resource = $resource instanceof AbstractResource ? $resource : (class_exists($resource) ? (new $resource) : null);
-        if (!$resource || $this->getCurrent()) {
+        if (!$resource) {
             return true;
         }
 
-        return $resource && $resource->hasGlobalActions() && !$this->getCurrent();
+        $actions = $resource->getGlobalActions();
+        if ($actions === 'all') {
+            return true;
+        }
+
+        return $actions === 'global' && !$this->getCurrent() || $actions === 'belongsto' && $this->getCurrent();
     }
 }

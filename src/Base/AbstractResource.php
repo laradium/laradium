@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Base;
 
 use File;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -44,6 +43,15 @@ abstract class AbstractResource
         'edit',
         'delete'
     ];
+
+    /**
+     * @var bool
+     */
+    protected $globalActions = 'all';
+
+    /**
+     * @var
+     */
     private $baseResource;
 
     /**
@@ -232,6 +240,10 @@ abstract class AbstractResource
      */
     public function hasAction($value)
     {
+        if ($belongsTo = laradium()->belongsTo()) {
+            return in_array($value, $this->actions) && $belongsTo->hasAccess($this);
+        }
+
         return in_array($value, $this->actions);
     }
 
@@ -263,6 +275,14 @@ abstract class AbstractResource
         $availableActions = $actions->diffAssoc($allActions);
 
         return $allActions->only($availableActions)->flatten()->all();
+    }
+
+    /**
+     * @return string
+     */
+    public function getGlobalActions()
+    {
+        return $this->globalActions;
     }
 
     /**

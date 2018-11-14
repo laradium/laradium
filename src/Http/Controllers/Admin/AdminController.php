@@ -73,6 +73,6 @@ class AdminController
     {
         laradium()->belongsTo()->set($value);
 
-        return back();
+        return redirect()->route('admin.dashboard');
     }
 }
