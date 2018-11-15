@@ -58,13 +58,13 @@ trait Datatable
             foreach ($table->getTabs() as $key => $tabs) {
                 if (request()->has($key)) {
                     $value = request()->get($key) === 'null' ? null : request()->get($key);
-                    $model = $this->model->where($key, $value);
+                    $model = $model->where($key, $value);
                 }
             }
         }
 
         if ($table->getWhere()) {
-            $model = $this->model->where($table->getWhere());
+            $model = $model->where($table->getWhere());
         }
 
         $dataTable = DataTables::of($model);

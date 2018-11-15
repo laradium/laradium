@@ -14,8 +14,10 @@ class TranslationRepository
      */
     public function languages($exceptCurrent = false)
     {
-        $languages = cache()->rememberForever('laradium::languages', function () {
-            return Language::get()->map(function ($language) {
+        $belongsTo = laradium()->belongsTo();
+        $cacheKey = $belongsTo ? 'laradium::languages-' . ($belongsTo->getCurrent() ?? 'null') : 'laradium::languages';
+        $languages = cache()->rememberForever($cacheKey, function () {
+            return (class_exists(\App\Models\Language::class) ? \App\Models\Language::class : Language::class)::get()->map(function ($language) {
                 if ($language->icon->exists()) {
                     $language->image = $language->icon->url();
                 } else {
