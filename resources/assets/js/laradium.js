@@ -37,6 +37,7 @@ Vue.component('color-field', require('./components/fields/Color.vue'));
 Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
 Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue'));
+Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.vue'));
 Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
 Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue'));
 

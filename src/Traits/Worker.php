@@ -83,4 +83,14 @@ trait Worker
         }
     }
 
+    /**
+     * @param $model
+     * @param $relationName
+     * @param $data
+     */
+    private function belongsToManyToWorker($model, $relationName, $data)
+    {
+        $model->{$relationName}()->sync($data);
+    }
+
 }
