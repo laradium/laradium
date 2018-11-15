@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
-use Laradium\Laradium\Models\Translation;
 
 class ImportTranslations extends Command
 {
@@ -71,32 +70,47 @@ class ImportTranslations extends Command
 
                     }
                 }
+
                 \DB::transaction(function () use ($rows) {
-                    foreach (array_chunk($rows, 300) as $chunk) {
-                        foreach ($chunk as $item) {
-                            \Laradium\Laradium\Models\Translation::firstOrCreate([
-                                'locale' => $item['locale'],
-                                'group'  => $item['group'],
-                                'key'    => $item['key'],
-                            ], [
-                                'locale' => $item['locale'],
-                                'group'  => $item['group'],
-                                'key'    => $item['key'],
-                                'value'  => $item['value'],
-                            ]);
+                    if ($belongsTo = laradium()->belongsTo()) {
+                        foreach ($belongsTo->getAll() as $item) {
+                            $belongsTo->set($item->id);
+                            foreach (array_chunk($rows, 300) as $chunk) {
+                                foreach (translate()->languages() as $language) {
+                                    foreach ($chunk as $translation) {
+                                        if ($language->iso_code !== $translation['locale']) {
+                                            continue;
+                                        }
+
+                                        \App\Models\Translation::firstOrCreate(
+                                            $this->data($translation, [$belongsTo->getForeignKey() => $item->id], 'value'),
+                                            $this->data($translation, [$belongsTo->getForeignKey() => $item->id])
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        foreach (array_chunk($rows, 300) as $chunk) {
+                            foreach ($chunk as $item) {
+                                \Laradium\Laradium\Models\Translation::firstOrCreate(
+                                    $this->data($item, null, 'value'),
+                                    $this->data($item)
+                                );
+                            }
                         }
                     }
-
                 });
             } catch (\Exception $e) {
                 return back()->withError('Something went wrong, please try again!');
             }
         }
+
         cache()->forget('translations');
     }
 
     /**
-     *
+     * Default laravel translations
      */
     private function importFromLangFiles()
     {
@@ -108,17 +122,58 @@ class ImportTranslations extends Command
                 $group = str_replace('.php', '', $file->getFilename());
                 foreach (\File::getRequire($fullPath) as $key => $translation) {
                     if (!is_array($key) && !is_array($group) && !is_array($translation)) {
-                        foreach (translate()->languages() as $language) {
-                            \Laradium\Laradium\Models\Translation::firstOrCreate([
-                                'locale' => $language->iso_code,
-                                'group'  => $group,
-                                'key'    => $key,
-                                'value'  => $translation,
-                            ]);
+                        if ($belongsTo = laradium()->belongsTo()) {
+                            foreach ($belongsTo->getAll($global = true) as $item) {
+                                $belongsTo->set($item->id);
+                                foreach (translate()->languages() as $language) {
+                                    \App\Models\Translation::firstOrCreate([
+                                        $belongsTo->getForeignKey() => $item->id,
+                                        'locale'                    => $language->iso_code,
+                                        'group'                     => $group,
+                                        'key'                       => $key,
+                                        'value'                     => $translation,
+                                    ]);
+                                }
+                            }
+                        } else {
+                            foreach (translate()->languages() as $language) {
+                                \Laradium\Laradium\Models\Translation::firstOrCreate([
+                                    'locale' => $language->iso_code,
+                                    'group'  => $group,
+                                    'key'    => $key,
+                                    'value'  => $translation,
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @param $item
+     * @param null $add
+     * @param null $remove
+     * @return array
+     */
+    protected function data($item, $add = null, $remove = null)
+    {
+        $data = [
+            'locale' => $item['locale'],
+            'group'  => $item['group'],
+            'key'    => $item['key'],
+            'value'  => $item['value'],
+        ];
+
+        if ($add) {
+            $data = array_merge($data, $add);
+        }
+
+        if ($remove) {
+            unset($data[$remove]);
+        }
+
+        return $data;
     }
 }

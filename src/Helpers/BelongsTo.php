@@ -112,6 +112,7 @@ class BelongsTo
     public function set($value): ?int
     {
         session([$this->getRelation() => $value]);
+        $_SESSION[$this->getRelation()] = $value;
 
         return $value;
     }
@@ -123,7 +124,7 @@ class BelongsTo
     public function getCurrent($user = null)
     {
         $user = $user ?? auth()->user();
-        $value = session()->get($this->getRelation(), null);
+        $value = $_SESSION[$this->getRelation()] ?? session()->get($this->getRelation(), null);
 
         // If admin belongs to domain/region etc.,
         // but session value is null,
@@ -174,6 +175,22 @@ class BelongsTo
 
             return $item->id !== $userForeignKey;
         });
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAll($global = false)
+    {
+        if ($global) {
+            return $this->class::all()->prepend(new $this->class([
+                'id'   => null,
+                'key'  => 'global',
+                'name' => 'Global'
+            ]));
+        }
+
+        return $this->class::all();
     }
 
     /**

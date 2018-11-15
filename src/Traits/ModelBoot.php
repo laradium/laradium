@@ -18,7 +18,7 @@ trait ModelBoot
         parent::boot();
 
         $belongsTo = laradium()->belongsTo();
-        if ($belongsTo && Schema::hasColumn(self::getModel()->getTable(), $belongsTo->getForeignKey()) && !app()->runningInConsole()) {
+        if ($belongsTo && Schema::hasColumn(self::getModel()->getTable(), $belongsTo->getForeignKey())) {
             static::addGlobalScope($belongsTo->getRelation(), function (Builder $builder) use ($belongsTo) {
                 $builder->where($belongsTo->getForeignKey(), '=', $belongsTo->getCurrent());
             });
