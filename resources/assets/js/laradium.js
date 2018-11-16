@@ -24,6 +24,7 @@ Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('tab-field', require('./components/fields/Tab.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
 Vue.component('select-field', require('./components/fields/Select.vue'));
+Vue.component('svgicon-field', require('./components/fields/SvgIcon.vue'));
 Vue.component('file-field', require('./components/fields/File.vue'));
 Vue.component('email-field', require('./components/fields/Email.vue'));
 Vue.component('password-field', require('./components/fields/Password.vue'));
