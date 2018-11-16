@@ -15,7 +15,7 @@ class SvgIcon extends Field
     /**
      * @var
      */
-    private $prefix;
+    private $filter;
 
     /**
      * @param string $value
@@ -28,9 +28,13 @@ class SvgIcon extends Field
         return $this;
     }
 
-    public function prefix($value)
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function filter($value)
     {
-        $this->prefix = $value;
+        $this->filter = $value;
 
         return $this;
     }
@@ -55,7 +59,7 @@ class SvgIcon extends Field
         $i = 1;
         foreach (\File::allFiles($this->path) as $path) {
             $fileName = pathinfo($path->getPathname(), PATHINFO_FILENAME);
-            if ($this->prefix && !str_contains($fileName, $this->prefix)) {
+            if ($this->filter && !str_contains($fileName, $this->filter)) {
                 continue;
             }
             $name = str_replace('-', ' ', $fileName);
