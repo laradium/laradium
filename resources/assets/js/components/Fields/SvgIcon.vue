@@ -7,15 +7,10 @@
 					{{ language }}
 				</span>
             </label>
-
-            <select :name="field.name" class="form-control" v-bind="attributes">
-                <option
-                        :value="file_name"
-                        :selected="file_name === field.value"
-                        v-for="(name, file_name) in field.options">
-                    {{ name }}
-                </option>
-            </select>
+            <input type="hidden" :value="selected" :name="field.name">
+            <select2 :options="field.options" v-model="selected">
+                <option disabled value="0">Select one</option>
+            </select2>
         </div>
     </div>
 </template>
@@ -23,6 +18,21 @@
 <script>
     export default {
         props: ['field', 'language', 'item'],
+
+        data() {
+            return {
+                selected: null
+            };
+        },
+
+        mounted() {
+            let options = this.field.options;
+            for (let option in options) {
+                if (options[option].id == this.field.value) {
+                    this.selected = options[option].id;
+                }
+            }
+        },
 
         computed: {
             attributes() {

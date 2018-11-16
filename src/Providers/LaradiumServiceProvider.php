@@ -194,6 +194,12 @@ class LaradiumServiceProvider extends ServiceProvider
         Blade::directive('lg', function ($expression) {
             return "<?php echo lg($expression); ?>";
         });
+
+        Blade::directive('svg', function ($expression) {
+            $file = \File::get(trim($expression, "'"));
+
+            return $file;
+        });
     }
 
     /**
