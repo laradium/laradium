@@ -18,7 +18,8 @@ Route::group([
         ]);
 
         Route::post('logout', [
-            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@logout'
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@logout',
+            'as'   => 'logout'
         ]);
 
         Route::delete('resource/{id}', [
@@ -34,10 +35,12 @@ Route::group([
 
     // Auth
     Route::get('login', [
-        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@index'
+        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@index',
+        'as'   => 'login'
     ]);
 
     Route::post('login', [
-        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@login'
+        'uses' => '\Laradium\Laradium\Http\Controllers\Admin\LoginController@login',
+        'as'   => 'login'
     ]);
 });
