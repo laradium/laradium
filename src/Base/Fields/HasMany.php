@@ -142,7 +142,7 @@ class HasMany extends Field
 
         foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
             $entry = [
-                'label'  => $item->{$this->getEntryLabel()} ?: 'Entry',
+                'label'  => $this->getEntryLabel($item),
                 'fields' => [],
                 'config' => [
                     'is_deleted'   => false,
@@ -239,9 +239,15 @@ class HasMany extends Field
     /**
      * @return string
      */
-    public function getEntryLabel()
+    public function getEntryLabel(Model $model)
     {
-        return $this->entryLabel;
+        if(!is_string($this->entryLabel)) {
+            $closure = $this->entryLabel;
+            $value = $closure($model);
+        } else {
+            $value = $model->{$this->entryLabel};
+        }
+        return $value;
     }
 
 }
