@@ -42,6 +42,7 @@ Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.
 Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
 Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue'));
 
+Vue.component('select2', require('./components/fields/Select2.vue'));
 Vue.component('draggable', require('vuedraggable'));
 Vue.component('VueEditor', VueEditor);
 

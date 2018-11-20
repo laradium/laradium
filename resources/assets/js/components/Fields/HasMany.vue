@@ -10,7 +10,7 @@
                     <h4>
                         <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
 
-                        {{ entry.label }} <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+                        <span v-html="entry.label"></span> <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
 
                         <div class="pull-right" v-if="entry.config.is_deleted">
                             <button class="btn btn-primary btn-sm"

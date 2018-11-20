@@ -51,6 +51,7 @@ trait ApiResponse
             return [
                 'items' => $data->getCollection(),
                 'meta'  => [
+                    'per_page'     => $data->perPage(),
                     'current_page' => $data->currentPage(),
                     'last_page'    => $data->lastPage(),
                     'total'        => $data->total()
