@@ -41,7 +41,7 @@ class Select extends Field
             return [
                 'value'    => $value,
                 'text'     => $text,
-                'selected' => $this->getValue() === $value,
+                'selected' => $this->getValue() == $value,
             ];
         })->toArray();
 
