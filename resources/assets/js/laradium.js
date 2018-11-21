@@ -8,8 +8,7 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
-
-import { VueEditor } from "vue2-editor";
+window.resizable = require('jquery-resizable-dom');
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -44,7 +43,17 @@ Vue.component('widgetconstructor-field', require('./components/fields/WidgetCons
 
 Vue.component('select2', require('./components/fields/Select2.vue'));
 Vue.component('draggable', require('vuedraggable'));
-Vue.component('VueEditor', VueEditor);
+
+// Trumbowyg
+import VueTrumbowyg from 'vue-trumbowyg';
+import 'trumbowyg/dist/plugins/noembed/trumbowyg.noembed';
+import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
+import 'trumbowyg/dist/plugins/table/trumbowyg.table';
+import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
+require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
+import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg';
+$.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
+Vue.use(VueTrumbowyg);
 
 Vue.mixin({
     methods: {

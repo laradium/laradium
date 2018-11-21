@@ -10,6 +10,18 @@ mix.setPublicPath('public');
  | file for the application as well as bundling up all the JS files.
  |
  */
+ 
+mix.webpackConfig(webpack => {
+    return {
+        plugins: [
+            new webpack.ProvidePlugin({  
+			  jQuery: 'jquery',
+			  $: 'jquery',
+			  'window.jQuery': 'jquery',
+			}),
+        ]
+    };
+})
 
 mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
 	.extract(['jquery', 'bootstrap', 'vue', 'jquery-datetimepicker'])
