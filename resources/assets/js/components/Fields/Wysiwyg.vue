@@ -40,7 +40,7 @@
         data() {
             return {
                 config: {
-                    //removeformatPasted: true,
+                    removeformatPasted: true,
                     btnsDef: {
                         image: {
                             dropdown: ['insertImage', this.field.config.upload_url ? 'upload' : ''],
@@ -50,7 +50,8 @@
                     btns: [
                         ['strong', 'em', 'del'],
                         ['superscript', 'subscript'],
-                        ['foreColor', 'backColor'],
+                        ['fontsize', 'fontfamily'],
+                        ['foreColor', 'backColor', 'lineheight'],
                         ['link'],
                         ['image'],
                         ['noembed'],
@@ -59,6 +60,7 @@
                         ['horizontalRule'],
                         ['table'],
                         ['formatting'],
+                        ['undo', 'redo'],
                         ['removeformat'],
                         ['viewHTML'],
                         ['fullscreen']

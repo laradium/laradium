@@ -46,12 +46,14 @@ Vue.component('draggable', require('vuedraggable'));
 
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
-import 'trumbowyg/dist/plugins/noembed/trumbowyg.noembed';
 import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
-import 'trumbowyg/dist/plugins/table/trumbowyg.table';
+import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
 import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
 require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
-import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg';
+import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
+import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
+import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
+import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
 
