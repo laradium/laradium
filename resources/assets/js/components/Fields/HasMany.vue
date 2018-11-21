@@ -29,8 +29,8 @@
 
                         <div class="pull-right" v-if="!entry.config.is_deleted">
                             <button class="btn btn-success btn-sm" @click.prevent="toggle(index)" style="margin-right: 5px;">
-                                <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i> Hide</span>
-                                <span v-else><i class="fa fa-eye"></i> Show</span>
+                                <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
+                                <span v-else><i class="fa fa-eye"></i></span>
                             </button>
                         </div>
                     </h4>
