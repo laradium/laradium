@@ -42,9 +42,11 @@ class TranslationLoader
     protected function cacheTranslations()
     {
         if (!$this->translations) {
-            $this->translations = cache()->rememberForever('translations', function () {
+            $belongsTo = laradium()->belongsTo();
+            $cacheKey = $belongsTo ? 'translations-' . ($belongsTo->getCurrent() ?? 'null') : 'translations';
+            $this->translations = cache()->rememberForever($cacheKey, function () {
                 $translations = [];
-                foreach (Translation::all() as $item) {
+                foreach ((class_exists(\App\Models\Translation::class) ? \App\Models\Translation::class : Translation::class)::get() as $item) {
                     $translations[$item->locale][$item->group][$item->key] = $item->value;
                 }
 

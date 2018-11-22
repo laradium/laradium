@@ -81,22 +81,7 @@ Class TranslationResource extends AbstractResource
                 }
             }
 
-            DB::transaction(function () use ($rows) {
-                foreach (array_chunk($rows, 300) as $chunk) {
-                    foreach ($chunk as $item) {
-                        $translation = Translation::where('key', $item['key'])->where('locale',
-                            $item['locale'])->where('group', $item['group'])->first();
-                        if ($translation) {
-                            $translation->value = $item['value'];
-                            $translation->save();
-                        } else {
-                            Translation::create($item);
-                        }
-                    }
-                }
-            });
-
-            cache()->forget('translations');
+            translate()->import($rows);
         } catch (\Exception $e) {
             logger()->error($e);
 
@@ -145,7 +130,6 @@ Class TranslationResource extends AbstractResource
                     $rows[0][] = $language->iso_code;
                 }
 
-                // Now $rows would be something like ['key', 'lv', 'ru']
                 $translations = $translations->map(function ($t, $index) use ($languages) {
                     $item = [
                         $t->group . '.' . $t->key,

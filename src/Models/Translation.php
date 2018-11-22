@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\PassThroughs\Translation\Import;
 
 class Translation extends Model
 {
@@ -21,4 +22,12 @@ class Translation extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * @return Import
+     */
+    public function import()
+    {
+        return new Import();
+    }
 }

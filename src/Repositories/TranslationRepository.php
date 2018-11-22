@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Repositories;
 
 use Laradium\Laradium\Models\Language;
+use Laradium\Laradium\Models\Translation;
 
 class TranslationRepository
 {
@@ -62,5 +63,17 @@ class TranslationRepository
         $language->iso_code = $isoCode;
 
         return (object)$language;
+    }
+
+    /**
+     * @param $translations
+     * @param $global
+     * @return void
+     */
+    public function import($translations, $global = false)
+    {
+        $class = (class_exists(\App\Models\Translation::class) ? \App\Models\Translation::class : Translation::class);
+        $translation = new $class();
+        $translation->import()->process($translations, $global);
     }
 }

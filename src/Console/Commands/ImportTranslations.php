@@ -71,109 +71,46 @@ class ImportTranslations extends Command
                     }
                 }
 
-                \DB::transaction(function () use ($rows) {
-                    if ($belongsTo = laradium()->belongsTo()) {
-                        foreach ($belongsTo->getAll() as $item) {
-                            $belongsTo->set($item->id);
-                            foreach (array_chunk($rows, 300) as $chunk) {
-                                foreach (translate()->languages() as $language) {
-                                    foreach ($chunk as $translation) {
-                                        if ($language->iso_code !== $translation['locale']) {
-                                            continue;
-                                        }
+                translate()->import($rows);
 
-                                        \App\Models\Translation::firstOrCreate(
-                                            $this->data($translation, [$belongsTo->getForeignKey() => $item->id], 'value'),
-                                            $this->data($translation, [$belongsTo->getForeignKey() => $item->id])
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        foreach (array_chunk($rows, 300) as $chunk) {
-                            foreach ($chunk as $item) {
-                                \Laradium\Laradium\Models\Translation::firstOrCreate(
-                                    $this->data($item, null, 'value'),
-                                    $this->data($item)
-                                );
-                            }
-                        }
-                    }
-                });
             } catch (\Exception $e) {
-                return back()->withError('Something went wrong, please try again!');
+                logger()->error($e);
+
+                $this->error('Something went wrong.');
+                exit;
             }
         }
-
-        cache()->forget('translations');
     }
 
     /**
      * Default laravel translations
+     * @return void
      */
     private function importFromLangFiles()
     {
         $file = resource_path('lang');
         $files = \File::allFiles($file);
+        $rows = [];
+
         if (file_exists($file)) {
             foreach ($files as $file) {
                 $fullPath = $file->getPathname();
                 $group = str_replace('.php', '', $file->getFilename());
                 foreach (\File::getRequire($fullPath) as $key => $translation) {
                     if (!is_array($key) && !is_array($group) && !is_array($translation)) {
-                        if ($belongsTo = laradium()->belongsTo()) {
-                            foreach ($belongsTo->getAll($global = true) as $item) {
-                                $belongsTo->set($item->id);
-                                foreach (translate()->languages() as $language) {
-                                    \App\Models\Translation::firstOrCreate([
-                                        $belongsTo->getForeignKey() => $item->id,
-                                        'locale'                    => $language->iso_code,
-                                        'group'                     => $group,
-                                        'key'                       => $key,
-                                        'value'                     => $translation,
-                                    ]);
-                                }
-                            }
-                        } else {
-                            foreach (translate()->languages() as $language) {
-                                \Laradium\Laradium\Models\Translation::firstOrCreate([
-                                    'locale' => $language->iso_code,
-                                    'group'  => $group,
-                                    'key'    => $key,
-                                    'value'  => $translation,
-                                ]);
-                            }
+                        foreach (translate()->languages() as $language) {
+                            $rows[] = [
+                                'locale' => $language->iso_code,
+                                'group'  => $group,
+                                'key'    => $key,
+                                'value'  => $translation,
+                            ];
                         }
                     }
                 }
             }
         }
-    }
 
-    /**
-     * @param $item
-     * @param null $add
-     * @param null $remove
-     * @return array
-     */
-    protected function data($item, $add = null, $remove = null)
-    {
-        $data = [
-            'locale' => $item['locale'],
-            'group'  => $item['group'],
-            'key'    => $item['key'],
-            'value'  => $item['value'],
-        ];
-
-        if ($add) {
-            $data = array_merge($data, $add);
-        }
-
-        if ($remove) {
-            unset($data[$remove]);
-        }
-
-        return $data;
+        translate()->import($rows, $global = true);
     }
 }
