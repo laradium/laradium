@@ -1,53 +1,14 @@
-/* ===========================================================
- * trumbowyg.noembed.js v1.0
- * noEmbed plugin for Trumbowyg
- * http://alex-d.github.com/Trumbowyg
- * ===========================================================
- * Author : Jake Johns (jakejohns)
- */
-
 (function ($) {
     'use strict';
 
-    var defaultOptions = {
-        proxy: 'https://noembed.com/embed?nowrap=on',
-        urlFiled: 'url',
-        data: [],
-        success: undefined,
-        error: undefined
-    };
+    var defaultOptions = {};
 
     $.extend(true, $.trumbowyg, {
         langs: {
             en: {
                 noembed: 'Embed',
                 noembedError: 'Error'
-            },
-            da: {
-                noembedError: 'Fejl'
-            },
-            sk: {
-                noembedError: 'Chyba'
-            },
-            fr: {
-                noembedError: 'Erreur'
-            },
-            cs: {
-                noembedError: 'Chyba'
-            },
-            ru: {
-                noembedError: 'Ошибка'
-            },
-            ja: {
-                noembedError: 'エラー'
-            },
-            tr: {
-                noembedError: 'Hata'
-            },
-            zh_tw: {
-                noembed: '插入影片',
-                noembedError: '錯誤'
-            },
+            }
         },
 
         plugins: {
@@ -66,46 +27,72 @@
                                     url: {
                                         label: 'URL',
                                         required: true
-                                    }
+                                    },
+
+                                    width: {
+                                        label: 'Width (optional)'
+                                    },
+
+                                    height: {
+                                        label: 'Height (optional)'
+                                    },
                                 },
 
                                 // Callback
                                 function (data) {
-									delete $.ajaxSettings.headers['X-CSRF-TOKEN'];
-									
-                                    $.ajax({
-                                        url: trumbowyg.o.plugins.noembed.proxy,
-                                        type: 'GET',
-                                        data: data,
-                                        cache: false,
-                                        dataType: 'json',
-
-                                        success: trumbowyg.o.plugins.noembed.success || function (data) {
-                                            if (data.html) {
-                                                trumbowyg.execCmd('insertHTML', data.html);
-                                                setTimeout(function () {
-                                                    trumbowyg.closeModal();
-                                                }, 250);
-                                            } else {
-                                                trumbowyg.addErrorOnModalField(
-                                                    $('input[type=text]', $modal),
-                                                    data.error
-                                                );
-                                            }
-                                        },
-                                        error: trumbowyg.o.plugins.noembed.error || function () {
-                                            trumbowyg.addErrorOnModalField(
-                                                $('input[type=text]', $modal),
-                                                trumbowyg.lang.noembedError
-                                            );
-                                        }
-                                    });
+                                    trumbowyg.execCmd('insertHTML', createVideo(data.url, data.width ? data.width : 470, data.height ? data.height : 280));
+                                    setTimeout(function () {
+                                        trumbowyg.closeModal();
+                                    }, 250);
                                 }
                             );
                         }
                     };
 
                     trumbowyg.addBtnDef('noembed', btnDef);
+
+                    function parseVideo(url) {
+                        url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+                        var type = 'default';
+
+                        if (RegExp.$3.indexOf('youtu') > -1) {
+                            type = 'youtube';
+                        } else if (RegExp.$3.indexOf('vimeo') > -1) {
+                            type = 'vimeo';
+                        }
+
+                        return {
+                            type: type,
+                            src: RegExp.$6
+                        };
+                    }
+
+                    function createVideo(url, width, height) {
+                        var videoObj = parseVideo(url);
+
+                        if (videoObj.type === 'default') {
+                            var $video = $('<video />', {
+                                class: 'video',
+                                src: url,
+                                controls: true,
+                                width: width,
+                                height: height
+                            });
+
+                            return $video[0].outerHTML;
+                        }
+
+                        var $iframe = $('<iframe />', {width: width, height: height});
+                        $iframe.attr('frameborder', 0).attr('class', 'video').attr('data-type', videoObj.type);
+
+                        if (videoObj.type == 'youtube') {
+                            $iframe.attr('src', '//www.youtube.com/embed/' + videoObj.src).attr('data-id', videoObj.src);
+                        } else if (videoObj.type == 'vimeo') {
+                            $iframe.attr('src', '//player.vimeo.com/video/' + videoObj.src).attr('data-id', videoObj.src);
+                        }
+
+                        return $iframe[0].outerHTML;
+                    }
                 }
             }
         }
