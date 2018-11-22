@@ -245,7 +245,7 @@ class HasMany extends Field
             $closure = $this->entryLabel;
             $value = $closure($model);
         } else {
-            $value = $model->{$this->entryLabel};
+            $value = $model->{$this->entryLabel} ?? 'Entry';
         }
         return $value;
     }
