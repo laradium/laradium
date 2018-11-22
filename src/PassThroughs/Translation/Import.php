@@ -44,7 +44,7 @@ class Import extends PassThrough
             }
         });
 
-        $this->flushCache();
+        $this->flushCache($global);
 
         return true;
     }
@@ -78,7 +78,7 @@ class Import extends PassThrough
     /**
      * @return void
      */
-    public function flushCache()
+    public function flushCache($global = false)
     {
         if ($belongsTo = laradium()->belongsTo()) {
             foreach ($belongsTo->getAll($global) as $item) {
