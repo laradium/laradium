@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laradium\Laradium\Models\Language;
 use Laradium\Laradium\Models\Translation;
 use File;
 use Symfony\Component\Finder\Finder;
@@ -86,7 +87,7 @@ class FindTranslations extends Command
         $mappedTranslations = [];
         foreach ($translations as $key => $text) {
             $data = compact('key');
-            foreach (translate()->languages() as $language) {
+            foreach (Language::all()->unique('iso_code') as $language) {
                 $data[$language->iso_code] = $text;
             }
             $mappedTranslations[] = $data;

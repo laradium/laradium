@@ -24,7 +24,7 @@ class Import extends PassThrough
                                     continue;
                                 }
 
-                                \App\Models\Translation::firstOrCreate(
+                                (class_exists(\App\Models\Translation::class) ? \App\Models\Translation::class : Translation::class)::firstOrCreate(
                                     $this->data($translation, [$belongsTo->getForeignKey() => $item->id], 'value'),
                                     $this->data($translation, [$belongsTo->getForeignKey() => $item->id])
                                 );
@@ -35,7 +35,7 @@ class Import extends PassThrough
             } else {
                 foreach (array_chunk($rows, 300) as $chunk) {
                     foreach ($chunk as $item) {
-                        \Laradium\Laradium\Models\Translation::firstOrCreate(
+                        (class_exists(\App\Models\Translation::class) ? \App\Models\Translation::class : Translation::class)::firstOrCreate(
                             $this->data($item, null, 'value'),
                             $this->data($item)
                         );
