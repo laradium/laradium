@@ -12,6 +12,16 @@
                                :name="field.name + '[]'" :value="item.id">
                         <label :for="field.name + '_' + item.id">{{ item.name }}</label>
                     </div>
+					<div v-if="item.fields" class="row">
+						<div v-for="(pivotField, index) in item.fields" :class="pivotField.config.col">
+                            <component
+                                    :is="pivotField.type + '-field'"
+                                    :field="pivotField"
+                                    :language="language"
+                                    :key="index"
+                            ></component>
+                        </div>
+					</div>
                 </div>
             </div>
         </div>
