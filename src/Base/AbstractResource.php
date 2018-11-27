@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Base;
 
 use File;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -13,7 +12,6 @@ use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
-
     use Crud, CrudEvent, Datatable;
 
     /**
@@ -44,6 +42,10 @@ abstract class AbstractResource
         'edit',
         'delete'
     ];
+
+    /**
+     * @var
+     */
     private $baseResource;
 
     /**
@@ -114,7 +116,12 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $this->model($this->model->findOrFail($id));
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $this->model($model->findOrFail($id));
         $form = $this->getForm();
 
         return view('laradium::admin.resource.edit', compact('form'));
@@ -128,7 +135,12 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $this->model($this->model->findOrFail($id));
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $this->model($model->findOrFail($id));
 
         $form = $this->getForm();
         $validationRequest = $this->prepareRequest($request);
@@ -159,7 +171,12 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->findOrFail($id);
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $model = $model->findOrFail($id);
         $model->delete();
 
         if ($request->ajax()) {

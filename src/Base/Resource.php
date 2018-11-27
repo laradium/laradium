@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 class Resource
 {
@@ -37,6 +36,11 @@ class Resource
      * @var array
      */
     private $requestParams = [];
+
+    /**
+     * @var
+     */
+    protected $where;
 
     /**
      * Resource constructor.
@@ -188,5 +192,24 @@ class Resource
     public function getRequestQuery()
     {
         return $this->requestParams ? '?' . http_build_query($this->requestParams) : '';
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function where(\Closure $closure)
+    {
+        $this->where = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 }
