@@ -63,6 +63,10 @@ trait Datatable
             }
         }
 
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
         if ($table->getWhere()) {
             $model = $model->where($table->getWhere());
         }

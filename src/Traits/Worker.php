@@ -2,8 +2,6 @@
 
 namespace Laradium\Laradium\Traits;
 
-use Czim\Paperclip\Attachment\Attachment;
-
 trait Worker
 {
 
@@ -90,6 +88,20 @@ trait Worker
      */
     private function belongsToManyToWorker($model, $relationName, $data)
     {
+        $checked = collect($data)->filter(function ($value, $key) {
+            return !is_array($value);
+        })->mapWithKeys(function ($value, $key) {
+            return [$value => $value];
+        });
+
+        $pivot = collect($data['pivot'] ?? [])->filter(function ($value, $key) use ($checked) {
+            return is_array($value) && $checked->contains($key);
+        })->mapWithKeys(function ($value, $key) {
+            return [$key => $value];
+        });
+
+        $data = array_replace($checked->all(), $pivot->all());
+
         $model->{$relationName}()->sync($data);
     }
 

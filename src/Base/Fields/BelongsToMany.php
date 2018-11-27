@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
+use Laradium\Laradium\Base\FieldSet;
 
 class BelongsToMany extends Field
 {
@@ -41,6 +42,7 @@ class BelongsToMany extends Field
         parent::__construct($parameters, $model);
 
         $this->relationName = array_first($parameters);
+        $this->fieldSet = new FieldSet;
     }
 
     /**
@@ -54,17 +56,21 @@ class BelongsToMany extends Field
         $model = $this->getModel();
         $relationModel = $model->{$this->relationName}()->getModel();
 
-        $this->items = $relationModel->all()->map(function ($item) use($model) {
+        $this->items = $relationModel->all()->map(function ($item) use ($model) {
             $isChecked = false;
-            if($checkedCategory = $model->{$this->relationName}->where('id', $item->id)->first()) {
+            if ($pivot = $model->{$this->relationName}->where('id', $item->id)->first()) {
                 $isChecked = true;
             }
+
             return [
-                'id' => $item->id,
-                'name' => $item->{$this->title},
+                'id'         => $item->id,
+                'name'       => $item->{$this->title},
                 'is_checked' => $isChecked,
+                'fields'     => $this->getTemplateData($pivot, $item->id)['fields']
             ];
         });
+
+        $this->validationRules($this->getTemplateData()['validation_rules']);
 
         return $this;
     }
@@ -102,6 +108,48 @@ class BelongsToMany extends Field
     public function fieldCol($size = 2, $type = 'md')
     {
         $this->fieldCol = compact('size', 'type');
+
         return $this;
+    }
+
+    /**
+     * @param $closure
+     * @return $this
+     */
+    public function fields($closure)
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->model($this->getModel());
+        $closure($fieldSet);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTemplateData($model = null, $id = null)
+    {
+        $fields = [];
+        $validationRules = [];
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $field->model($model)
+                ->value($model ? $model->pivot->{$field->getFieldName()} : '')
+                ->build(array_merge($this->getAttributes(), ['pivot', $id]));
+
+            if ($field->getRules()) {
+                $validationRules[$field->getValidationKey()] = $field->getRules();
+            }
+
+            $fields[] = $field->formattedResponse();
+        }
+
+        return [
+            'fields'           => $fields,
+            'validation_rules' => $validationRules
+        ];
     }
 }
