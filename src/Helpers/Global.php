@@ -86,44 +86,11 @@ if (!function_exists('lg')) {
      */
     function lg($key, $replace = [], $locale = null, $value = null): String
     {
-        $createTranslations = config('laradium.create_translations_on_the_fly', false);
-        if ($createTranslations) {
-//            $translations = cache('translations');
-//            $languages = languages();
-//            if (isset($locale) && !$languages->where('iso_code', $locale)->count()) {
-//                $value = $locale;
-//            }
-//            if (!$locale && !$value && !is_array($replace)) {
-//                $value = $replace;
-//            }
-//            $fallbackLanguage = $languages->where('is_fallback', 1)->first();
-//            if($fallbackLanguage) {
-//                $fallbackIsoCode = $fallbackLanguage->iso_code;
-//                $transKey = $fallbackIsoCode . '.' . $key;
-//                if (!isset($translations[$transKey])) {
-//                    $translations = [
-//                        'key' => $key,
-//                    ];
-//                    foreach ($languages->pluck('iso_code')->toArray() as $code) {
-//                        $translations[$code] = $value;
-//                    }
-//                    $translation = new Translation();
-//                    $translation->import()->process([$translations], false);
-//                    cache()->forget('translations');
-//                    if (!is_array($replace)) {
-//                        $replace = [];
-//                    }
-//                    $translation = $value;
-//                    foreach ($replace as $key => $value) {
-//                        $translation = str_replace(':' . $key, $value, $translation);
-//                    }
-//                    return $translation;
-//                }
-//            }
-        }
         if (!is_array($replace)) {
             $replace = [];
         }
+
+        $locale = strlen($locale) !== 2 ? app()->getLocale() : $locale;
 
         return trans($key, $replace, $locale);
     }
