@@ -9,7 +9,7 @@ return [
 
     'resource_path' => 'App\\Laradium\\Resources',
 
-    'file_size' => '2024', // default max file upload size 2mb
+    'file_size' => '2048', // default max file upload size 2mb
 
     'translations_file' => 'translations',
 
@@ -37,8 +37,9 @@ return [
         ],
     ],
 
-    'dashboard-view' => 'laradium::admin.dashboard',
+    'validate_all_languages' => false,
 
+    'dashboard-view' => 'laradium::admin.dashboard',
 
     'menus' => [
         'Admin menu' => [
