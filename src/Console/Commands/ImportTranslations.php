@@ -71,7 +71,7 @@ class ImportTranslations extends Command
                     }
                 }
 
-                translate()->import($rows);
+                translate()->import($rows, $global = true);
 
             } catch (\Exception $e) {
                 logger()->error($e);
