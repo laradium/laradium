@@ -87,7 +87,7 @@
                         order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({
-                            error: function(response, newValue) {
+                            error: function (response, newValue) {
                                 if (response.status !== 422) {
                                     return 'Something went wrong, please, try again later.';
                                 }
@@ -117,7 +117,7 @@
                     order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
                     $('.js-editable').editable({
-                        error: function(response, newValue) {
+                        error: function (response, newValue) {
                             if (response.status !== 422) {
                                 return 'Something went wrong, please, try again later.';
                             }
@@ -132,15 +132,18 @@
             $(document).on('click', '.js-delete-resource', function (e) {
                 e.preventDefault();
                 var url = $(this).data('url');
+
                 swal({
                     title: 'Are you sure?',
                     text: 'Once deleted, you will not be able to recover this resource!',
-                    icon: 'warning',
-                    buttons: true,
-                    dangerMode: true,
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
                 })
-                    .then((willDelete) => {
-                        if (willDelete) {
+                    .then((result) => {
+                        if (result.value) {
 
                             $.ajax({
                                 type: 'POST',
