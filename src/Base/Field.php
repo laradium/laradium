@@ -98,15 +98,18 @@ class Field
 
         if ($this->getRules()) {
             if ($this->isTranslatable()) {
-                foreach (translate()->languages() as $language) {
+                $languages = (bool)config('laradium.validate_all_languages', false) ? translate()->languages() : translate()->languages()->where('is_fallback', 1);
+
+                foreach ($languages as $language) {
                     $attributes = array_merge($currentAttributes,
                         ['translations', $language->iso_code, $this->getFieldName()]);
                     $this->validationKey($attributes);
-                    break;
-                }
-            }
-            $this->validationRules = [$this->getValidationKey() => $this->getRules()];
 
+                    $this->validationRules += [$this->getValidationKey() => $this->getRules()];
+                }
+            } else {
+                $this->validationRules = [$this->getValidationKey() => $this->getRules()];
+            }
         }
 
         return $this;
