@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
+use App\Models\MenuItem;
 use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -71,6 +72,10 @@ class HasMany extends Field
     public function build($attributes = [])
     {
         parent::build($attributes);
+
+        if (get_class($this->getModel()) === config('laradium.menu_class', '\Laradium\Laradium\Models\Menu')) {
+            MenuItem::rebuild();
+        }
 
         $this->templateData = $this->getTemplateData();
         $this->validationRules($this->templateData['validation_rules']);
