@@ -34,6 +34,11 @@ class BelongsTo extends Field
     protected $nullable = false;
 
     /**
+     * @var
+     */
+    protected $where;
+
+    /**
      * BelongsTo constructor.
      * @param $parameters
      * @param Model $model
@@ -68,11 +73,16 @@ class BelongsTo extends Field
      */
     public function getOptions()
     {
-        if (method_exists($this->relationModel, 'translations')) {
-            return $this->relationModel::get()->pluck($this->getTitle(), 'id')->toArray();
+        $options = $this->relationModel;
+        if ($where = $this->getWhere()) {
+            $options = $options->where($where);
         }
 
-        return $this->relationModel::pluck($this->getTitle(), 'id')->toArray();
+        if (method_exists($this->relationModel, 'translations')) {
+            return $options->get()->pluck($this->getTitle(), 'id')->toArray();
+        }
+
+        return $options->pluck($this->getTitle(), 'id')->toArray();
     }
 
     /**
@@ -119,5 +129,24 @@ class BelongsTo extends Field
         })->toArray();
 
         return $data;
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function where(\Closure $closure)
+    {
+        $this->where = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 }
