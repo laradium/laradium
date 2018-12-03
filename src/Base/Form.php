@@ -65,13 +65,14 @@ class Form
 
             $field->build();
             $this->setValidationRules($field->getValidationRules());
-            if ($field->isTranslatable()) {
-                $this->isTranslatable = true;
-            }
 
             $this->fields->push($field);
 
         }
+
+//        if ($field->isTranslatable()) {
+        $this->isTranslatable = true;
+//        }
 
         return $this;
     }
