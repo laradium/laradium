@@ -36,6 +36,7 @@ Vue.component('color-field', require('./components/fields/Color.vue'));
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
+Vue.component('hasmany-nested-field', require('./components/fields/HasManyNested.vue'));
 Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue'));
 Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.vue'));
 Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
@@ -43,6 +44,10 @@ Vue.component('widgetconstructor-field', require('./components/fields/WidgetCons
 
 Vue.component('select2', require('./components/fields/Select2.vue'));
 Vue.component('draggable', require('vuedraggable'));
+Vue.component('nestable', require('./components/fields/Nestable.vue'));
+Vue.component('vue-menu', require('./components/fields/Menu.vue'));
+Vue.component('menuitems', require('./components/fields/MenuItems.vue'));
+
 
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
@@ -76,20 +81,17 @@ Vue.mixin({
                 replacement_ids[lastId] = rand_id;
             }
 
-            return replacement_ids;
+            return {
+                id: rand_id,
+                replacement_ids: replacement_ids
+            };
         }
     }
 });
+export const serverBus = new Vue();
 
 const app = new Vue({
     el: '#crud-form',
-    data: {
-        selectedPage: false
-    }
-});
-
-new Vue({
-    el: '#channel-select',
     data: {
         selectedPage: false
     },

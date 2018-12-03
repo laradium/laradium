@@ -22,7 +22,8 @@
         },
         mounted() {
             if(!this.field.exists) {
-                this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.replacement_ids);
+                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.replacement_ids);
+                this.new_replacement_ids = generate_replacements.replacement_ids;
 
                 let fields = this.field.fields;
 

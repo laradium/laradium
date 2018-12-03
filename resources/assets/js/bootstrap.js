@@ -40,6 +40,7 @@ if (token) {
 
 window.datetimepicker = require('jquery-datetimepicker');
 window.swal = require('sweetalert2');
+window.toastr = require('toastr');
 window.select2 = require('select2');
 
 $.ajaxSetup({

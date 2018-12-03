@@ -95,3 +95,12 @@ if (!function_exists('lg')) {
         return trans($key, $replace, $locale);
     }
 }
+
+/**
+ * @param $items
+ * @return mixed
+ */
+function menuItems($items)
+{
+    return view('laradium::admin._partials.menu-items', compact('items'))->render();
+}
