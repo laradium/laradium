@@ -6,8 +6,6 @@ use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\FieldSet;
-use Laradium\Laradium\Models\Menu;
-use Laradium\Laradium\Models\MenuItem;
 use Laradium\Laradium\Traits\Nestable;
 use Laradium\Laradium\Traits\Relation;
 use Laradium\Laradium\Traits\Sortable;
@@ -210,7 +208,7 @@ class HasMany extends Field
             }
         }
 
-        if ($item instanceof MenuItem) {
+        if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
             $entry['formatted'] = [
                 'name'           => $item->name,
                 'url'            => $item->url,

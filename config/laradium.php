@@ -53,6 +53,9 @@ return [
         ]
     ],
 
+    'menu_class' => \Laradium\Laradium\Models\Menu::class,
+    'menu_item_class' => \Laradium\Laradium\Models\MenuItem::class,
+
     'disable_menus' => [
         //\Laradium\Laradium\Base\Resources\LanguageResource::class,
         //\Laradium\Laradium\Base\Resources\MenuResource::class,

@@ -10,6 +10,7 @@ class MenuItem extends \Baum\Node
     use Translatable;
 
     /**
+     * 
      * @var array
      */
     protected $fillable = [
