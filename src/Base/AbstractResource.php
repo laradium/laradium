@@ -179,6 +179,8 @@ abstract class AbstractResource
         $model = $model->findOrFail($id);
         $model->delete();
 
+        $this->fireEvent('afterDelete', $request);
+
         if ($request->ajax()) {
             return [
                 'state' => 'success'
