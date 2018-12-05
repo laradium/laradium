@@ -42,8 +42,12 @@
         <div class="crud-bottom">
             <div class="row">
                 <div class="col-md-2">
-                    <button class="btn btn-primary">
-                        Save
+                    <button class="btn btn-primary" :disabled="isSubmitted">
+                        <i class="fa fa-floppy-o"></i> Save
+                    </button>
+
+                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)" :disabled="isSubmitted">
+                        Save & Return
                     </button>
                 </div>
                 <div class="col-md-1 middle-align" v-if="data.is_translatable && data.languages">
@@ -73,7 +77,8 @@
                 errors: [],
                 data: [],
                 tabs: [],
-                loading: true
+                loading: true,
+                isSubmitted: false
             };
         },
         created() {
@@ -96,7 +101,8 @@
             }
         },
         methods: {
-            onSubmit(el) {
+            onSubmit(el, redirect) {
+                this.isSubmitted = true;
                 let form = document.getElementsByClassName('crud-form')[0];
                 let form_data = new FormData();
                 /*
@@ -129,11 +135,18 @@
                     $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
                     this.success = res.data.success;
 
+                    if (redirect) {
+                        window.location = redirect;
+
+                        return;
+                    }
+
                     if (res.data.redirect != undefined) {
                         window.location = res.data.redirect;
                     }
 
                 }).catch(res => {
+                    this.isSubmitted = false;
                     this.errors = [];
                     this.success = '';
                     let errors = res.response.data.errors;
