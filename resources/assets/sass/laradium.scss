@@ -9,6 +9,13 @@
 @import '~trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 @import '~trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
 
+.breadcrumb {
+  background-color: transparent;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-left: 0;
+}
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);

@@ -74,8 +74,9 @@ abstract class AbstractResource
     public function create()
     {
         $form = $this->getForm();
+        $resource = $this;
 
-        return view('laradium::admin.resource.create', compact('form'));
+        return view('laradium::admin.resource.create', compact('form', 'resource'));
     }
 
     /**
@@ -123,8 +124,9 @@ abstract class AbstractResource
 
         $this->model($model->findOrFail($id));
         $form = $this->getForm();
+        $resource = $this;
 
-        return view('laradium::admin.resource.edit', compact('form'));
+        return view('laradium::admin.resource.edit', compact('form', 'resource'));
     }
 
     /**
@@ -282,6 +284,46 @@ abstract class AbstractResource
         $availableActions = $actions->diffAssoc($allActions);
 
         return $allActions->only($availableActions)->flatten()->all();
+    }
+
+    /**
+     * @param $action
+     * @return array|mixed
+     */
+    public function getBreadcrumbs($action)
+    {
+        $form = $this->getForm();
+
+        $breadcrumbs = [
+            'index'  => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ]
+            ],
+            'create' => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Create',
+                    'url'  => $form->getAction('create')
+                ]
+            ],
+            'edit'   => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Edit',
+                    'url'  => $form->getAction('edit')
+                ]
+            ],
+        ];
+
+        return $breadcrumbs[$action] ?? [];
     }
 
     /**

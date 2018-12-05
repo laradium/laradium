@@ -1,5 +1,10 @@
 @extends('laradium::layouts.main', ['title' => 'Edit ' . $form->getResource()->getName()])
+
 @section('content')
+    @include('laradium::admin._partials.breadcrumbs', [
+       'items' => $resource->getBreadcrumbs('edit')
+   ])
+
     <div class="row">
         <div class="col-12">
             <div class="card-box table-responsive">

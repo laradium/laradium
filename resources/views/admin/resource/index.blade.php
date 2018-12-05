@@ -1,6 +1,10 @@
 @extends('laradium::layouts.main', ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
 
 @section('content')
+    @include('laradium::admin._partials.breadcrumbs', [
+        'items' => $resource->getBreadcrumbs('index')
+    ])
+
     <div class="row">
         <div class="col-12">
             <div class="card-box">

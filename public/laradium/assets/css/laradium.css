@@ -797,6 +797,13 @@ button.toast-close-button {
       -webkit-box-shadow: #000 0 0 2px;
               box-shadow: #000 0 0 2px;
       z-index: 10; }
+.breadcrumb {
+  background-color: transparent;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-left: 0;
+}
+
 .navbar-laravel {
   background-color: #fff;
   -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
