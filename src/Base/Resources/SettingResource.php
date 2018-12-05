@@ -36,7 +36,9 @@ Class SettingResource extends AbstractResource
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file');
             } else {
-                $set->$fieldType('non_translatable_value')->label('Value');
+                if ($fieldType) {
+                    $set->$fieldType('non_translatable_value')->label('Value');
+                }
             }
         });
     }
