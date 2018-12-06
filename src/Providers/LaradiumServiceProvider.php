@@ -35,8 +35,9 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadRoutes();
         $this->registerViewComposers();
 
-        // Global helpers
+        // Global helpers, icons
         require_once __DIR__ . '/../Helpers/Global.php';
+        require_once __DIR__ . '/../Helpers/Icons.php';
 
         // Mail config
         $this->setMailConfig();
