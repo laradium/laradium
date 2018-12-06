@@ -2,7 +2,7 @@
     <draggable :element="'ul'"
                :list="entries"
                class="dragArea"
-               :options="{group:{ name:'g1'}}"
+               :options="draggable"
                :move="cancel"
                @change="change"
                @start="start"
@@ -35,7 +35,8 @@
                     </button>
                 </div>
             </h4>
-            <div class="row border" v-show="!entry.config.is_collapsed" style="padding: 5px; border-radius: 2px; margin: 5px;">
+            <div class="row border" v-show="!entry.config.is_collapsed"
+                 style="padding: 5px; border-radius: 2px; margin: 5px;">
                 <div v-for="(field, index) in entry.fields" :class="field.config.col">
                     <component
                             :is="field.type + '-field'"
@@ -70,7 +71,13 @@
 
         data() {
             return {
-                removed_items: {}
+                removed_items: {},
+                draggable: {
+                    handle: '.handle',
+                    group: {
+                        name: 'g1'
+                    }
+                },
             };
         },
 

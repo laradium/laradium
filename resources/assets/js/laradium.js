@@ -23,6 +23,7 @@ Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('tab-field', require('./components/fields/Tab.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
 Vue.component('select-field', require('./components/fields/Select.vue'));
+Vue.component('select2-field', require('./components/fields/Select2.vue'));
 Vue.component('svgicon-field', require('./components/fields/SvgIcon.vue'));
 Vue.component('file-field', require('./components/fields/File.vue'));
 Vue.component('email-field', require('./components/fields/Email.vue'));
@@ -42,7 +43,7 @@ Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.
 Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
 Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue'));
 
-Vue.component('select2', require('./components/fields/Select2.vue'));
+Vue.component('select2', require('./components/Select2.vue'));
 Vue.component('draggable', require('vuedraggable'));
 Vue.component('nestable', require('./components/fields/Nestable.vue'));
 Vue.component('vue-menu', require('./components/fields/Menu.vue'));
