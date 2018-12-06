@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="row">
         <div v-for="(field, index) in field.fields" :class="field.config.col">
             <component
                     :is="field.type + '-field'"
