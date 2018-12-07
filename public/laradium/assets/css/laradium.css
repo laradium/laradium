@@ -898,3 +898,7 @@ button.toast-close-button {
   line-height: 60px;
 }
 
+.logo img {
+  max-width: 100%;
+}
+
