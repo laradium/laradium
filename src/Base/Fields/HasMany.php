@@ -74,7 +74,7 @@ class HasMany extends Field
         parent::build($attributes);
 
         if (get_class($this->getModel()) === config('laradium.menu_class', '\Laradium\Laradium\Models\Menu')) {
-            MenuItem::rebuild();
+            config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')::rebuild();
         }
 
         $this->templateData = $this->getTemplateData();
