@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base;
 
+use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
@@ -12,6 +13,7 @@ use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
+
     use Crud, CrudEvent, Datatable;
 
     /**
@@ -53,7 +55,10 @@ abstract class AbstractResource
      */
     public function __construct()
     {
-        $this->model(new $this->resource);
+        if (class_exists($this->resource)) {
+            $this->model(new $this->resource);
+        }
+
         $this->events = collect([]);
     }
 
@@ -324,6 +329,14 @@ abstract class AbstractResource
         ];
 
         return $breadcrumbs[$action] ?? [];
+    }
+
+    /**
+     * @return string
+     */
+    public function resourceName()
+    {
+        return $this->resource;
     }
 
     /**
