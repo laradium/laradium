@@ -88,7 +88,7 @@
                         serverSide: true,
                         ajax: $(selector).data('url'),
                         columns: {!! $table->getColumnConfig()->toJson() !!},
-                        order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+                        order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({
                             error: function (response, newValue) {
@@ -118,7 +118,7 @@
                     serverSide: true,
                     ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
                     columns: {!! $table->getColumnConfig()->toJson() !!},
-                    order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+                    order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
                     $('.js-editable').editable({
                         error: function (response, newValue) {

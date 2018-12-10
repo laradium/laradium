@@ -181,6 +181,14 @@ trait Datatable
             });
         }
 
+        if (!request()->get('order')) {
+            $dataTable->order(function ($query) use ($table) {
+                $orderBy = $table->getOrderBy();
+
+                $query->orderBy($orderBy['column'], $orderBy['direction']);
+            });
+        }
+
         return $dataTable->make(true);
     }
 }
