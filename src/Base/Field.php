@@ -96,23 +96,50 @@ class Field
         $currentAttributes = $this->attributes;
         $this->attributes = array_merge($currentAttributes, [$this->getFieldName()]);
 
-        if ($this->getRules()) {
-            if ($this->isTranslatable()) {
-                $languages = (bool)config('laradium.validate_all_languages', false) ? translate()->languages() : translate()->languages()->where('is_fallback', 1);
-
-                foreach ($languages as $language) {
-                    $attributes = array_merge($currentAttributes,
-                        ['translations', $language->iso_code, $this->getFieldName()]);
-                    $this->validationKey($attributes);
-
-                    $this->validationRules += [$this->getValidationKey() => $this->getRules()];
-                }
-            } else {
-                $this->validationRules = [$this->getValidationKey() => $this->getRules()];
-            }
+        if (!$this->getRules()) {
+            return $this;
         }
 
+        $this->registerValidationRules($currentAttributes);
+
         return $this;
+    }
+
+    /**
+     * @param $currentAttributes
+     * @return void
+     */
+    private function registerValidationRules($currentAttributes): void
+    {
+        if ($this->isTranslatable()) {
+            $languages = $this->getLanguageList();
+
+            foreach ($languages as $language) {
+                $attributes = array_merge($currentAttributes,
+                    ['translations', $language->iso_code, $this->getFieldName()]);
+                $this->validationKey($attributes);
+
+                $this->validationRules += [$this->getValidationKey() => $this->getRules()];
+            }
+
+            return;
+        }
+
+        $this->validationRules = [$this->getValidationKey() => $this->getRules()];
+
+        return;
+    }
+
+    /**
+     * @return collection
+     */
+    private function getLanguageList()
+    {
+        if (config('laradium.validate_all_languages', false)) {
+            return translate()->languages();
+        }
+
+        return translate()->languages()->where('is_fallback', 1);
     }
 
     /**
@@ -145,7 +172,7 @@ class Field
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getValue()
     {

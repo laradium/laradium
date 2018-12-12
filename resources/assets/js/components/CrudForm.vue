@@ -41,7 +41,7 @@
 
         <div class="crud-bottom">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <button class="btn btn-primary" :disabled="isSubmitted">
                         <i class="fa fa-floppy-o"></i> Save
                     </button>

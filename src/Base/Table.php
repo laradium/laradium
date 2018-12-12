@@ -208,7 +208,6 @@ class Table
             'name'       => 'action',
             'searchable' => false,
             'orderable'  => false,
-            'width'      => '150px',
             'class'      => 'text-center'
         ]);
 
