@@ -41,11 +41,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}     !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}     !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         .user-box ul li a:hover {
@@ -53,16 +53,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}     !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}     !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}     !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         a:hover {
@@ -136,19 +136,16 @@
 
                 <!-- User -->
                 <div class="user-box">
-                    <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}</h5>
-                    <ul class="list-inline">
-                        <form id="logout-form" action="/admin/logout" method="POST"
-                              style="display: none;">{{ csrf_field() }}</form>
-                        <li class="list-inline-item">
-                            <a href="javascript:;"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                               class="text-custom"
-                            >
-                                <i class="mdi mdi-power"></i>
-                            </a>
-                        </li>
-                    </ul>
+                    <form id="logout-form" action="/admin/logout" method="POST"
+                          style="display: none;">{{ csrf_field() }}</form>
+                    <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}
+                        <a href="javascript:;"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                           class="text-custom"
+                        >
+                            <i class="mdi mdi-power"></i>
+                        </a>
+                    </h5>
                 </div>
                 <!-- End User -->
 
