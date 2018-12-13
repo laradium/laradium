@@ -43,10 +43,15 @@
             <div class="row">
                 <div class="col-md-3">
                     <button class="btn btn-primary" :disabled="isSubmitted">
-                        <i class="fa fa-floppy-o"></i> Save
+                        <span v-if="isSubmitted">
+                            <i class="fa fa-cog fa-spin fa-fw"></i> Saving...
+                        </span>
+                        <span v-else>
+                            <i class="fa fa-floppy-o"></i> Save
+                        </span>
                     </button>
 
-                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)" :disabled="isSubmitted">
+                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)" :disabled="isSubmitted" v-if="!isSubmitted">
                         Save & Return
                     </button>
                 </div>
