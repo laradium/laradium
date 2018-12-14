@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddNestedsetForMenuItemsTable extends Migration
 {
@@ -80,7 +80,8 @@ class AddNestedsetForMenuItemsTable extends Migration
             'TranslationResource' => 'fa fa-globe',
             'PageResource'        => 'fa fa-file-text-o',
             'MenuResource'        => 'fa fa-link',
-            'SettingResource'     => 'fa fa-cogs'
+            'SettingResource'     => 'fa fa-cogs',
+            'UserResource'        => 'fa fa-users'
         ];
 
         $resource = array_last(explode('\\', get_class($resource)));
