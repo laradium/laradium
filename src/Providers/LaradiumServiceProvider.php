@@ -22,6 +22,9 @@ class LaradiumServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Global helpers
+        require_once __DIR__ . '/../Helpers/Global.php';
+
         $this->registerPaperClipConfig();
         $this->registerResources();
         $this->registerProviders();
@@ -36,8 +39,7 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadRoutes();
         $this->registerViewComposers();
 
-        // Global helpers, icons
-        require_once __DIR__ . '/../Helpers/Global.php';
+        // Icons
         require_once __DIR__ . '/../Helpers/Icons.php';
 
         // Mail config
