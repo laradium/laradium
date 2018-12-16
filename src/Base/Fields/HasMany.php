@@ -2,17 +2,19 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
+use App\Models\MenuItem;
 use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Traits\Nestable;
 use Laradium\Laradium\Traits\Relation;
 use Laradium\Laradium\Traits\Sortable;
 
 class HasMany extends Field
 {
 
-    use Sortable, Relation;
+    use Sortable, Relation, Nestable;
 
     /**
      * @var
@@ -71,6 +73,10 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
+        if (get_class($this->getModel()) === config('laradium.menu_class', '\Laradium\Laradium\Models\Menu')) {
+            config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')::rebuild();
+        }
+
         $this->templateData = $this->getTemplateData();
         $this->validationRules($this->templateData['validation_rules']);
 
@@ -84,6 +90,9 @@ class HasMany extends Field
     {
         $data = parent::formattedResponse();
         $data['value'] = get_class($this);
+        if ($this->isNestable()) {
+            $data['type'] = 'hasmany-nested';
+        }
 
         $data['entries'] = $this->getEntries();
         $data['template_data'] = $this->templateData;
@@ -139,39 +148,81 @@ class HasMany extends Field
     private function getEntries()
     {
         $entries = [];
+        $collection = $this->getRelationCollection()->sortBy($this->getSortableColumn());
 
-        foreach ($this->getRelationCollection()->sortBy($this->getSortableColumn()) as $item) {
-            $entry = [
-                'label'  => $this->getEntryLabel($item),
-                'fields' => [],
-                'config' => [
-                    'is_deleted'   => false,
-                    'is_collapsed' => $this->isCollapsed(),
-                ],
-                'id'     => $item->id,
-            ];
-
-            $entry['fields'][] = (new Hidden('id', $item))
-                ->build(array_merge($this->getAttributes(), [$item->id]))
-                ->formattedResponse(); // Add hidden ID field
-
-            if ($this->isSortable()) {
-                $entry['fields'][] = $this->sortableField($item); // Add hidden sortable field
+        if ($this->isNestable()) {
+            foreach ($collection as $item) {
+                if ($item->parent_id && !$item->parent) {
+                    $item->parent_id = null;
+                    $item->save();
+                }
             }
 
-            foreach ($this->fieldSet->fields as $temporaryField) {
-                $field = clone $temporaryField;
+            $collection = $this->getRelationCollection()->where('parent_id', null)->sortBy($this->getSortableColumn());
+        }
 
-                $entry['fields'][] = $field->model($item)
-                    ->build(array_merge($this->getAttributes(), [$item->id]))
-                    ->formattedResponse();
-            }
-
-            $entries[] = $entry;
+        foreach ($collection as $item) {
+            $entries[] = $this->formattedEntry($item);
         }
 
 
         return $entries;
+    }
+
+    /**
+     * @param $item
+     * @return array
+     */
+    private function formattedEntry($item)
+    {
+        $entry = [
+            'label'  => $this->getEntryLabel($item),
+            'fields' => [],
+            'config' => [
+                'is_deleted'   => false,
+                'is_collapsed' => $this->isCollapsed(),
+            ],
+            'id'     => $item->id,
+        ];
+        if ($this->isNestable()) {
+            $entry['children'] = [];
+            $entry['fields'][] = (new Hidden('parent_id', $item))
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse(); // Add hidden ID field
+        }
+
+        $entry['fields'][] = (new Hidden('id', $item))
+            ->build(array_merge($this->getAttributes(), [$item->id]))
+            ->formattedResponse(); // Add hidden ID field
+
+        if ($this->isSortable()) {
+            $entry['fields'][] = $this->sortableField($item); // Add hidden sortable field
+        }
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $entry['fields'][] = $field->model($item)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+        }
+
+        if ($this->isNestable() && $item->children->count()) {
+            foreach ($item->children->sortBy($this->getSortableColumn()) as $child) {
+                $entry['children'][] = $this->formattedEntry($child);
+            }
+        }
+
+        if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
+            $entry['formatted'] = [
+                'name'           => $item->name,
+                'url'            => $item->url,
+                'icon'           => $item->icon,
+                'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+            ];
+        }
+
+        return $entry;
     }
 
     /**
@@ -241,12 +292,13 @@ class HasMany extends Field
      */
     public function getEntryLabel(Model $model)
     {
-        if(!is_string($this->entryLabel)) {
+        if (!is_string($this->entryLabel)) {
             $closure = $this->entryLabel;
             $value = $closure($model);
         } else {
             $value = $model->{$this->entryLabel} ?? 'Entry';
         }
+
         return $value;
     }
 

@@ -5,11 +5,12 @@ namespace Laradium\Laradium\Models;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model
+class MenuItem extends \Baum\Node
 {
     use Translatable;
 
     /**
+     * 
      * @var array
      */
     protected $fillable = [
@@ -17,7 +18,8 @@ class MenuItem extends Model
         'target',
         'sequence_no',
         'icon',
-        'resource'
+        'resource',
+        'parent_id',
     ];
 
     /**

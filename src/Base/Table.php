@@ -60,7 +60,10 @@ class Table
     /**
      * @var array
      */
-    protected $orderBy = [];
+    protected $orderBy = [
+        'column'    => 'id',
+        'direction' => 'desc'
+    ];
 
     /**
      * @var
@@ -205,7 +208,6 @@ class Table
             'name'       => 'action',
             'searchable' => false,
             'orderable'  => false,
-            'width'      => '15%',
             'class'      => 'text-center'
         ]);
 
@@ -302,6 +304,7 @@ class Table
 
         $this->orderBy = [
             'key'       => $key,
+            'column'    => $column,
             'direction' => $direction
         ];
 

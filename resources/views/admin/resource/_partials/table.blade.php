@@ -4,10 +4,10 @@
             <thead>
             <tr>
                 @foreach($table->columns() as $column)
-                    <th>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
+                    <th {{ $column['column'] == 'action' ? 'style="width: 150px"' : '' }}>{{ ucfirst(str_replace('_', ' ', $column['name'])) }}</th>
                 @endforeach
                 @if(!$table->columns()->where('column', 'action')->first())
-                    <th>
+                    <th style="width: 150px">
                         Actions
                     </th>
                 @endif

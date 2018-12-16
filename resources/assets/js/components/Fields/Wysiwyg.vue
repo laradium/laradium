@@ -15,7 +15,7 @@
                        v-model="item.value"
                 >
                 <trumbowyg v-model="item.value"
-                           :key="item.name + '-editor'"
+                           :key="index"
                            :config="config"
                 ></trumbowyg>
             </div>

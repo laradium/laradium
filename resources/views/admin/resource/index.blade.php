@@ -1,6 +1,10 @@
 @extends('laradium::layouts.main', ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
 
 @section('content')
+    @include('laradium::admin._partials.breadcrumbs', [
+        'items' => $resource->getBreadcrumbs('index')
+    ])
+
     <div class="row">
         <div class="col-12">
             <div class="card-box">
@@ -84,7 +88,7 @@
                         serverSide: true,
                         ajax: $(selector).data('url'),
                         columns: {!! $table->getColumnConfig()->toJson() !!},
-                        order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+                        order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                     }).on('draw.dt', function () {
                         $('.js-editable').editable({
                             error: function (response, newValue) {
@@ -114,7 +118,7 @@
                     serverSide: true,
                     ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
                     columns: {!! $table->getColumnConfig()->toJson() !!},
-                    order: [{!! $table->getOrderBy() ?  '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+                    order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
                 }).on('draw.dt', function () {
                     $('.js-editable').editable({
                         error: function (response, newValue) {

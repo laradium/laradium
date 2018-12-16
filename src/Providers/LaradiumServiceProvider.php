@@ -7,14 +7,11 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
-use Laradium\Laradium\Console\Commands\InitializeLaradium;
 use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
-use Laradium\Laradium\Repositories\LaradiumRepository;
-use Laradium\Laradium\Repositories\SettingsRepository;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
@@ -24,9 +21,6 @@ class LaradiumServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Global helpers
-        require_once __DIR__ . '/../Helpers/Global.php';
-
         $this->registerPaperClipConfig();
         $this->registerResources();
         $this->registerProviders();
@@ -41,8 +35,13 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadRoutes();
         $this->registerViewComposers();
 
+        // Global helpers, icons
+        require_once __DIR__ . '/../Helpers/Global.php';
+        require_once __DIR__ . '/../Helpers/Icons.php';
+
         // Mail config
         $this->setMailConfig();
+
         $this->setTranslatableConfig();
     }
 
@@ -52,6 +51,7 @@ class LaradiumServiceProvider extends ServiceProvider
     private function registerProviders()
     {
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
+        $this->app->register(\Baum\Providers\BaumServiceProvider::class);
         $this->app->register(LaradiumTranslationServiceProvider::class);
     }
 
@@ -234,8 +234,7 @@ class LaradiumServiceProvider extends ServiceProvider
                 MakeLaradiumResource::class,
                 MakeLaradiumApiResource::class,
                 ImportTranslations::class,
-                FindTranslations::class,
-                InitializeLaradium::class
+                FindTranslations::class
             ]);
         }
     }

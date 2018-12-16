@@ -33,6 +33,11 @@ class BelongsToMany extends Field
     ];
 
     /**
+     * @var
+     */
+    protected $where;
+
+    /**
      * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
@@ -55,8 +60,15 @@ class BelongsToMany extends Field
 
         $model = $this->getModel();
         $relationModel = $model->{$this->relationName}()->getModel();
+        $items = $relationModel;
 
-        $this->items = $relationModel->all()->map(function ($item) use ($model) {
+        if ($where = $this->getWhere()) {
+            $items = $items->where($where);
+        }
+
+        $items = $items->get();
+
+        $this->items = $items->map(function ($item) use ($model) {
             $isChecked = false;
             if ($pivot = $model->{$this->relationName}->where('id', $item->id)->first()) {
                 $isChecked = true;
@@ -123,6 +135,25 @@ class BelongsToMany extends Field
         $closure($fieldSet);
 
         return $this;
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function where(\Closure $closure)
+    {
+        $this->where = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 
     /**

@@ -1,41 +1,37 @@
 <template>
-    <div class="border" style="padding: 10px; border-radius: 2px; margin: 5px;">
+    <div class="border" style="padding: 0px 10px 10px 10px; border-radius: 2px;">
         <h4>
             <i class="fa fa-bars"></i> Widgets
         </h4>
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
         <draggable class="dragArea" :list="field.blocks" @update="onUpdate(field.blocks)" :options="draggable">
             <div v-for="(block, index) in field.blocks">
-                <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
-                    <h4>
+                <div class="col-md-12 border" style="border-radius: 2px; margin: 5px 5px 5px 0;">
+
+                    <h4 class="d-inline-block">
                         <i class="mdi mdi-arrow-all handle"
                            v-if="field.config.is_sortable && !block.config.is_deleted"></i>
-
                         {{ block.label }}
                         <span v-if="block.config.is_deleted"><i>Deleted</i></span>
-
-                        <div class="pull-right" v-if="block.config.is_deleted">
-                            <button class="btn btn-primary btn-sm"
-                                    @click.prevent="restore(index)">
-                                <i class="fa fa-undo"></i> Restore
-                            </button>
-                        </div>
-
-                        <div class="pull-right" v-if="!block.config.is_deleted">
-                            <button class="btn btn-danger btn-sm"
-                                    @click.prevent="remove(block, field.name, index)">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-
-                        <div class="pull-right">
-                            <button class="btn btn-success btn-sm" @click.prevent="toggle(index)"
-                                    style="margin-right: 5px;">
-                                <span v-if="!block.config.is_collapsed"><i class="fa fa-eye-slash"></i> Hide</span>
-                                <span v-else><i class="fa fa-eye"></i> Show</span>
-                            </button>
-                        </div>
                     </h4>
+
+                    <div class="pull-right" style="margin-top: 7px;">
+                        <button class="btn btn-success btn-sm" @click.prevent="toggle(index)">
+                            <span v-if="!block.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
+                            <span v-else><i class="fa fa-eye"></i></span>
+                        </button>
+
+                        <button class="btn btn-primary btn-sm" v-if="block.config.is_deleted"
+                                @click.prevent="restore(index)">
+                            <i class="fa fa-undo"></i> Restore
+                        </button>
+
+                        <button class="btn btn-danger btn-sm" v-if="!block.config.is_deleted"
+                                @click.prevent="remove(block, field.name, index)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+
                     <div class="row" v-show="!block.config.is_collapsed">
                         <div v-for="(field, index) in block.fields" :class="field.config.col">
                             <component
@@ -100,7 +96,8 @@
                     if (templateBlocks[block].label === this.selectedWidget) {
                         template = templateBlocks[block];
                         template = _.cloneDeep(template);
-                        this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, template.replacement_ids);
+                        let generate_replacements = this.generateReplacementIds(this.replacement_ids, template.replacement_ids);
+                        this.new_replacement_ids = generate_replacements.replacement_ids;
 
                         for (let field in template.fields) {
                             for (let id in this.new_replacement_ids) {
@@ -140,14 +137,16 @@
 
             remove(item, field_name, index) {
                 swal({
-                    title: "Are you sure?",
-                    text: "After clicking \"Save\", you will not be able to recover this item!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this after you press 'Save'!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
                 })
-                    .then((willDelete) => {
-                        if (willDelete) {
+                    .then((result) => {
+                        if (result.value) {
                             if (item.id !== undefined) {
                                 let item_copy = _.cloneDeep(this.field.blocks[index]);
                                 this.removed_items[index] = item_copy;

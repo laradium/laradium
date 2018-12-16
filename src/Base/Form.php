@@ -65,13 +65,14 @@ class Form
 
             $field->build();
             $this->setValidationRules($field->getValidationRules());
-            if ($field->isTranslatable()) {
-                $this->isTranslatable = true;
-            }
 
             $this->fields->push($field);
 
         }
+
+//        if ($field->isTranslatable()) {
+        $this->isTranslatable = true;
+//        }
 
         return $this;
     }
@@ -89,7 +90,10 @@ class Form
                 'languages'        => $languages,
                 'form'             => $this->response(),
                 'is_translatable'  => $this->isTranslatable(),
-                'default_language' => array_first($languages)['iso_code']
+                'default_language' => array_first($languages)['iso_code'],
+                'actions'          => [
+                    'index' => $this->getAction('index')
+                ]
             ]
         ];
     }
@@ -118,7 +122,7 @@ class Form
         foreach ($this->fields as $field) {
             $response = $field->formattedResponse($field);
             $fieldList[] = $response;
-            if($field instanceof Tab && $response['config']['is_translatable']) {
+            if ($field instanceof Tab && $response['config']['is_translatable']) {
                 $this->isTranslatable = true;
             }
         }
@@ -194,13 +198,13 @@ class Form
     public function getAction($action = 'index'): string
     {
         $slug = $this->getResource()->getSlug();
-        if ($action == 'create') {
+        if ($action === 'create') {
             return url('/admin/' . $slug . '/create');
-        } else if ($action == 'edit') {
+        } else if ($action === 'edit') {
             return url('/admin/' . $slug . '/' . $this->getModel()->id . '/edit');
-        } else if ($action == 'store') {
+        } else if ($action === 'store') {
             return url('/admin/' . $slug);
-        } else if ($action == 'update') {
+        } else if ($action === 'update') {
             return url('/admin/' . $slug . '/' . $this->model->id);
         }
 

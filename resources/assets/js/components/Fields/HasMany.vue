@@ -1,39 +1,37 @@
 <template>
-    <div class="border" style="padding: 10px; border-radius: 2px; margin: 5px;">
+    <div class="border" style="padding: 0px 10px 10px 10px; border-radius: 2px; margin: 0px 0px 10px;">
         <h4>
             <i class="fa fa-bars"></i> {{ field.label }}
         </h4>
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
         <draggable class="dragArea" :list="field.entries" @update="onUpdate(field.entries)" :options="draggable">
             <div v-for="(entry, index) in field.entries">
-                <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
-                    <h4>
-                        <i class="mdi mdi-arrow-all handle" v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
+                <div class="col-md-12 border" style="border-radius: 2px; margin: 5px 5px 5px 0;">
+                    <h4 class="d-inline-block">
+                        <i class="mdi mdi-arrow-all handle"
+                           v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
 
                         <span v-html="entry.label"></span> <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
-
-                        <div class="pull-right" v-if="entry.config.is_deleted">
-                            <button class="btn btn-primary btn-sm"
-                                    @click.prevent="restore(index)"
-                                    v-if="field.config.actions.includes('delete')">
-                                <i class="fa fa-undo"></i> Restore
-                            </button>
-                        </div>
-
-                        <div class="pull-right" v-if="!entry.config.is_deleted">
-                            <button class="btn btn-danger btn-sm"
-                                    @click.prevent="remove(entry, field.name, index)"
-                                    v-if="field.config.actions.includes('delete')"><i
-                                    class="fa fa-trash"></i></button>
-                        </div>
-
-                        <div class="pull-right" v-if="!entry.config.is_deleted">
-                            <button class="btn btn-success btn-sm" @click.prevent="toggle(index)" style="margin-right: 5px;">
-                                <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
-                                <span v-else><i class="fa fa-eye"></i></span>
-                            </button>
-                        </div>
                     </h4>
+
+                    <div class="pull-right" style="margin-top: 7px;">
+                        <button class="btn btn-success btn-sm" v-if="!entry.config.is_deleted"
+                                @click.prevent="toggle(index)">
+                            <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
+                            <span v-else><i class="fa fa-eye"></i></span>
+                        </button>
+                        <button class="btn btn-primary btn-sm"
+                                @click.prevent="restore(index)"
+                                v-if="entry.config.is_deleted && field.config.actions.includes('delete')">
+                            <i class="fa fa-undo"></i> Restore
+                        </button>
+
+                        <button class="btn btn-danger btn-sm"
+                                @click.prevent="remove(entry, field.name, index)"
+                                v-if="!entry.config.is_deleted && field.config.actions.includes('delete')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
                     <div class="row" v-show="!entry.config.is_collapsed">
                         <div v-for="(field, index) in entry.fields" :class="field.config.col">
                             <component
@@ -85,7 +83,8 @@
 
         methods: {
             addItem() {
-                this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                this.new_replacement_ids = generate_replacements.replacement_ids;
                 let template_fields = _.cloneDeep(this.field.template_data.fields);
 
                 for (let field in template_fields) {
@@ -160,7 +159,7 @@
                                     },
                                     translations: []
                                 }];
-                                if(this.field.entries[index].config.is_deleted !== undefined) {
+                                if (this.field.entries[index].config.is_deleted !== undefined) {
                                     this.field.entries[index].config.is_deleted = true;
                                 }
                             } else {
@@ -173,14 +172,14 @@
 
             restore(index) {
                 this.field.entries[index].fields = this.removed_items[index].fields;
-                if(this.field.entries[index].config.is_deleted !== undefined) {
+                if (this.field.entries[index].config.is_deleted !== undefined) {
                     this.field.entries[index].config.is_deleted = false;
                 }
             },
 
             toggle(index) {
                 let config = this.field.entries[index].config;
-                if(config.is_collapsed !== undefined) {
+                if (config.is_collapsed !== undefined) {
                     this.field.entries[index].config.is_collapsed = !config.is_collapsed;
                 }
             }

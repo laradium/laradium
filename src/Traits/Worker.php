@@ -67,16 +67,17 @@ trait Worker
         $morphableName = array_get($data, 'morphable_name');
         $morphableType = array_get($data, 'morphable_type');
 
-        foreach (array_except($data, ['morphable_name', 'morphable_type']) as $key => $value) {
+        $fields = array_except($data, ['morphable_name', 'morphable_type']);
+
+        if (!count($fields)) {
+            $this->saveMorphToData($model, $morphableType, $morphableName, []);
+        }
+
+        foreach ($fields as $key => $value) {
             if ($id = array_get($value, 'id', null)) {
                 $this->saveData($value, $model->{$morphableName});
             } else {
-                $morphableModel = new $morphableType;
-                $createdMorphableModel = $this->saveData($value, $morphableModel);
-
-                $model->{$morphableName . '_id'} = $createdMorphableModel->id;
-                $model->{$morphableName . '_type'} = $morphableType;
-                $model->save();
+                $this->saveMorphToData($model, $morphableType, $morphableName, $value);
             }
         }
     }
@@ -103,6 +104,23 @@ trait Worker
         $data = array_replace($checked->all(), $pivot->all());
 
         $model->{$relationName}()->sync($data);
+    }
+
+    /**
+     * @param $model
+     * @param $morphableType
+     * @param $morphableName
+     * @param $data
+     * @return void
+     */
+    private function saveMorphToData($model, $morphableType, $morphableName, $data)
+    {
+        $morphableModel = new $morphableType;
+        $createdMorphableModel = $this->saveData($data, $morphableModel);
+
+        $model->{$morphableName . '_id'} = $createdMorphableModel->id;
+        $model->{$morphableName . '_type'} = $morphableType;
+        $model->save();
     }
 
 }

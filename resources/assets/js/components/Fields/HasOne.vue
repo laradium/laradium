@@ -61,7 +61,8 @@
 
         methods: {
             addItem() {
-                this.new_replacement_ids = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                this.new_replacement_ids = generate_replacements.replacement_ids;
                 let template_fields = JSON.parse(JSON.stringify(this.field.template_data.fields));
 
                 for (let field in template_fields) {

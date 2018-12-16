@@ -41,11 +41,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         .user-box ul li a:hover {
@@ -53,16 +53,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
         }
 
         a:hover {
@@ -129,46 +129,44 @@
         </div><!-- end navbar -->
     </div>
     <!-- Top Bar End -->
+    <div id="crud-form">
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="left side-menu">
+            <div class="sidebar-inner slimscrollleft">
 
-    <!-- ========== Left Sidebar Start ========== -->
-    <div class="left side-menu">
-        <div class="sidebar-inner slimscrollleft">
-
-            <!-- User -->
-            <div class="user-box">
-                <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}</h5>
-                <ul class="list-inline">
+                <!-- User -->
+                <div class="user-box">
                     <form id="logout-form" action="/admin/logout" method="POST"
                           style="display: none;">{{ csrf_field() }}</form>
-                    <li class="list-inline-item">
+                    <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}
                         <a href="javascript:;"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                            class="text-custom"
                         >
                             <i class="mdi mdi-power"></i>
                         </a>
-                    </li>
-                </ul>
+                    </h5>
+                </div>
+                <!-- End User -->
+
+                @include('laradium::admin._partials.menu')
             </div>
-            <!-- End User -->
-
-            @include('laradium::admin._partials.menu')
         </div>
-    </div>
-    <!-- Left Sidebar End -->
+        <!-- Left Sidebar End -->
 
-    <!-- ============================================================== -->
-    <!-- Start right Content here -->
-    <!-- ============================================================== -->
-    <div class="content-page">
-        <!-- Start content -->
-        <div class="content">
-            <div class="container-fluid" id="app">
-                @yield('content')
-            </div> <!-- container -->
-        </div> <!-- content -->
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container-fluid">
+                    @yield('content')
+                </div> <!-- container -->
+            </div> <!-- content -->
 
-        <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
+            <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
+        </div>
     </div>
     <!-- ============================================================== -->
     <!-- End Right content here -->

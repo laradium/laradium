@@ -18,7 +18,13 @@ trait CrudEvent
      */
     public function event($name, \Closure $callable)
     {
-        $this->events->put($name, $callable);
+        if (is_array($name)) {
+            foreach ($name as $event) {
+                $this->events->put($event, $callable);
+            }
+        } else {
+            $this->events->put($name, $callable);
+        }
 
         return $this;
     }
@@ -41,7 +47,7 @@ trait CrudEvent
             return $key === $name;
         })->first();
 
-        if($event) {
+        if ($event) {
             $event($this->getModel(), $request);
         }
     }

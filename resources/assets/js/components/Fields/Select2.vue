@@ -1,48 +1,43 @@
 <template>
-    <select>
-        <slot></slot>
-    </select>
+    <div>
+        <div class="form-group">
+            <label for="">{{ field.label }}
+                <span class="badge badge-primary"
+                      v-if="field.config.is_translatable">
+					{{ language }}
+				</span>
+            </label>
+            <input type="hidden" :value="selected" :name="field.name">
+            <select2 :options="field.options" v-model="selected">
+                <option disabled value="0">Select one</option>
+            </select2>
+        </div>
+    </div>
 </template>
 
 <script>
     export default {
-        props: ['options', 'value'],
-        mounted: function () {
-            let vm = this;
-            $(this.$el)
-                .select2({
-                    data: this.options,
-                    placeholder: 'Select',
-                    width: '100%',
-                    height: '100px',
-                    // templateResult: function (d) { return $(d.text); },
-                    // templateSelection: function (d) { return $(d.text); },
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    },
-                    // templateSelection: function(data) {
-                    //     return data.text;
-                    // }
-                })
-                .val(this.value)
-                .trigger('change')
-                // emit event on change.
-                .on('change', function () {
-                    vm.$emit('input', this.value)
-                });
+        props: ['field', 'language', 'item'],
+
+        data() {
+            return {
+                selected: null
+            };
         },
-        watch: {
-            value: function (value) {
-                $(this.$el)
-                    .val(value)
-                    .trigger('change');
-            },
-            options: function (options) {
-                $(this.$el).empty().select2({data: options});
+
+        mounted() {
+            let options = this.field.options;
+            for (let option in options) {
+                if (options[option].selected) {
+                    this.selected = options[option].id;
+                }
             }
         },
-        destroyed: function () {
-            $(this.$el).off().select2('destroy');
+
+        computed: {
+            attributes() {
+                return this.field.attr;
+            }
         }
     }
 </script>

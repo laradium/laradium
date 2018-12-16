@@ -22,6 +22,9 @@
 </template>
 
 <script>
+
+    import { serverBus } from '../../laradium';
+
     export default {
         props: ['field', 'language', 'item'],
 
@@ -29,6 +32,11 @@
             attributes() {
                 return this.field.attr;
             }
+        },
+        created() {
+            serverBus.$on('test', function () {
+               console.log(761237861236785123687);
+            });
         }
     }
 </script>

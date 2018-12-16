@@ -23,7 +23,7 @@ Class TranslationResource extends AbstractResource
      */
     public function resource()
     {
-        $this->event('afterSave', function () {
+        $this->event(['afterSave', 'afterDelete'], function () {
             cache()->forget('translations');
         });
 

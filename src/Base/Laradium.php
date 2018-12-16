@@ -74,6 +74,10 @@ class Laradium
                 $resource = $path->getPathname();
                 $baseName = basename($resource, '.php');
                 $resource = $resources . '\\' . $baseName;
+                $r = new $resource;
+                if(!class_exists($r->resourceName())) {
+                    continue;
+                }
                 $projectResources[] = $resource;
             }
         }

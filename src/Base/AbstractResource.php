@@ -2,6 +2,8 @@
 
 namespace Laradium\Laradium\Base;
 
+use App\Models\User;
+use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -11,6 +13,7 @@ use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
+
     use Crud, CrudEvent, Datatable;
 
     /**
@@ -43,11 +46,6 @@ abstract class AbstractResource
     ];
 
     /**
-     * @var bool
-     */
-    protected $globalActions = 'all';
-
-    /**
      * @var
      */
     private $baseResource;
@@ -57,7 +55,10 @@ abstract class AbstractResource
      */
     public function __construct()
     {
-        $this->model(new $this->resource);
+        if (class_exists($this->resource)) {
+            $this->model(new $this->resource);
+        }
+
         $this->events = collect([]);
     }
 
@@ -78,8 +79,9 @@ abstract class AbstractResource
     public function create()
     {
         $form = $this->getForm();
+        $resource = $this;
 
-        return view('laradium::admin.resource.create', compact('form'));
+        return view('laradium::admin.resource.create', compact('form', 'resource'));
     }
 
     /**
@@ -127,8 +129,9 @@ abstract class AbstractResource
 
         $this->model($model->findOrFail($id));
         $form = $this->getForm();
+        $resource = $this;
 
-        return view('laradium::admin.resource.edit', compact('form'));
+        return view('laradium::admin.resource.edit', compact('form', 'resource'));
     }
 
     /**
@@ -182,6 +185,8 @@ abstract class AbstractResource
 
         $model = $model->findOrFail($id);
         $model->delete();
+
+        $this->fireEvent('afterDelete', $request);
 
         if ($request->ajax()) {
             return [
@@ -253,10 +258,6 @@ abstract class AbstractResource
      */
     public function hasAction($value)
     {
-        if ($belongsTo = laradium()->belongsTo()) {
-            return in_array($value, $this->actions) && $belongsTo->hasAccess($this);
-        }
-
         return in_array($value, $this->actions);
     }
 
@@ -291,11 +292,51 @@ abstract class AbstractResource
     }
 
     /**
+     * @param $action
+     * @return array|mixed
+     */
+    public function getBreadcrumbs($action)
+    {
+        $form = $this->getForm();
+
+        $breadcrumbs = [
+            'index'  => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ]
+            ],
+            'create' => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Create',
+                    'url'  => $form->getAction('create')
+                ]
+            ],
+            'edit'   => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Edit',
+                    'url'  => $form->getAction('edit')
+                ]
+            ],
+        ];
+
+        return $breadcrumbs[$action] ?? [];
+    }
+
+    /**
      * @return string
      */
-    public function getGlobalActions()
+    public function resourceName()
     {
-        return $this->globalActions;
+        return $this->resource;
     }
 
     /**

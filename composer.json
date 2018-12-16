@@ -21,6 +21,7 @@
     "cviebrock/eloquent-sluggable": "4.6.*",
     "laracasts/utilities": "^3.0",
     "laracasts/generators": "^1.1"
+    "baum/baum": "^1.1"
   },
   "autoload": {
     "psr-4": {
