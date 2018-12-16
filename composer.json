@@ -20,7 +20,7 @@
     "doctrine/dbal": "2.8.*",
     "cviebrock/eloquent-sluggable": "4.6.*",
     "laracasts/utilities": "^3.0",
-    "laracasts/generators": "^1.1"
+    "laracasts/generators": "^1.1",
     "baum/baum": "^1.1"
   },
   "autoload": {
