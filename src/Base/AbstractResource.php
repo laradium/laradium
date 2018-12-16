@@ -46,6 +46,11 @@ abstract class AbstractResource
     ];
 
     /**
+     * @var bool
+     */
+    protected $globalActions = 'all';
+
+    /**
      * @var
      */
     private $baseResource;
@@ -258,6 +263,10 @@ abstract class AbstractResource
      */
     public function hasAction($value)
     {
+        if ($belongsTo = laradium()->belongsTo()) {
+            return in_array($value, $this->actions) && $belongsTo->hasAccess($this);
+        }
+
         return in_array($value, $this->actions);
     }
 
@@ -337,6 +346,14 @@ abstract class AbstractResource
     public function resourceName()
     {
         return $this->resource;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getGlobalActions()
+    {
+        return $this->globalActions;
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
+use Laradium\Laradium\Console\Commands\InitializeLaradium;
 use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
@@ -234,7 +235,8 @@ class LaradiumServiceProvider extends ServiceProvider
                 MakeLaradiumResource::class,
                 MakeLaradiumApiResource::class,
                 ImportTranslations::class,
-                FindTranslations::class
+                FindTranslations::class,
+                InitializeLaradium::class
             ]);
         }
     }
