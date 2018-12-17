@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laradium\Laradium\Models\Language;
 
 class ImportTranslations extends Command
 {
@@ -98,7 +99,7 @@ class ImportTranslations extends Command
                 $group = str_replace('.php', '', $file->getFilename());
                 foreach (\File::getRequire($fullPath) as $key => $translation) {
                     if (!is_array($key) && !is_array($group) && !is_array($translation)) {
-                        foreach (translate()->languages() as $language) {
+                        foreach (Language::all()->unique('iso_code') as $language) {
                             $rows[] = [
                                 'locale' => $language->iso_code,
                                 'group'  => $group,
