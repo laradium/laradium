@@ -43,12 +43,24 @@ trait CrudEvent
      */
     public function fireEvent($name, $request)
     {
-        $event = $this->events->filter(function ($value, $key) use ($name) {
-            return $key === $name;
-        })->first();
+        if (is_array($name)) {
+            foreach ($name as $eventName) {
+                $event = $this->events->filter(function ($value, $key) use ($eventName) {
+                    return $key === $eventName;
+                })->first();
 
-        if ($event) {
-            $event($this->getModel(), $request);
+                if ($event) {
+                    $event($this->getModel(), $request);
+                }
+            }
+        } else {
+            $event = $this->events->filter(function ($value, $key) use ($name) {
+                return $key === $name;
+            })->first();
+
+            if ($event) {
+                $event($this->getModel(), $request);
+            }
         }
     }
 }

@@ -104,7 +104,7 @@ abstract class AbstractResource
         $form->model($model);
         $this->model($model);
 
-        $this->fireEvent('afterSave', $request);
+        $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
         if ($request->ajax()) {
             return [
