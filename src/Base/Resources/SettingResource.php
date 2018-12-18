@@ -93,6 +93,15 @@ Class SettingResource extends AbstractResource
         }
 
         if ($item->type === 'file') {
+            if ($item->is_translatable) {
+                $html = '';
+                foreach ($item->translations as $translation) {
+                    $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . ($translation->file->exists() ? $translation->file->url() : '- empty -') . '</li>';
+                }
+
+                return $html;
+            }
+
             if ($item->file->exists()) {
                 return $item->file->url();
             } else {
