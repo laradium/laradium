@@ -32,7 +32,7 @@ Class SettingResource extends AbstractResource
             $fieldType = $set->getModel()->type;
 
             if ($set->getModel()->is_translatable) {
-                $set->$fieldType('value')->translatable()->label($set->getModel()->name);
+                $set->$fieldType($fieldType === 'file' ? 'file' : 'value')->translatable()->label($set->getModel()->name);
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file')->label($set->getModel()->name);
             } else {

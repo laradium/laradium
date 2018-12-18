@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Repositories;
 
 use Laradium\Laradium\Models\Setting;
+use Laradium\Laradium\Models\SettingTranslation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SettingsRepository
@@ -67,10 +68,15 @@ class SettingsRepository
     private function getValue($setting)
     {
         if ($setting['is_translatable']) {
-
             $translation = collect(array_get($setting, 'translations'))->where('locale', app()->getLocale())->first();
 
             if ($translation) {
+                if ($setting['type'] === 'file') {
+                    $file = SettingTranslation::find($translation['id'])->file;
+
+                    return is_file(public_path('uploads/' . $file->path())) ? $file->url() : null;
+                }
+
                 return $translation['value'];
             }
 
