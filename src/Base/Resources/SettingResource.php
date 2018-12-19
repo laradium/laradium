@@ -32,7 +32,7 @@ Class SettingResource extends AbstractResource
             $fieldType = $set->getModel()->type;
 
             if ($set->getModel()->is_translatable) {
-                $set->$fieldType('value')->translatable()->label($set->getModel()->name);
+                $set->$fieldType($fieldType === 'file' ? 'file' : 'value')->translatable()->label($set->getModel()->name);
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file')->label($set->getModel()->name);
             } else {
@@ -93,6 +93,15 @@ Class SettingResource extends AbstractResource
         }
 
         if ($item->type === 'file') {
+            if ($item->is_translatable) {
+                $html = '';
+                foreach ($item->translations as $translation) {
+                    $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . ($translation->file->exists() ? $translation->file->url() : '- empty -') . '</li>';
+                }
+
+                return $html;
+            }
+
             if ($item->file->exists()) {
                 return $item->file->url();
             } else {
