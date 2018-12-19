@@ -50,9 +50,11 @@ class File extends Field
         $model = $this->getModel();
 
         if ($this->isTranslatable()) {
+            $attributes = $this->getAttributes();
+            unset($attributes[count($attributes) - 1]);
             foreach (translate()->languages() as $language) {
                 $isoCode = $language->iso_code;
-                $this->build(['translations', $isoCode]);
+                $this->build(array_merge($attributes, ['translations', $isoCode]));
                 $model = $this->getModel()->translateOrNew($isoCode);
 
                 $url = null;
