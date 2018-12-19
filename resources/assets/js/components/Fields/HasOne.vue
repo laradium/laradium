@@ -109,7 +109,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then((result) => {
+                    .then(function (result) {
                         if (result.value) {
                             if (item.id !== undefined) {
                                 this.removed_items[index] = _.cloneDeep(this.field.entries[index]);
