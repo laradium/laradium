@@ -27,7 +27,7 @@ class SettingsRepository
         $this->cacheKey = config('laradium-setting.cache_key', 'laradium::settings');
 
         $this->cachedSettings = cache()->rememberForever($this->cacheKey, function () {
-            $settings = Setting::all()->keyBy('key')->map(function ($item) {
+            $settings = (class_exists(\App\Models\Setting::class) ? \App\Models\Setting::class : Setting::class)::all()->keyBy('key')->map(function ($item) {
                 return $item->toArray();
             });
 
@@ -85,7 +85,7 @@ class SettingsRepository
 
         //yes its ugly. yes it needs to be redone. yes I am a lazy fuck
         if ($setting['type'] === 'file') {
-            $file = Setting::find($setting['id'])->file;
+            $file = (class_exists(\App\Models\Setting::class) ? \App\Models\Setting::class : Setting::class)::find($setting['id'])->file;
 
             return is_file(public_path('uploads/' . $file->path())) ? $file->url() : null;
         }
@@ -156,7 +156,7 @@ class SettingsRepository
                 }
             }
 
-            $setting = Setting::firstOrCreate([
+            $setting = (class_exists(\App\Models\Setting::class) ? \App\Models\Setting::class : Setting::class)::firstOrCreate([
                 'key' => $item['key']
             ], array_except($item, 'value'));
 

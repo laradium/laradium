@@ -4,13 +4,11 @@ namespace Laradium\Laradium\Models;
 
 use Czim\Paperclip\Model\PaperclipTrait;
 use Dimsav\Translatable\Translatable;
-use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
 class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
 {
-
-    //use Translatable;
     use PaperclipTrait, PaperclipAndTranslatable;
 
     use Translatable {
@@ -36,22 +34,26 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
         'is_translatable',
         'file'
     ];
+
     /**
      * @var array
      */
     protected $casts = [
         'meta' => 'array'
     ];
+
     /**
      * @var string
      */
     public $translationModel = SettingTranslation::class;
+
     /**
      * @var array
      */
     public $translatedAttributes = [
         'value'
     ];
+
     /**
      * @var array
      */
@@ -63,7 +65,13 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
      */
     public function __construct(array $attributes = [])
     {
-        $this->hasAttachedFile('file', []);
+        if (class_exists(\App\Models\Setting::class)) {
+            $this->hasAttachedFile('file', [
+                'path' => 'settings/:attachment/:id/:variant/:hash/:filename'
+            ]);
+        } else {
+            $this->hasAttachedFile('file', []);
+        }
 
         parent::__construct($attributes);
     }
