@@ -21,6 +21,7 @@
     "vue": "^2.5.7"
   },
   "dependencies": {
+    "cnc-vue-jstree": "^1.0.15",
     "jquery-datetimepicker": "^2.5.20",
     "jquery-resizable-dom": "^0.32.0",
     "jquery-ui": "^1.12.1",

@@ -9,7 +9,6 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 window.resizable = require('jquery-resizable-dom');
-
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -46,6 +45,7 @@ Vue.component('widgetconstructor-field', require('./components/fields/WidgetCons
 Vue.component('select2', require('./components/Select2.vue'));
 Vue.component('draggable', require('vuedraggable'));
 Vue.component('nestable', require('./components/fields/Nestable.vue'));
+Vue.component('tree-field', require('./components/fields/Tree.vue'));
 Vue.component('vue-menu', require('./components/fields/Menu.vue'));
 Vue.component('menuitems', require('./components/fields/MenuItems.vue'));
 
