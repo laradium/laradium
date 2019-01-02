@@ -9,12 +9,15 @@ class Import extends PassThrough
 
     /**
      * @param $rows
+     * @param bool $global
      * @return bool
      */
-    public function process($rows, $global = false)
+    public function process($rows, $global = false): bool
     {
         \DB::transaction(function () use ($rows, $global) {
             if ($belongsTo = laradium()->belongsTo()) {
+                $current = $belongsTo->getCurrent();
+
                 foreach ($belongsTo->getAll($global) as $item) {
                     $belongsTo->set($item->id);
                     foreach (array_chunk($rows, 300) as $chunk) {
@@ -32,6 +35,9 @@ class Import extends PassThrough
                         }
                     }
                 }
+
+                // Set back to current
+                $belongsTo->set($current);
             } else {
                 foreach (array_chunk($rows, 300) as $chunk) {
                     foreach ($chunk as $item) {
@@ -55,7 +61,7 @@ class Import extends PassThrough
      * @param null $remove
      * @return array
      */
-    protected function data($item, $add = null, $remove = null)
+    protected function data($item, $add = null, $remove = null): array
     {
         $data = [
             'locale' => $item['locale'],
@@ -76,9 +82,11 @@ class Import extends PassThrough
     }
 
     /**
+     * @param bool $global
      * @return void
+     * @throws \Exception
      */
-    public function flushCache($global = false)
+    public function flushCache($global = false): void
     {
         if ($belongsTo = laradium()->belongsTo()) {
             foreach ($belongsTo->getAll($global) as $item) {
