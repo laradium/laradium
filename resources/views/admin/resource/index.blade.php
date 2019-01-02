@@ -32,7 +32,7 @@
                         <ul class="nav nav-tabs">
                             @foreach($tabs as $id => $tabName)
                                 <li class="nav-item">
-                                    <a href="#tab-{{ $id }}" data-toggle="tab" aria-expanded="false"
+                                    <a href="#tab-{{ str_slug($id) }}" data-toggle="tab" aria-expanded="false"
                                        class="nav-link {{ $loop->first ? 'active' : '' }}">
                                         {{ $tabName }}
                                     </a>
@@ -45,10 +45,8 @@
                         <div class="tab-content">
                             @foreach ($tabs as $id => $tabName)
                                 <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                     id="tab-{{ $id }}">
-
+                                     id="tab-{{ str_slug($id) }}">
                                     @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id) ])
-
                                 </div>
                             @endforeach
                         </div>

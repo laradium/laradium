@@ -29,7 +29,7 @@ Class TranslationResource extends AbstractResource
 
         return laradium()->resource(function (FieldSet $set) {
             $set->select('locale')->options($this->localeList());
-            $set->text('group')->rules('required');
+            $set->text('group')->rules('required|regex:/^\S*$/u');
             $set->text('key')->rules('required');
             $set->text('value')->rules('required');
         });

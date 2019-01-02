@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\PassThroughs\Translation;
 
+use Laradium\Laradium\Models\Translation;
 use Laradium\Laradium\PassThroughs\PassThrough;
 
 class Import extends PassThrough
@@ -11,6 +12,7 @@ class Import extends PassThrough
      * @param $rows
      * @param bool $global
      * @return bool
+     * @throws \Exception
      */
     public function process($rows, $global = false): bool
     {
