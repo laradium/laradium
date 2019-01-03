@@ -2,6 +2,7 @@
     <div class="form-group">
         <label for="">
             <span v-html="field.label"></span>
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
             <span class="badge badge-primary"
                   v-if="field.config.is_translatable">
                 {{ language }}
