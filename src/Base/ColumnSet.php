@@ -42,6 +42,7 @@ class ColumnSet
             'modify'         => null,
             'not_sortable'   => false,
             'not_searchable' => false,
+            'switchable'     => false,
         ]);
 
         $this->column = $column;
@@ -120,7 +121,7 @@ class ColumnSet
     public function modify($closure)
     {
         $this->list = $this->list->map(function ($item) use ($closure) {
-            if ($this->column == $item['column']) {
+            if ($this->column == $item['column'] && !$item['switchable']) {
                 $item['modify'] = $closure;
             }
 
@@ -130,4 +131,27 @@ class ColumnSet
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function switchable($disabled = false)
+    {
+        $this->list = $this->list->map(function ($item) use ($disabled) {
+            if ($this->column == $item['column']) {
+                $item['modify'] = function ($row) use ($item, $disabled) {
+                    return view('laradium::admin.resource._partials.switcher', [
+                        'row'      => $row,
+                        'column'   => $item['column'],
+                        'disabled' => $disabled
+                    ])->render();
+                };
+
+                $item['switchable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
 }
