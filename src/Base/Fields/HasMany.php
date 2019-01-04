@@ -52,6 +52,11 @@ class HasMany extends Field
     private $entryLabel = 'name';
 
     /**
+     * @var array
+     */
+    private $letters = [];
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -63,6 +68,7 @@ class HasMany extends Field
         $this->relationName = array_first($parameters);
         $this->fieldName = array_first($parameters);
         $this->fieldSet = new FieldSet;
+        $this->letters = array_combine(range(0, 25), range('a', 'z'));
     }
 
     /**
@@ -190,25 +196,23 @@ class HasMany extends Field
                 ->formattedResponse();
         }
 
-        if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
-            $entry['formatted'] = [
-                'name'           => $item->name,
-                'url'            => $item->url,
-                'icon'           => $item->icon,
-                'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
-            ];
-        }
-
         if ($this->isNestable()) {
             $tree = [
-                'id'     => (string)$item->id,
-                'title'  => $item->name,
-                'order'  => $item->sequnce_no,
-                'opened' => true,
+                'id'       => (string)$item->id,
+                'text'     => $item->name,
+                'parent'   => $item->parent_id ? (string)$item->parent_id : '#',
+                'children' => [],
             ];
-            if ($item->parent_id) {
-                $tree['parent'] = (string)$item->parent_id;
+
+            if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
+                $tree['data'] = [
+                    'name'           => $item->name,
+                    'url'            => $item->url,
+                    'icon'           => $item->icon,
+                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                ];
             }
+
             $entry['tree'] = $tree;
         }
 
@@ -284,12 +288,11 @@ class HasMany extends Field
     {
         if (!is_string($this->entryLabel)) {
             $closure = $this->entryLabel;
-            $value = $closure($model);
-        } else {
-            $value = $model->{$this->entryLabel} ?? 'Entry';
+
+            return $closure($model);
         }
 
-        return $value;
+        return $model->{$this->entryLabel} ?? 'Entry';
     }
 
 }
