@@ -10,7 +10,7 @@
     export default {
         props: ['tree', 'field'],
 
-        data () {
+        data() {
             return {
                 has_new_items: false,
                 new_item_count: 0
@@ -18,16 +18,17 @@
         },
 
         created() {
-            let $vm = this;
+            serverBus.$on('added_tree_item', id => {
+                this.new_item_count = this.new_item_count + 1;
 
-            serverBus.$on('added_tree_item', function (id) {
-                $vm.new_item_count =  $vm.new_item_count + 1;
-
-                $('#js-tree').jstree().create_node('#', {"id": id, "text": "NEW ITEM (" + $vm.new_item_count + ")"}, "last", function () {
-                    $vm.has_new_items = true;
+                $('#js-tree').jstree().create_node('#', {
+                    "id": id,
+                    "text": "NEW ITEM (" + this.new_item_count + ")"
+                }, "last", () => {
+                    this.has_new_items = true;
                 });
 
-                let entries = $vm.field.entries;
+                let entries = this.field.entries;
                 for (let entry in entries) {
                     if (entries[entry].id == id) {
                         entries[entry].config.is_collapsed = false;
@@ -38,17 +39,16 @@
             });
         },
 
-        mounted: function () {
-            let $vm = this;
+        mounted() {
             let tree = $('#js-tree');
             let field = this.field;
 
             tree.jstree({
                 'core': {
                     'data': this.tree,
-                    "check_callback": function (op, node, parent, position, more) {
+                    "check_callback": (op, node, parent, position, more) => {
                         if (op === "move_node" && more && more.core) {
-                            if ($vm.has_new_items) {
+                            if (this.has_new_items) {
                                 toastr.warning('You need to save new data before sorting!');
 
                                 return false;
@@ -61,7 +61,7 @@
                 'plugins': [
                     "dnd"
                 ]
-            }).bind("move_node.jstree", function () {
+            }).bind("move_node.jstree", () => {
                 let modified_tree = tree.jstree(true).get_json('#', {flat: true});
                 serverBus.$emit('formatted', modified_tree);
 
@@ -87,12 +87,12 @@
                     }
                     i++;
                 }
-            }).on('loaded.jstree', function () {
+            }).on('loaded.jstree', () => {
                 tree.jstree('open_all');
 
                 let modified_tree = tree.jstree(true).get_json('#', {flat: true});
                 serverBus.$emit('formatted', modified_tree);
-            }).on("select_node.jstree", function (e, data) {
+            }).on("select_node.jstree", (e, data) => {
                 let entries = field.entries;
                 for (let entry in entries) {
                     if (entries[entry].id == data.node.id) {
@@ -102,8 +102,6 @@
                     }
                 }
             });
-
-
         },
     };
 </script>

@@ -19,7 +19,16 @@ mix.webpackConfig(webpack => {
 			  $: 'jquery',
 			  'window.jQuery': 'jquery',
 			}),
-        ]
+        ],
+
+        module: {
+            rules: [
+                {
+                    test: /\.jsx?$/,
+                    loader: 'babel-loader',
+                }
+            ]
+        }
     };
 })
 

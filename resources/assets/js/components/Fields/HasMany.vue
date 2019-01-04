@@ -125,8 +125,6 @@
             },
 
             remove(item, field_name, index) {
-                let $vm = this;
-
                 swal({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this after you press 'Save'!",
@@ -136,14 +134,13 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then(function (result) {
+                    .then((result) => {
                         if (result.value) {
                             if (item.id !== undefined) {
-                                console.log(2);
-                                let item_copy = _.cloneDeep($vm.field.entries[index]);
-                                $vm.removed_items[index] = item_copy;
+                                let item_copy = _.cloneDeep(this.field.entries[index]);
+                                this.removed_items[index] = item_copy;
 
-                                $vm.field.entries[index].fields = [{
+                                this.field.entries[index].fields = [{
                                     type: "hidden",
                                     label: "Id",
                                     name: field_name + "[" + item.id + "][remove]",
@@ -162,11 +159,11 @@
                                     },
                                     translations: []
                                 }];
-                                if ($vm.field.entries[index].config.is_deleted !== undefined) {
-                                    $vm.field.entries[index].config.is_deleted = true;
+                                if (this.field.entries[index].config.is_deleted !== undefined) {
+                                    this.field.entries[index].config.is_deleted = true;
                                 }
                             } else {
-                                $vm.field.entries.splice(index, 1);
+                                this.field.entries.splice(index, 1);
                             }
                         }
                     });

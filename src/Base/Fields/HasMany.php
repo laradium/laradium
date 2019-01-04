@@ -79,8 +79,8 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
-        if (get_class($this->getModel()) === config('laradium.menu_class', '\Laradium\Laradium\Models\Menu')) {
-            config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')::rebuild();
+        if (get_class($this->getModel()) === config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class)) {
+            config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)::rebuild();
         }
 
         $this->templateData = $this->getTemplateData();
@@ -204,7 +204,7 @@ class HasMany extends Field
                 'children' => [],
             ];
 
-            if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
+            if (get_class($item) === config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)) {
                 $tree['data'] = [
                     'name'           => $item->name,
                     'url'            => $item->url,

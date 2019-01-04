@@ -18,41 +18,33 @@
             return {
                 form_data: {},
                 items: [],
-                arr: [
-                    {'id':1 ,'parent' : 0},
-                    {'id':2 ,'parent' : 1},
-                    {'id':3 ,'parent' : 1},
-                    {'id':4 ,'parent' : 2},
-                    {'id':5 ,'parent' : 0},
-                    {'id':6 ,'parent' : 0},
-                    {'id':7 ,'parent' : 4}
-                ]
             };
         },
 
         created() {
-            let $vm = this;
-            serverBus.$on('formatted', function (data) {
-                $vm.items = $vm.flatToTree(data);
+            serverBus.$on('formatted', (data) => {
+                this.items = this.flatToTree(data);
             });
         },
 
         methods: {
-            flatToTree( array, parent, tree ){
-                let $vm = this;
-
+            flatToTree(array, parent, tree) {
                 tree = typeof tree !== 'undefined' ? tree : [];
-                parent = typeof parent !== 'undefined' ? parent : { id: '#' };
+                parent = typeof parent !== 'undefined' ? parent : {id: '#'};
 
-                let children = _.filter( array, function(child){ return child.parent == parent.id; });
+                let children = _.filter(array, (child) => {
+                    return child.parent == parent.id;
+                });
 
-                if( !_.isEmpty( children )  ){
-                    if( parent.id == '#' ){
+                if (!_.isEmpty(children)) {
+                    if (parent.id == '#') {
                         tree = children;
-                    }else{
+                    } else {
                         parent['children'] = children
                     }
-                    _.each( children, function( child ){ $vm.flatToTree( array, child ) } );
+                    _.each(children, (child) => {
+                        this.flatToTree(array, child)
+                    });
                 }
 
                 return tree;

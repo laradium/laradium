@@ -56,7 +56,6 @@ $(function() {
    });
 
    if($(document).find('li.has_sub a').hasClass('active')) {
-       console.log($('li.has_sub a.active'));
        $('li.has_sub a.active').next('ul').slideDown()
    }
 });
