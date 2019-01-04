@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -21,6 +20,7 @@ Vue.component('text-field', require('./components/fields/Text.vue'));
 Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
 Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
 Vue.component('tab-field', require('./components/fields/Tab.vue'));
+Vue.component('block-field', require('./components/fields/Block.vue'));
 Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
 Vue.component('select-field', require('./components/fields/Select.vue'));
 Vue.component('select2-field', require('./components/fields/Select2.vue'));
@@ -49,17 +49,18 @@ Vue.component('nestable', require('./components/fields/Nestable.vue'));
 Vue.component('vue-menu', require('./components/fields/Menu.vue'));
 Vue.component('menuitems', require('./components/fields/MenuItems.vue'));
 
-
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
 import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
 import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
 import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
+
 require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
 import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
 import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
 import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
 import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
+
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
 

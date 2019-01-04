@@ -82,8 +82,10 @@
 
         mounted() {
             this.draggable.disabled = !this.field.config.is_sortable;
-            this.selectedWidget = this.field.template_data.blocks[0].label;
 
+            if (typeof this.field.template_data.blocks[0] !== "undefined") {
+                this.selectedWidget = this.field.template_data.blocks[0].label;
+            }
         },
 
         methods: {

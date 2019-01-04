@@ -6,37 +6,33 @@
 
         <input type="hidden" name="_method" :value="method" v-if="method">
 
-        <div class="alert alert-danger" v-show="errors.length">
-            <li v-for="error in errors">
-                {{ error }}
-            </li>
-        </div>
+        <template v-if="blocks.length > 1">
+            <div class="alert alert-danger" v-show="errors.length">
+                <li v-for="error in errors">
+                    {{ error }}
+                </li>
+            </div>
 
-        <div class="alert alert-success" v-if="success">
-            {{ success }}
-        </div>
-        <div class="row" v-if="tabs.length">
-            <div class="col-md-12">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item" v-for="(tab, index) in tabs">
-                        <a :href="'#tab-' + tab.slug" data-toggle="tab" @click.prevent="current_tab = tab.slug"
-                           aria-expanded="false" class="nav-link"
-                           :class="{'active': index === 0}">
-                            {{ tab.name }}
-                        </a>
-                    </li>
-                </ul>
+            <div class="alert alert-success" v-if="success">
+                {{ success }}
             </div>
-        </div>
-        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length }">
-            <div v-for="field in data.form" :class="field.config.col">
-                <component :is="field.type + '-field'"
-                           :field="field"
-                           :current_tab="current_tab"
-                           :language="data.default_language"
-                           :replacement_ids="{}"
-                ></component>
-            </div>
+        </template>
+
+        <div class="row">
+            <block-field v-for="(block, index) in blocks" :data="block" :default_language="data.default_language"
+                         :key="'block' + index">
+                <template v-if="blocks.length === 1">
+                    <div class="alert alert-danger" v-show="errors.length">
+                        <li v-for="error in errors">
+                            {{ error }}
+                        </li>
+                    </div>
+
+                    <div class="alert alert-success" v-if="success">
+                        {{ success }}
+                    </div>
+                </template>
+            </block-field>
         </div>
 
         <div class="crud-bottom">
@@ -51,7 +47,8 @@
                         </span>
                     </button>
 
-                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)" :disabled="isSubmitted" v-if="!isSubmitted">
+                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)"
+                            :disabled="isSubmitted" v-if="!isSubmitted">
                         Save & Return
                     </button>
                 </div>
@@ -81,7 +78,7 @@
                 is_translatable: false,
                 errors: [],
                 data: [],
-                tabs: [],
+                blocks: [],
                 loading: true,
                 isSubmitted: false
             };
@@ -91,18 +88,21 @@
             this.data = JSON.parse(data[0].value).data;
 
             let fields = this.data.form;
-            let i = 0;
             for (let field in fields) {
-                if (fields[field].type === 'tab') {
-                    if (i === 0) {
-                        this.current_tab = fields[field].slug;
+                if (fields.hasOwnProperty(field)) {
+                    if (fields[field].type === 'block') {
+                        this.blocks.push(fields[field]);
                     }
-                    this.tabs.push({
-                        slug: fields[field].slug,
-                        name: fields[field].name,
-                    });
                 }
-                i++;
+            }
+
+            if (!this.blocks.length) {
+                this.blocks.push({
+                    fields: this.data.form,
+                    config: {
+                        col: 'col-12'
+                    }
+                });
             }
         },
         methods: {
@@ -146,7 +146,7 @@
                         return;
                     }
 
-                    if (res.data.redirect != undefined) {
+                    if (typeof res.data.redirect !== "undefined") {
                         window.location = res.data.redirect;
                     }
 
@@ -156,16 +156,20 @@
                     this.success = '';
                     let errors = res.response.data.errors;
 
-                    $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
-
                     for (let error in errors) {
-                        this.errors.push(errors[error][0]);
+                        if (errors.hasOwnProperty(error)) {
+                            this.errors.push(errors[error][0]);
+                        }
                     }
 
                     if (!errors) {
                         let status = res.response.status;
                         this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
                     }
+
+                    this.$nextTick(() => {
+                        $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
+                    });
                 });
 
             }
