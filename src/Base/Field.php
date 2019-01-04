@@ -445,9 +445,9 @@ class Field
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getInfo()
+    public function getInfo(): string
     {
         return $this->info;
     }
