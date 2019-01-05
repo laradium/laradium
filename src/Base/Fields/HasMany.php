@@ -52,6 +52,11 @@ class HasMany extends Field
     private $entryLabel = 'name';
 
     /**
+     * @var array
+     */
+    private $letters = [];
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -63,6 +68,7 @@ class HasMany extends Field
         $this->relationName = array_first($parameters);
         $this->fieldName = array_first($parameters);
         $this->fieldSet = new FieldSet;
+        $this->letters = array_combine(range(0, 25), range('a', 'z'));
     }
 
     /**
@@ -73,8 +79,8 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
-        if (get_class($this->getModel()) === config('laradium.menu_class', '\Laradium\Laradium\Models\Menu')) {
-            config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')::rebuild();
+        if (get_class($this->getModel()) === config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class)) {
+            config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)::rebuild();
         }
 
         $this->templateData = $this->getTemplateData();
@@ -90,10 +96,6 @@ class HasMany extends Field
     {
         $data = parent::formattedResponse();
         $data['value'] = get_class($this);
-        if ($this->isNestable()) {
-            $data['type'] = 'hasmany-nested';
-        }
-
         $data['entries'] = $this->getEntries();
         $data['template_data'] = $this->templateData;
         $data['config']['is_sortable'] = $this->isSortable();
@@ -138,7 +140,7 @@ class HasMany extends Field
             'label'            => 'Entry',
             'fields'           => $fields,
             'replacement_ids'  => $this->getReplacementAttributes(),
-            'validation_rules' => $validationRules
+            'validation_rules' => $validationRules,
         ];
     }
 
@@ -150,21 +152,9 @@ class HasMany extends Field
         $entries = [];
         $collection = $this->getRelationCollection()->sortBy($this->getSortableColumn());
 
-        if ($this->isNestable()) {
-            foreach ($collection as $item) {
-                if ($item->parent_id && !$item->parent) {
-                    $item->parent_id = null;
-                    $item->save();
-                }
-            }
-
-            $collection = $this->getRelationCollection()->where('parent_id', null)->sortBy($this->getSortableColumn());
-        }
-
         foreach ($collection as $item) {
             $entries[] = $this->formattedEntry($item);
         }
-
 
         return $entries;
     }
@@ -185,7 +175,6 @@ class HasMany extends Field
             'id'     => $item->id,
         ];
         if ($this->isNestable()) {
-            $entry['children'] = [];
             $entry['fields'][] = (new Hidden('parent_id', $item))
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse(); // Add hidden ID field
@@ -207,19 +196,24 @@ class HasMany extends Field
                 ->formattedResponse();
         }
 
-        if ($this->isNestable() && $item->children->count()) {
-            foreach ($item->children->sortBy($this->getSortableColumn()) as $child) {
-                $entry['children'][] = $this->formattedEntry($child);
-            }
-        }
-
-        if (get_class($item) === config('laradium.menu_item_class', '\Laradium\Laradium\Models\MenuItem')) {
-            $entry['formatted'] = [
-                'name'           => $item->name,
-                'url'            => $item->url,
-                'icon'           => $item->icon,
-                'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+        if ($this->isNestable()) {
+            $tree = [
+                'id'       => (string)$item->id,
+                'text'     => $item->name,
+                'parent'   => $item->parent_id ? (string)$item->parent_id : '#',
+                'children' => [],
             ];
+
+            if (get_class($item) === config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)) {
+                $tree['data'] = [
+                    'name'           => $item->name,
+                    'url'            => $item->url,
+                    'icon'           => $item->icon,
+                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                ];
+            }
+
+            $entry['tree'] = $tree;
         }
 
         return $entry;
@@ -294,12 +288,11 @@ class HasMany extends Field
     {
         if (!is_string($this->entryLabel)) {
             $closure = $this->entryLabel;
-            $value = $closure($model);
-        } else {
-            $value = $model->{$this->entryLabel} ?? 'Entry';
+
+            return $closure($model);
         }
 
-        return $value;
+        return $model->{$this->entryLabel} ?? 'Entry';
     }
 
 }
