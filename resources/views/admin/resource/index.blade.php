@@ -16,8 +16,6 @@
                     </div>
                 @endif
 
-                @include('laradium::admin.resource._partials.import_export')
-
                 @if($table->getAdditionalView())
                     <div class="row">
                         <div class="col-md-12">
