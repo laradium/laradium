@@ -208,7 +208,7 @@ abstract class AbstractResource
 
         abort_unless($column, 400);
 
-        $model = $this->model;
+        $model = $this->getModel();
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
         }
