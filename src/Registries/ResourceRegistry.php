@@ -72,6 +72,13 @@ class ResourceRegistry
                 'middleware' => ['web', 'laradium']
             ],
             [
+                'method'     => 'post',
+                'route_slug' => $this->getRouteName('toggle/{id?}'),
+                'controller' => $this->getRouteController('toggle'),
+                'middleware' => ['web', 'laradium'],
+                'name'       => 'admin.' . $routeSlug . '.toggle'
+            ],
+            [
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),

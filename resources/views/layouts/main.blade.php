@@ -187,6 +187,7 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.nicescroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
 
 <!-- App js -->
 <script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>
