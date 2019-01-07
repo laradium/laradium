@@ -48,7 +48,6 @@ class BelongsTo extends Field
         parent::__construct($parameters, $model);
 
         $this->relationName = array_first($parameters);
-
     }
 
     /**
@@ -57,13 +56,13 @@ class BelongsTo extends Field
      */
     public function build($attributes = [])
     {
-        parent::build($attributes);
-
         $model = $this->getModel();
         $this->relation = $model->{$this->relationName}();
         $this->relationModel = $this->relation->getRelated();
         $this->label(ucfirst($this->relation->getRelation()));
         $this->fieldName($this->relation->getForeignKey());
+
+        parent::build($attributes);
 
         return $this;
     }

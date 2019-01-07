@@ -76,7 +76,7 @@ class Field
     /**
      * @var string
      */
-    private $info;
+    private $info = '';
 
     /**
      * Field constructor.
