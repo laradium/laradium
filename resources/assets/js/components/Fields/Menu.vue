@@ -22,10 +22,33 @@
         },
 
         created() {
-            let $vm = this;
-            serverBus.$on('form_data', function (data) {
-                $vm.items = data;
+            serverBus.$on('formatted', (data) => {
+                this.items = this.flatToTree(data);
             });
+        },
+
+        methods: {
+            flatToTree(array, parent, tree) {
+                tree = typeof tree !== 'undefined' ? tree : [];
+                parent = typeof parent !== 'undefined' ? parent : {id: '#'};
+
+                let children = _.filter(array, (child) => {
+                    return child.parent == parent.id;
+                });
+
+                if (!_.isEmpty(children)) {
+                    if (parent.id == '#') {
+                        tree = children;
+                    } else {
+                        parent['children'] = children
+                    }
+                    _.each(children, (child) => {
+                        this.flatToTree(array, child)
+                    });
+                }
+
+                return tree;
+            }
         },
     }
 </script>

@@ -42,9 +42,20 @@ window.datetimepicker = require('jquery-datetimepicker');
 window.swal = require('sweetalert2');
 window.toastr = require('toastr');
 window.select2 = require('select2');
+window.jstree = require('jstree');
 
 $.ajaxSetup({
 	headers: {
 		'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	}
+});
+
+$(function() {
+   $(document).on('click', 'li.has_sub a', function () {
+        $(this).next('ul').slideToggle();
+   });
+
+   if($(document).find('li.has_sub a').hasClass('active')) {
+       $('li.has_sub a.active').next('ul').slideDown()
+   }
 });
