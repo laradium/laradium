@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <link href="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('/laradium/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/laradium/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
@@ -188,6 +189,7 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.js') }}"></script>
 
 <!-- App js -->
 <script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>

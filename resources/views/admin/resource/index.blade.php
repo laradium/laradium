@@ -174,6 +174,12 @@
 
                 $.post('{{ url('/admin/' . $resource->getBaseResource()->getSlug() . '/toggle') }}/' + id, {
                     column: column
+                }, function () {
+                    try {
+                        toastr.success('Resource successfully updated');
+                    } catch (e) {
+                        //do nothing
+                    }
                 })
             });
         });
