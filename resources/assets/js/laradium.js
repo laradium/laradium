@@ -88,6 +88,33 @@ Vue.mixin({
         }
     }
 });
+
+Vue.directive('tooltip', {
+    bind: bsTooltip,
+    update: bsTooltip,
+    unbind (el, binding) {
+        $(el).tooltip('destroy');
+    }
+});
+
+function bsTooltip(el, binding) { 
+    let trigger = 'hover';
+    if (binding.modifiers.focus || binding.modifiers.hover || binding.modifiers.click) {
+        const t = [];
+        if (binding.modifiers.focus) t.push('focus');
+        if (binding.modifiers.hover) t.push('hover');
+        if (binding.modifiers.click) t.push('click');
+        trigger = t.join(' ');
+    }
+
+    $(el).tooltip({
+        title: binding.value,
+        placement: binding.arg,
+        trigger: trigger,
+        html: binding.modifiers.html ? binding.modifiers.html : false
+    });
+}
+
 export const serverBus = new Vue();
 
 const app = new Vue({
