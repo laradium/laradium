@@ -67,7 +67,7 @@ class ResourceRegistry
             ],
             [
                 'method'     => 'post',
-                'route_slug' => $this->getRouteName('editable'),
+                'route_slug' => $this->getRouteName('editable/{locale?}'),
                 'controller' => $this->getRouteController('editable'),
                 'middleware' => ['web', 'laradium']
             ],
