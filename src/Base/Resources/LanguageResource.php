@@ -42,8 +42,8 @@ Class LanguageResource extends AbstractResource
             $column->add('iso_code');
             $column->add('title');
             $column->add('title_localized');
-            $column->add('is_visible');
-            $column->add('is_fallback');
+            $column->add('is_visible')->switchable();
+            $column->add('is_fallback')->switchable();
         });
     }
 }

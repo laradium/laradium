@@ -74,6 +74,11 @@ class Field
     private $type;
 
     /**
+     * @var string
+     */
+    private $info = '';
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -156,7 +161,8 @@ class Field
             'config'       => [
                 'is_translatable' => $this->isTranslatable(),
                 'col'             => $this->getCol(),
-            ]
+            ],
+            'info'         => $this->getInfo()
         ];
     }
 
@@ -425,5 +431,24 @@ class Field
     public function getType()
     {
         return $this->type ?: strtolower(array_last(explode('\\', get_class($this))));
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function info($value)
+    {
+        $this->info = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInfo(): string
+    {
+        return $this->info;
     }
 }

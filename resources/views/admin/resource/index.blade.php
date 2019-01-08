@@ -47,7 +47,9 @@
                                 <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
                                      id="tab-{{ $id }}">
 
-                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id) ])
+                                    @include('laradium::admin.resource._partials.table', [
+                                        'dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id)
+                                    ])
 
                                 </div>
                             @endforeach
@@ -164,6 +166,21 @@
                             });
                         }
                     });
+            });
+
+            $(document).on('change', '.js-switch', function () {
+                var id = $(this).data('id');
+                var column = $(this).attr('name');
+
+                $.post('{{ url('/admin/' . $resource->getBaseResource()->getSlug() . '/toggle') }}/' + id, {
+                    column: column
+                }, function () {
+                    try {
+                        toastr.success('Resource successfully updated');
+                    } catch (e) {
+                        //do nothing
+                    }
+                })
             });
         });
 

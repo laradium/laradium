@@ -51,15 +51,14 @@ Class SettingResource extends AbstractResource
         return laradium()->table(function (ColumnSet $column) {
 
             $column->add('name')->modify(function ($row) {
-                return ($row->is_translatable ? $this->translatableIcon() : '') . $row->name;
+                return ($row->is_translatable ? $this->translatableIcon() . ' ' : '') . $row->name;
             });
 
             $column->add('value')->modify(function ($item) {
                 return $this->modifyValueColumn($item);
-            })->editable()->notSortable();
+            })->editable()->translatable()->notSortable();
 
         })->dataTable(false)
-            ->relations(['translations'])
             ->tabs([
                 'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
                     return [
@@ -89,7 +88,10 @@ Class SettingResource extends AbstractResource
     {
         //we do not want to display textarea content in table
         if ($item->type === 'textarea') {
-            return '<span style="font-size:80%">- too long to show -</span>';
+            return [
+                'type'  => 'textarea',
+                'value' => '- too long to show -'
+            ];
         }
 
         if ($item->type === 'file') {
@@ -99,25 +101,36 @@ Class SettingResource extends AbstractResource
                     $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . ($translation->file->exists() ? $translation->file->url() : '- empty -') . '</li>';
                 }
 
-                return $html;
+                return [
+                    'type'  => 'file',
+                    'value' => $html
+                ];
             }
 
-            if ($item->file->exists()) {
-                return $item->file->url();
-            } else {
-                return '<span style="font-size:80%">- empty -</span>';
-            }
+            return [
+                'type'  => 'file',
+                'value' => $item->file->exists() ? $item->file->url() : '- empty -'
+            ];
         }
 
         if ($item->is_translatable) {
-            $column = [
-                'column_parsed' => 'value'
-            ];
+            $html = '';
+            foreach ($item->translations as $translation) {
+                $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . $translation->value . '</li>';
+            }
 
-            return view('laradium::admin.resource._partials.translation', compact('item', 'column'));
+            return [
+                'translatable' => true,
+                'type'         => $item->type,
+                'value'        => $html
+            ];
         }
 
-        return $item->non_translatable_value ? e($item->non_translatable_value) : '<span style="font-size:80%">- empty -</span>';
+        return [
+            'column' => 'non_translatable_value',
+            'type'   => 'text',
+            'value'  => $item->non_translatable_value ? e($item->non_translatable_value) : ''
+        ];
     }
 
     /**
@@ -125,7 +138,7 @@ Class SettingResource extends AbstractResource
      */
     public function translatableIcon()
     {
-        return '<span data-toggle="tooltip" data-placement="top" title="" data-original-title="Value is translatable"><i class="fa fa-language"></i></span> ';
+        return '<span data-toggle="tooltip" data-placement="top" title="" data-original-title="Value is translatable"><i class="fa fa-language"></i></span>';
     }
 
 }

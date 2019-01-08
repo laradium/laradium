@@ -212,6 +212,32 @@ abstract class AbstractResource
     }
 
     /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggle(Request $request, $id)
+    {
+        $column = $request->get('column', null);
+
+        abort_unless($column, 400);
+
+        $model = $this->getModel();
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $model = $model->findOrFail($id);
+
+        $model->$column = !$model->$column;
+        $model->save();
+
+        return response()->json([
+            'state' => 'success'
+        ]);
+    }
+
+    /**
      * @param null $model
      * @return Resource
      */

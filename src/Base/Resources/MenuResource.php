@@ -59,9 +59,7 @@ Class MenuResource extends AbstractResource
     {
         return laradium()->table(function (ColumnSet $column) {
             $column->add('key');
-            $column->add('is_active')->modify(function ($item) {
-                return $item->is_active ? 'Yes' : 'No';
-            });
+            $column->add('is_active')->switchable();
             $column->add('name')->translatable();
         })->relations(['translations']);
     }

@@ -12,7 +12,7 @@ trait Datatable
      * @param Request $request
      * @return array
      */
-    public function editable(Request $request)
+    public function editable(Request $request, $locale = null)
     {
         $model = $this->model;
         $resource = $this->resource();
@@ -27,10 +27,30 @@ trait Datatable
 
         $validationRules = $form->getValidationRules();
         $validationRules = array_only($validationRules, $request->get('name'));
-        $validationRules['value'] = $validationRules[$request->get('name')];
+        $validationRules['value'] = $validationRules[$request->get('name')] ?? '';
         $request->validate($validationRules);
 
-        $model->where('id', $request->get('pk'))->update([$request->get('name') => $request->get('value')]);
+        $model = $model->where('id', $request->get('pk'))->first();
+
+        if (!$model) {
+            return [
+                'state' => 'error'
+            ];
+        }
+
+        if ($locale && in_array($locale, translate()->languages()->pluck('iso_code')->toArray())) {
+            $translation = $model->translations()->where('locale', $locale)->firstOrCreate([
+                'locale' => $locale
+            ]);
+
+            if ($translation) {
+                $translation->update([$request->get('name') => $request->get('value')]);
+            }
+        }
+
+        if (!$locale) {
+            $model->update([$request->get('name') => $request->get('value')]);
+        }
 
         $this->fireEvent('afterSave', $request);
 
@@ -74,27 +94,21 @@ trait Datatable
         $dataTable = DataTables::of($model);
 
         $columns = $table->columns();
-        $editableColumns = $columns->where('editable', true);
+        $rawColumns = ['action'];
 
+        // Editable columns
         $editableColumnNames = [];
-
+        $editableColumns = $columns->where('editable', true)->where('translatable', false);
         foreach ($editableColumns as $column) {
             $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
-                return '<a href="#" 
-                class="js-editable" 
-                data-name="' . $column['column_parsed'] . '"
-                data-type="text" 
-                data-pk="' . $item->id . '" 
-                data-url="/admin/' . $slug . '/editable" 
-                data-title="Enter value">' . $item->{$column['column_parsed']} . '</a>';
+                return view('laradium::admin.resource._partials.editable', compact('item', 'column', 'slug'))->render();
             });
 
             $editableColumnNames[] = $column['column_parsed'];
         }
 
-        $rawColumns = ['action'];
-
-        foreach ($columns->where('translatable', true) as $column) {
+        // Translatable columns
+        foreach ($columns->where('translatable', true)->where('editable', false) as $column) {
             $dataTable->addColumn($column['column_parsed'], function ($item) use ($column) {
                 return view('laradium::admin.resource._partials.translation', compact('item', 'column'))->render();
             });
@@ -102,13 +116,46 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        foreach ($columns->where('modify', '!=', null) as $column) {
+        // Editable & translatable columns
+        foreach ($columns->where('translatable', true)->where('editable', true) as $column) {
+            $dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
+                return view('laradium::admin.resource._partials.translation_editable', compact('item', 'column', 'slug'))->render();
+            });
 
+            $editableColumnNames[] = $column['column_parsed'];
+
+            $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
+        }
+
+        // Modified columns
+        foreach ($columns->where('modify', '!=', null) as $column) {
             $dataTable->editColumn($column['column_parsed'], $column['modify']);
 
-            //@TODO: if column is modified AND has editable flag, we need to re-apply it
+            // If column is modified AND has editable flag, we need to re-apply it
             if (in_array($column['column_parsed'], $editableColumnNames)) {
-                //$dataTable->editColumn
+                $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
+                    $value = $column['modify']($item);
+                    if (is_array($value)) {
+                        $type = $value['type'];
+                        $translatable = $value['translatable'] ?? false;
+
+                        if (isset($value['column'])) {
+                            $column['column_parsed'] = $value['column'];
+                        }
+
+                        $value = $value['value'];
+                    }
+
+                    if (isset($type) && $type !== 'text' || !isset($type)) {
+                        return $value;
+                    }
+
+                    if (isset($translatable) && $translatable) {
+                        return view('laradium::admin.resource._partials.translation_editable', compact('item', 'column', 'slug'))->render();
+                    }
+
+                    return view('laradium::admin.resource._partials.editable', compact('item', 'column', 'slug'))->render();
+                });
             }
 
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
