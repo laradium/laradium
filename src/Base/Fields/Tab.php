@@ -81,6 +81,10 @@ class Tab
         $closure($fieldSet);
         $fields = [];
         foreach ($fieldSet->fields() as $field) {
+            if ($field instanceof self) {
+                $field->model($this->getModel());
+            }
+
             $field->build();
 
             if ($field->isTranslatable()) {
@@ -134,5 +138,13 @@ class Tab
         $this->model = $value;
 
         return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getModel(): Model
+    {
+        return $this->model;
     }
 }

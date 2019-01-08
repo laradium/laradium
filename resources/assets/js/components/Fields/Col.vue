@@ -13,7 +13,7 @@
                 </ul>
             </div>
         </div>
-        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length}">
+        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length}" style="margin-bottom:20px">
             <div v-for="field in data.fields" :class="field.config.col">
                 <component :is="field.type + '-field'"
                            :field="field"
