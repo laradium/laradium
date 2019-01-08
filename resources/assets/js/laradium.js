@@ -33,6 +33,9 @@ Vue.component('datetime-field', require('./components/fields/DateTime.vue').defa
 Vue.component('time-field', require('./components/fields/Time.vue').default);
 Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue').default);
 Vue.component('color-field', require('./components/fields/Color.vue').default);
+Vue.component('row-field', require('./components/fields/Row.vue').default);
+Vue.component('block-field', require('./components/fields/Block.vue').default);
+Vue.component('col-field', require('./components/fields/Col.vue').default);
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);

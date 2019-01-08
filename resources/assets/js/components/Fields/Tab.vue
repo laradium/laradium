@@ -7,6 +7,7 @@
         <div v-for="field in field.fields" :class="field.config.col">
             <component :is="field.type + '-field'"
                        :field="field"
+                       :data="field"
                        :language="language"
                        :replacement_ids="{}"
             ></component>

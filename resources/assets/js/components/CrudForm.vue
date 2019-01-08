@@ -6,34 +6,18 @@
 
         <input type="hidden" name="_method" :value="method" v-if="method">
 
-        <template v-if="blocks.length > 1">
-            <div class="alert alert-danger" v-show="errors.length">
-                <li v-for="error in errors">
-                    {{ error }}
-                </li>
-            </div>
-
-            <div class="alert alert-success" v-if="success">
-                {{ success }}
-            </div>
-        </template>
-
-        <div class="row">
-            <block-field v-for="(block, index) in blocks" :data="block" :default_language="data.default_language"
-                         :key="'block' + index">
-                <template v-if="blocks.length === 1">
-                    <div class="alert alert-danger" v-show="errors.length">
-                        <li v-for="error in errors">
-                            {{ error }}
-                        </li>
-                    </div>
-
-                    <div class="alert alert-success" v-if="success">
-                        {{ success }}
-                    </div>
-                </template>
-            </block-field>
+        <div class="alert alert-danger" v-show="errors.length">
+            <li v-for="error in errors">
+                {{ error }}
+            </li>
         </div>
+
+        <div class="alert alert-success" v-if="success">
+            {{ success }}
+        </div>
+
+        <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
+                   :language="data.default_language"></row-field>
 
         <div class="crud-bottom">
             <div class="row">
@@ -78,7 +62,7 @@
                 is_translatable: false,
                 errors: [],
                 data: [],
-                blocks: [],
+                rows: [],
                 loading: true,
                 isSubmitted: false
             };
@@ -90,17 +74,18 @@
             let fields = this.data.form;
             for (let field in fields) {
                 if (fields.hasOwnProperty(field)) {
-                    if (fields[field].type === 'block') {
-                        this.blocks.push(fields[field]);
+                    if (fields[field].type === 'row') {
+                        this.rows.push(fields[field]);
                     }
                 }
             }
 
-            if (!this.blocks.length) {
-                this.blocks.push({
+            if (!this.rows.length) {
+                this.rows.push({
                     fields: this.data.form,
                     config: {
-                        col: 'col-12'
+                        use_block: true,
+                        col: 'col-md-12'
                     }
                 });
             }
@@ -172,6 +157,30 @@
                     });
                 });
 
+            },
+
+            countFieldsByType(type, fields) {
+                if (!this.data) {
+                    return 0;
+                }
+
+                if (typeof fields === 'undefined') {
+                    fields = this.data.form;
+                }
+
+                let count = 0;
+
+                fields.forEach(field => {
+                    if (field.type === type) {
+                        count++;
+                    }
+
+                    if (field.fields && field.fields.length) {
+                        count += this.countFieldsByType(type, field.fields)
+                    }
+                });
+
+                return count;
             }
         }
     }
