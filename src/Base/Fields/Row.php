@@ -19,7 +19,7 @@ class Row extends Col
      */
     public function __construct($parameters, Model $model)
     {
-        $this->use_block = array_first($parameters, null, false);
+        $this->use_block = array_first($parameters, null, true);
 
         parent::__construct($parameters, $model);
     }
