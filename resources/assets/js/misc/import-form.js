@@ -18,7 +18,7 @@ $(function () {
             swal({
                 type: 'warning',
                 title: 'Are you sure?',
-                text: `Are you really want to upload ${file.name}`,
+                text: `Do you really want to upload ${file.name}`,
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
