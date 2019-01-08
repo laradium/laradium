@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Row extends Col
 {
     /**
-     * @var mixed
+     * @var boolean
      */
-    private $use_block;
+    private $use_block = false;
 
     /**
      * Row constructor.
@@ -19,9 +19,13 @@ class Row extends Col
      */
     public function __construct($parameters, Model $model)
     {
-        $this->use_block = array_first($parameters, null, true);
+        $closure = array_first($parameters, null, true);
 
-        parent::__construct($parameters, $model);
+        if ($closure) {
+            $this->fields($closure);
+        }
+
+        parent::__construct([12, 'md'], $model);
     }
 
     /**
@@ -39,5 +43,15 @@ class Row extends Col
                 'col'       => 'col-md-12'
             ]
         ];
+    }
+
+    /**
+     * @return $this
+     */
+    public function block(): self
+    {
+        $this->use_block = true;
+
+        return $this;
     }
 }
