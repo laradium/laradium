@@ -96,11 +96,24 @@ if (!function_exists('lg')) {
     }
 }
 
-/**
- * @param $items
- * @return mixed
- */
-function menuItems($items)
-{
-    return view('laradium::admin._partials.menu-items', compact('items'))->render();
+if (!function_exists('menuItems')) {
+    /**
+     * @param $items
+     * @return mixed
+     */
+    function menuItems($items)
+    {
+        return view('laradium::admin._partials.menu-items', compact('items'))->render();
+    }
+}
+
+if (!function_exists('getTabId')) {
+    /**
+     * @param $id
+     * @return string
+     */
+    function getTabId($id)
+    {
+        return strtolower(str_replace('-', '_', str_replace('\\', '_', $id)));
+    }
 }
