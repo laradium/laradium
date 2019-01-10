@@ -8,6 +8,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 trait Datatable
 {
+
     /**
      * @param Request $request
      * @return array
@@ -76,7 +77,7 @@ trait Datatable
 
         if ($table->getTabs()) {
             foreach ($table->getTabs() as $key => $tabs) {
-                if (request()->has($key)) {
+                if (request()->has($key) && request()->get($key) !== 'all') {
                     $value = request()->get($key) === 'null' ? null : request()->get($key);
                     $model = $model->where($key, $value);
                 }
@@ -119,7 +120,8 @@ trait Datatable
         // Editable & translatable columns
         foreach ($columns->where('translatable', true)->where('editable', true) as $column) {
             $dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
-                return view('laradium::admin.resource._partials.translation_editable', compact('item', 'column', 'slug'))->render();
+                return view('laradium::admin.resource._partials.translation_editable',
+                    compact('item', 'column', 'slug'))->render();
             });
 
             $editableColumnNames[] = $column['column_parsed'];
@@ -151,10 +153,12 @@ trait Datatable
                     }
 
                     if (isset($translatable) && $translatable) {
-                        return view('laradium::admin.resource._partials.translation_editable', compact('item', 'column', 'slug'))->render();
+                        return view('laradium::admin.resource._partials.translation_editable',
+                            compact('item', 'column', 'slug'))->render();
                     }
 
-                    return view('laradium::admin.resource._partials.editable', compact('item', 'column', 'slug'))->render();
+                    return view('laradium::admin.resource._partials.editable',
+                        compact('item', 'column', 'slug'))->render();
                 });
             }
 

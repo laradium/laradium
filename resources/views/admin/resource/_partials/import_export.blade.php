@@ -1,36 +1,21 @@
 @if (method_exists($resource, 'import') || method_exists($resource, 'export'))
-    <div class="row">
-        <div class="col-md-6">
-            @if (method_exists($resource, 'import'))
-                <form action="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.import') }}"
-                      class="form-horizontal"
-                      method="POST"
-                      enctype="multipart/form-data">
-
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="file" name="import" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                    type="submit"
-                                    class="btn btn-md btn-info"
-                            >Import
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            @endif
-            @if (method_exists($resource, 'export'))
-                or
-                <a href="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.export') }}"
-                   class="btn btn-success btn-sm">
-                    Export
-                </a>
-            @endif
+    @if (method_exists($resource, 'import'))
+        <div>
+            <form action="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.import') }}" class="form-inline import-form" method="POST" enctype="multipart/form-data">
+                {{ csrf_field() }}
+                <input type="file" name="import" class="form-control d-none">
+                <button type="button" class="btn btn-sm btn-info import-button">
+                    <i class="fa fa-cloud-upload"></i> Import
+                </button>
+            </form>
         </div>
-    </div>
-    <hr>
+    @endif
+
+    @if (method_exists($resource, 'export'))
+        <div>
+            <a href="{{ route('admin.' . $resource->getBaseResource()->getSlug() . '.export') }}" class="btn btn-success btn-sm">
+                <i class="fa fa-cloud-download"></i> Export
+            </a>
+        </div>
+    @endif
 @endif

@@ -45,7 +45,28 @@ Class TranslationResource extends AbstractResource
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        });
+        })->tabs([
+            'group' => $this->getTabs()
+        ]);
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getTabs(): array
+    {
+        $tabs = ['all' => 'All'];
+        $availableTabs = Translation::select('group')
+            ->groupBy('group')
+            ->get()
+            ->mapWithKeys(function ($translation) {
+                return [
+                    $translation->group => ucfirst(str_replace('_', ' ', $translation->group))
+                ];
+            })->toArray();
+
+        return array_merge($tabs, $availableTabs);
     }
 
     /**
@@ -74,9 +95,9 @@ Class TranslationResource extends AbstractResource
                 foreach ($languages as $lang) {
                     $rows[] = [
                         'locale' => $lang,
-                        'group'  => $group,
-                        'key'    => $key,
-                        'value'  => $item[$lang],
+                        'group' => $group,
+                        'key' => $key,
+                        'value' => $item[$lang],
                     ];
                 }
             }

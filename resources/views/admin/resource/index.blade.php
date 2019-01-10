@@ -16,8 +16,6 @@
                     </div>
                 @endif
 
-                @include('laradium::admin.resource._partials.import_export')
-
                 @if($table->getAdditionalView())
                     <div class="row">
                         <div class="col-md-12">
@@ -32,7 +30,7 @@
                         <ul class="nav nav-tabs">
                             @foreach($tabs as $id => $tabName)
                                 <li class="nav-item">
-                                    <a href="#tab-{{ $id }}" data-toggle="tab" aria-expanded="false"
+                                    <a href="#tab-{{ getTabId($id) }}" data-toggle="tab" aria-expanded="false"
                                        class="nav-link {{ $loop->first ? 'active' : '' }}">
                                         {{ $tabName }}
                                     </a>
@@ -45,7 +43,7 @@
                         <div class="tab-content">
                             @foreach ($tabs as $id => $tabName)
                                 <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                     id="tab-{{ $id }}">
+                                     id="tab-{{ getTabId($id) }}">
 
                                     @include('laradium::admin.resource._partials.table', [
                                         'dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id)

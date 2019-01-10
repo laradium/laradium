@@ -51,6 +51,7 @@ Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
 Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
 Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
+require('./misc/import-form')
 
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
