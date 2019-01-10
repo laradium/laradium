@@ -5,9 +5,8 @@ namespace Laradium\Laradium\Base\Fields;
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\FieldSet;
 
-class Tab
+class Col
 {
-
     /**
      * @var
      */
@@ -44,28 +43,30 @@ class Tab
     private $validationRules = [];
 
     /**
-     * Tab constructor.
-     * @param $name
+     * Col constructor.
+     * @param $parameters
+     * @param Model $model
      */
-    public function __construct($name)
+    public function __construct($parameters, Model $model)
     {
-        $this->name = array_first($name);
+        $this->name = 'col-' . array_get($parameters, 1, 'md') . '-' . array_get($parameters, 0, '12');
+        $this->model = $model;
         $this->fieldSet = new FieldSet;
     }
 
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function formattedResponse(): array
     {
         return [
             'name'   => $this->name,
             'slug'   => str_slug($this->name, '_'),
-            'type'   => 'tab',
+            'type'   => 'col',
             'fields' => $this->fields,
             'config' => [
                 'is_translatable' => $this->isTranslatable,
-                'col'             => 'col-md-12',
+                'col'             => $this->name,
             ]
         ];
     }
@@ -73,7 +74,7 @@ class Tab
     /**
      * @return $this
      */
-    public function build()
+    public function build(): self
     {
         $fieldSet = $this->fieldSet;
         $fieldSet->model($this->model);
@@ -81,7 +82,7 @@ class Tab
         $closure($fieldSet);
         $fields = [];
         foreach ($fieldSet->fields() as $field) {
-            if ($field instanceof self) {
+            if ($field instanceof Tab) {
                 $field->model($this->getModel());
             }
 
@@ -106,7 +107,7 @@ class Tab
      * @param $closure
      * @return $this
      */
-    public function fields($closure)
+    public function fields($closure): self
     {
         $this->closure = $closure;
 
@@ -116,7 +117,7 @@ class Tab
     /**
      * @return array
      */
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return $this->validationRules;
     }
@@ -124,7 +125,7 @@ class Tab
     /**
      * @return bool
      */
-    public function isTranslatable()
+    public function isTranslatable(): bool
     {
         return $this->isTranslatable;
     }
@@ -133,7 +134,7 @@ class Tab
      * @param $value
      * @return $this
      */
-    public function model($value)
+    public function model($value): self
     {
         $this->model = $value;
 
@@ -146,5 +147,21 @@ class Tab
     public function getModel(): Model
     {
         return $this->model;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 }
