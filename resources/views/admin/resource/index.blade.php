@@ -70,6 +70,18 @@
     <script src="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
     <script>
         $(function () {
+            function switchUpdate() {
+                var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+
+                elems.forEach(function (html) {
+                    if (!$(html).data('switchery')) {
+                        new Switchery(html, {
+                            disabled: $(html).data('disabled') === 'yes' ? true : false
+                        });
+                    }
+                });
+            }
+
             $.fn.editable.defaults.mode = 'inline';
             $.fn.editableform.buttons =
                 '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
@@ -100,6 +112,8 @@
                             }
                         });
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+
+                        switchUpdate();
                     });
                 };
 
@@ -129,7 +143,9 @@
                             return response.responseJSON.message;
                         }
                     });
-                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
+
+                    switchUpdate();
                 });
             @endif
 
