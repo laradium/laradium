@@ -11,17 +11,9 @@ class MenuRepository
 {
 
     /**
-     * Menu key.
-     *
      * @var string
      */
-    protected $key;
-    /**
-     * Cached menus collection.
-     *
-     * @var \Illuminate\Support\Collection
-     */
-    protected $cachedMenus;
+    private $menu;
 
     /**
      * MenuRepository constructor.
@@ -30,34 +22,15 @@ class MenuRepository
      */
     public function __construct()
     {
-        $loadWith = [
-            'translations',
-            'items' => function (HasMany $hasMany) {
-                return $hasMany->active()->with('translations')->orderBy('sequence_no');
-            }
-        ];
-        try {
-
-            $this->cachedMenus = cache()->rememberForever(Menu::$cacheKey, function () use ($loadWith) {
-                return Menu::with($loadWith)->get();
+        $this->menu = config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class);
+        cache()->rememberForever($this->menu::$cacheKey,
+            function () {
+                return $this->menu::with([
+                    'translations',
+                    'items',
+                    'items.translations',
+                ])->get();
             });
-        } catch (Exception $e) {
-            $this->cachedMenus = Menu::with($loadWith)->get();
-        }
-        $this->key = '';
-    }
-
-    /**
-     * Set the menu key.
-     *
-     * @param $key
-     * @return $this
-     */
-    public function setKey($key)
-    {
-        $this->key = $key;
-
-        return $this;
     }
 
     /**
@@ -72,7 +45,7 @@ class MenuRepository
             return $this->getAll();
         }
 
-        return $this->cachedMenus->where('key', $key)->first();
+        return $this->getAll()->where('key', $key)->first();
     }
 
     /**
@@ -82,23 +55,7 @@ class MenuRepository
      */
     public function getAll(): Collection
     {
-        return $this->cachedMenus;
-    }
-
-    /**
-     * Render menu.
-     *
-     * @return string
-     */
-    public function render(): string
-    {
-        if ($this->key) {
-            logger()->warning('Couldn\'t render the menu, because the menu ' . $this->key . ' doesn\'t exist');
-        } else {
-            logger()->warning('Couldn\'t render the menu without a key');
-        }
-
-        return '';
+        return cache()->get($this->menu::$cacheKey);
     }
 
     /**
@@ -114,14 +71,14 @@ class MenuRepository
             throw new Exception('Invalid data given!');
         }
         foreach ($menus as $name => $menuItems) {
-            $m = \Laradium\Laradium\Models\Menu::firstOrCreate([
+            $m = $this->menu::firstOrCreate([
                 'key' => str_slug($name, '_')
             ]);
 
             foreach (translate()->languages() as $language) {
                 $m->translations()->firstOrCreate([
                     'locale' => $language->iso_code,
-                    'name'   => $name
+                    'name' => $name
                 ]);
             }
 
@@ -137,6 +94,6 @@ class MenuRepository
             }
         }
 
-        cache()->forget(Menu::$cacheKey);
+        cache()->forget($this->menu::$cacheKey);
     }
 }
