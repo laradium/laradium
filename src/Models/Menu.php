@@ -38,4 +38,34 @@ class Menu extends Model
     {
         return $this->hasMany(MenuItem::class);
     }
+
+    /**
+     * @return array
+     */
+    public function getTree()
+    {
+        return $this->buildTree($this->items);
+    }
+
+    /**
+     * @param $elements
+     * @param int $parentId
+     * @return array
+     */
+    public function buildTree($elements, $parentId = 0)
+    {
+        $branch = [];
+
+        foreach ($elements as $element) {
+            if ($element->parent_id == $parentId) {
+                $children = $this->buildTree($elements, $element->id);
+                if ($children) {
+                    $element->children = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
+    }
 }
