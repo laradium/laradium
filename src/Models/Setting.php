@@ -85,6 +85,7 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
         if (!is_array($attributes)) {
             $attributes = [];
         }
+
         if (!isset($attributes['class'])) {
             $attributes['class'] = $this->getClass();
         }
@@ -107,9 +108,11 @@ class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInter
         if (is_array($options)) {
             return $options;
         }
+
         if (function_exists($options)) {
             $options = $options();
         }
+
         if (!is_array($options)) {
             return [];
         }

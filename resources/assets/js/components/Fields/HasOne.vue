@@ -2,6 +2,7 @@
     <div class="border" style="padding: 10px; border-radius: 2px; margin: 5px;">
         <h4>
             <i class="fa fa-bars"></i> {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
         </h4>
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
         <div v-for="(entry, index) in field.entries">

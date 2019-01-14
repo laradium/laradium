@@ -5,13 +5,8 @@
        'items' => $resource->getBreadcrumbs('create')
     ])
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card-box table-responsive">
-                <crud-form
-                        url="{{ $form->getAction('store') . '?' . http_build_query(request()->all())  }}"></crud-form>
-                <input type="hidden" name="data" value="{{ json_encode($form->data()) }}">
-            </div>
-        </div>
-    </div>
+    <crud-form
+            url="{{ $form->getAction('store') . '?' . http_build_query(request()->all())  }}"></crud-form>
+    <input type="hidden" name="data" value="{{ json_encode($form->data()) }}">
+
 @endsection

@@ -51,6 +51,20 @@ abstract class AbstractResource
     protected $globalActions = 'all';
 
     /**
+     * @var array
+     */
+    protected $defaultViews = [
+        'index'  => 'laradium::admin.resource.index',
+        'create' => 'laradium::admin.resource.create',
+        'edit'   => 'laradium::admin.resource.edit'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $views = [];
+
+    /**
      * @var
      */
     private $baseResource;
@@ -75,7 +89,7 @@ abstract class AbstractResource
         $table = $this->table()->setModel($this->getModel());
         $resource = $this;
 
-        return view('laradium::admin.resource.index', compact('table', 'resource'));
+        return view($this->getView('index'), compact('table', 'resource'));
     }
 
     /**
@@ -86,7 +100,7 @@ abstract class AbstractResource
         $form = $this->getForm();
         $resource = $this;
 
-        return view('laradium::admin.resource.create', compact('form', 'resource'));
+        return view($this->getView('create'), compact('form', 'resource'));
     }
 
     /**
@@ -136,7 +150,7 @@ abstract class AbstractResource
         $form = $this->getForm();
         $resource = $this;
 
-        return view('laradium::admin.resource.edit', compact('form', 'resource'));
+        return view($this->getView('edit'), compact('form', 'resource'));
     }
 
     /**
@@ -200,6 +214,32 @@ abstract class AbstractResource
         }
 
         return back()->withSuccess('Resource successfully deleted!');
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggle(Request $request, $id)
+    {
+        $column = $request->get('column', null);
+
+        abort_unless($column, 400);
+
+        $model = $this->getModel();
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $model = $model->findOrFail($id);
+
+        $model->$column = !$model->$column;
+        $model->save();
+
+        return response()->json([
+            'state' => 'success'
+        ]);
     }
 
     /**
@@ -338,6 +378,19 @@ abstract class AbstractResource
         ];
 
         return $breadcrumbs[$action] ?? [];
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getView($name): string
+    {
+        if (!isset($this->views[$name])) {
+            return $this->defaultViews[$name];
+        }
+
+        return $this->views[$name];
     }
 
     /**

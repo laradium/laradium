@@ -1,6 +1,8 @@
 <template>
     <div class="form-group">
-        <label for="">{{ field.label }}
+        <label for="">
+            <span v-html="field.label"></span>
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
             <span class="badge badge-primary"
                   v-if="field.config.is_translatable">
                 {{ language }}
@@ -22,9 +24,6 @@
 </template>
 
 <script>
-
-    import { serverBus } from '../../laradium';
-
     export default {
         props: ['field', 'language', 'item'],
 
@@ -33,10 +32,5 @@
                 return this.field.attr;
             }
         },
-        created() {
-            serverBus.$on('test', function () {
-               console.log(761237861236785123687);
-            });
-        }
     }
 </script>

@@ -9,46 +9,49 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 window.resizable = require('jquery-resizable-dom');
-
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('crud-form', require('./components/CrudForm.vue'));
-Vue.component('text-field', require('./components/fields/Text.vue'));
-Vue.component('textarea-field', require('./components/fields/Textarea.vue'));
-Vue.component('boolean-field', require('./components/fields/Boolean.vue'));
-Vue.component('tab-field', require('./components/fields/Tab.vue'));
-Vue.component('hidden-field', require('./components/fields/Hidden.vue'));
-Vue.component('select-field', require('./components/fields/Select.vue'));
-Vue.component('select2-field', require('./components/fields/Select2.vue'));
-Vue.component('svgicon-field', require('./components/fields/SvgIcon.vue'));
-Vue.component('file-field', require('./components/fields/File.vue'));
-Vue.component('email-field', require('./components/fields/Email.vue'));
-Vue.component('password-field', require('./components/fields/Password.vue'));
-Vue.component('radio-field', require('./components/fields/Radio.vue'));
-Vue.component('date-field', require('./components/fields/Date.vue'));
-Vue.component('datetime-field', require('./components/fields/DateTime.vue'));
-Vue.component('time-field', require('./components/fields/Time.vue'));
-Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue'));
-Vue.component('color-field', require('./components/fields/Color.vue'));
+Vue.component('crud-form', require('./components/CrudForm.vue').default);
+Vue.component('text-field', require('./components/fields/Text.vue').default);
+Vue.component('textarea-field', require('./components/fields/Textarea.vue').default);
+Vue.component('boolean-field', require('./components/fields/Boolean.vue').default);
+Vue.component('tab-field', require('./components/fields/Tab.vue').default);
+Vue.component('hidden-field', require('./components/fields/Hidden.vue').default);
+Vue.component('select-field', require('./components/fields/Select.vue').default);
+Vue.component('select2-field', require('./components/fields/Select2.vue').default);
+Vue.component('svgicon-field', require('./components/fields/SvgIcon.vue').default);
+Vue.component('file-field', require('./components/fields/File.vue').default);
+Vue.component('email-field', require('./components/fields/Email.vue').default);
+Vue.component('password-field', require('./components/fields/Password.vue').default);
+Vue.component('radio-field', require('./components/fields/Radio.vue').default);
+Vue.component('date-field', require('./components/fields/Date.vue').default);
+Vue.component('datetime-field', require('./components/fields/DateTime.vue').default);
+Vue.component('time-field', require('./components/fields/Time.vue').default);
+Vue.component('wysiwyg-field', require('./components/fields/Wysiwyg.vue').default);
+Vue.component('color-field', require('./components/fields/Color.vue').default);
+Vue.component('row-field', require('./components/fields/Row.vue').default);
+Vue.component('block-field', require('./components/fields/Block.vue').default);
+Vue.component('col-field', require('./components/fields/Col.vue').default);
 
-Vue.component('hasone-field', require('./components/fields/HasOne.vue'));
-Vue.component('hasmany-field', require('./components/fields/HasMany.vue'));
-Vue.component('hasmany-nested-field', require('./components/fields/HasManyNested.vue'));
-Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue'));
-Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.vue'));
-Vue.component('morphto-field', require('./components/fields/MorphTo.vue'));
-Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue'));
+Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
+Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);
+Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue').default);
+Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.vue').default);
+Vue.component('morphto-field', require('./components/fields/MorphTo.vue').default);
+Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue').default);
 
-Vue.component('select2', require('./components/Select2.vue'));
+Vue.component('select2', require('./components/Select2.vue').default);
 Vue.component('draggable', require('vuedraggable'));
-Vue.component('nestable', require('./components/fields/Nestable.vue'));
-Vue.component('vue-menu', require('./components/fields/Menu.vue'));
-Vue.component('menuitems', require('./components/fields/MenuItems.vue'));
+Vue.component('tree-field', require('./components/fields/Tree.vue').default);
+Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
+Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
+Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
+require('./misc/import-form')
 
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
@@ -89,6 +92,33 @@ Vue.mixin({
         }
     }
 });
+
+Vue.directive('tooltip', {
+    bind: bsTooltip,
+    update: bsTooltip,
+    unbind (el, binding) {
+        $(el).tooltip('destroy');
+    }
+});
+
+function bsTooltip(el, binding) { 
+    let trigger = 'hover';
+    if (binding.modifiers.focus || binding.modifiers.hover || binding.modifiers.click) {
+        const t = [];
+        if (binding.modifiers.focus) t.push('focus');
+        if (binding.modifiers.hover) t.push('hover');
+        if (binding.modifiers.click) t.push('click');
+        trigger = t.join(' ');
+    }
+
+    $(el).tooltip({
+        title: binding.value,
+        placement: binding.arg,
+        trigger: trigger,
+        html: binding.modifiers.html ? binding.modifiers.html : false
+    });
+}
+
 export const serverBus = new Vue();
 
 const app = new Vue({

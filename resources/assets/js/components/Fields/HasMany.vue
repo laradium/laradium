@@ -2,6 +2,7 @@
     <div class="border" style="padding: 0px 10px 10px 10px; border-radius: 2px; margin: 0px 0px 10px;">
         <h4>
             <i class="fa fa-bars"></i> {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
         </h4>
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
         <draggable class="dragArea" :list="field.entries" @update="onUpdate(field.entries)" :options="draggable">
@@ -134,7 +135,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then(function (result) {
+                    .then((result) => {
                         if (result.value) {
                             if (item.id !== undefined) {
                                 let item_copy = _.cloneDeep(this.field.entries[index]);

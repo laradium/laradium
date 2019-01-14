@@ -8,6 +8,7 @@
 @import '~trumbowyg/dist/ui/trumbowyg.min.css';
 @import '~trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 @import '~trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
+@import '~jstree/dist/themes/default/style.min.css';
 
 .breadcrumb {
   background-color: transparent;
@@ -106,5 +107,15 @@
 .logo {
   img {
     max-width: 100%;
+  }
+}
+
+.margin-elements {
+  > * {
+    margin-right: 5px;
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }

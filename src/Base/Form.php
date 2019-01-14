@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Laradium\Laradium\Base\Fields\Col;
 use Laradium\Laradium\Base\Fields\Tab;
 
 class Form

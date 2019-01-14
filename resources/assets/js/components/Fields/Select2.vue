@@ -1,7 +1,9 @@
 <template>
     <div>
         <div class="form-group">
-            <label for="">{{ field.label }}
+            <label for="">
+                {{ field.label }}
+                <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
                 <span class="badge badge-primary"
                       v-if="field.config.is_translatable">
 					{{ language }}

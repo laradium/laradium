@@ -15,29 +15,9 @@
         <div class="alert alert-success" v-if="success">
             {{ success }}
         </div>
-        <div class="row" v-if="tabs.length">
-            <div class="col-md-12">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item" v-for="(tab, index) in tabs">
-                        <a :href="'#tab-' + tab.slug" data-toggle="tab" @click.prevent="current_tab = tab.slug"
-                           aria-expanded="false" class="nav-link"
-                           :class="{'active': index === 0}">
-                            {{ tab.name }}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length }">
-            <div v-for="field in data.form" :class="field.config.col">
-                <component :is="field.type + '-field'"
-                           :field="field"
-                           :current_tab="current_tab"
-                           :language="data.default_language"
-                           :replacement_ids="{}"
-                ></component>
-            </div>
-        </div>
+
+        <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
+                   :language="data.default_language"></row-field>
 
         <div class="crud-bottom">
             <div class="row">
@@ -51,7 +31,8 @@
                         </span>
                     </button>
 
-                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)" :disabled="isSubmitted" v-if="!isSubmitted">
+                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)"
+                            :disabled="isSubmitted" v-if="!isSubmitted">
                         Save & Return
                     </button>
                 </div>
@@ -81,7 +62,7 @@
                 is_translatable: false,
                 errors: [],
                 data: [],
-                tabs: [],
+                rows: [],
                 loading: true,
                 isSubmitted: false
             };
@@ -91,18 +72,22 @@
             this.data = JSON.parse(data[0].value).data;
 
             let fields = this.data.form;
-            let i = 0;
             for (let field in fields) {
-                if (fields[field].type === 'tab') {
-                    if (i === 0) {
-                        this.current_tab = fields[field].slug;
+                if (fields.hasOwnProperty(field)) {
+                    if (fields[field].type === 'row') {
+                        this.rows.push(fields[field]);
                     }
-                    this.tabs.push({
-                        slug: fields[field].slug,
-                        name: fields[field].name,
-                    });
                 }
-                i++;
+            }
+
+            if (!this.rows.length) {
+                this.rows.push({
+                    fields: this.data.form,
+                    config: {
+                        use_block: true,
+                        col: 'col-md-12'
+                    }
+                });
             }
         },
         methods: {
@@ -146,7 +131,7 @@
                         return;
                     }
 
-                    if (res.data.redirect != undefined) {
+                    if (typeof res.data.redirect !== "undefined") {
                         window.location = res.data.redirect;
                     }
 
@@ -156,18 +141,46 @@
                     this.success = '';
                     let errors = res.response.data.errors;
 
-                    $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
-
                     for (let error in errors) {
-                        this.errors.push(errors[error][0]);
+                        if (errors.hasOwnProperty(error)) {
+                            this.errors.push(errors[error][0]);
+                        }
                     }
 
                     if (!errors) {
                         let status = res.response.status;
                         this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
                     }
+
+                    this.$nextTick(() => {
+                        $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
+                    });
                 });
 
+            },
+
+            countFieldsByType(type, fields) {
+                if (!this.data) {
+                    return 0;
+                }
+
+                if (typeof fields === 'undefined') {
+                    fields = this.data.form;
+                }
+
+                let count = 0;
+
+                fields.forEach(field => {
+                    if (field.type === type) {
+                        count++;
+                    }
+
+                    if (field.fields && field.fields.length) {
+                        count += this.countFieldsByType(type, field.fields)
+                    }
+                });
+
+                return count;
             }
         }
     }

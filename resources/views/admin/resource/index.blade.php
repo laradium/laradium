@@ -16,8 +16,6 @@
                     </div>
                 @endif
 
-                @include('laradium::admin.resource._partials.import_export')
-
                 @if($table->getAdditionalView())
                     <div class="row">
                         <div class="col-md-12">
@@ -32,7 +30,7 @@
                         <ul class="nav nav-tabs">
                             @foreach($tabs as $id => $tabName)
                                 <li class="nav-item">
-                                    <a href="#tab-{{ str_slug($id) }}" data-toggle="tab" aria-expanded="false"
+                                    <a href="#tab-{{ getTabId($id) }}" data-toggle="tab" aria-expanded="false"
                                        class="nav-link {{ $loop->first ? 'active' : '' }}">
                                         {{ $tabName }}
                                     </a>
@@ -45,8 +43,11 @@
                         <div class="tab-content">
                             @foreach ($tabs as $id => $tabName)
                                 <div role="tabpanel" class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                     id="tab-{{ str_slug($id) }}">
-                                    @include('laradium::admin.resource._partials.table', ['dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id) ])
+                                     id="tab-{{ getTabId($id) }}">
+
+                                    @include('laradium::admin.resource._partials.table', [
+                                        'dataUrl' => url('/admin/' . $resource->getBaseResource()->getSlug() . '/data-table?' . $key . '=' . $id)
+                                    ])
                                 </div>
                             @endforeach
                         </div>
@@ -68,6 +69,18 @@
     <script src="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
     <script>
         $(function () {
+            function switchUpdate() {
+                var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+
+                elems.forEach(function (html) {
+                    if (!$(html).data('switchery')) {
+                        new Switchery(html, {
+                            disabled: $(html).data('disabled') === 'yes' ? true : false
+                        });
+                    }
+                });
+            }
+
             $.fn.editable.defaults.mode = 'inline';
             $.fn.editableform.buttons =
                 '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
@@ -98,6 +111,8 @@
                             }
                         });
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+
+                        switchUpdate();
                     });
                 };
 
@@ -127,7 +142,9 @@
                             return response.responseJSON.message;
                         }
                     });
-                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
+                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
+
+                    switchUpdate();
                 });
             @endif
 
@@ -162,6 +179,21 @@
                             });
                         }
                     });
+            });
+
+            $(document).on('change', '.js-switch', function () {
+                var id = $(this).data('id');
+                var column = $(this).attr('name');
+
+                $.post('{{ url('/admin/' . $resource->getBaseResource()->getSlug() . '/toggle') }}/' + id, {
+                    column: column
+                }, function () {
+                    try {
+                        toastr.success('Resource successfully updated');
+                    } catch (e) {
+                        //do nothing
+                    }
+                })
             });
         });
 
