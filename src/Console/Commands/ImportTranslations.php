@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Http\UploadedFile;
 use Laradium\Laradium\Imports\TranslationImport;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ImportTranslations extends Command
 {
@@ -51,14 +52,14 @@ class ImportTranslations extends Command
             try {
                 $copy = str_replace('.xlsx', '_copy.xlsx', $source);
                 copy($source, $copy);
-                $file = new \Symfony\Component\HttpFoundation\File\File($copy);
+                $file = new File($copy);
                 $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
 
                 (new TranslationImport)->import($file);
             } catch (\Exception $e) {
                 logger()->error($e);
 
-                $this->error('Something went wrong.');
+                $this->error('Something went wrong. ' . $e->getMessage());
                 exit;
             }
         }
