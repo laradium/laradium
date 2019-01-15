@@ -16,7 +16,9 @@
                     </h4>
 
                     <div class="pull-right" style="margin-top: 7px;">
-                        <button class="btn btn-success btn-sm" @click.prevent="toggle(index)">
+                        <button class="btn btn-success btn-sm"
+                                @click.prevent="toggle(index)"
+                                v-if="!block.config.is_deleted">
                             <span v-if="!block.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
                             <span v-else><i class="fa fa-eye"></i></span>
                         </button>
