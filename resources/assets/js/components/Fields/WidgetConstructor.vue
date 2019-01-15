@@ -147,7 +147,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then(function (result) {
+                    .then((result) => {
                         if (result.value) {
                             if (item.id !== undefined) {
                                 let item_copy = _.cloneDeep(this.field.blocks[index]);
