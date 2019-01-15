@@ -19,7 +19,7 @@
         <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
                    :language="data.default_language"></row-field>
 
-        <div class="crud-bottom">
+        <div v-if="!countFieldsByType('save-buttons')" class="crud-bottom">
             <div class="row">
                 <div class="col-md-3">
                     <button class="btn btn-primary" :disabled="isSubmitted">
@@ -53,7 +53,10 @@
 
 <script>
     export default {
+        name: 'CrudForm',
+
         props: ['url', 'method'],
+
         data() {
             return {
                 language: '',
@@ -67,6 +70,7 @@
                 isSubmitted: false
             };
         },
+
         created() {
             let data = document.getElementsByName('data');
             this.data = JSON.parse(data[0].value).data;
@@ -90,6 +94,7 @@
                 });
             }
         },
+
         methods: {
             onSubmit(el, redirect) {
                 this.isSubmitted = true;

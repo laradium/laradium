@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="row" v-bind="fieldAttributes">
         <template v-if="data.config.use_block">
             <block-field v-for="(block, index) in blocks" :data="block" :language="language"
                          :key="'block' + index">
@@ -49,11 +49,5 @@
                 });
             }
         },
-
-        computed: {
-            attributes() {
-                return this.field.attr;
-            }
-        }
     }
 </script>

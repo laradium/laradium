@@ -1,5 +1,5 @@
 <template>
-    <div :class="data.config.col">
+    <div :class="data.config.col ? data.config.col : 'col-md-12'" v-bind="fieldAttributes">
         <div class="row" v-if="tabs.length">
             <div class="col-md-12">
                 <ul class="nav nav-tabs">
@@ -13,8 +13,8 @@
                 </ul>
             </div>
         </div>
-        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length}" style="margin-bottom:20px">
-            <div v-for="field in data.fields" :class="field.config.col">
+        <div :class="{ 'tab-content': tabs.length, 'col-md-12': tabs.length, 'row': !tabs.length}" :style="{'margin-bottom:20px': tabs.length}">
+            <div v-for="field in data.fields" :class="field.config.col ? field.config.col : 'col-md-12'">
                 <component :is="field.type + '-field'"
                            :field="field"
                            :data="field"
@@ -56,5 +56,6 @@
                 }
             }
         },
+
     }
 </script>

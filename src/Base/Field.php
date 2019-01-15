@@ -69,7 +69,7 @@ class Field
     private $validationAttributes = [];
 
     /**
-     * @var
+     * @var string
      */
     private $type;
 
