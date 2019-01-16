@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -53,16 +52,29 @@ Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
 require('./misc/import-form')
 
+if (typeof window.laradiumFields === 'undefined') {
+    window.laradiumFields = {};
+}
+
+for (let key in window.laradiumFields) {
+    if (window.laradiumFields.hasOwnProperty(key)) {
+        Vue.component(key.split(/(?=[A-Z])/).join('-').toLowerCase() + '-field', window.laradiumFields[key])
+    }
+}
+
+
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
 import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
 import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
 import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
+
 require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
 import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
 import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
 import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
 import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
+
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
 
@@ -96,12 +108,12 @@ Vue.mixin({
 Vue.directive('tooltip', {
     bind: bsTooltip,
     update: bsTooltip,
-    unbind (el, binding) {
+    unbind(el, binding) {
         $(el).tooltip('destroy');
     }
 });
 
-function bsTooltip(el, binding) { 
+function bsTooltip(el, binding) {
     let trigger = 'hover';
     if (binding.modifiers.focus || binding.modifiers.hover || binding.modifiers.click) {
         const t = [];
