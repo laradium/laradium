@@ -43,6 +43,16 @@ class Resource
     protected $where;
 
     /**
+     * @var array
+     */
+    protected $css = [];
+
+    /**
+     * @var array
+     */
+    protected $js = [];
+
+    /**
      * Resource constructor.
      */
     public function __construct()
@@ -211,5 +221,43 @@ class Resource
     public function getWhere()
     {
         return $this->where;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function css($assets = []): self
+    {
+        $this->css = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function js($assets = []): self
+    {
+        $this->js = $assets;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCss(): array
+    {
+        return $this->css;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJs(): array
+    {
+        return $this->js;
     }
 }
