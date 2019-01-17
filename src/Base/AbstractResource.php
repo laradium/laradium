@@ -96,9 +96,10 @@ abstract class AbstractResource
         $resource = $this;
 
         $js = $this->resource()->getJs();
+        $jsBeforeSource = $this->resource()->getJsBeforeSource();
         $css = $this->resource()->getCss();
 
-        return view($this->getView('create'), compact('form', 'resource', 'js', 'css'));
+        return view($this->getView('create'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
     }
 
     /**
@@ -149,9 +150,10 @@ abstract class AbstractResource
         $resource = $this;
 
         $js = $this->resource()->getJs();
+        $jsBeforeSource = $this->resource()->getJsBeforeSource();
         $css = $this->resource()->getCss();
 
-        return view($this->getView('edit'), compact('form', 'resource', 'js', 'css'));
+        return view($this->getView('edit'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
     }
 
     /**

@@ -53,6 +53,11 @@ class Resource
     protected $js = [];
 
     /**
+     * @var array
+     */
+    protected $jsBeforeSource = [];
+
+    /**
      * Resource constructor.
      */
     public function __construct()
@@ -245,6 +250,19 @@ class Resource
         return $this;
     }
 
+
+
+    /**
+     * @param array $assets
+     * @return $this
+     */
+    public function jsBeforeSource($assets = []): self
+    {
+        $this->jsBeforeSource = $assets;
+
+        return $this;
+    }
+
     /**
      * @return array
      */
@@ -259,5 +277,13 @@ class Resource
     public function getJs(): array
     {
         return $this->js;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJsBeforeSource(): array
+    {
+        return $this->jsBeforeSource;
     }
 }
