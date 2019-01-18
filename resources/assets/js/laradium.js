@@ -56,6 +56,16 @@ Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
 require('./misc/import-form')
 
+if (typeof window.laradiumFields === 'undefined') {
+    window.laradiumFields = {};
+}
+
+for (let key in window.laradiumFields) {
+    if (window.laradiumFields.hasOwnProperty(key)) {
+        Vue.component(key.split(/(?=[A-Z])/).join('').toLowerCase() + '-field', window.laradiumFields[key])
+    }
+}
+
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
 import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
