@@ -62,7 +62,7 @@ if (typeof window.laradiumFields === 'undefined') {
 
 for (let key in window.laradiumFields) {
     if (window.laradiumFields.hasOwnProperty(key)) {
-        Vue.component(key.split(/(?=[A-Z])/).join('-').toLowerCase() + '-field', window.laradiumFields[key])
+        Vue.component(key.split(/(?=[A-Z])/).join('').toLowerCase() + '-field', window.laradiumFields[key])
     }
 }
 
