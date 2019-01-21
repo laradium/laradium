@@ -345,9 +345,7 @@ class Table
      */
     protected function parseTitle($title): string
     {
-        $title = str_replace('_', ' ', $title);
-        $title = explode('.', $title);
-        $title = implode(' ', $title);
+        $title = str_replace(['.', '_'], ' ', $title);
         $title = ucwords($title);
 
         return $title;
