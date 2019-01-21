@@ -11,25 +11,19 @@
 
         <div v-if="field.config.is_translatable">
             <textarea v-model="item.value"
-                   :name="item.name"
-                   v-for="item in field.translations"
-                   v-show="language === item.iso_code"
-                   class="form-control" v-bind="attributes"></textarea>
+                      :name="item.name"
+                      v-for="item in field.translations"
+                      v-show="language === item.iso_code"
+                      class="form-control" v-bind="fieldAttributes"></textarea>
         </div>
         <div v-else>
-            <textarea v-model="field.value" :name="field.name" class="form-control" v-bind="attributes"></textarea>
+            <textarea v-model="field.value" :name="field.name" class="form-control" v-bind="fieldAttributes"></textarea>
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
-
-        computed: {
-            attributes() {
-                return this.field.attr;
-            }
-        }
+        props: ['field', 'language']
     }
 </script>

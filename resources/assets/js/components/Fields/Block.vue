@@ -1,5 +1,5 @@
 <template>
-    <div :class="data.config.col">
+    <div :class="data.config.col" v-bind="fieldAttributes">
         <div class="card-box table-responsive">
             <slot></slot>
 
@@ -40,12 +40,6 @@
                         col: 'col-md-12'
                     }
                 });
-            }
-        },
-
-        computed: {
-            attributes() {
-                return this.field.attr;
             }
         }
     }

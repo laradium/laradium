@@ -20,7 +20,7 @@
                 </button>
             </div>
             <input type="file" :name="item.name" class="form-control" v-for="item in field.translations"
-                   v-show="language === item.iso_code" v-bind="attributes">
+                   v-show="language === item.iso_code" v-bind="fieldAttributes">
         </div>
         <div v-else>
             <div v-if="field.file.url">
@@ -33,20 +33,14 @@
                 </button>
             </div>
 
-            <input type="file" :name="field.name" class="form-control" v-bind="attributes">
+            <input type="file" :name="field.name" class="form-control" v-bind="fieldAttributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
-
-        computed: {
-            attributes() {
-                return this.field.attr;
-            }
-        },
+        props: ['field', 'language'],
 
         methods: {
             deleteFile(field, url) {
@@ -59,7 +53,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then(function (result) {
+                    .then((result) => {
                         if (result.value) {
                             axios({
                                 method: 'DELETE',

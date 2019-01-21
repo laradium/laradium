@@ -19,7 +19,7 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
+        props: ['field', 'language'],
 
         data() {
             return {
@@ -33,12 +33,6 @@
                 if (options[option].selected) {
                     this.selected = options[option].id;
                 }
-            }
-        },
-
-        computed: {
-            attributes() {
-                return this.field.attr;
             }
         }
     }

@@ -35,6 +35,10 @@ Vue.component('color-field', require('./components/fields/Color.vue').default);
 Vue.component('row-field', require('./components/fields/Row.vue').default);
 Vue.component('block-field', require('./components/fields/Block.vue').default);
 Vue.component('col-field', require('./components/fields/Col.vue').default);
+Vue.component('save-buttons-field', require('./components/fields/SaveButtons.vue').default);
+Vue.component('language-selector-field', require('./components/fields/LanguageSelect.vue').default);
+Vue.component('link-field', require('./components/fields/Link.vue').default);
+Vue.component('button-field', require('./components/fields/Button.vue').default);
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);
@@ -61,7 +65,6 @@ for (let key in window.laradiumFields) {
         Vue.component(key.split(/(?=[A-Z])/).join('-').toLowerCase() + '-field', window.laradiumFields[key])
     }
 }
-
 
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
@@ -101,6 +104,30 @@ Vue.mixin({
                 id: rand_id,
                 replacement_ids: replacement_ids
             };
+        }
+    },
+
+    computed: {
+        fieldAttributes() {
+            let attributes = {};
+
+            if (this.field && this.field.attr) {
+                for (let key in this.field.attr) {
+                    if (this.field.attr.hasOwnProperty(key) && isNaN(parseInt(key))) {
+                        attributes[key] = this.field.attr[key];
+                    }
+                }
+            }
+
+            if (this.data && this.data.attr) {
+                for (let key in this.data.attr) {
+                    if (this.data.attr.hasOwnProperty(key) && isNaN(parseInt(key))) {
+                        attributes[key] = this.data.attr[key];
+                    }
+                }
+            }
+
+            return attributes;
         }
     }
 });

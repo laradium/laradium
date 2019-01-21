@@ -4,7 +4,7 @@
             <br>
             <div class="checkbox checkbox-primary">
                 <input type="hidden" value="0" :name="field.name">
-                <input type="checkbox" value="1" v-model="field.checked" :name="field.name" :id="field.name">
+                <input type="checkbox" value="1" v-model="field.checked" :name="field.name" :id="field.name" v-bind="fieldAttributes">
                 <label :for="field.name">
                     {{ field.label }}
                 </label>
@@ -25,6 +25,6 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
+        props: ['field', 'language'],
     }
 </script>

@@ -15,22 +15,16 @@
                    :name="item.name"
                    v-for="item in field.translations"
                    v-show="language === item.iso_code"
-                   class="form-control" v-bind="attributes">
+                   class="form-control" v-bind="fieldAttributes">
         </div>
         <div v-else>
-            <input type="text" v-model="field.value" :name="field.name" class="form-control" v-bind="attributes">
+            <input type="text" v-model="field.value" :name="field.name" class="form-control" v-bind="fieldAttributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
-
-        computed: {
-            attributes() {
-                return this.field.attr;
-            }
-        },
+        props: ['field', 'language']
     }
 </script>

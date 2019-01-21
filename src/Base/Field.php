@@ -69,7 +69,7 @@ class Field
     private $validationAttributes = [];
 
     /**
-     * @var
+     * @var string
      */
     private $type;
 
@@ -77,6 +77,11 @@ class Field
      * @var string
      */
     private $info = '';
+
+    /**
+     * @var array
+     */
+    protected $htmlAttributes = [];
 
     /**
      * Field constructor.
@@ -160,9 +165,10 @@ class Field
             'translations' => $this->getTranslations(),
             'config'       => [
                 'is_translatable' => $this->isTranslatable(),
-                'col'             => $this->getCol(),
+                'col'             => $this->getCol()
             ],
-            'info'         => $this->getInfo()
+            'info'         => $this->getInfo(),
+            'attr'         => $this->getAttr()
         ];
     }
 
@@ -450,5 +456,24 @@ class Field
     public function getInfo(): string
     {
         return $this->info;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function attr($value)
+    {
+        $this->htmlAttributes = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttr()
+    {
+        return $this->htmlAttributes;
     }
 }

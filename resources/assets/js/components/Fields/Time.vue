@@ -30,7 +30,7 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'item']
+        props: ['field', 'language']
     }
 
     Vue.component('timepicker', {
