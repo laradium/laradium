@@ -194,6 +194,7 @@ class Table
             $config->push([
                 'data'       => $column['column'],
                 'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'title'      => $column['title'] ?? $this->parseTitle($column['column']),
                 'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
                 'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
@@ -336,5 +337,19 @@ class Table
     public function getSearch()
     {
         return $this->search;
+    }
+
+    /**
+     * @param $title
+     * @return string
+     */
+    protected function parseTitle($title): string
+    {
+        $title = str_replace('_', ' ', $title);
+        $title = explode('.', $title);
+        $title = implode(' ', $title);
+        $title = ucwords($title);
+
+        return $title;
     }
 }
