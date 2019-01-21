@@ -150,7 +150,11 @@ class FindTranslations extends Command
      */
     protected function writeToFile(array $translations): void
     {
-        $filename = config('laradium.translations_file');
+        $path = resource_path('seed_translations');
+        if (!File::isDirectory($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+        $filename = config('laradium.translations_file', 'translations') . '.xlsx';
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -175,7 +179,7 @@ class FindTranslations extends Command
         }
 
         $writer = new Xlsx($spreadsheet);
-        $writer->save(resource_path('seed_translations/' . $filename . '.xlsx'));
+        $writer->save($path . '/' . $filename);
     }
 
     /**
