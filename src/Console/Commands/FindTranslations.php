@@ -2,15 +2,14 @@
 
 namespace Laradium\Laradium\Console\Commands;
 
+use File;
 use Illuminate\Console\Command;
 use Laradium\Laradium\Models\Language;
-use Laradium\Laradium\Models\Translation;
-use File;
-use Symfony\Component\Finder\Finder;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpParser\Lexer;
 use PhpParser\ParserFactory;
-use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
-use Maatwebsite\Excel\Writers\LaravelExcelWriter;
+use Symfony\Component\Finder\Finder;
 
 class FindTranslations extends Command
 {
@@ -49,6 +48,25 @@ class FindTranslations extends Command
     {
         $paths = $this->getPaths();
         $translations = [];
+
+        // Default laravel translations.
+        $files = File::allFiles(
+            resource_path('lang/en')
+        );
+
+        foreach ($files as $file) {
+            $fullPath = $file->getPathname();
+            $group = str_replace('.php', '', $file->getFilename());
+            foreach (File::getRequire($fullPath) as $key => $translation) {
+                foreach ($this->makeRows($group, $key, $translation) as $row) {
+                    if ($row['key'] === 'validation.custom.attribute-name') {
+                        continue;
+                    }
+
+                    $translations[$row['key']] = $row['value'];
+                }
+            }
+        }
 
         // Find translations in files
         $finder = new Finder();
@@ -93,6 +111,9 @@ class FindTranslations extends Command
             $mappedTranslations[] = $data;
         }
 
+        // Add key, languages to header.
+        $mappedTranslations = array_prepend($mappedTranslations, array_keys(array_first($mappedTranslations)));
+
         // Write translations to the file.
         $this->writeToFile($mappedTranslations);
 
@@ -130,18 +151,62 @@ class FindTranslations extends Command
      */
     protected function writeToFile(array $translations): void
     {
-        $excel = app('excel');
-        $filename = config('laradium.translations_file');
-        $excel
-            ->create($filename, function (LaravelExcelWriter $writer) use ($translations) {
-                $writer->setTitle('Translations');
-                $writer->sheet('Translations', function (LaravelExcelWorksheet $sheet) use ($translations) {
-                    $sheet->fromArray($translations, '', 'A1');
-                    $sheet->row(1, function ($row) {
-                        $row->setFontWeight('bold');
-                    });
-                });
-            })
-            ->store('xlsx', resource_path('seed_translations'));
+        $path = resource_path('seed_translations');
+        if (!File::isDirectory($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+        $filename = config('laradium.translations_file', 'translations') . '.xlsx';
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Load data from array
+        $sheet->fromArray($translations, null, 'A1');
+
+        // Set first row to bold
+        $styleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle('1:1')->applyFromArray($styleArray);
+
+        // Set auto width for columns
+        $spreadsheet->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+        $column = 'B';
+        foreach (translate()->languages() as $language) {
+            $spreadsheet->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($path . '/' . $filename);
+    }
+
+    /**
+     * Create translations from array.
+     *
+     * @param $group
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    protected function makeRows($group, $key, $value): array
+    {
+        $rows = [];
+        if (is_array($value)) {
+            foreach ($value as $subKey => $subValue) {
+                $rows[] = [
+                    'key'   => $group . '.' . $key . '.' . $subKey,
+                    'value' => $subValue,
+                ];
+            }
+        } else {
+            $rows[] = [
+                'key'   => $group . '.' . $key,
+                'value' => $value,
+            ];
+        }
+        return $rows;
     }
 }

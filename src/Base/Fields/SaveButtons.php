@@ -2,31 +2,30 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Element;
 
-class Row extends Element
+class SaveButtons extends Element
 {
     /**
-     * @var boolean
+     * @var bool
      */
-    private $use_block = false;
+    private $locale_selector = true;
 
     /**
-     * Row constructor.
+     * SaveButtons constructor.
      * @param $parameters
      * @param Model $model
      */
     public function __construct($parameters, Model $model)
     {
-        $closure = array_first($parameters, null, true);
+        $closure = array_first($parameters, null, false);
 
         if ($closure) {
             $this->fields($closure);
         }
 
-        parent::__construct($parameters, $model);
+        parent::__construct([12, 'md'], $model);
     }
 
     /**
@@ -35,24 +34,22 @@ class Row extends Element
     public function formattedResponse(): array
     {
         return [
-            'name'   => 'row',
-            'slug'   => 'row',
-            'type'   => 'row',
+            'name'   => 'save-buttons',
+            'slug'   => 'save-buttons',
+            'type'   => 'save-buttons',
             'fields' => $this->getFields(),
             'config' => [
-                'use_block' => $this->use_block,
-                'col'       => 'col-md-12'
-            ],
-            'attr'   => $this->getAttributes()
+                'locale_selector' => $this->locale_selector
+            ]
         ];
     }
 
     /**
      * @return $this
      */
-    public function block(): self
+    public function withoutLanguageSelect(): self
     {
-        $this->use_block = true;
+        $this->locale_selector = false;
 
         return $this;
     }

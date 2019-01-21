@@ -42,11 +42,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         .user-box ul li a:hover {
@@ -54,16 +54,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}       !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         a:hover {
@@ -114,7 +114,8 @@
                 @if(isset($resource))
                     <nav class="navbar-custom d-flex align-items-center justify-content-center margin-elements">
                         @if($resource->hasAction('create') && laradium()->hasPermissionTo(auth()->user(), $resource, 'create'))
-                            <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create" class="btn btn-primary btn-sm">
+                            <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create"
+                               class="btn btn-primary btn-sm">
                                 <i class="fa fa-plus"></i> Create
                             </a>
                         @endif
@@ -174,6 +175,13 @@
 @yield('crud-url')
 <script src="{{ versionedAsset('laradium/assets/js/manifest.js') }}"></script>
 <script src="{{ versionedAsset('laradium/assets/js/vendor.js') }}"></script>
+
+@isset($jsBeforeSource)
+    @foreach($jsBeforeSource as $asset)
+        <script src="{{ $asset }}"></script>
+    @endforeach
+@endisset
+
 <script src="{{ versionedAsset('laradium/assets/js/laradium.js') }}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 

@@ -5,16 +5,16 @@ namespace Laradium\Laradium\Base\Fields;
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Element;
 
-class Block extends Element
+class LanguageSelect extends Element
 {
     /**
-     * Block constructor.
+     * LanguageSelect constructor.
      * @param $parameters
      * @param Model $model
      */
     public function __construct($parameters, Model $model)
     {
-        $this->setName('col-' . array_get($parameters, 1, 'md') . '-' . array_get($parameters, 0, '12'));
+        $this->setName('language-selector');
 
         parent::__construct($parameters, $model);
     }
@@ -27,12 +27,9 @@ class Block extends Element
         return [
             'name'   => $this->getName(),
             'slug'   => str_slug($this->getName(), '_'),
-            'type'   => 'block',
+            'type'   => 'language-selector',
             'fields' => $this->getFields(),
-            'config' => [
-                'col' => $this->getName(),
-            ],
-            'attr'   => $this->getAttributes()
+            'config' => []
         ];
     }
 }

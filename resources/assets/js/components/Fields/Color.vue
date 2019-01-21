@@ -14,18 +14,20 @@
                    :key="index"
                    v-for="(item, index) in field.translations"
                    v-show="language === item.iso_code"
-                   class="form-control">
+                   class="form-control"
+                   v-bind="fieldAttributes">
         </div>
         <div v-else>
             <input type="color" :name="field.name"
                    v-model="field.value"
-                   class="form-control">
+                   class="form-control"
+                   v-bind="fieldAttributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['field', 'language', 'item']
+        props: ['field', 'language']
     }
 </script>

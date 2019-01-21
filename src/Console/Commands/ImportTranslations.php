@@ -3,18 +3,19 @@
 namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Http\UploadedFile;
+use Laradium\Laradium\Imports\TranslationImport;
 use Laradium\Laradium\Models\Language;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ImportTranslations extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'translations:import';
-
     /**
      * The console command description.
      *
@@ -41,58 +42,33 @@ class ImportTranslations extends Command
     public function handle()
     {
         \DB::table('translations')->delete();
-
         $this->importFromLangFiles();
-
         $fileName = config('laradium.translations_file');
-        $excelLocation = resource_path('seed_translations/' . $fileName . '.xlsx');
-        if (file_exists($excelLocation)) {
+        $source = resource_path('seed_translations/' . $fileName . '.xlsx');
+        if (file_exists($source)) {
             try {
-                $rows = [];
-                $excel = app('excel');
-                $data = $excel->load($excelLocation)
-                    ->get()
-                    ->toArray();
+                $copy = str_replace('.xlsx', '_copy.xlsx', $source);
+                copy($source, $copy);
+                $file = new File($copy);
+                $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
 
-                foreach ($data as $item) {
-                    $group = array_first(explode('.', $item['key']));
-                    $key = str_replace($group . '.', '', $item['key']);
-
-                    unset($item['key']);
-
-                    $languages = array_keys($item);
-                    foreach ($languages as $lang) {
-                        $rows[] = [
-                            'locale' => $lang,
-                            'group'  => $group,
-                            'key'    => $key,
-                            'value'  => $item[$lang],
-                        ];
-
-                    }
-                }
-
-                translate()->import($rows, $global = true);
-
+                (new TranslationImport)->import($file);
             } catch (\Exception $e) {
                 logger()->error($e);
-
-                $this->error('Something went wrong.');
+                $this->error('Something went wrong. ' . $e->getMessage());
                 exit;
             }
         }
     }
 
     /**
-     * Default laravel translations
-     * @return void
+     *
      */
-    private function importFromLangFiles()
+    private function importFromLangFiles(): void
     {
         $file = resource_path('lang');
         $files = \File::allFiles($file);
         $rows = [];
-
         if (file_exists($file)) {
             foreach ($files as $file) {
                 $fullPath = $file->getPathname();

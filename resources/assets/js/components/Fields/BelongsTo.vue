@@ -7,7 +7,7 @@
             </label>
 
             <div v-if="!field.isHidden">
-                <select :name="field.name" class="form-control" v-bind="attributes">
+                <select :name="field.name" class="form-control" v-bind="fieldAttributes">
                     <option
                             :value="option.value"
                             :selected="option.selected"
@@ -25,12 +25,6 @@
 
 <script>
     export default {
-        props: ['field', 'language', 'item'],
-
-        computed: {
-            attributes() {
-                return this.field.attr;
-            }
-        }
+        props: ['field', 'language'],
     }
 </script>

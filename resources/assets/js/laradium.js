@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -36,6 +35,10 @@ Vue.component('color-field', require('./components/fields/Color.vue').default);
 Vue.component('row-field', require('./components/fields/Row.vue').default);
 Vue.component('block-field', require('./components/fields/Block.vue').default);
 Vue.component('col-field', require('./components/fields/Col.vue').default);
+Vue.component('save-buttons-field', require('./components/fields/SaveButtons.vue').default);
+Vue.component('language-selector-field', require('./components/fields/LanguageSelect.vue').default);
+Vue.component('link-field', require('./components/fields/Link.vue').default);
+Vue.component('button-field', require('./components/fields/Button.vue').default);
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);
@@ -53,16 +56,28 @@ Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
 require('./misc/import-form')
 
+if (typeof window.laradiumFields === 'undefined') {
+    window.laradiumFields = {};
+}
+
+for (let key in window.laradiumFields) {
+    if (window.laradiumFields.hasOwnProperty(key)) {
+        Vue.component(key.split(/(?=[A-Z])/).join('').toLowerCase() + '-field', window.laradiumFields[key])
+    }
+}
+
 // Trumbowyg
 import VueTrumbowyg from 'vue-trumbowyg';
 import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
 import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
 import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
+
 require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
 import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
 import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
 import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
 import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
+
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
 
@@ -90,18 +105,42 @@ Vue.mixin({
                 replacement_ids: replacement_ids
             };
         }
+    },
+
+    computed: {
+        fieldAttributes() {
+            let attributes = {};
+
+            if (this.field && this.field.attr) {
+                for (let key in this.field.attr) {
+                    if (this.field.attr.hasOwnProperty(key) && isNaN(parseInt(key))) {
+                        attributes[key] = this.field.attr[key];
+                    }
+                }
+            }
+
+            if (this.data && this.data.attr) {
+                for (let key in this.data.attr) {
+                    if (this.data.attr.hasOwnProperty(key) && isNaN(parseInt(key))) {
+                        attributes[key] = this.data.attr[key];
+                    }
+                }
+            }
+
+            return attributes;
+        }
     }
 });
 
 Vue.directive('tooltip', {
     bind: bsTooltip,
     update: bsTooltip,
-    unbind (el, binding) {
+    unbind(el, binding) {
         $(el).tooltip('destroy');
     }
 });
 
-function bsTooltip(el, binding) { 
+function bsTooltip(el, binding) {
     let trigger = 'hover';
     if (binding.modifiers.focus || binding.modifiers.hover || binding.modifiers.click) {
         const t = [];

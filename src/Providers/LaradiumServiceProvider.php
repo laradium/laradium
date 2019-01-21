@@ -275,6 +275,10 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
         ], 'laradium');
+
+        $this->publishes([
+            __DIR__ . '/../../public/laradium' => public_path('laradium'),
+        ], 'laradium-assets');
     }
 
     /**
