@@ -3,7 +3,9 @@
 namespace Laradium\Laradium\Console\Commands;
 
 use Illuminate\Console\Command;
-use Laradium\Laradium\Models\Translation;
+use Illuminate\Http\UploadedFile;
+use Laradium\Laradium\Imports\TranslationImport;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ImportTranslations extends Command
 {
@@ -45,60 +47,28 @@ class ImportTranslations extends Command
         $this->importFromLangFiles();
 
         $fileName = config('laradium.translations_file');
-        $excelLocation = resource_path('seed_translations/' . $fileName . '.xlsx');
-        if (file_exists($excelLocation)) {
+        $source = resource_path('seed_translations/' . $fileName . '.xlsx');
+        if (file_exists($source)) {
             try {
-                $rows = [];
-                $excel = app('excel');
-                $data = $excel->load($excelLocation)
-                    ->get()
-                    ->toArray();
+                $copy = str_replace('.xlsx', '_copy.xlsx', $source);
+                copy($source, $copy);
+                $file = new File($copy);
+                $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
 
-                foreach ($data as $item) {
-                    $group = array_first(explode('.', $item['key']));
-                    $key = str_replace($group . '.', '', $item['key']);
-
-                    unset($item['key']);
-
-                    $languages = array_keys($item);
-                    foreach ($languages as $lang) {
-                        $rows[] = [
-                            'locale' => $lang,
-                            'group'  => $group,
-                            'key'    => $key,
-                            'value'  => $item[$lang],
-                        ];
-
-                    }
-                }
-                \DB::transaction(function () use ($rows) {
-                    foreach (array_chunk($rows, 300) as $chunk) {
-                        foreach ($chunk as $item) {
-                            \Laradium\Laradium\Models\Translation::firstOrCreate([
-                                'locale' => $item['locale'],
-                                'group'  => $item['group'],
-                                'key'    => $item['key'],
-                            ], [
-                                'locale' => $item['locale'],
-                                'group'  => $item['group'],
-                                'key'    => $item['key'],
-                                'value'  => $item['value'],
-                            ]);
-                        }
-                    }
-
-                });
+                (new TranslationImport)->import($file);
             } catch (\Exception $e) {
-                return back()->withError('Something went wrong, please try again!');
+                logger()->error($e);
+
+                $this->error('Something went wrong. ' . $e->getMessage());
+                exit;
             }
         }
-        cache()->forget('translations');
     }
 
     /**
      *
      */
-    private function importFromLangFiles()
+    private function importFromLangFiles(): void
     {
         $file = resource_path('lang');
         $files = \File::allFiles($file);

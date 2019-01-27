@@ -36,12 +36,14 @@ class ColumnSet
             'column'         => $column,
             'column_parsed'  => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
             'name'           => $name ?? $column,
+            'title'          => null,
             'relation'       => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
             'editable'       => false,
             'translatable'   => false,
             'modify'         => null,
             'not_sortable'   => false,
             'not_searchable' => false,
+            'switchable'     => false,
         ]);
 
         $this->column = $column;
@@ -71,7 +73,7 @@ class ColumnSet
     public function translatable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['translatable'] = true;
             }
 
@@ -87,7 +89,7 @@ class ColumnSet
     public function notSortable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['not_sortable'] = true;
             }
 
@@ -120,7 +122,7 @@ class ColumnSet
     public function modify($closure)
     {
         $this->list = $this->list->map(function ($item) use ($closure) {
-            if ($this->column == $item['column']) {
+            if ($this->column == $item['column'] && !$item['switchable']) {
                 $item['modify'] = $closure;
             }
 
@@ -130,4 +132,44 @@ class ColumnSet
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function switchable($disabled = false)
+    {
+        $this->list = $this->list->map(function ($item) use ($disabled) {
+            if ($this->column == $item['column']) {
+                $item['modify'] = function ($row) use ($item, $disabled) {
+                    return view('laradium::admin.resource._partials.switcher', [
+                        'row'      => $row,
+                        'column'   => $item['column'],
+                        'disabled' => $disabled
+                    ])->render();
+                };
+
+                $item['switchable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param $title
+     * @return $this
+     */
+    public function title($title)
+    {
+        $this->list = $this->list->map(function ($item) use ($title) {
+            if ($this->column === $item['column']) {
+                $item['title'] = $title;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
 }

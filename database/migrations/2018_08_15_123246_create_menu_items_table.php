@@ -20,6 +20,7 @@ class CreateMenuItemsTable extends Migration
             $table->string('target')->default('_self');
             $table->integer('sequence_no')->default(0);
             $table->string('icon')->nullable();
+            $table->string('resource')->nullable();
 
             $table->unsignedInteger('menu_id')->nullable();
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');

@@ -33,11 +33,6 @@ class Table
     protected $additionalViewData;
 
     /**
-     * @var array
-     */
-    protected $actions = ['create', 'edit', 'delete'];
-
-    /**
      * @var
      */
     protected $where;
@@ -66,8 +61,8 @@ class Table
      * @var array
      */
     protected $orderBy = [
-        'key'       => 0,
-        'direction' => 'asc'
+        'column'    => 'id',
+        'direction' => 'desc'
     ];
 
     /**
@@ -79,6 +74,11 @@ class Table
      * @var string
      */
     protected $sortableColumn = 'order';
+
+    /**
+     * @var
+     */
+    protected $search;
 
     /**
      * Table constructor.
@@ -149,31 +149,11 @@ class Table
      * @param $value
      * @return $this
      */
-    public function actions($value)
-    {
-        $this->actions = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
     public function dataTable($value)
     {
         $this->dataTable = $value;
 
         return $this;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function hasAction($value)
-    {
-        return in_array($value, $this->actions);
     }
 
     /**
@@ -220,21 +200,11 @@ class Table
     {
         $config = collect([]);
 
-        if ($this->isSortable()) {
-            $config->push([
-                'data'       => $this->sortableColumn,
-                'name'       => $this->sortableColumn,
-                'searchable' => false,
-                'orderable'  => true,
-                'width'      => '2%',
-                'class'      => 'text-center'
-            ]);
-        }
-
         foreach ($this->columns() as $column) {
             $config->push([
                 'data'       => $column['column'],
                 'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'title'      => $column['title'] ?? $this->parseTitle($column['column']),
                 'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
                 'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
@@ -249,32 +219,8 @@ class Table
             'name'       => 'action',
             'searchable' => false,
             'orderable'  => false,
-            'width'      => '15%',
             'class'      => 'text-center'
         ]);
-
-        return $config;
-    }
-
-    /**
-     * @param $resource
-     * @return Collection
-     */
-    public function getTableConfig($resource)
-    {
-        $config = collect([
-            'processing' => true,
-            'serverSide' => true,
-            'ajax'       => '/admin/' . $resource->getSlug() . '/data-table',
-            'columns'    => $this->getColumnConfig(),
-            'order'      => [$this->getOrderBy()['key'], $this->getOrderBy()['direction']]
-        ]);
-
-        if ($this->isSortable()) {
-            $config->put('rowReorder', [
-                'update' => false
-            ]);
-        }
 
         return $config;
     }
@@ -354,16 +300,7 @@ class Table
      */
     public function orderBy($column, $direction = 'desc')
     {
-        if ($this->isSortable()) {
-            $this->orderBy = [
-                'key'       => 0,
-                'direction' => 'asc'
-            ];
-
-            return $this;
-        }
-
-        // Was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
+        //was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
         $key = -1;
         foreach ($this->columns() as $itemKey => $item) {
             if ($item['column'] === $column) {
@@ -378,6 +315,7 @@ class Table
 
         $this->orderBy = [
             'key'       => $key,
+            'column'    => $column,
             'direction' => $direction
         ];
 
@@ -393,20 +331,36 @@ class Table
     }
 
     /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function search(\Closure $closure)
+    {
+        $this->search = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSearch()
+    {
+        return $this->search;
+    }
+
+    /**
      * @param $value
      * @return $this
      */
     public function sortable($value = null)
     {
         $this->sortable = true;
-
         if ($value) {
             $this->sortableColumn = $value;
         }
-
         return $this;
     }
-
     /**
      * @return bool
      */
@@ -414,12 +368,23 @@ class Table
     {
         return $this->sortable;
     }
-
     /**
      * @return string
      */
     public function getSortableColumn()
     {
         return $this->sortableColumn;
+    }
+
+    /**
+     * @param $title
+     * @return string
+     */
+    protected function parseTitle($title): string
+    {
+        $title = str_replace(['.', '_'], ' ', $title);
+        $title = ucwords($title);
+
+        return $title;
     }
 }

@@ -1,19 +1,21 @@
 <template>
     <div class="form-group">
-        <label for="">{{ input.label }}</label>
+        <label :for="field.name">
+            {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
+        </label>
 
-        <input type="password" :name="input.name" class="form-control" v-bind="attributes">
+        <input type="password" :name="field.name" class="form-control" v-bind="fieldAttributes">
+        <component :is="field.worker.type + '-field'"
+                   :field="field.worker"
+                   :language="language"
+                   :replacement_ids="{}"
+        ></component>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
-
-        computed: {
-            attributes() {
-                return this.input.attr;
-            }
-        }
+        props: ['field', 'language'],
     }
 </script>

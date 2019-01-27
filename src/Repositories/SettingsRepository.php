@@ -2,8 +2,8 @@
 
 namespace Laradium\Laradium\Repositories;
 
-use File;
 use Laradium\Laradium\Models\Setting;
+use Laradium\Laradium\Models\SettingTranslation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SettingsRepository
@@ -68,10 +68,15 @@ class SettingsRepository
     private function getValue($setting)
     {
         if ($setting['is_translatable']) {
-
             $translation = collect(array_get($setting, 'translations'))->where('locale', app()->getLocale())->first();
 
             if ($translation) {
+                if ($setting['type'] === 'file') {
+                    $file = SettingTranslation::find($translation['id'])->file;
+
+                    return is_file(public_path('uploads/' . $file->path())) ? $file->url() : null;
+                }
+
                 return $translation['value'];
             }
 
@@ -82,7 +87,7 @@ class SettingsRepository
         if ($setting['type'] === 'file') {
             $file = Setting::find($setting['id'])->file;
 
-            return File::exists(public_path('uploads/' . $file->path())) ? $file->url() : null;
+            return is_file(public_path('uploads/' . $file->path())) ? $file->url() : null;
         }
 
         return $setting['non_translatable_value'];
@@ -144,7 +149,7 @@ class SettingsRepository
                 $item['type'] = 'file';
                 $item['file'] = null;
 
-                if (File::exists($file)) {
+                if (is_file($file)) {
                     $file = new \Symfony\Component\HttpFoundation\File\File($file);
                     $file = new UploadedFile($file, $file->getBasename(), $file->getMimeType(), null, null, true);
                     $item['file'] = $file;

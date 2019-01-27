@@ -5,18 +5,21 @@ namespace Laradium\Laradium\Models;
 use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model
+class MenuItem extends \Baum\Node
 {
     use Translatable;
 
     /**
+     * 
      * @var array
      */
     protected $fillable = [
         'is_active',
         'target',
         'sequence_no',
-        'icon'
+        'icon',
+        'resource',
+        'parent_id',
     ];
 
     /**
@@ -35,5 +38,19 @@ class MenuItem extends Model
     public function scopeActive($query)
     {
         return $query->whereIsActive(true);
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getUrlAttribute()
+    {
+        if ($this->resource !== '' && class_exists($this->resource)) {
+            $url = route('admin.' . (new $this->resource)->getBaseResource()->getSlug() . '.index');
+        } else {
+            $url = $this->translateOrNew(session('locale', config('app.locale')))->url;
+        }
+
+        return $url ?? '#';
     }
 }

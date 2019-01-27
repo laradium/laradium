@@ -4,12 +4,16 @@ namespace Laradium\Laradium\Base;
 
 use File;
 use Illuminate\Http\Request;
+use Laradium\Laradium\Content\Base\Resources\PageResource;
+use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Traits\Crud;
+use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Datatable;
 
 abstract class AbstractResource
 {
-    use Crud, Datatable;
+
+    use Crud, CrudEvent, Datatable;
 
     /**
      * @var
@@ -22,11 +26,6 @@ abstract class AbstractResource
     protected $resource;
 
     /**
-     * @var array
-     */
-    protected $events = [];
-
-    /**
      * @var string
      */
     protected $name;
@@ -37,11 +36,48 @@ abstract class AbstractResource
     protected $slug;
 
     /**
+     * @var array
+     */
+    protected $actions = [
+        'create',
+        'edit',
+        'delete'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $defaultViews = [
+        'index'  => 'laradium::admin.resource.index',
+        'create' => 'laradium::admin.resource.create',
+        'edit'   => 'laradium::admin.resource.edit'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $views = [];
+
+    /**
+     * @var array
+     */
+    protected $customRoutes = [];
+
+    /**
+     * @var
+     */
+    private $baseResource;
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
     {
-        $this->model = new $this->resource;
+        if (class_exists($this->resource)) {
+            $this->model(new $this->resource);
+        }
+
+        $this->events = collect([]);
     }
 
     /**
@@ -49,37 +85,10 @@ abstract class AbstractResource
      */
     public function index()
     {
-        $model = $this->model;
-        $table = $this->table()->setModel($model);
+        $table = $this->table()->setModel($this->getModel());
         $resource = $this;
-        $name = $this->getName();
 
-        return view('laradium::admin.resource.index', compact('table', 'model', 'resource', 'name'));
-    }
-
-    /**
-     * @param null $id
-     * @return array
-     */
-    public function getForm($id = null)
-    {
-        if ($id) {
-            $model = $this->model->find($id);
-        } else {
-            $model = $this->model;
-        }
-
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-        $response = $form->formattedResponse();
-
-        return ([
-            'languages'      => $this->languages(),
-            'inputs'         => $response,
-            'tabs'           => $resource->fieldSet()->tabs()->toArray(),
-            'isTranslatable' => $form->isTranslatable()
-        ]);
+        return view($this->getView('index'), compact('table', 'resource'));
     }
 
     /**
@@ -87,17 +96,14 @@ abstract class AbstractResource
      */
     public function create()
     {
-        $model = $this->model;
+        $form = $this->getForm();
+        $resource = $this;
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->abstractResource($this);
-        $form->buildForm();
+        $js = $this->resource()->getJs();
+        $jsBeforeSource = $this->resource()->getJsBeforeSource();
+        $css = $this->resource()->getCss();
 
-        $name = $this->getName();
-        $slug = $this->getSlug();
-
-        return view('laradium::admin.resource.create', compact('form', 'name', 'slug'));
+        return view($this->getView('create'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
     }
 
     /**
@@ -107,29 +113,25 @@ abstract class AbstractResource
      */
     public function store(Request $request)
     {
-        $model = $this->model;
+        $form = $this->getForm();
+        $validationRequest = $this->prepareRequest($request);
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
-        }
+        $this->fireEvent('beforeSave', $request);
 
         $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
+        $validationRequest->validate($validationRules);
 
-        $this->updateResource($request->except('_token'), $model);
+        $model = $this->saveData($request->all(), $this->getModel());
 
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+        $form->model($model);
+        $this->model($model);
+
+        $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
         if ($request->ajax()) {
             return [
                 'success'  => 'Resource successfully created',
-                'redirect' => url()->previous()
+                'redirect' => $form->getAction('edit')
             ];
         }
 
@@ -142,17 +144,20 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model->findOrNew($id);
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
 
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->abstractResource($this);
-        $form->buildForm();
+        $this->model($model->findOrFail($id));
+        $form = $this->getForm();
+        $resource = $this;
 
-        $name = $this->getName();
-        $slug = $this->getSlug();
+        $js = $this->resource()->getJs();
+        $jsBeforeSource = $this->resource()->getJsBeforeSource();
+        $css = $this->resource()->getCss();
 
-        return view('laradium::admin.resource.edit', compact('form', 'name', 'slug'));
+        return view($this->getView('edit'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
     }
 
     /**
@@ -163,36 +168,33 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model->findOrNew($id);
-
-        $resource = $this->resource();
-        $form = new Form($resource->setModel($model)->build());
-        $form->buildForm();
-
-        if (isset($this->events['beforeSave'])) {
-            $this->events['beforeSave']($this->model, $request);
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
         }
+
+        $this->model($model->findOrFail($id));
+
+        $form = $this->getForm();
+        $validationRequest = $this->prepareRequest($request);
+
+        $this->fireEvent('beforeSave', $request);
 
         $validationRules = $form->getValidationRules();
-        $request->validate($validationRules);
+        $validationRequest->validate($validationRules);
 
-        $model = $this->model->find($id);
+        $this->saveData($request->all(), $this->getModel());
 
-        $this->updateResource($request->except('_token'), $model);
-
-        if (isset($this->events['afterSave'])) {
-            $this->events['afterSave']($this->model, $request);
-        }
+        $this->fireEvent('afterSave', $request);
 
         if ($request->ajax()) {
             return [
-                'success' => 'Resource successfully updated',
-                'data'    => $this->getForm($model->id)
+                'success'  => 'Resource successfully updated!',
+                'redirect' => $form->getAction('edit')
             ];
         }
 
         return back()->withSuccess('Resource successfully updated!');
-
     }
 
     /**
@@ -202,8 +204,15 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model;
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $model = $model->findOrFail($id);
         $model->delete();
+
+        $this->fireEvent('afterDelete', $request);
 
         if ($request->ajax()) {
             return [
@@ -215,13 +224,66 @@ abstract class AbstractResource
     }
 
     /**
-     * @param $name
-     * @param \Closure $callable
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggle(Request $request, $id)
+    {
+        $column = $request->get('column', null);
+
+        abort_unless($column, 400);
+
+        $model = $this->getModel();
+        if ($where = $this->resource()->getWhere()) {
+            $model = $model->where($where);
+        }
+
+        $model = $model->findOrFail($id);
+
+        $model->$column = !$model->$column;
+        $model->save();
+
+        return response()->json([
+            'state' => 'success'
+        ]);
+    }
+
+    /**
+     * @param null $model
+     * @return Resource
+     */
+    public function getBaseResource($model = null)
+    {
+        $model = $model ?? $this->getModel();
+
+        return (new Resource)->model($model)
+            ->name($this->name)
+            ->slug($this->slug);
+    }
+
+    /**
+     * @return Form
+     */
+    private function getForm()
+    {
+        $form = (new Form(
+            $this
+                ->getBaseResource($this->getModel())
+                ->make($this->resource()->closure())
+                ->build())
+        )->build();
+
+        return $form;
+    }
+
+    /**
+     * @param $value
      * @return $this
      */
-    protected function registerEvent($name, \Closure $callable)
+    public function model($value)
     {
-        $this->events[$name] = $callable;
+        $this->model = $value;
 
         return $this;
     }
@@ -229,77 +291,125 @@ abstract class AbstractResource
     /**
      * @return mixed
      */
-    public function getResourceName()
-    {
-        return $this->model->getTable();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }
 
     /**
+     * @return Import
+     */
+    public function importHelper()
+    {
+        return new Import($this);
+    }
+
+    /**
+     * @param $value
      * @return bool
      */
-    public function importInProgress(): bool
+    public function hasAction($value)
     {
-        return !!File::exists(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
+        return in_array($value, $this->actions);
     }
 
     /**
-     * @return bool|string
+     * @return array
      */
-    public function importStatus()
+    public function getActions()
     {
-        return file_get_contents(storage_path('app/import/' . $this->model->getTable() . '-import.lock'));
+        $actions = collect($this->actions)->push('index'); // Index is allowed by default
+
+        if ($this instanceof PageResource) {
+            $actions->push('create');
+        }
+
+        $allActions = collect([
+            'index'  => 'index',
+            'create' => [
+                'create',
+                'store'
+            ],
+            'edit'   => [
+                'edit',
+                'update'
+            ],
+            'show'   => 'show',
+            'delete' => 'destroy'
+        ]);
+
+        $availableActions = $actions->diffAssoc($allActions);
+
+        return $allActions->only($availableActions)->flatten()->all();
     }
 
     /**
-     * @return mixed
+     * @param $action
+     * @return array|mixed
      */
-    public function languages()
+    public function getBreadcrumbs($action)
     {
-        return translate()->languages()->map(function ($item, $index) {
-            $item->is_current = $index === 0;
+        $form = $this->getForm();
 
-            return $item;
-        })->toArray();
+        $breadcrumbs = [
+            'index'  => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ]
+            ],
+            'create' => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Create',
+                    'url'  => $form->getAction('create')
+                ]
+            ],
+            'edit'   => [
+                [
+                    'name' => $this->getBaseResource()->getName(),
+                    'url'  => $form->getAction('index')
+                ],
+                [
+                    'name' => 'Edit',
+                    'url'  => $form->getAction('edit')
+                ]
+            ],
+        ];
+
+        return $breadcrumbs[$action] ?? [];
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getView($name): string
+    {
+        if (!isset($this->views[$name])) {
+            return $this->defaultViews[$name];
+        }
+
+        return $this->views[$name];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomRoutes()
+    {
+        return $this->customRoutes;
     }
 
     /**
      * @return string
      */
-    public function getSlug()
+    public function resourceName()
     {
-        if (!$this->slug && $this->name) {
-            $this->slug = strtolower(str_replace(' ', '-', $this->name));
-
-            return $this->slug;
-        } else if (!$this->slug && !$this->name) {
-            $this->name = str_replace('_', '-', $this->model->getTable());
-
-            return $this->name;
-        }
-
-        return $this->slug;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        if (!$this->name && !$this->slug) {
-            return ucfirst(str_replace('_', ' ', $this->model->getTable()));
-        } else if (!$this->name && $this->slug) {
-            return ucfirst(str_replace('-', ' ', $this->slug));
-        }
-
-        return ucfirst($this->name);
+        return $this->resource;
     }
 
     /**

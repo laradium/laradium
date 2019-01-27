@@ -9,12 +9,10 @@ window.Popper = require('popper.js').default;
  */
 
 try {
-    window.$ = window.jQuery = require('jquery');
+    global.$ = global.jQuery = require('jquery');
 
     require('bootstrap');
 } catch (e) {}
-
-window.datetimepicker = require('jquery-datetimepicker');
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -40,19 +38,24 @@ if (token) {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
+window.datetimepicker = require('jquery-datetimepicker');
+window.swal = require('sweetalert2');
+window.toastr = require('toastr');
+window.select2 = require('select2');
+window.jstree = require('jstree');
 
-// import Echo from 'laravel-echo'
+$.ajaxSetup({
+	headers: {
+		'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	}
+});
 
-// window.Pusher = require('pusher-js');
+$(function() {
+   $(document).on('click', 'li.has_sub a', function () {
+        $(this).next('ul').slideToggle();
+   });
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     encrypted: true
-// });
+   if($(document).find('li.has_sub a').hasClass('active')) {
+       $('li.has_sub a.active').next('ul').slideDown()
+   }
+});

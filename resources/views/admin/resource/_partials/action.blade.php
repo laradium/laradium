@@ -1,8 +1,8 @@
-@if($table->hasAction('edit'))
+@if($resource->hasAction('edit') && laradium()->hasPermissionTo(auth()->user(), $resource, 'edit'))
     <a href="/admin/{{ $slug }}/{{ $item->id }}/edit" class="btn btn-primary btn-sm"><i class="mdi mdi-pencil"></i> Edit</a>
 @endif
 
-@if($table->hasAction('delete'))
+@if($resource->hasAction('delete') && laradium()->hasPermissionTo(auth()->user(), $resource, 'destroy'))
     <a href="javascript:;"
        data-url="/admin/{{ $slug }}/{{ $item->id }}"
        class="btn btn-danger btn-sm js-delete-resource">

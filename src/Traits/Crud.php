@@ -4,180 +4,103 @@ namespace Laradium\Laradium\Traits;
 
 trait Crud
 {
+    use Worker;
 
     /**
-     * @param $fields
+     * @var array
+     */
+    private $unwantedKeys = ['crud_worker', 'morphable_type', 'morphable_name'];
+
+    /**
+     * @param $inputs
      * @param $model
      * @return bool
      * @throws \ReflectionException
      */
-    public function updateResource($fields, $model)
+    public function saveData($inputs, $model)
     {
-        // Password
-        if (array_key_exists('password', $fields)) {
-            $password = array_get($fields, 'password');
-
-            if (empty($password)) {
-                $fields = array_except($fields, 'password');
-            } else {
-                $fields['password'] = bcrypt($password);
-            }
-        }
-
-        $resourceData = $this->getResourceData(collect($fields));
-
-        $resourceFields = $resourceData['resourceFields'];
-        $relations = $resourceData['relations'];
-        $translations = $resourceData['translations'];
-
-        $model->fill(array_except($resourceFields->toArray(), ['morph_type', 'morph_name']));
-        $model->save();
-
-        $this->putTranslations($model, $translations);
-        $this->updateRelations($relations, $model);
-
-        return true;
-    }
-
-    /**
-     * @param $fields
-     * @return array
-     */
-    public function getResourceData($fields): array
-    {
-        $resourceFields = $fields->filter(function ($item) {
-            return !is_array($item);
-        });
-
-        $relations = $fields->filter(function ($item) {
-            return is_array($item);
-        });
-
-        $translations = $fields->filter(function ($item, $index) {
-            return is_array($item) && $index == 'translations';
+        // Update or create base model
+        $baseData = collect($inputs)->filter(function ($value, $index) {
+            return $index !== 'translations' && !is_array($value);
         })->toArray();
 
-        $relationList = array_keys($relations->toArray());
+        if ($model->exists) {
+            $model->update($baseData);
+        } else {
+            $model = $model->create($baseData);
+        }
 
-        return compact('resourceFields', 'relations', 'relationList', 'translations');
-    }
+        // Update or create translations
+        $translations = collect($inputs)->filter(function ($value, $index) {
+            return $index === 'translations';
+        })->toArray();
 
-    /**
-     * @param $relations
-     * @param $model
-     * @throws \ReflectionException
-     */
-    public function updateRelations($relations, $model)
-    {
-        foreach (array_except($relations, 'translations') as $relationName => $relationSet) {
-            $existingItemSet = collect($relationSet)->filter(function ($item) {
-                return isset($item['id']);
-            })->toArray();
-            $nonExistingItemSet = collect($relationSet)->filter(function ($item) {
-                return !isset($item['id']);
-            })->toArray();
+        $this->putTranslations($translations, $model);
 
-            if (isset($nonExistingItemSet['morph_type'])) {
-                $this->saveMorphToFields($nonExistingItemSet, $model);
-            } else {
-                $relationModel = $model->{$relationName}();
-                $relationType = (new \ReflectionClass($relationModel))->getShortName();
+        // Run workers for relations or custom fields (HasMany, HasOne, MorphTo)
+        $workers = collect($inputs)->filter(function ($value, $index) {
+            return $index !== 'translations' && is_array($value);
+        })->toArray();
 
-                if (count($nonExistingItemSet)) {
-                    if ($relationType == 'HasMany') {
-                        foreach ($nonExistingItemSet as $item) {
-                            $newItem = $relationModel->create(array_except($item, 'translations'));
-                            $this->putTranslations($newItem, array_only($item, 'translations'));
-                            $morph = array_first($item);
-                            if (is_array($morph)) {
-                                $this->saveMorphToFields(array_first($item), $newItem);
-                            }
-
-                            foreach (array_except($item, 'translations') as $key => $input) {
-                                if (is_array($input)) {
-                                    $this->updateRelations([$key => $input], $newItem);
-                                }
-                            }
-                        }
-                    } elseif ($relationType == 'HasOne') {
-                        if ($model->{$relationName}) {
-                            $relationModel = $model->{$relationName};
-                        } else {
-                            $relationModel = $model->{$relationName}()->firstOrCreate($nonExistingItemSet);
-                        }
-                        $this->updateResource(collect($nonExistingItemSet), $relationModel);
-                    } elseif ($relationType == 'BelongsToMany') {
-                        $model->{$relationName}()->sync($nonExistingItemSet);
-                    }
-                }
-
-                if (count($existingItemSet)) {
-                    if ($relationType == 'HasMany') {
-                        foreach ($existingItemSet as $item) {
-                            $relationModel = $model->{$relationName}()->find($item['id']);
-
-                            $relationModel->fill(array_except($item, ['translations', 'id']));
-                            $relationModel->save();
-                            $this->putTranslations($relationModel, array_only($item, 'translations'));
-
-                            $morph = array_first($item);
-                            if (is_array($morph)) {
-                                $this->saveMorphToFields(array_first($item), $relationModel);
-                            }
-
-                            foreach (array_except($item, 'translations') as $key => $input) {
-                                if (is_array($input)) {
-                                    if (is_integer(key($input))) {
-                                        $this->updateRelations([$key => $input], $relationModel);
-                                    }
-                                }
-                            }
-                        }
-                    }
+        foreach ($workers as $key => $worker) {
+            if ($crudWorkerClass = array_get($worker, 'crud_worker', null)) {
+                if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\HasMany::class || $crudWorkerClass === \Laradium\Laradium\Base\Fields\HasOne::class) {
+                    $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
+                } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\Password::class) {
+                    $this->passwordWorker($model, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
+                    $this->morphToWorker($model, array_except($worker, 'crud_worker'));
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
+                    $this->belongsToManyToWorker($model, $key, array_except($worker, 'crud_worker'));
                 }
             }
         }
+
+        return $model;
     }
 
+
     /**
-     * @param $fields
+     * @param $data
      * @param $model
-     * @throws \ReflectionException
      */
-    protected function saveMorphToFields($fields, $model)
+    private function putTranslations($data, $model)
     {
-        if (isset($fields['morph_type'])) {
-            $morphModel = new $fields['morph_type'];
-            if ($model->{$fields['morph_name'] . '_id'}) {
-                $morphModel = $morphModel->find($model->{$fields['morph_name'] . '_id'});
-            }
-
-            $this->updateResource(collect($fields), $morphModel);
-            $model->{$fields['morph_name'] . '_id'} = $morphModel->id;
-            $model->{$fields['morph_name'] . '_type'} = $fields['morph_type'];
-
-            $model->save();
-        }
+        $model->fill(array_get($data, 'translations', []));
+        $model->save();
     }
 
     /**
-     * @param $model
-     * @param $translations
+     * @param $request
+     * @return \Illuminate\Http\Request
+     */
+    private function prepareRequest($request)
+    {
+        $data = $request->all();
+        $this->recursiveUnset($data);
+
+        return (new \Illuminate\Http\Request($data));
+    }
+
+    /**
+     * @param $array
      * @return bool
      */
-    protected function putTranslations($model, $translations)
+    private function recursiveUnset(&$array)
     {
-        if (isset($translations['translations'])) {
-            $translations = $translations['translations'];
-            if (count($translations)) {
-                foreach ($translations as $locale => $translationList) {
-                    $translation = $model->translations()->firstOrCreate(['locale' => $locale]);
-                    $translation->fill($translationList);
-                    $translation->save();
+            foreach ($array as $index => &$value) {
+                if(in_array($index, $this->unwantedKeys)) {
+                    unset($array[$index]);
+                }
+                if (is_array($value)) {
+                    if (array_get($value, 'remove', null)) {
+                        unset($array[$index]);
+                    }
+                    $this->recursiveUnset($value, $this->unwantedKeys);
                 }
             }
-        }
 
         return true;
     }
+
 }

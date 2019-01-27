@@ -2,14 +2,31 @@
 
 namespace Laradium\Laradium\Base;
 
+use Illuminate\Support\Collection;
+use Laradium\Laradium\Registries\ApiResourceRegistry;
 use Laradium\Laradium\Registries\ResourceRegistry;
 
-class Laradium {
+class Laradium
+{
 
     /**
-     * @var
+     * @var \Illuminate\Foundation\Application|mixed
      */
     protected $resourceRegistry;
+
+    /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
+    protected $apiResourceRegistry;
+
+    /**
+     * @var array
+     */
+    protected $baseResources = [
+        'vendor/laradium/laradium/src/Base/Resources'            => 'Laradium\\Laradium\\Base\\Resources\\',
+        'vendor/laradium/laradium-content/src/Base/Resources'    => 'Laradium\\Laradium\\Content\\Base\\Resources\\',
+        'vendor/laradium/laradium-permission/src/Base/Resources' => 'Laradium\\Laradium\\Permission\\Base\\Resources\\',
+    ];
 
     /**
      * Laradium constructor.
@@ -17,6 +34,7 @@ class Laradium {
     public function __construct()
     {
         $this->resourceRegistry = app(ResourceRegistry::class);
+        $this->apiResourceRegistry = app(ApiResourceRegistry::class);
     }
 
     /**
@@ -29,31 +47,71 @@ class Laradium {
     }
 
     /**
+     * @param $resource
+     * @return mixed
+     */
+    public function registerApi($resource)
+    {
+        return $this->apiResourceRegistry->register($resource);
+    }
+
+    /**
      * @return array
      */
-    public function resources()
+    public function resources(): array
     {
-        $resourceList = [];
-        $baseResourcePath = base_path('vendor/laradium/laradium/src/Base/Resources');
-        $contentResourcePath = base_path('vendor/laradium/laradium-content/src/Base/Resources');
-        if (file_exists($baseResourcePath)) {
-            foreach (\File::allFiles($baseResourcePath) as $path) {
+        $baseResources = [];
+        $projectResources = [];
+
+        // Project resources
+        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources');
+        $namespace = app()->getNamespace();
+        $resourcePath = str_replace($namespace, '', $resources);
+        $resourcePath = str_replace('\\', '/', $resourcePath);
+        $resourcePath = app_path($resourcePath);
+        if (file_exists($resourcePath)) {
+            foreach (\File::files($resourcePath) as $path) {
                 $resource = $path->getPathname();
                 $baseName = basename($resource, '.php');
-                $resource = 'Laradium\\Laradium\\Base\\Resources\\' . $baseName;
-                $resourceList[] = $resource;
+                $resource = $resources . '\\' . $baseName;
+                $r = new $resource;
+                if(!class_exists($r->resourceName())) {
+                    continue;
+                }
+                $projectResources[] = $resource;
             }
-            if (file_exists($contentResourcePath)) {
-                foreach (\File::allFiles($contentResourcePath) as $path) {
-                    $resource = $path->getPathname();
+        }
+
+        // CMS resources
+        foreach ($this->baseResources as $path => $namespace) {
+            $resourcesPath = base_path($path);
+
+            if (file_exists($resourcesPath)) {
+                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                    $resource = $resourcePath->getPathname();
                     $baseName = basename($resource, '.php');
-                    $resource = 'Laradium\\Laradium\\Content\\Base\\Resources\\' . $baseName;
-                    $resourceList[] = $resource;
+                    $resource = $namespace . $baseName;
+
+                    // Check if there is a overridden resource in the project
+                    if ($this->resourceExists($projectResources, $baseName)) {
+                        continue;
+                    }
+
+                    $baseResources[] = $resource;
                 }
             }
         }
 
-        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources');
+        return array_merge($baseResources, $projectResources);
+    }
+
+    /**
+     * @return array
+     */
+    public function apiResources(): array
+    {
+        $resourceList = [];
+        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources\\Api') . '\\Api';
         $namespace = app()->getNamespace();
         $resourcePath = str_replace($namespace, '', $resources);
         $resourcePath = str_replace('\\', '/', $resourcePath);
@@ -76,5 +134,22 @@ class Laradium {
     public function all()
     {
         return $this->resourceRegistry->all();
+    }
+
+    /**
+     * @param $resources
+     * @param $resource
+     * @return bool
+     */
+    protected function resourceExists($resources, $resource): bool
+    {
+        foreach ($resources as $res) {
+            $className = array_last(explode('\\', $res));
+            if ($className === $resource) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

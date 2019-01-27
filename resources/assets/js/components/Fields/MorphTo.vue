@@ -1,51 +1,43 @@
 <template>
-    <transition name="fade">
-        <div>
-            <h3>{{ input.name }}</h3>
-            <div v-for="input in input.fields">
-                <component :is="input.type + '-field'"
-                           :input="input"
-                           :replacementIds="replacementIds"
-                           :language="language">
-                </component>
-            </div>
+    <div class="row">
+        <div v-for="(field, index) in field.fields" :class="field.config.col">
+            <component
+                    :is="field.type + '-field'"
+                    :field="field"
+                    :language="language"
+                    :replacement_ids="new_replacement_ids"
+                    :key="index"
+            ></component>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language'],
+        props: ['field', 'language', 'replacement_ids'],
         data() {
             return {
-                replacementIds: {}
+                new_replacement_ids: {}
             };
         },
         mounted() {
-            if(this.input.id) {
-                let id = this.input.id;
-                let fields = this.input.fields;
+            if(!this.field.exists) {
+                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.replacement_ids);
+                this.new_replacement_ids = generate_replacements.replacement_ids;
+
+                let fields = this.field.fields;
+
                 for (let field in fields) {
-                    let repAttr = fields[field].replacementAttributes;
-
-                    for(let ids in repAttr) {
-                        if(!this.replacementIds[repAttr[ids]]) {
-                            this.replacementIds[repAttr[ids]] = Math.random().toString(36).substring(7);
-                        }
-                    }
-
-                    if(fields[field].isTranslatable) {
-                        for (let attribute in fields[field].translatedAttributes) {
-                            for(id in this.replacementIds) {
-                                fields[field].translatedAttributes[attribute].name = fields[field].translatedAttributes[attribute].name.replace(id, this.replacementIds[id]);
+                    for (let id in this.new_replacement_ids) {
+                        if (!fields[field].config.is_translatable) {
+                            fields[field].name = fields[field].name.replace(id, this.new_replacement_ids[id]);
+                        } else {
+                            let translations = fields[field].translations;
+                            for (let translation in translations) {
+                                translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
                             }
                         }
-                    } else {
-                        for(id in this.replacementIds) {
-                            fields[field].name = fields[field].name.replace(id, this.replacementIds[id]);
-                        }
                     }
-
                 }
             }
         },

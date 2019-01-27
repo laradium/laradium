@@ -2,53 +2,59 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
+use App\Models\MenuItem;
 use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Traits\Nestable;
+use Laradium\Laradium\Traits\Relation;
+use Laradium\Laradium\Traits\Sortable;
 
 class HasMany extends Field
 {
 
-    /**
-     * @var mixed
-     */
-    protected $relationName;
+    use Sortable, Relation, Nestable;
 
     /**
-     * @var mixed
+     * @var
      */
-    protected $resource;
+    private $fields;
 
     /**
-     * @var Collection
+     * @var
      */
-    protected $fields;
+    private $fieldName;
 
     /**
-     * @var boolean
+     * @var
      */
-    protected $sortable = false;
-
-    /**
-     * @var string
-     */
-    protected $sortableColumn;
+    private $actions = ['create', 'delete'];
 
     /**
      * @var FieldSet
      */
-    protected $fieldSet;
-
-    /**
-     * @var string
-     */
-    protected $morphType;
+    private $fieldSet;
 
     /**
      * @var array
      */
-    protected $actions = ['create', 'delete'];
+    private $templateData = [];
+
+    /**
+     * @var bool
+     */
+    private $isCollapsed = true;
+
+    /**
+     * @var string
+     */
+    private $entryLabel = 'name';
+
+    /**
+     * @var array
+     */
+    private $letters = [];
 
     /**
      * HasMany constructor.
@@ -60,235 +66,157 @@ class HasMany extends Field
         parent::__construct($parameters, $model);
 
         $this->relationName = array_first($parameters);
-        $this->resource = array_pop($parameters);
-        $this->fields = new Collection;
-        $this->fieldSet = new FieldSet();
+        $this->fieldName = array_first($parameters);
+        $this->fieldSet = new FieldSet;
+        $this->letters = array_combine(range(0, 25), range('a', 'z'));
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @param array $attributes
+     * @return $this|Field
      */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function build($attributes = [])
     {
-        return $this->model()->{$this->relationName}();
-    }
+        parent::build($attributes);
 
-    /**
-     * @return Collection
-     */
-    public function fieldGroups()
-    {
-        return $this->fields;
-    }
-
-    /**
-     * @param array $parentAttributeList
-     * @param null $model
-     * @return $this
-     */
-    public function build($parentAttributeList = [], $model = null)
-    {
-        $this->parentAttributeList = $parentAttributeList;
-        $relation = $this->relation();
-        $rules = [];
-        if ($model) {
-            $this->model = $model;
+        if (get_class($this->getModel()) === config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class)) {
+            config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)::rebuild();
         }
 
-        foreach ($this->fieldSet->fields() as $field) {
-            if ($field instanceof MorphsTo) {
-                $relation->where($field->morphName . '_type', $field->morphClass);
-            }
-        }
-
-        if ($relation->count()) {
-            $fields = [];
-
-            if ($this->isSortable()) {
-                $itemList = $relation->orderBy($this->sortableColumn)->get();
-            } else {
-                $itemList = $relation->get();
-            }
-
-            foreach ($itemList as $item) {
-                foreach ($this->fieldSet->fields() as $field) {
-                    $attributeList = array_merge($this->parentAttributeList, [
-                        $this->relationName,
-                        $item->id,
-                    ]);
-
-                    $clonedField = clone $field;
-                    $clonedField->setModel($item);
-                    $clonedField->build($attributeList, $item);
-
-                    $fields[$item->id]['fields'][] = $clonedField;
-
-                    if ($this->isSortable()) {
-                        $fields[$item->id][$this->sortableColumn] = $item->{$this->sortableColumn};
-                    }
-
-                    $fields[$item->id]['id'] = $item->id;
-                    $rules += $clonedField->getRules();
-                }
-
-                if ($this->isSortable()) {
-                    $fields[$item->id]['fields'][] = $this->createSortableField($item, $attributeList);
-                }
-
-                $fields[$item->id]['fields'][] = $this->createIdField($item, $attributeList);
-            }
-
-            if ($rules) {
-                $this->validationRules = $rules;
-            }
-
-            $this->fields = $fields;
-        }
+        $this->templateData = $this->getTemplateData();
+        $this->validationRules($this->templateData['validation_rules']);
 
         return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function setMorphType($value)
-    {
-        $this->morphType = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function sortable($value)
-    {
-        $this->sortable = true;
-        $this->sortableColumn = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSortable()
-    {
-        return $this->sortable;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function relationName()
-    {
-        return $this->relationName;
     }
 
     /**
      * @return array
      */
-    public function template()
+    public function formattedResponse()
     {
-        $hasManyFields = $this->fieldSet->fields();
+        $data = parent::formattedResponse();
+        $data['value'] = get_class($this);
+        $data['entries'] = $this->getEntries();
+        $data['template_data'] = $this->templateData;
+        $data['config']['is_sortable'] = $this->isSortable();
+        $data['config']['actions'] = $this->getActions();
 
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTemplateData()
+    {
         $fields = [];
-        $model = $this->model->{$this->relationName}()->getModel();
-        foreach ($hasManyFields as $f) {
-            $field = clone $f;
-            $attributeList = array_merge($this->parentAttributeList, [
-                $this->relationName,
-                '__ID__',
-            ]);
+        $validationRules = [];
+        $this->addReplacementAttribute();
+        $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
 
-            $field->setModel($model);
-            $field->build($attributeList, $model);
-            $field->isTemplate(true);
-            $field->setValue(null);
+        if ($this->isSortable()) {
+            $fields[] = (new Hidden('sequence_no', $this->getRelationBaseModel()))
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute))
+                ->value($this->getRelationCollection()->count())
+                ->formattedResponse(); // Add hidden sortable field
+        }
 
-            $fields[] = $field->formattedResponse($field);
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $field->model($this->getRelationBaseModel())
+                ->replacementAttributes($this->getReplacementAttributes())
+                ->build(array_merge($this->getAttributes(), $lastReplacementAttribute));
+
+            if ($field->getRules()) {
+                $validationRules[$field->getValidationKey()] = $field->getRules();
+            }
+
+            $fields[] = $field->formattedResponse();
         }
 
         return [
-            'id'     => 0,
-            'order'  => 0,
-            'fields' => $fields,
-            'show'   => false
+            'label'            => 'Entry',
+            'fields'           => $fields,
+            'replacement_ids'  => $this->getReplacementAttributes(),
+            'validation_rules' => $validationRules,
         ];
     }
 
     /**
-     * @param null $f
      * @return array
      */
-    public function formattedResponse($f = null)
+    private function getEntries()
     {
-        $f = !is_null($f) ? $f : $this;
-        $items = [];
+        $entries = [];
+        $collection = $this->getRelationCollection()->sortBy($this->getSortableColumn());
 
-        foreach ($f->fieldGroups() as $group) {
-            $item = [
-                'id'       => $group['id'],
-                'url'      => '/admin/resource/' . $group['id'],
-                'resource' => get_class($this->relation()->getModel())
+        foreach ($collection as $item) {
+            $entries[] = $this->formattedEntry($item);
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @param $item
+     * @return array
+     */
+    private function formattedEntry($item)
+    {
+        $entry = [
+            'label'  => $this->getEntryLabel($item),
+            'fields' => [],
+            'config' => [
+                'is_deleted'   => false,
+                'is_collapsed' => $this->isCollapsed(),
+            ],
+            'id'     => $item->id,
+        ];
+        if ($this->isNestable()) {
+            $entry['fields'][] = (new Hidden('parent_id', $item))
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse(); // Add hidden ID field
+        }
+
+        $entry['fields'][] = (new Hidden('id', $item))
+            ->build(array_merge($this->getAttributes(), [$item->id]))
+            ->formattedResponse(); // Add hidden ID field
+
+        if ($this->isSortable()) {
+            $entry['fields'][] = $this->sortableField($item); // Add hidden sortable field
+        }
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $entry['fields'][] = $field->model($item)
+                ->build(array_merge($this->getAttributes(), [$item->id]))
+                ->formattedResponse();
+        }
+
+        if ($this->isNestable()) {
+            $tree = [
+                'id'       => (string)$item->id,
+                'text'     => $item->name,
+                'parent'   => $item->parent_id ? (string)$item->parent_id : '#',
+                'children' => [],
             ];
 
-            if ($this->isSortable()) {
-                $item['order'] = $group[$this->sortableColumn];
+            if (get_class($item) === config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)) {
+                $tree['data'] = [
+                    'name'           => $item->name,
+                    'url'            => $item->url,
+                    'icon'           => $item->icon,
+                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                ];
             }
 
-            foreach ($group['fields'] as $field) {
-                $item['fields'][] = $field->formattedResponse();
-            }
-
-            $items[] = $item;
+            $entry['tree'] = $tree;
         }
 
-        return [
-            'type'        => 'has-many',
-            'full_column' => true,
-            'name'        => $f->relationName,
-            'label'       => ucfirst(str_singular($f->relationName)),
-            'is_sortable' => $f->isSortable(),
-            'template'    => $f->template(),
-            'tab'         => $this->tab(),
-            'col'         => $this->col,
-            'items'       => $items,
-            'show'        => false,
-            'actions'     => $f->getActions()
-        ];
-    }
-
-    /**
-     * @param $model
-     * @param $attributeList
-     * @return Hidden
-     */
-    public function createIdField($model, $attributeList)
-    {
-        $field = new Hidden('id', $model);
-        $field->build($attributeList);
-
-        return $field;
-    }
-
-    /**
-     * @param $model
-     * @param $attributeList
-     * @return Hidden
-     */
-    public function createSortableField($model, $attributeList)
-    {
-        $field = new Hidden($this->sortableColumn, $model);
-        $field->build($attributeList);
-        $field->class('js-sortable-item');
-        $field->params([
-            'orderable' => true
-        ]);
-
-        return $field;
+        return $entry;
     }
 
     /**
@@ -298,7 +226,7 @@ class HasMany extends Field
     public function fields($closure)
     {
         $fieldSet = $this->fieldSet;
-        $fieldSet->setModel($this->model());
+        $fieldSet->model($this->getModel());
         $closure($fieldSet);
 
         return $this;
@@ -321,6 +249,50 @@ class HasMany extends Field
     public function getActions()
     {
         return $this->actions;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function collapse($value)
+    {
+        $this->isCollapsed = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCollapsed()
+    {
+        return $this->isCollapsed;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function entryLabel($value)
+    {
+        $this->entryLabel = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntryLabel(Model $model)
+    {
+        if (!is_string($this->entryLabel)) {
+            $closure = $this->entryLabel;
+
+            return $closure($model);
+        }
+
+        return $model->{$this->entryLabel} ?? 'Entry';
     }
 
 }

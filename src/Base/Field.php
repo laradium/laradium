@@ -2,77 +2,53 @@
 
 namespace Laradium\Laradium\Base;
 
-use Laradium\Laradium\Traits\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Traits\Translatable;
 
 class Field
 {
+
     use Translatable;
 
     /**
-     * @var bool
+     * @var array
      */
-    protected $isHidden = false;
+    private $attributes = [];
 
     /**
-     * @var
+     * @var array
      */
-    protected $default;
-
-    /**
-     * @var string
-     */
-    protected $ruleSet;
+    private $validationRules = [];
 
     /**
      * @var string
      */
-    protected $label;
+    private $rules;
+
+    /**
+     * @var array
+     */
+    private $replacementAttributes = [];
 
     /**
      * @var string
      */
-    protected $name;
+    private $fieldName;
 
     /**
      * @var string
      */
-    protected $nameAttribute;
-
-    /**
-     * @var string
-     */
-    protected $value;
+    private $label;
 
     /**
      * @var Model
      */
-    protected $model;
+    private $model;
 
     /**
-     * @var array
+     * @var
      */
-    protected $validationRules = [];
-
-    /**
-     * @var array
-     */
-    protected $attributeList = [];
-
-    /**
-     * @var bool
-     */
-    protected $isTemplate = false;
-
-    /**
-     * @var array
-     */
-    protected $parentAttributeList = [];
-
-    /**
-     * @var string
-     */
-    protected $tab;
+    private $value;
 
     /**
      * @var array
@@ -81,6 +57,26 @@ class Field
         'size' => 12,
         'type' => 'md'
     ];
+
+    /**
+     * @var string
+     */
+    private $tab = 'Main';
+
+    /**
+     * @var array
+     */
+    private $validationAttributes = [];
+
+    /**
+     * @var string
+     */
+    private $type;
+
+    /**
+     * @var string
+     */
+    private $info = '';
 
     /**
      * @var array
@@ -94,28 +90,93 @@ class Field
      */
     public function __construct($parameters, Model $model)
     {
-        $this->name = is_array($parameters) ? array_first($parameters) : $parameters;
+        $this->fieldName = array_first($parameters);
         $this->model = $model;
-        $this->tab = 'Main';
     }
 
     /**
-     * @return mixed
+     * @param array $attributes
+     * @return $this
      */
-    public function getValue()
+    public function build($attributes = [])
     {
-        if ($this->isTranslatable() && !$this->isTemplate) {
-            $this->value = $this->model()->translateOrNew($this->getLocale())->{$this->name()};
+        if ($attributes) {
+            $this->attributes = $attributes;
+        }
+        $currentAttributes = $this->attributes;
+        $this->attributes = array_merge($currentAttributes, [$this->getFieldName()]);
+
+        if (!$this->getRules()) {
+            return $this;
         }
 
-        return $this->value;
+        $this->registerValidationRules($currentAttributes);
+
+        return $this;
+    }
+
+    /**
+     * @param $currentAttributes
+     * @return void
+     */
+    private function registerValidationRules($currentAttributes): void
+    {
+        if ($this->isTranslatable()) {
+            $languages = $this->getLanguageList();
+
+            foreach ($languages as $language) {
+                $attributes = array_merge($currentAttributes,
+                    ['translations', $language->iso_code, $this->getFieldName()]);
+                $this->validationKey($attributes);
+
+                $this->validationRules += [$this->getValidationKey() => $this->getRules()];
+            }
+
+            return;
+        }
+
+        $this->validationRules = [$this->getValidationKey() => $this->getRules()];
+
+        return;
+    }
+
+    /**
+     * @return collection
+     */
+    private function getLanguageList()
+    {
+        if (config('laradium.validate_all_languages', false)) {
+            return translate()->languages();
+        }
+
+        return translate()->languages()->where('is_fallback', 1);
+    }
+
+    /**
+     * @return array
+     */
+    public function formattedResponse()
+    {
+        return [
+            'type'         => $this->getType(),
+            'label'        => $this->getLabel(),
+            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
+            'value'        => !$this->isTranslatable() ? $this->getValue() : null,
+            'translations' => $this->getTranslations(),
+            'config'       => [
+                'is_translatable' => $this->isTranslatable(),
+                'col'             => $this->getCol()
+            ],
+            'info'         => $this->getInfo(),
+            'attr'         => $this->getAttr()
+        ];
     }
 
     /**
      * @param $value
      * @return $this
      */
-    public function setValue($value)
+    public function value($value)
     {
         $this->value = $value;
 
@@ -125,46 +186,43 @@ class Field
     /**
      * @return string
      */
-    public function getNameAttribute()
+    public function getValue()
     {
-        $attributeList = $this->getNameAttributeList();
+        return $this->value ?? $this->model->{$this->getFieldName()};
+    }
 
-        if ($this->isTranslatable()) {
-            if (count($attributeList) === 1) {
-                $attributeList = array_merge(['translations', $this->getLocale()], $attributeList);
-            } else if (count($attributeList) > 1) {
-                $count = count($attributeList) - 1;
-                $last = $attributeList[$count];
-                unset($attributeList[$count]);
+    /**
+     * @param array $attributes
+     */
+    public function validationKey($attributes = [])
+    {
+        $this->validationAttributes = $attributes;
+    }
 
-                $attributeList = array_merge($attributeList, ['translations', $this->getLocale()], [$last]);
-            }
+    /**
+     * @return string
+     */
+    public function getValidationKey()
+    {
+        $attributes = count($this->validationAttributes) ? $this->validationAttributes : $this->getAttributes();
 
-            $this->nameAttribute = $this->buildNameAttribute($attributeList);
+        return implode('.', collect($attributes)
+            ->map(function ($item, $index) {
+                if (is_numeric($item) || is_null($item) || str_contains($item, '__ID')) {
+                    $item = '*';
+                }
 
-        }
-
-        return $this->nameAttribute;
+                return $item;
+            })->toArray());
     }
 
     /**
      * @param $value
      * @return $this
      */
-    public function setNameAttribute($value)
+    public function rules($value)
     {
-        $this->nameAttribute = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $ruleSet
-     * @return $this
-     */
-    public function rules($ruleSet)
-    {
-        $this->ruleSet = $ruleSet;
+        $this->rules = $value;
 
         return $this;
     }
@@ -172,189 +230,28 @@ class Field
     /**
      * @return string
      */
-    public function getRuleSet(): string
+    public function getRules()
     {
-        return $this->ruleSet ?? '';
+        return $this->rules;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function validationRules($value)
+    {
+        $this->validationRules = $value;
+
+        return $this;
     }
 
     /**
      * @return array
      */
-    public function getRules(): array
+    public function getValidationRules(): array
     {
         return $this->validationRules;
-    }
-
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return Model
-     */
-    public function model(): Model
-    {
-        return $this->model;
-    }
-
-    /**
-     * @param Model $model
-     * @return $this
-     */
-    public function setModel(Model $model)
-    {
-        $this->model = $model;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function view(): string
-    {
-        return $this->view;
-    }
-
-    /**
-     * @param array $list
-     * @return $this
-     */
-    public function setNameAttributeList(array $list)
-    {
-        $this->attributeList = $list;
-        $this->nameAttribute = $this->buildNameAttribute($list);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getNameAttributeList()
-    {
-        return $this->attributeList;
-    }
-
-    /**
-     * @param array $parentAttributeList
-     * @param null $model
-     * @return $this
-     */
-    public function build($parentAttributeList = [], $model = null)
-    {
-        $this->parentAttributeList = $parentAttributeList;
-        if ($model) {
-            $this->setModel($model);
-        }
-
-        $attributeList = array_merge($parentAttributeList, [$this->name()]);
-
-        $this->setNameAttributeList($attributeList);
-        $this->setNameAttribute($this->buildNameAttribute($attributeList));
-
-        $this->setValue($this->model->getAttribute($this->name()));
-
-        if ($this->isTranslatable()) {
-            foreach (translate()->languages() as $language) {
-                if (is_array($attributeList) && count($attributeList) >= 1) {
-                    $attributeList = $this->arrayInsert($attributeList, count($attributeList) - 1, [$language->iso_code, 'translations']);
-                }
-
-                if ($language->is_fallback) {
-                    $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
-                }
-            }
-        } else {
-            $this->setValidationRules($this->buildRuleSetKey($attributeList), $this->getRuleSet());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param null $field
-     * @return array
-     */
-    public function formattedResponse($field = null)
-    {
-        $field = !is_null($field) ? $field : $this;
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
-
-        $field->setNameAttributeList($attributes->toArray());
-
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
-
-        if (!$field->isTranslatable()) {
-            $data = [
-                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-                'name'                  => $field->getNameAttribute(),
-                'label'                 => $field->getLabel(),
-                'value'                 => $field->getValue(),
-                'isTranslatable'        => $field->isTranslatable(),
-                'replacementAttributes' => $attributes->toArray(),
-                'tab'                   => $this->tab(),
-                'col'                   => $this->col,
-                'attr'                  => $this->getAttr()
-            ];
-        } else {
-
-            $data = [
-                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'                 => $field->getLabel(),
-                'isTranslatable'        => $field->isTranslatable(),
-                'replacementAttributes' => $attributes->toArray(),
-                'tab'                   => $this->tab(),
-                'col'                   => $this->col,
-                'attr'                  => $this->getAttr()
-            ];
-
-            $translatedAttributes = [];
-
-            foreach (translate()->languages() as $language) {
-                $field->setLocale($language->iso_code);
-                $translatedAttributes[] = [
-                    'iso_code' => $language->iso_code,
-                    'value'    => $field->getValue(),
-                    'name'     => $field->getNameAttribute(),
-                ];
-            }
-
-            $data['translatedAttributes'] = $translatedAttributes;
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function isTemplate($value)
-    {
-        $this->isTemplate = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLabel()
-    {
-        return $this->label ?: ucfirst(str_replace('_', ' ', $this->name()));
     }
 
     /**
@@ -369,51 +266,58 @@ class Field
     }
 
     /**
-     * @param $value
-     * @return $this
-     */
-    public function hideIf($value)
-    {
-        $this->isHidden = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return $this->isHidden;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function default($value)
-    {
-        $this->default = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefault()
-    {
-        return $this->default;
-    }
-
-    /**
-     * @param $attributes
      * @return string
      */
-    public function buildNameAttribute($attributes): string
+    public function getLabel()
     {
-        return implode('', collect($attributes)->filter(function ($item) {
-            return !is_null($item);
+        return $this->label ?: ucfirst(str_replace('_', ' ', $this->getFieldName()));
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function model($value)
+    {
+        $this->model = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldName()
+    {
+        return $this->fieldName;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function fieldName($value)
+    {
+        $this->fieldName = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNameAttribute()
+    {
+        return implode('', collect($this->getAttributes())->filter(function ($item) {
+            return $item !== null;
         })->map(function ($item, $index) {
             if ($index !== 0) {
                 return '[' . $item . ']';
@@ -424,49 +328,57 @@ class Field
     }
 
     /**
-     * @param $attributes
-     * @return string
+     * @param $value
+     * @return $this
      */
-    public function buildRuleSetKey($attributes): string
+    public function attributes($value)
     {
-        return implode('.', collect($attributes)->map(function ($item, $index) {
-            if (is_null($item)) {
-                $item = '*';
-            }
+        $this->attributes = $value;
 
-            return $item;
-        })->toArray());
+        return $this;
     }
 
     /**
-     * @param $key
-     * @param $rules
-     * @return $this
+     * @return array
      */
-    public function setValidationRules($key, $rules)
+    public function getAttributes()
     {
-        $this->validationRules += [$key => $rules];
-
-        return $this;
+        return $this->attributes;
     }
 
     /**
      * @param $value
      * @return $this
      */
-    public function setTab($value)
+    public function replacementAttributes($value)
     {
-        $this->tab = $value;
+        $this->replacementAttributes = $value;
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return $this
      */
-    public function tab()
+    public function addReplacementAttribute()
     {
-        return $this->tab;
+        $attributes = array_merge($this->replacementAttributes, ['__ID__']);
+
+        $replacementAttributes = [];
+        foreach ($attributes as $index => $value) {
+            $replacementAttributes[] = '__ID' . ($index + 1) . '__';
+        }
+        $this->replacementAttributes = $replacementAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReplacementAttributes()
+    {
+        return $this->replacementAttributes;
     }
 
     /**
@@ -479,6 +391,71 @@ class Field
         $this->col = compact('size', 'type');
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCol()
+    {
+        return 'col-' . $this->col['type'] . '-' . $this->col['size'];
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function tab($value)
+    {
+        $this->tab = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTab()
+    {
+        return $this->tab;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function type($value)
+    {
+        $this->type = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type ?: strtolower(array_last(explode('\\', get_class($this))));
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function info($value)
+    {
+        $this->info = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInfo(): string
+    {
+        return $this->info;
     }
 
     /**
@@ -498,39 +475,5 @@ class Field
     public function getAttr()
     {
         return $this->htmlAttributes;
-    }
-
-    /**
-     * @param $array
-     * @param $index
-     * @param $value
-     * @return array
-     */
-    private function arrayInsert(&$array, $index, $value): array
-    {
-        $size = count($array);
-        if (!is_int($index) || $index < 0 || $index > $size) {
-            return $array;
-        }
-
-        if (count($value) === 2) {
-            foreach ($value as $val) {
-                if ($size === 1) {
-                    $array = array_prepend($array, $val);
-                } else {
-                    $temp = array_slice($array, 0, $index);
-                    $temp[] = $val;
-
-                    $array = array_merge($temp, array_slice($array, $index, $size));
-                }
-            }
-        } else {
-            $temp = array_slice($array, 0, $index);
-            $temp[] = $val;
-
-            $array = array_merge($temp, array_slice($array, $index, $size));
-        }
-
-        return $array;
     }
 }

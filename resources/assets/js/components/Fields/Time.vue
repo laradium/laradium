@@ -1,24 +1,26 @@
 <template>
     <div class="form-group">
-        <label for="">{{ input.label }}
+        <label for="">
+            {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
             <span class="badge badge-primary"
-                  v-if="input.isTranslatable">
+                  v-if="field.config.is_translatable">
                 {{ language }}
             </span>
         </label>
-        <div v-if="input.isTranslatable">
-            <timepicker :name="input.name"
+        <div v-if="field.config.is_translatable">
+            <timepicker :name="field.name"
                         v-model="item.value"
                         :key="index"
-                        v-for="(item, index) in input.translatedAttributes"
+                        v-for="(item, index) in field.translations"
                         v-show="language === item.iso_code"
                         class="form-control"
                         placeholder="Select date">
             </timepicker>
         </div>
         <div v-else>
-            <timepicker :name="input.name"
-                        :value="input.value"
+            <timepicker :name="field.name"
+                        v-model="field.value"
                         class="form-control"
                         placeholder="Select time">
             </timepicker>
@@ -28,7 +30,7 @@
 
 <script>
     export default {
-        props: ['input', 'language', 'item']
+        props: ['field', 'language']
     }
 
     Vue.component('timepicker', {
@@ -39,7 +41,7 @@
         mounted: function () {
             $(this.$el).datetimepicker({
                 format: 'H:i',
-                datepicker:false,
+                datepicker: false,
             });
         }
     });

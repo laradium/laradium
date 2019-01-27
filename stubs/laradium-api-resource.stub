@@ -1,0 +1,40 @@
+<?php
+
+namespace {{namespace}}\Laradium\Resources\Api;
+
+use Laradium\Laradium\Base\AbstractApiResource;
+use Laradium\Laradium\Base\ApiFieldSet;
+use Laradium\Laradium\Base\ApiResource;
+use Laradium\Laradium\Base\DataSet;
+use Laradium\Laradium\Base\Api;
+use {{modelNamespace}}\{{resource}};
+
+class {{resource}}ApiResource extends AbstractApiResource
+{
+
+    /**
+     * @var string
+     */
+    protected $resource = {{resource}}::class;
+
+     /**
+     * @return Api
+     */
+    public function api(): Api
+    {
+        return (new Api)->make(function (DataSet $set) {
+            $set->add('id');
+            $set->add('title');
+        });
+    }
+
+    /**
+     * @return ApiResource
+     */
+    public function resource(): ApiResource
+    {
+        return (new ApiResource)->make(function (ApiFieldSet $set) {
+            $set->text('title');
+        });
+    }
+}

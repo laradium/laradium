@@ -2,14 +2,13 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
-use Laradium\Laradium\Models\Language;
 use Laradium\Laradium\Base\AbstractResource;
-use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Base\ColumnSet;
+use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Language;
 
 Class LanguageResource extends AbstractResource
 {
-
     /**
      * @var string
      */
@@ -20,17 +19,17 @@ Class LanguageResource extends AbstractResource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event(['afterSave', 'afterDelete'], function () {
             cache()->forget('laradium::languages');
         });
 
         return laradium()->resource(function (FieldSet $set) {
-            $set->text('iso_code')->rules('required');
-            $set->text('title')->rules('required');
-            $set->text('title_localized')->rules('required');
+            $set->text('iso_code')->rules('required|min:2|max:2');
+            $set->text('title')->rules('required|min:2|max:255');
+            $set->text('title_localized')->rules('required|min:2|max:255');
             $set->boolean('is_fallback');
             $set->boolean('is_visible');
-            $set->file('icon');
+            $set->file('icon')->rules('image|max:' . config('laradium.file_size'));
         });
     }
 
@@ -43,8 +42,8 @@ Class LanguageResource extends AbstractResource
             $column->add('iso_code');
             $column->add('title');
             $column->add('title_localized');
-            $column->add('is_visible');
-            $column->add('is_fallback');
+            $column->add('is_visible')->switchable();
+            $column->add('is_fallback')->switchable();
         });
     }
 }

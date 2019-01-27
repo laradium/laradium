@@ -4,32 +4,38 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
+use Laradium\Laradium\Base\FieldSet;
 
 class BelongsToMany extends Field
 {
 
     /**
-     * @var
+     * @var string
      */
-    protected $relationModel;
+    private $relationName;
 
     /**
      * @var string
      */
-    protected $relationName;
-
-    /**
-     * @var string
-     */
-    protected $title;
+    private $title = 'name';
 
     /**
      * @var
+     */
+    private $items;
+
+    /**
+     * @var array
      */
     protected $fieldCol = [
         'size' => 2,
         'type' => 'md'
     ];
+
+    /**
+     * @var
+     */
+    protected $where;
 
     /**
      * BelongsToMany constructor.
@@ -40,57 +46,58 @@ class BelongsToMany extends Field
     {
         parent::__construct($parameters, $model);
 
-        $this->relationName = $this->name;
-
-        if (count($parameters) > 1) {
-            $this->label = array_last($parameters);
-        }
+        $this->relationName = array_first($parameters);
+        $this->fieldSet = new FieldSet;
     }
 
     /**
-     * @param null $field
-     * @return array
+     * @param array $attributes
+     * @return Field
      */
-    public function formattedResponse($field = null)
+    public function build($attributes = [])
     {
-        $field = !is_null($field) ? $field : $this;
+        parent::build($attributes);
 
-        $relatedItems = $this->relation()->get()->pluck('id')->toArray();
-        $relationModel = $this->relation()->getModel();
-        $items = new $relationModel;
+        $model = $this->getModel();
+        $relationModel = $model->{$this->relationName}()->getModel();
+        $items = $relationModel;
+
+        if ($where = $this->getWhere()) {
+            $items = $items->where($where);
+        }
+
         $items = $items->get();
 
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
+        $this->items = $items->map(function ($item) use ($model) {
+            $isChecked = false;
+            if ($pivot = $model->{$this->relationName}->where('id', $item->id)->first()) {
+                $isChecked = true;
             }
+
+            return [
+                'id'         => $item->id,
+                'name'       => $item->{$this->title},
+                'is_checked' => $isChecked,
+                'fields'     => $this->getTemplateData($pivot, $item->id)['fields']
+            ];
         });
 
-        $field->setNameAttributeList($attributes->toArray());
+        $this->validationRules($this->getTemplateData()['validation_rules']);
 
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
+        return $this;
+    }
 
-        return [
-            'type'                  => 'belongs-to-many',
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'replacementAttributes' => $attributes->toArray(),
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'fieldCol'              => $this->fieldCol,
-            'attr'                  => $this->getAttr(),
-            'items'                 => $items->map(function ($item) use ($relatedItems) {
-                return [
-                    'id'      => $item->id,
-                    'name'    => $this->title ? $item->{$this->title} : $item->name,
-                    'checked' => in_array($item->id, $relatedItems),
-                ];
-            })->toArray(),
-        ];
+    /**
+     * @return array
+     */
+    public function formattedResponse(): array
+    {
+        $data = parent::formattedResponse();
+        $data['value'] = get_class($this);
+        $data['items'] = $this->items;
+        $data['config']['field_col'] = $this->fieldCol;
+
+        return $data;
     }
 
     /**
@@ -104,13 +111,6 @@ class BelongsToMany extends Field
         return $this;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function relation(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->model()->load($this->relationName)->{$this->relationName}();
-    }
 
     /**
      * @param int $size
@@ -122,5 +122,65 @@ class BelongsToMany extends Field
         $this->fieldCol = compact('size', 'type');
 
         return $this;
+    }
+
+    /**
+     * @param $closure
+     * @return $this
+     */
+    public function fields($closure)
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->model($this->getModel());
+        $closure($fieldSet);
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function where(\Closure $closure)
+    {
+        $this->where = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWhere()
+    {
+        return $this->where;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTemplateData($model = null, $id = null)
+    {
+        $fields = [];
+        $validationRules = [];
+
+        foreach ($this->fieldSet->fields as $temporaryField) {
+            $field = clone $temporaryField;
+
+            $field->model($model)
+                ->value($model ? $model->pivot->{$field->getFieldName()} : '')
+                ->build(array_merge($this->getAttributes(), ['pivot', $id]));
+
+            if ($field->getRules()) {
+                $validationRules[$field->getValidationKey()] = $field->getRules();
+            }
+
+            $fields[] = $field->formattedResponse();
+        }
+
+        return [
+            'fields'           => $fields,
+            'validation_rules' => $validationRules
+        ];
     }
 }

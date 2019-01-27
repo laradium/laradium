@@ -16,7 +16,7 @@ class Select extends Field
      * @param array $options
      * @return $this
      */
-    public function options(array $options)
+    public function options(array $options): self
     {
         $this->options = $options;
 
@@ -26,50 +26,25 @@ class Select extends Field
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
     /**
-     * @param null $field
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse(): array
     {
-        $field = !is_null($field) ? $field : $this;
+        $data = parent::formattedResponse();
+        $data['options'] = collect($this->getOptions())->map(function ($text, $value) {
+            return [
+                'value'    => $value,
+                'text'     => $text,
+                'selected' => $this->getValue() == $value,
+            ];
+        })->toArray();
 
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
-
-        $field->setNameAttributeList($attributes->toArray());
-
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
-
-        return [
-            'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'default'               => $field->getDefault(),
-            'isHidden'              => $field->isHidden(),
-            'replacementAttributes' => $attributes->toArray(),
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'attr'                  => $this->getAttr(),
-            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
-                return [
-                    'value'    => $value,
-                    'text'     => $text,
-                    'selected' => $field->getValue() == $value,
-                ];
-            })->toArray(),
-        ];
+        return $data;
     }
 }

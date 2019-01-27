@@ -1,162 +1,188 @@
 <template>
-    <transition name="fade">
-        <div class="border" style="padding: 20px; border-radius: 5px; margin: 5px;">
-            <h4>
-                <i class="fa fa-bars"></i> {{ input.label }}s
-                <div class="pull-right">
-                    <button class="btn btn-success btn-sm" @click.prevent="toggle()">
-                        <span v-if="input.show"><i class="fa fa-eye-slash"></i> Hide</span>
-                        <span v-else><i class="fa fa-eye"></i> Show</span>
-                    </button>
-                </div>
-            </h4>
-            <div v-show="input.show">
-                <draggable class="dragArea" :list="input.items" @update="onUpdate(input.items)" :options="draggable">
-                    <div class="col-md-12" v-for="(item, index) in input.items" :key="item.id">
-                        <div class="panel" style="padding: 5px;">
-                            <div class="panel-title">
-                                <h4>
-                                    <i class="mdi mdi-arrow-all handle" v-if="input.is_sortable"></i>
-                                    <div class="pull-right" v-if="input.actions.includes('delete')">
-                                        <button class="btn btn-danger btn-sm"
-                                                @click.prevent="remove(index, item.url, item.resource)"><i
-                                                class="fa fa-trash"></i></button>
-                                    </div>
-                                </h4>
-                            </div>
-                            <div class="panel-body border" style="padding: 20px; border-radius: 2px;">
-                                <div class="row">
-                                    <div v-for="input in item.fields"
-                                         :class="input.col ? 'col-' + input.col.type + '-' + input.col.size : 'col-md-12'">
-                                        <component :is="input.type + '-field'"
-                                                   :input="input"
-                                                   :item="item"
-                                                   :replacementIds="replacementIds"
-                                                   :language="language">
-                                        </component>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <br>
+    <div class="border" style="padding: 0px 10px 10px 10px; border-radius: 2px; margin: 0px 0px 10px;">
+        <h4>
+            <i class="fa fa-bars"></i> {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
+        </h4>
+        <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
+        <draggable class="dragArea" :list="field.entries" @update="onUpdate(field.entries)" :options="draggable">
+            <div v-for="(entry, index) in field.entries">
+                <div class="col-md-12 border" style="border-radius: 2px; margin: 5px 5px 5px 0;">
+                    <h4 class="d-inline-block">
+                        <i class="mdi mdi-arrow-all handle"
+                           v-if="field.config.is_sortable && !entry.config.is_deleted"></i>
+
+                        <span v-html="entry.label"></span> <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
+                    </h4>
+
+                    <div class="pull-right" style="margin-top: 7px;">
+                        <button class="btn btn-success btn-sm" v-if="!entry.config.is_deleted"
+                                @click.prevent="toggle(index)">
+                            <span v-if="!entry.config.is_collapsed"><i class="fa fa-eye-slash"></i></span>
+                            <span v-else><i class="fa fa-eye"></i></span>
+                        </button>
+                        <button class="btn btn-primary btn-sm"
+                                @click.prevent="restore(index)"
+                                v-if="entry.config.is_deleted && field.config.actions.includes('delete')">
+                            <i class="fa fa-undo"></i> Restore
+                        </button>
+
+                        <button class="btn btn-danger btn-sm"
+                                @click.prevent="remove(entry, field.name, index)"
+                                v-if="!entry.config.is_deleted && field.config.actions.includes('delete')">
+                            <i class="fa fa-trash"></i>
+                        </button>
                     </div>
-                </draggable>
-                <button class="btn btn-primary btn-sm" type="button" @click.prevent="addItem()" v-if="input.actions.includes('create')">
-                    <i class="fa fa-plus"></i> Add {{ input.label }}
+                    <div class="row" v-show="!entry.config.is_collapsed">
+                        <div v-for="(field, index) in entry.fields" :class="field.config.col">
+                            <component
+                                    :is="field.type + '-field'"
+                                    :field="field"
+                                    :language="language"
+                                    :replacement_ids="new_replacement_ids"
+                                    :key="index"
+                            ></component>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </draggable>
+        <div class="row">
+            <div class="col-md-12">
+                <button
+                        class="btn btn-primary btn-sm"
+                        type="button"
+                        @click.prevent="addItem()"
+                        v-if="field.config.actions.includes('create')">
+
+                    <i class="fa fa-plus"></i> Add {{ field.label }}
                 </button>
-                <br><br>
             </div>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'replacementIds'],
+        props: ['field', 'language', 'replacement_ids'],
 
         data() {
             return {
                 draggable: {
                     disabled: true,
                     handle: '.handle'
-                }
+                },
+                new_replacement_ids: {},
+                removed_items: {}
             };
         },
 
         mounted() {
-            this.draggable.disabled = !this.input.is_sortable;
+            this.draggable.disabled = !this.field.config.is_sortable;
         },
 
         methods: {
             addItem() {
-                let randId = Math.random().toString(36).substring(7);
-                let template = JSON.parse(JSON.stringify(this.input.template));
-                template.id = randId;
-                template.order = this.input.items.length;
+                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
+                this.new_replacement_ids = generate_replacements.replacement_ids;
+                let template_fields = _.cloneDeep(this.field.template_data.fields);
 
-                for (let field in template.fields) {
-
-                    let repAttr = template.fields[field].replacementAttributes;
-
-
-                    let i = 1;
-                    let idProp = '';
-                    for (let ids in repAttr) {
-                        if (!this.replacementIds[repAttr[ids]]) {
-                            this.replacementIds[repAttr[ids]] = Math.random().toString(36).substring(7);
-                        }
-
-                        idProp = repAttr[ids];
-
-                        i++;
-                    }
-
-                    if (idProp) {
-                        this.replacementIds[idProp] = randId;
-                    }
-
-                    if (template.fields[field].type !== 'morph-to') {
-                        if (template.fields[field].isTranslatable) {
-                            for (let attribute in template.fields[field].translatedAttributes) {
-                                for (let id in this.replacementIds) {
-                                    template.fields[field].translatedAttributes[attribute].name = template.fields[field].translatedAttributes[attribute].name.replace(id, this.replacementIds[id]);
-                                }
-                            }
+                for (let field in template_fields) {
+                    for (let id in this.new_replacement_ids) {
+                        if (!template_fields[field].config.is_translatable) {
+                            template_fields[field].name = template_fields[field].name.replace(id, this.new_replacement_ids[id]);
                         } else {
-                            for (let id in this.replacementIds) {
-                                template.fields[field].name = template.fields[field].name.replace(id, this.replacementIds[id]);
+                            let translations = template_fields[field].translations;
+                            for (let translation in translations) {
+                                translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
                             }
                         }
-                    } else {
-                        template.fields[field].id = randId;
                     }
                 }
-                this.input.items.push(template);
+
+                this.field.entries.push({
+                    fields: template_fields,
+                    config: {
+                        is_deleted: false,
+                        is_collapsed: false
+                    },
+                    label: 'Entry'
+                });
+
             },
 
             onUpdate(items) {
                 let i = 0;
-                for (let i = 0; i < items.length; i++)
-                    items[i].order = i;
-                i++;
+                for (let item in items) {
+                    let fields = items[item].fields;
+                    for (let field in fields) {
+                        if (fields[field].label == 'Sequence no') {
+                            fields[field].value = i;
+                        }
+                    }
+                    i++;
+                }
             },
 
-            remove(item, url, resource) {
-                let id = item.id;
-
+            remove(item, field_name, index) {
                 swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this item!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this after you press 'Save'!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
                 })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            if (url) {
-                                axios({
-                                    method: 'POST',
-                                    url: url,
-                                    data: {
-                                        _method: 'delete',
-                                        id: id,
-                                        resource: resource
-                                    }
-                                });
+                    .then((result) => {
+                        if (result.value) {
+                            if (item.id !== undefined) {
+                                let item_copy = _.cloneDeep(this.field.entries[index]);
+                                this.removed_items[index] = item_copy;
+
+                                this.field.entries[index].fields = [{
+                                    type: "hidden",
+                                    label: "Id",
+                                    name: field_name + "[" + item.id + "][remove]",
+                                    value: 1,
+                                    config: {
+                                        is_translatable: false,
+                                    },
+                                    translations: []
+                                }, {
+                                    type: "hidden",
+                                    label: "Id",
+                                    name: field_name + "[" + item.id + "][id]",
+                                    value: item.id,
+                                    config: {
+                                        is_translatable: false,
+                                    },
+                                    translations: []
+                                }];
+                                if (this.field.entries[index].config.is_deleted !== undefined) {
+                                    this.field.entries[index].config.is_deleted = true;
+                                }
+                            } else {
+                                this.field.entries.splice(index, 1);
                             }
-
-                            this.input.items.splice(item, 1);
-
-                            swal("Item has been deleted!", {
-                                icon: "success",
-                            });
                         }
                     });
 
             },
 
-            toggle() {
-                this.input.show = !this.input.show;
+            restore(index) {
+                this.field.entries[index].fields = this.removed_items[index].fields;
+                if (this.field.entries[index].config.is_deleted !== undefined) {
+                    this.field.entries[index].config.is_deleted = false;
+                }
+            },
+
+            toggle(index) {
+                let config = this.field.entries[index].config;
+                if (config.is_collapsed !== undefined) {
+                    this.field.entries[index].config.is_collapsed = !config.is_collapsed;
+                }
             }
         }
     }

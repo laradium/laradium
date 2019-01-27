@@ -1,15 +1,28 @@
 <template>
     <div>
-        <div class="form-group" v-if="!input.isHidden">
+        <div class="form-group">
             <h3>
-                {{ input.label }}
+                {{ field.label }}
+                <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
             </h3>
             <div class="row">
-                <div :class="'col-' + input.fieldCol.type + '-' + input.fieldCol.size" v-for="item in input.items">
+                <input type="hidden" :value="field.value" :name="field.name + '[crud_worker]'">
+                <div :class="'col-' + field.config.field_col.type + '-' + field.config.field_col.size"
+                     v-for="item in field.items">
                     <div class="checkbox checkbox-primary">
-                        <input type="checkbox" :checked="item.checked" :id="input.name + '_' + item.id"
-                               :name="input.name + '[]'" :value="item.id">
-                        <label :for="input.name + '_' + item.id">{{ item.name }}</label>
+                        <input type="checkbox" :checked="item.is_checked" :id="field.name + '_' + item.id"
+                               :name="field.name + '[]'" :value="item.id">
+                        <label :for="field.name + '_' + item.id">{{ item.name }}</label>
+                    </div>
+                    <div v-if="item.fields" class="row">
+                        <div v-for="(pivotField, index) in item.fields" :class="pivotField.config.col">
+                            <component
+                                    :is="pivotField.type + '-field'"
+                                    :field="pivotField"
+                                    :language="language"
+                                    :key="index"
+                            ></component>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -19,6 +32,6 @@
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
+        props: ['field', 'language'],
     }
 </script>

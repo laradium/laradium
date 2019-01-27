@@ -11,17 +11,37 @@ class Tab
     /**
      * @var
      */
-    protected $closure;
+    private $fieldSet;
 
     /**
      * @var
      */
-    protected $fieldSet;
+    private $name;
 
     /**
-     * @var mixed
+     * @var
      */
-    protected $name;
+    private $closure;
+
+    /**
+     * @var bool
+     */
+    private $isTranslatable = false;
+
+    /**
+     * @var
+     */
+    private $model;
+
+    /**
+     * @var
+     */
+    private $fields;
+
+    /**
+     * @var array
+     */
+    private $validationRules = [];
 
     /**
      * Tab constructor.
@@ -30,7 +50,57 @@ class Tab
     public function __construct($name)
     {
         $this->name = array_first($name);
+        $this->fieldSet = new FieldSet;
     }
+
+    /**
+     * @return array
+     */
+    public function formattedResponse()
+    {
+        return [
+            'name'   => $this->name,
+            'slug'   => str_slug($this->name, '_'),
+            'type'   => 'tab',
+            'fields' => $this->fields,
+            'config' => [
+                'is_translatable' => $this->isTranslatable,
+                'col'             => 'col-md-12',
+            ]
+        ];
+    }
+
+    /**
+     * @return $this
+     */
+    public function build()
+    {
+        $fieldSet = $this->fieldSet;
+        $fieldSet->model($this->model);
+        $closure = $this->closure;
+        $closure($fieldSet);
+        $fields = [];
+        foreach ($fieldSet->fields() as $field) {
+            if ($field instanceof self) {
+                $field->model($this->getModel());
+            }
+
+            $field->build();
+
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
+
+            $this->validationRules = array_merge($this->validationRules, $field->getValidationRules());
+
+            $fields[] = $field->formattedResponse();
+        }
+
+        $this->fields = $fields;
+
+        return $this;
+    }
+
 
     /**
      * @param $closure
@@ -44,34 +114,37 @@ class Tab
     }
 
     /**
-     * @param FieldSet $set
+     * @return array
+     */
+    public function getValidationRules()
+    {
+        return $this->validationRules;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslatable()
+    {
+        return $this->isTranslatable;
+    }
+
+    /**
+     * @param $value
      * @return $this
      */
-    public function setFieldSet(FieldSet $set)
+    public function model($value)
     {
-        $this->fieldSet = $set;
+        $this->model = $value;
 
         return $this;
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Model
      */
-    public function build()
+    public function getModel(): Model
     {
-        $closure = $this->closure;
-        $fieldSet = $this->fieldSet;
-        $fieldSet->addTab($this->name);
-        $tabFieldSet = new FieldSet();
-        $tabFieldSet->setModel($fieldSet->model());
-        $closure($tabFieldSet);
-        $fields = $tabFieldSet->fields();
-
-        foreach ($fields as $field) {
-            $field->setTab($this->name);
-            $this->fieldSet->fields->push($field);
-        }
-
-        return $tabFieldSet->fields();
+        return $this->model;
     }
 }

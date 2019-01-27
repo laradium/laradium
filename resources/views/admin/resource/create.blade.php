@@ -1,18 +1,24 @@
-@extends('laradium::layouts.main', ['title' => 'Create ' . $name])
+@extends('laradium::layouts.main', ['title' => 'Create ' . $form->getResource()->getName()])
+
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="card-box table-responsive">
-                <div id="crud-form">
-                    <crud-form url="{{ $form->getAction('store') }}"></crud-form>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('laradium::admin._partials.breadcrumbs', [
+       'items' => $resource->getBreadcrumbs('create')
+    ])
+
+    <crud-form
+            url="{{ $form->getAction('store') . '?' . http_build_query(request()->all())  }}"></crud-form>
+    <input type="hidden" name="data" value="{{ json_encode($form->data()) }}">
+
 @endsection
 
-@section('crud-url')
-    <script>
-        let url = '{{ route('admin.' . $slug . '.form') }}';
-    </script>
-@endsection
+@push('scripts')
+    @foreach($js as $asset)
+        <script src="{{ $asset }}"></script>
+    @endforeach
+@endpush
+
+@push('styles')
+    @foreach($css as $asset)
+        <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
+    @endforeach
+@endpush

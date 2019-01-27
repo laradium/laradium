@@ -4,10 +4,8 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Base\Fields\HasMany;
-use Laradium\Laradium\Base\Fields\MorphsTo;
+use Laradium\Laradium\Base\Fields\Col;
 use Laradium\Laradium\Base\Fields\Tab;
-use Laradium\Laradium\Content\Base\Fields\WidgetConstructor;
 
 class Form
 {
@@ -55,36 +53,27 @@ class Form
     /**
      * @return $this
      */
-    public function buildForm()
+    public function build()
     {
-        $resource = $this->resource;
+        $resource = $this->getResource();
         $fields = $resource->fieldSet()->fields();
-        $this->model = $resource->model();
+        $this->model($resource->getModel());
 
         foreach ($fields as $field) {
             if ($field instanceof Tab) {
-                $tabFields = $field->setFieldSet($resource->fieldSet())->build();
-                foreach ($tabFields as $tabField) {
-                    $tabField->build();
-                    $this->setValidationRules($tabField->getRules());
-
-                    $this->fields->push($tabField);
-
-                    if ($tabField->isTranslatable()) {
-                        $this->isTranslatable = true;
-                    }
-                }
-            } else {
-                $field->build();
-                $this->setValidationRules($field->getRules());
-
-                $this->fields->push($field);
-
-                if ($field->isTranslatable()) {
-                    $this->isTranslatable = true;
-                }
+                $field->model($this->getModel());
             }
+
+            $field->build();
+            $this->setValidationRules($field->getValidationRules());
+
+            $this->fields->push($field);
+
         }
+
+//        if ($field->isTranslatable()) {
+        $this->isTranslatable = true;
+//        }
 
         return $this;
     }
@@ -92,25 +81,62 @@ class Form
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function data()
+    {
+        $languages = $this->languages();
+
+        return [
+            'state' => 'success',
+            'data'  => [
+                'languages'        => $languages,
+                'form'             => $this->response(),
+                'is_translatable'  => $this->isTranslatable(),
+                'default_language' => array_first($languages)['iso_code'],
+                'actions'          => [
+                    'index' => $this->getAction('index')
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function languages(): array
+    {
+        return translate()->languages()->map(function ($item) {
+            return [
+                'name'     => $item->title_localized,
+                'iso_code' => $item->iso_code,
+                'id'       => $item->id,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function response()
     {
         $fieldList = [];
+
         foreach ($this->fields as $field) {
-            $fieldList[] = $field->formattedResponse($field);
+            $response = $field->formattedResponse($field);
+            $fieldList[] = $response;
+            if ($field instanceof Tab && $response['config']['is_translatable']) {
+                $this->isTranslatable = true;
+            }
         }
 
         return $fieldList;
     }
 
     /**
-     * @param $value
-     * @return $this
+     * @return Resource
      */
-    public function abstractResource($value)
+    public function getResource()
     {
-        $this->abstractResource = $value;
-
-        return $this;
+        return $this->resource;
     }
 
     /**
@@ -124,7 +150,17 @@ class Form
     /**
      * @return Model
      */
-    public function model(): Model
+    public function model($value)
+    {
+        $this->model = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getModel()
     {
         return $this->model;
     }
@@ -141,10 +177,9 @@ class Form
      * @param $rules
      * @return $this
      */
-    public function setValidationRules(
-        $rules
-    ) {
-        $this->validationRules += $rules;
+    public function setValidationRules($rules)
+    {
+        $this->validationRules = array_merge($this->validationRules, $rules);
 
         return $this;
     }
@@ -163,14 +198,14 @@ class Form
      */
     public function getAction($action = 'index'): string
     {
-        $slug = $this->abstractResource->getSlug();
-        if ($action == 'create') {
+        $slug = $this->getResource()->getSlug();
+        if ($action === 'create') {
             return url('/admin/' . $slug . '/create');
-        } elseif ($action == 'create') {
-            return url('/admin/' . $slug . '/create');
-        } elseif ($action == 'store') {
+        } else if ($action === 'edit') {
+            return url('/admin/' . $slug . '/' . $this->getModel()->id . '/edit');
+        } else if ($action === 'store') {
             return url('/admin/' . $slug);
-        } elseif ($action == 'update') {
+        } else if ($action === 'update') {
             return url('/admin/' . $slug . '/' . $this->model->id);
         }
 

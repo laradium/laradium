@@ -16,7 +16,27 @@ class BelongsTo extends Field
     /**
      * @var
      */
-    protected $title;
+    protected $relation;
+
+    /**
+     * @var mixed
+     */
+    protected $relationName;
+
+    /**
+     * @var
+     */
+    protected $title = 'name';
+
+    /**
+     * @var bool
+     */
+    protected $nullable = false;
+
+    /**
+     * @var
+     */
+    protected $where;
 
     /**
      * BelongsTo constructor.
@@ -27,9 +47,24 @@ class BelongsTo extends Field
     {
         parent::__construct($parameters, $model);
 
-        $this->relationModel = new $this->name;
-        $this->label = array_last(explode('\\', $this->name));
-        $this->name = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->label)) . '_id';
+        $this->relationName = array_first($parameters);
+    }
+
+    /**
+     * @param array $attributes
+     * @return $this|Field
+     */
+    public function build($attributes = [])
+    {
+        $model = $this->getModel();
+        $this->relation = $model->{$this->relationName}();
+        $this->relationModel = $this->relation->getRelated();
+        $this->label(ucfirst($this->relation->getRelation()));
+        $this->fieldName($this->relation->getForeignKey());
+
+        parent::build($attributes);
+
+        return $this;
     }
 
     /**
@@ -37,7 +72,16 @@ class BelongsTo extends Field
      */
     public function getOptions()
     {
-        return $this->relationModel->all()->pluck(($this->title ?: 'name'), 'id')->toArray();
+        $options = $this->relationModel;
+        if ($where = $this->getWhere()) {
+            $options = $options->where($where);
+        }
+
+        if (method_exists($this->relationModel, 'translations')) {
+            return $options->get()->pluck($this->getTitle(), 'id')->toArray();
+        }
+
+        return $options->pluck($this->getTitle(), 'id')->toArray();
     }
 
     /**
@@ -52,44 +96,56 @@ class BelongsTo extends Field
     }
 
     /**
-     * @param null $field
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return $this
+     */
+    public function nullable()
+    {
+        $this->nullable = true;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse(): array
     {
-        $field = !is_null($field) ? $field : $this;
+        $data = parent::formattedResponse();
+        $data['options'] = collect($this->getOptions())->map(function ($text, $value) {
+            return [
+                'value'    => $value,
+                'text'     => $text,
+                'selected' => $this->getValue() == $value,
+            ];
+        })->toArray();
 
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
+        return $data;
+    }
 
-        $field->setNameAttributeList($attributes->toArray());
+    /**
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function where(\Closure $closure)
+    {
+        $this->where = $closure;
 
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
+        return $this;
+    }
 
-        return [
-            'type'                  => 'select',
-            'name'                  => $field->getNameAttribute(),
-            'label'                 => $field->getLabel(),
-            'replacementAttributes' => $attributes->toArray(),
-            'isHidden'              => $field->isHidden(),
-            'default'               => $field->getDefault(),
-            'tab'                   => $this->tab(),
-            'col'                   => $this->col,
-            'attr'                  => $this->getAttr(),
-            'options'               => collect($field->getOptions())->map(function ($text, $value) use ($field) {
-                return [
-                    'value'    => $value,
-                    'text'     => $text,
-                    'selected' => $field->getValue() == $value,
-                ];
-            })->toArray(),
-        ];
+    /**
+     * @return mixed
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 }

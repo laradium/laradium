@@ -3,13 +3,18 @@
 return [
     'default_models_directory' => 'App\\Models',
 
+    'custom_field_directory' => app_path('Laradium/Fields'),
+
+    'custom_field_namespace' => 'App\\Laradium\\Fields',
+
     'resource_path' => 'App\\Laradium\\Resources',
 
-    'file_size' => '2024', // default max file upload size 2mb
+    'file_size' => '2048', // default max file upload size 2mb
 
     'translations_file' => 'translations',
 
     'user'      => [
+
         'email'    => 'admin@laradium.com',
         'password' => 'laradium2018'
     ],
@@ -32,6 +37,8 @@ return [
         ],
     ],
 
+    'validate_all_languages' => false,
+
     'dashboard-view' => 'laradium::admin.dashboard',
 
     'menus' => [
@@ -45,6 +52,9 @@ return [
 //            ],
         ]
     ],
+
+    'menu_class' => \Laradium\Laradium\Models\Menu::class,
+    'menu_item_class' => \Laradium\Laradium\Models\MenuItem::class,
 
     'disable_menus' => [
         //\Laradium\Laradium\Base\Resources\LanguageResource::class,

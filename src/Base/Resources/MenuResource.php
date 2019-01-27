@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
+use Laradium\Laradium\Base\Laradium;
 use Laradium\Laradium\Models\Menu;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\FieldSet;
@@ -20,26 +21,35 @@ Class MenuResource extends AbstractResource
      */
     public function resource()
     {
-        $this->registerEvent('afterSave', function () {
+        $this->event('afterSave', function () {
             cache()->forget(Menu::$cacheKey);
         });
 
-        return laradium()->resource(function (FieldSet $set) {
-            $set->boolean('is_active');
-            $set->text('key')->rules('required');
-            $set->text('name')->rules('required')->translatable();
-            $set->tab('Items')->fields(function (FieldSet $set) {
-                $set->hasMany('items')->fields(function (FieldSet $set) {
-                    $set->boolean('is_active');
+        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($r) {
+            return [$r => (new $r)->getBaseResource()->getName()];
+        })->toArray();
+        $resources = array_merge(['' => '- Select -'], $resources);
+
+        return laradium()->resource(function (FieldSet $set) use ($resources) {
+
+            $set->tab('Items')->fields(function (FieldSet $set) use ($resources) {
+                $set->tree('items')->fields(function (FieldSet $set) use ($resources) {
+                    $set->select2('icon')->options(getFontAwesomeIcons());
+                    $set->text('name')->rules('max:255')->translatable()->col(6);
+                    $set->text('url')->rules('max:255')->translatable()->col(6);
                     $set->select('target')->options([
                         '_self'  => 'Self',
                         '_blank' => 'Blank',
-                    ])->rules('required');
-                    $set->text('name')->rules('required')->translatable();
-                    $set->text('url')->rules('required')->translatable();
-                })->sortable('sequence_no');
+                    ])->rules('required')->col(6);
+                    $set->select('resource')->options($resources)->col(6);
+                })->sortable();
             });
 
+            $set->tab('Main')->fields(function (FieldSet $set) use ($resources) {
+                $set->boolean('is_active');
+                $set->text('key')->rules('required|max:255');
+                $set->text('name')->rules('required|max:255')->translatable();
+            });
             // TODO needs possibility to add attributes
         });
     }
@@ -51,9 +61,7 @@ Class MenuResource extends AbstractResource
     {
         return laradium()->table(function (ColumnSet $column) {
             $column->add('key');
-            $column->add('is_active')->modify(function ($item) {
-                return $item->is_active ? 'Yes' : 'No';
-            });
+            $column->add('is_active')->switchable();
             $column->add('name')->translatable();
         })->relations(['translations']);
     }

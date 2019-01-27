@@ -2,18 +2,23 @@
 
 namespace Laradium\Laradium\Providers;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
+use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
 
+    /**
+     * @return void
+     */
     public function boot()
     {
         $this->registerPaperClipConfig();
@@ -28,12 +33,16 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadMigrations();
         $this->loadViews();
         $this->loadRoutes();
+        $this->registerViewComposers();
 
-        // Global helpers
+        // Global helpers, icons
         require_once __DIR__ . '/../Helpers/Global.php';
+        require_once __DIR__ . '/../Helpers/Icons.php';
 
         // Mail config
         $this->setMailConfig();
+
+        $this->setTranslatableConfig();
     }
 
     /**
@@ -42,6 +51,7 @@ class LaradiumServiceProvider extends ServiceProvider
     private function registerProviders()
     {
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
+        $this->app->register(\Baum\Providers\BaumServiceProvider::class);
         $this->app->register(LaradiumTranslationServiceProvider::class);
     }
 
@@ -84,6 +94,7 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
         $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
+        $customFields = config('laradium.custom_field_directory', app_path('Laradium/Fields'));
 
         $fieldList = [];
         if (file_exists($fieldPath)) {
@@ -102,6 +113,15 @@ class LaradiumServiceProvider extends ServiceProvider
                     $fieldList[lcfirst($baseName)] = $field;
                 }
             }
+
+            if (file_exists($customFields)) {
+                foreach (\File::allFiles($customFields) as $path) {
+                    $field = $path->getPathname();
+                    $baseName = basename($field, '.php');
+                    $field = config('laradium.custom_field_namespace') . '\\' . $baseName;
+                    $fieldList[lcfirst($baseName)] = $field;
+                }
+            }
         }
 
         return $fieldList;
@@ -116,6 +136,10 @@ class LaradiumServiceProvider extends ServiceProvider
 
         foreach ($laradium->resources() as $resource) {
             $laradium->register($resource);
+        }
+
+        foreach ($laradium->apiResources() as $apiResource) {
+            $laradium->registerApi($apiResource);
         }
     }
 
@@ -140,6 +164,21 @@ class LaradiumServiceProvider extends ServiceProvider
     }
 
     /**
+     * Set translatable config
+     *
+     * @return void
+     */
+    private function setTranslatableConfig()
+    {
+        try {
+            config([
+                'translatable.locales' => translate()->languages()->pluck('iso_code')->toArray()
+            ]);
+        } catch (\Exception $e) {
+        }
+    }
+
+    /**
      * @return void
      */
     private function registerBindings()
@@ -157,6 +196,10 @@ class LaradiumServiceProvider extends ServiceProvider
         Blade::directive('lg', function ($expression) {
             return "<?php echo lg($expression); ?>";
         });
+
+        Blade::directive('svg', function ($expression) {
+            return '<?php echo (file_exists(' . $expression . ') ? \File::get(' . $expression . ') : ""); ?>';
+        });
     }
 
     /**
@@ -168,6 +211,8 @@ class LaradiumServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
             __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
             __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
+            __DIR__ . '/../../config/javascript.php'       => config_path('javascript.php'),
+            __DIR__ . '/../../config/translatable.php'     => config_path('translatable.php'),
         ], 'laradium');
     }
 
@@ -187,8 +232,9 @@ class LaradiumServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeLaradiumResource::class,
+                MakeLaradiumApiResource::class,
                 ImportTranslations::class,
-                FindTranslations::class,
+                FindTranslations::class
             ]);
         }
     }
@@ -224,6 +270,21 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
+            __DIR__ . '/../../public/images' => public_path('images'),
         ], 'laradium');
+
+        $this->publishes([
+            __DIR__ . '/../../public/laradium' => public_path('laradium'),
+        ], 'laradium-assets');
+    }
+
+    /**
+     * @return void
+     */
+    private function registerViewComposers()
+    {
+        View::composer(
+            'laradium::layouts.main', 'Laradium\Laradium\ViewComposers\VariableComposer'
+        );
     }
 }

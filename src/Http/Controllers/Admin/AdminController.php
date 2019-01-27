@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Http\Controllers\Admin;
 
+use Czim\Paperclip\Attachment\Attachment;
 use Illuminate\Http\Request;
 
 class AdminController
@@ -39,5 +40,28 @@ class AdminController
         return [
             'state' => 'success'
         ];
+    }
+
+    /**
+     * @param Request $request
+     * @param $model
+     * @param $id
+     * @param $file
+     * @param null $locale
+     * @return array
+     */
+    public function destroyFile(Request $request, $model, $id, $file, $locale = null)
+    {
+        $model = $model::findOrFail($id);
+        $model->{$file} = Attachment::NULL_ATTACHMENT;
+        $model->save();
+
+        if ($request->ajax()) {
+            return [
+                'state' => 'success'
+            ];
+        }
+
+        return back()->withSuccess('Resource file successfully deleted!');
     }
 }

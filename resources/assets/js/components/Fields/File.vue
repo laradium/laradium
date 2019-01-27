@@ -1,35 +1,81 @@
 <template>
     <div class="form-group">
-        <label for="">{{ input.label }}
+        <label for="">
+            {{ field.label }}
+            <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>
             <span class="badge badge-primary"
-                  v-if="input.isTranslatable">
+                  v-if="field.config.is_translatable">
                 {{ language }}
             </span>
         </label>
         <br>
-        <div v-if="input.isTranslatable">
-            <a v-for="item in input.translatedAttributes" :href="item.url" v-if="item.url" v-show="language === item.iso_code" target="_blank">
-                {{ item.file_name }} ({{ item.file_size }} kb)
-            </a>
-            <input type="file" :name="item.name" class="form-control" v-for="item in input.translatedAttributes"
-                   v-show="language === item.iso_code" v-bind="attributes">
+        <div v-if="field.config.is_translatable">
+            <div v-for="item in field.translations" v-show="language === item.iso_code" v-if="item.file.url">
+                <a :href="item.file.url" target="_blank">
+                    {{ item.file.file_name }} ({{ item.file.file_size }} kb)
+                </a>
+                <button class="btn btn-danger btn-sm"
+                        @click.prevent="deleteFile(item, item.file.deleteUrl)">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+            <input type="file" :name="item.name" class="form-control" v-for="item in field.translations"
+                   v-show="language === item.iso_code" v-bind="fieldAttributes">
         </div>
         <div v-else>
-            <a :href="input.url" v-if="input.url" target="_blank">
-                {{ input.file_name }} ({{ input.file_size }} kb)
-            </a>
-            <input type="file" :name="input.name" class="form-control" v-bind="attributes">
+            <div v-if="field.file.url">
+                <a :href="field.file.url" target="_blank">
+                    {{ field.file.file_name }} ({{ field.file.file_size }} kb)
+                </a>
+                <button class="btn btn-danger btn-sm"
+                        @click.prevent="deleteFile(field, field.file.deleteUrl)">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+
+            <input type="file" :name="field.name" class="form-control" v-bind="fieldAttributes">
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['input', 'language', 'item'],
+        props: ['field', 'language'],
 
-        computed: {
-            attributes() {
-                return this.input.attr;
+        methods: {
+            deleteFile(field, url) {
+                swal({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                })
+                    .then((result) => {
+                        if (result.value) {
+                            axios({
+                                method: 'DELETE',
+                                url: url
+                            }).then(res => {
+                                field.file.url = null;
+
+                                swal({
+									type: 'success',
+									title: 'File has been deleted!',
+								});
+                            }).catch(res => {
+                                let error = document.createElement('div');
+                                error.innerHTML = 'Something went wrong! <br> If issue persists, please, contact technical staff.';
+                                swal({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    content: error
+                                })
+                            });
+                        }
+                    });
             }
         }
     }

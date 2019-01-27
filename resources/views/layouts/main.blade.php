@@ -7,9 +7,12 @@
 
     <title>{{ config('app.name') }} {{ isset($title) ? '- ' . $title :'' }}</title>
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
-          integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    @if(setting()->get('design.admin_theme_favicon'))
+        <link rel="shortcut icon" href="{{ setting()->get('design.admin_theme_favicon') }}">
+    @endif
+
+<!-- Styles -->
+    <link href="{{ asset('/laradium/admin/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
@@ -17,8 +20,7 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <link href="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css') }}"
-          rel="stylesheet">
+    <link href="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('/laradium/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/laradium/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
@@ -40,11 +42,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         .user-box ul li a:hover {
@@ -52,16 +54,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
         }
 
         a:hover {
@@ -73,6 +75,8 @@
         }
 
     </style>
+
+    @include('laradium::admin._partials.variables')
 </head>
 <body>
 <!-- Begin page -->
@@ -107,65 +111,60 @@
                     </li>
                 </ul>
 
-                @if(isset($table) && $table->hasAction('create'))
-                    <nav class="navbar-custom">
+                @if(isset($resource))
+                    <nav class="navbar-custom d-flex align-items-center justify-content-center margin-elements">
+                        @if($resource->hasAction('create') && laradium()->hasPermissionTo(auth()->user(), $resource, 'create'))
+                            <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create"
+                               class="btn btn-primary btn-sm">
+                                <i class="fa fa-plus"></i> Create
+                            </a>
+                        @endif
 
-                        <ul class="list-unstyled topbar-right-menu float-right mb-0">
-
-                            <li>
-                                <a href="/admin/{{ $resource->getSlug() }}/create"
-                                   class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus"></i> Create
-                                </a>
-                            </li>
-
-                        </ul>
+                        @include('laradium::admin.resource._partials.import_export')
                     </nav>
                 @endif
             </div><!-- end container -->
         </div><!-- end navbar -->
     </div>
     <!-- Top Bar End -->
+    <div id="crud-form">
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="left side-menu">
+            <div class="sidebar-inner slimscrollleft">
 
-    <!-- ========== Left Sidebar Start ========== -->
-    <div class="left side-menu">
-        <div class="sidebar-inner slimscrollleft">
-
-            <!-- User -->
-            <div class="user-box">
-                <h5>{{ auth()->user()->name }}</h5>
-                <ul class="list-inline">
+                <!-- User -->
+                <div class="user-box">
                     <form id="logout-form" action="/admin/logout" method="POST"
                           style="display: none;">{{ csrf_field() }}</form>
-                    <li class="list-inline-item">
+                    <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}
                         <a href="javascript:;"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                            class="text-custom"
                         >
                             <i class="mdi mdi-power"></i>
                         </a>
-                    </li>
-                </ul>
+                    </h5>
+                </div>
+                <!-- End User -->
+
+                @include('laradium::admin._partials.menu')
             </div>
-            <!-- End User -->
-
-            @include('laradium::admin._partials.menu')
         </div>
-    </div>
-    <!-- Left Sidebar End -->
+        <!-- Left Sidebar End -->
 
-    <!-- ============================================================== -->
-    <!-- Start right Content here -->
-    <!-- ============================================================== -->
-    <div class="content-page">
-        <!-- Start content -->
-        <div class="content">
-            <div class="container-fluid" id="app">
-                @yield('content')
-            </div> <!-- container -->
-        </div> <!-- content -->
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container-fluid">
+                    @yield('content')
+                </div> <!-- container -->
+            </div> <!-- content -->
 
-        <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
+            <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
+        </div>
     </div>
     <!-- ============================================================== -->
     <!-- End Right content here -->
@@ -174,12 +173,16 @@
 </div>
 <!-- END wrapper -->
 @yield('crud-url')
+<script src="{{ versionedAsset('laradium/assets/js/manifest.js') }}"></script>
+<script src="{{ versionedAsset('laradium/assets/js/vendor.js') }}"></script>
+
+@isset($jsBeforeSource)
+    @foreach($jsBeforeSource as $asset)
+        <script src="{{ $asset }}"></script>
+    @endforeach
+@endisset
+
 <script src="{{ versionedAsset('laradium/assets/js/laradium.js') }}"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"
-        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
-        crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
 
 <script src="{{ asset('/laradium/admin/assets/js/detect.js') }}"></script>
@@ -190,20 +193,11 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/plugins/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
+<script src="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.js') }}"></script>
 
 <!-- App js -->
 <script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.app.js') }}"></script>
-
-<!-- Laradium js -->
-<script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-</script>
 
 @stack('scripts')
 

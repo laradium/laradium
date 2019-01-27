@@ -26,36 +26,6 @@ class CreateMenuItemTranslationsTable extends Migration
 
             $table->timestamps();
         });
-
-        $menus = [];
-        $laradium = app(\Laradium\Laradium\Base\Laradium::class);
-
-        foreach ($laradium->resources() as $resource) {
-            $laradium->register($resource);
-        }
-
-        if ($laradium->all()) {
-            foreach ($laradium->all() as $resource) {
-                if (in_array($resource, config('laradium.disable_menus', []))) {
-                    continue;
-                }
-
-                $resource = new $resource;
-                $menus['Admin menu'][] = [
-                    'is_active'    => 1,
-                    'translations' => [
-                        'name' => $resource->getName(),
-                        'url'  => '/admin/' . $resource->getSlug(),
-                    ]
-                ];
-            }
-        }
-
-        menu()->seed($menus);
-
-        if ($menus = config('laradium.menus', [])) {
-            menu()->seed($menus);
-        }
     }
 
     /**

@@ -20,7 +20,6 @@ class FieldRegistry
         $this->fields = new Collection;
     }
 
-
     /**
      * @param $name
      * @param $class

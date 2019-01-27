@@ -8,85 +8,85 @@ class File extends Field
 {
 
     /**
-     * @param null $field
      * @return array
      */
-    public function formattedResponse($field = null)
+    public function formattedResponse(): array
     {
-        $field = !is_null($field) ? $field : $this;
+        $data = parent::formattedResponse();
+        $model = $this->getModel();
 
-        $attributes = collect($field->getNameAttributeList())->map(function ($item, $index) {
-            if ($item === '__ID__') {
-                return '__ID' . ($index + 1) . '__';
-            } else {
-                return $item;
-            }
-        });
+        $data['worker'] = (new Hidden('crud_worker', $this->getModel()))
+            ->build([$this->getNameAttribute()])
+            ->value(get_class($this))
+            ->formattedResponse();
 
-        $field->setNameAttributeList($attributes->toArray());
-
-        $attributes = $attributes->filter(function ($item) {
-            return str_contains($item, '__ID');
-        });
-
-        $url = null;
-        $size = null;
-        $name = null;
-
-        if (!$field->isTranslatable()) {
-            if ($this->model->{$this->name} && $this->model->{$this->name}->exists()) {
-                $url = $this->model->{$this->name}->url();
-                $size = number_format($this->model->{$this->name}->size() / 1000, 2);
-                $name = $this->model->{$this->name}->originalFilename();
+        if (!$this->isTranslatable()) {
+            if ($model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
+                $url = $model->{$this->getFieldName()}->url();
+                $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
+                $name = $model->{$this->getFieldName()}->originalFilename();
+                $deleteUrl = route('admin.resource.destroy-file', [
+                    get_class($model), $model->id, $this->getFieldName()
+                ]);
             }
 
-            $data = [
-                'type'                  => 'file',
-                'name'                  => $field->getNameAttribute(),
-                'label'                 => $field->getLabel(),
-                'isTranslatable'        => $field->isTranslatable(),
-                'replacementAttributes' => $attributes->toArray(),
-                'tab'                   => $this->tab(),
-                'col'                   => $this->col,
-                'attr'                  => $this->getAttr(),
-                'url'                   => $url,
-                'file_name'             => $name,
-                'file_size'             => $size,
+            $data['file'] = [
+                'url'       => $url ?? null,
+                'file_name' => $name ?? null,
+                'file_size' => $size ?? null,
+                'deleteUrl' => $deleteUrl ?? null
             ];
-        } else {
-            $data = [
-                'type'                  => strtolower(array_last(explode('\\', get_class($field)))),
-                'label'                 => $field->getLabel(),
-                'isTranslatable'        => $field->isTranslatable(),
-                'replacementAttributes' => $attributes->toArray(),
-                'tab'                   => $this->tab(),
-                'col'                   => $this->col,
-                'attr'                  => $this->getAttr(),
-            ];
-            $translatedAttributes = [];
-
-            foreach (translate()->languages() as $language) {
-                $field->setLocale($language->iso_code);
-                $model = $field->model()->translations->where('locale', $language->iso_code)->first();
-                if ($model && $model->{$this->name} && $model->{$this->name}->exists()) {
-                    $url = $model->{$this->name}->url();
-                    $size = number_format($model->{$this->name}->size() / 1000, 2);
-                    $name = $model->{$this->name}->originalFilename();
-                }
-
-                $translatedAttributes[] = [
-                    'iso_code'  => $language->iso_code,
-                    'value'     => $field->getValue(),
-                    'name'      => $field->getNameAttribute(),
-                    'url'       => $url,
-                    'file_name' => $name,
-                    'file_size' => $size,
-                ];
-            }
-
-            $data['translatedAttributes'] = $translatedAttributes;
         }
 
         return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslations(): array
+    {
+        $translations = [];
+        $model = $this->getModel();
+
+        if ($this->isTranslatable()) {
+            $attributes = $this->getAttributes();
+            unset($attributes[count($attributes) - 1]);
+            foreach (translate()->languages() as $language) {
+                $isoCode = $language->iso_code;
+                $this->build(array_merge($attributes, ['translations', $isoCode]));
+                $model = $this->getModel()->translateOrNew($isoCode);
+
+                $url = null;
+                $size = null;
+                $name = null;
+                $deleteUrl = null;
+
+                if ($model && $model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
+                    $url = $model->{$this->getFieldName()}->url();
+                    $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
+                    $name = $model->{$this->getFieldName()}->originalFilename();
+                    $deleteUrl = route('admin.resource.destroy-file', [
+                        get_class($model), $model->id, $this->getFieldName(), $language->iso_code
+                    ]);
+                }
+
+                $translations[] = [
+                    'iso_code' => $isoCode,
+                    'value'    => $this->getValue(),
+                    'name'     => $this->getNameAttribute(),
+                    'file'     => [
+                        'url'       => $url,
+                        'file_name' => $name,
+                        'file_size' => $size,
+                        'deleteUrl' => $deleteUrl
+                    ]
+                ];
+            }
+
+            $this->model($model);
+        }
+
+        return $translations;
     }
 }
