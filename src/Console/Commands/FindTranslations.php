@@ -122,7 +122,7 @@ class FindTranslations extends Command
             $this->call('translations:import');
         }
 
-        cache()->forget('translations');
+        translate()->import()->flushCache($global = true);
     }
 
     /**
