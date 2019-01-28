@@ -274,6 +274,7 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
+            __DIR__ . '/../../public/images' => public_path('images'),
         ], 'laradium');
 
         $this->publishes([

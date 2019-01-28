@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base;
 
-use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
@@ -63,6 +62,11 @@ abstract class AbstractResource
      * @var array
      */
     protected $views = [];
+
+    /**
+     * @var array
+     */
+    protected $customRoutes = [];
 
     /**
      * @var
@@ -399,6 +403,14 @@ abstract class AbstractResource
         }
 
         return $this->views[$name];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomRoutes()
+    {
+        return $this->customRoutes;
     }
 
     /**

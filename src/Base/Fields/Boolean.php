@@ -53,6 +53,12 @@ class Boolean extends Field
         $data['checked'] = $this->getValue() == 1;
         $data['fields'] = $this->templateData['fields'];
 
+        if (isset($data['translations'])) {
+            foreach ($data['translations'] as $key => $translation) {
+                $data['translations'][$key]['checked'] = $translation['value'] == 1;
+            }
+        }
+
         return $data;
     }
 

@@ -31,16 +31,18 @@ Class MenuResource extends AbstractResource
         $resources = array_merge(['' => '- Select -'], $resources);
 
         return laradium()->resource(function (FieldSet $set) use ($resources) {
+
             $set->tab('Items')->fields(function (FieldSet $set) use ($resources) {
-                $set->hasMany('items')->fields(function (FieldSet $set) use ($resources) {
+                $set->tree('items')->fields(function (FieldSet $set) use ($resources) {
+                    $set->select2('icon')->options(getFontAwesomeIcons());
+                    $set->text('name')->rules('max:255')->translatable()->col(6);
+                    $set->text('url')->rules('max:255')->translatable()->col(6);
                     $set->select('target')->options([
                         '_self'  => 'Self',
                         '_blank' => 'Blank',
-                    ])->rules('required');
-                    $set->text('name')->rules('required|max:255')->translatable();
-                    $set->text('url')->rules('max:255')->translatable();
-                    $set->select('resource')->options($resources);
-                })->sortable('sequence_no')->label('Items')->nestable();
+                    ])->rules('required')->col(6);
+                    $set->select('resource')->options($resources)->col(6);
+                })->sortable();
             });
 
             $set->tab('Main')->fields(function (FieldSet $set) use ($resources) {

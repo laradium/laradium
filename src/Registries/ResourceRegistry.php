@@ -58,6 +58,19 @@ class ResourceRegistry
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
 
+        // Add custom routes
+        foreach ($resource->getCustomRoutes() as $name => $route) {
+            $route = [
+                'method'     => $route['method'],
+                'name'       => $route['name'] ?? $name,
+                'route_slug' => $this->getRouteName(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
+                'controller' => $this->getRouteController($name),
+                'middleware' => $route['middleware'] ?? ['web', 'laradium'],
+            ];
+
+            $this->registerRoute($route);
+        }
+
         $routeList = [
             [
                 'method'     => 'get',
@@ -69,7 +82,8 @@ class ResourceRegistry
                 'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable/{locale?}'),
                 'controller' => $this->getRouteController('editable'),
-                'middleware' => ['web', 'laradium']
+                'middleware' => ['web', 'laradium'],
+                'name'       => 'admin.' . $routeSlug . '.editable'
             ],
             [
                 'method'     => 'post',
@@ -121,21 +135,7 @@ class ResourceRegistry
                 continue;
             }
 
-            if (isset($route['name'])) {
-                $this->router->{$route['method']}($route['route_slug'],
-                    $route['controller'])->middleware($route['middleware'])->name($route['name']);
-            } else {
-                $this->router->name('admin.')->group(function () use ($route) {
-                    if ($route['method'] === 'resource') {
-                        $this->router->{$route['method']}($route['route_slug'],
-                            $route['controller'])->middleware($route['middleware'])->only($route['only']);
-                    } else {
-                        $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
-                        $this->router->name($name)->{$route['method']}($route['route_slug'],
-                            $route['controller'])->middleware($route['middleware']);
-                    }
-                });
-            }
+            $this->registerRoute($route);
         }
 
         return $this;
@@ -166,5 +166,27 @@ class ResourceRegistry
     protected function getRouteController($method = null)
     {
         return '\\' . $this->namespace . ($method ? '@' . $method : '');
+    }
+
+    /**
+     * @param $route
+     */
+    protected function registerRoute($route)
+    {
+        if (isset($route['name'])) {
+            $this->router->{$route['method']}($route['route_slug'],
+                $route['controller'])->middleware($route['middleware'])->name($route['name']);
+        } else {
+            $this->router->name('admin.')->group(function () use ($route) {
+                if ($route['method'] === 'resource') {
+                    $this->router->{$route['method']}($route['route_slug'],
+                        $route['controller'])->middleware($route['middleware'])->only($route['only']);
+                } else {
+                    $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
+                    $this->router->name($name)->{$route['method']}($route['route_slug'],
+                        $route['controller'])->middleware($route['middleware']);
+                }
+            });
+        }
     }
 }

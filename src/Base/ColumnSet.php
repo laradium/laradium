@@ -36,6 +36,7 @@ class ColumnSet
             'column'         => $column,
             'column_parsed'  => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
             'name'           => $name ?? $column,
+            'title'          => null,
             'relation'       => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
             'editable'       => false,
             'translatable'   => false,
@@ -72,7 +73,7 @@ class ColumnSet
     public function translatable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['translatable'] = true;
             }
 
@@ -88,7 +89,7 @@ class ColumnSet
     public function notSortable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['not_sortable'] = true;
             }
 
@@ -147,6 +148,23 @@ class ColumnSet
                 };
 
                 $item['switchable'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param $title
+     * @return $this
+     */
+    public function title($title)
+    {
+        $this->list = $this->list->map(function ($item) use ($title) {
+            if ($this->column === $item['column']) {
+                $item['title'] = $title;
             }
 
             return $item;

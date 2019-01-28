@@ -285,6 +285,27 @@ $set->text('field')->rules('required|min:1|max:255');
 $set->text('field')->translatable();
 ```
 
+## Custom routes
+
+```
+/**
+ * @var array
+ */
+protected $customRoutes = [
+    'markAsPaid' => [
+        'method'     => 'GET',
+        'params'     => '{id}',
+        'middleware' => ['web'],
+        'name'       => 'admin.resource.mark-as-paid'
+    ],
+];
+
+public function markAsPaid($id)
+{
+    //
+}
+```
+
 # Table
 
 Available fields for columns
@@ -305,6 +326,11 @@ $column->add('is_active', 'Is Visible?')
     ->modify(function ($item) {
         return $item->is_active ? 'Yes' : 'No';
     });
+```
+
+## Title
+```
+$column->add('column_name_in_table')->title('Nice column name');
 ```
 
 ## Translatable
