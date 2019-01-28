@@ -200,6 +200,17 @@ class Table
     {
         $config = collect([]);
 
+        if ($this->isSortable()) {
+            $config->push([
+                'data'       => $this->sortableColumn,
+                'name'       => $this->sortableColumn,
+                'searchable' => false,
+                'orderable'  => true,
+                'width'      => '2%',
+                'class'      => 'text-center'
+            ]);
+        }
+
         foreach ($this->columns() as $column) {
             $config->push([
                 'data'       => $column['column'],

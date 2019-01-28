@@ -68,7 +68,7 @@
     <!-- Responsive examples -->
     <script src="/laradium/admin/assets/plugins/datatables/dataTables.responsive.min.js"></script>
     <script src="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/rowreorder/1.2.0/js/dataTables.rowReorder.min.js"></script>
+    <script src="/laradium/admin/assets/plugins/datatables/dataTables.rowReorder.min.js"></script>
     <script>
         $(function () {
             function switchUpdate() {
@@ -131,6 +131,9 @@
             var dataTable = $('.resource-datatable').DataTable({
                     processing: true,
                     serverSide: true,
+                    rowReorder: {
+                        update: false
+                    },
                     ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
                     columns: {!! $table->getColumnConfig()->toJson() !!},
                     order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
@@ -162,13 +165,10 @@
                 }
 
                 $.ajax({
-                    url: '/admin/{{ $resource->getSlug() }}/data-table/reorder',
+                    url: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table/reorder',
                     type: 'POST',
                     data: JSON.stringify(orderData),
-                    dataType: 'json',
-                    success: function (json) {
-                        dataTable.ajax.reload();
-                    }
+                    dataType: 'json'
                 });
             });
             @endif
@@ -237,10 +237,7 @@
     <!-- Responsive datatable examples -->
     <link href="/laradium/admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet"
           type="text/css"/>
-    <<<<<<< HEAD
-    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.0/css/rowReorder.dataTables.min.css">
-    =======
-    >>>>>>> master
+    <link rel="stylesheet" href="/laradium/admin/assets/plugins/datatables/rowReorder.dataTables.min.css">
     @foreach($table->getCss() as $asset)
         <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
     @endforeach

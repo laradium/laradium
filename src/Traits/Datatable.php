@@ -107,8 +107,8 @@ trait Datatable
                 'modify'         => function () {
                     return '<i class="fa fa-arrows"></i>';
                 },
-                'not_sortable'   => false,
-                'not_searchable' => false,
+                'not_sortable'   => true,
+                'not_searchable' => true,
             ]);
         }
 
@@ -125,7 +125,7 @@ trait Datatable
 
         // Translatable columns
         foreach ($columns->where('translatable', true)->where('editable', false) as $column) {
-            $dataTable->addColumn($column['column_parsed'], function ($item) use ($column) {
+            $dataTable->editColumn($column['column_parsed'], function ($item) use ($column) {
                 return view('laradium::admin.resource._partials.translation', compact('item', 'column'))->render();
             });
 
@@ -134,7 +134,7 @@ trait Datatable
 
         // Editable & translatable columns
         foreach ($columns->where('translatable', true)->where('editable', true) as $column) {
-            $dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
+            $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                 return view('laradium::admin.resource._partials.translation_editable',
                     compact('item', 'column', 'slug'))->render();
             });
@@ -270,13 +270,18 @@ trait Datatable
                 $id = $key['id'];
                 $position = $key['position'];
                 $model = $this->model->find($id);
-                $model->{$this->table()->getSortableColumn()} = $position;
-                $model->save();
+
+                if ($model) {
+                    $model->{$this->table()->getSortableColumn()} = $position;
+                    $model->save();
+                }
             }
+
             return response()->json([
                 'success' => true
             ]);
         }
+
         return response()->json([
             'success' => false
         ]);
