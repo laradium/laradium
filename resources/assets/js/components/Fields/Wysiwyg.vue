@@ -42,7 +42,7 @@
         data() {
             return {
                 config: {
-                    removeformatPasted: true,
+                    removeformatPasted: false,
                     btnsDef: {
                         image: {
                             dropdown: ['insertImage', this.field.config.upload_url ? 'upload' : ''],
@@ -62,7 +62,7 @@
                         ['horizontalRule'],
                         ['table'],
                         ['formatting'],
-                        ['undo', 'redo'],
+                        ['historyUndo', 'historyRedo'],
                         ['removeformat'],
                         ['viewHTML'],
                         ['fullscreen']

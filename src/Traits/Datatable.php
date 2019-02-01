@@ -200,28 +200,31 @@ trait Datatable
                     if ($table->getTabs()) {
                         $tab = array_keys($table->getTabs())[0]; // Only will work for one level tabs
 
-                        $query->where($tab, request()->input($tab))
-                            ->where(function ($query) use ($columns, $searchTerm) {
-                                foreach ($columns as $i => $column) {
-                                    if ($column['not_searchable']) {
-                                        continue;
-                                    }
+                        if (request()->input($tab) !== 'all') {
+                            $query->where($tab, request()->input($tab));
+                        }
 
-                                    if ($column['translatable']) {
-                                        if ($i === 0) {
-                                            $query->whereTranslationLike($column['column'], '%' . $searchTerm . '%');
-                                        } else {
-                                            $query->orWhereTranslationLike($column['column'], '%' . $searchTerm . '%');
-                                        }
+                        $query->where(function ($query) use ($columns, $searchTerm) {
+                            foreach ($columns as $i => $column) {
+                                if ($column['not_searchable']) {
+                                    continue;
+                                }
+
+                                if ($column['translatable']) {
+                                    if ($i === 0) {
+                                        $query->whereTranslationLike($column['column'], '%' . $searchTerm . '%');
                                     } else {
-                                        if ($i === 0) {
-                                            $query->where($column['column'], 'LIKE', '%' . $searchTerm . '%');
-                                        } else {
-                                            $query->orWhere($column['column'], 'LIKE', '%' . $searchTerm . '%');
-                                        }
+                                        $query->orWhereTranslationLike($column['column'], '%' . $searchTerm . '%');
+                                    }
+                                } else {
+                                    if ($i === 0) {
+                                        $query->where($column['column'], 'LIKE', '%' . $searchTerm . '%');
+                                    } else {
+                                        $query->orWhere($column['column'], 'LIKE', '%' . $searchTerm . '%');
                                     }
                                 }
-                            });
+                            }
+                        });
                     } else {
                         foreach ($columns as $i => $column) {
                             if ($column['not_searchable']) {

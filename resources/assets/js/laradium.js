@@ -73,10 +73,12 @@ import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
 import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
 
 require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
+require('./trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste');
 import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
 import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
 import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
 import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
+import 'trumbowyg/dist/plugins/history/trumbowyg.history.min';
 
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
