@@ -289,4 +289,29 @@ trait Datatable
             'success' => false
         ]);
     }
+
+    /**
+     * @param $row
+     * @param string $action
+     * @return void
+     */
+    public function syncOrder($row, $action = 'create')
+    {
+        $table = $this->table();
+        $model = $this->getModel();
+        $column = $table->getSortableColumn();
+
+        if ($action === 'create') {
+            $max = $model::max($column);
+            $max++;
+            $row->update([
+                $column => $max
+            ]);
+        }
+
+        if ($action === 'delete') {
+            $model::where('id', '>', $row->id)
+                ->decrement($column);
+        }
+    }
 }

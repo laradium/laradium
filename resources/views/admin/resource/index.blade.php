@@ -71,6 +71,8 @@
     <script src="/laradium/admin/assets/plugins/datatables/dataTables.rowReorder.min.js"></script>
     <script>
         $(function () {
+            var dataTable;
+
             function switchUpdate() {
                 var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
 
@@ -96,9 +98,13 @@
                         return;
                     }
 
-                    var dataTable = $(selector).DataTable({
+                    dataTable = $(selector).DataTable({
                         processing: true,
                         serverSide: true,
+                        rowReorder: {
+                            update: false,
+                            dataSrc: '{{ $table->getSortableColumn() }}'
+                        },
                         ajax: $(selector).data('url'),
                         columns: {!! $table->getColumnConfig()->toJson() !!},
                         order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
@@ -115,6 +121,27 @@
                         $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip()
 
                         switchUpdate();
+                    }).on('row-reorder', function (e, diff, edit) {
+                                @if ($table->isSortable())
+                        var orderData = [];
+
+                        for (var i = 0, ien = diff.length; i < ien; i++) {
+                            var rowData = dataTable.row(diff[i].node).data();
+                            orderData.push({
+                                id: rowData.id,
+                                position: (diff[i].newPosition + 1) * (dataTable.page.info().page + 1)
+                            });
+                        }
+
+                        $.ajax({
+                            url: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table/reorder',
+                            type: 'POST',
+                            data: JSON.stringify(orderData),
+                            dataType: 'json'
+                        });
+
+                        toastr.success('Order successfully changed');
+                        @endif
                     });
                 };
 
@@ -127,33 +154,32 @@
                 var activeTab = $('.nav-tabs li.active:first');
                 onTabChange(activeTab);
             });
-                    @else
-            var dataTable = $('.resource-datatable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    rowReorder: {
-                        update: false
-                    },
-                    ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
-                    columns: {!! $table->getColumnConfig()->toJson() !!},
-                    order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
-                }).on('draw.dt', function () {
-                    $('.js-editable').editable({
-                        error: function (response, newValue) {
-                            if (response.status !== 422) {
-                                return 'Something went wrong, please, try again later.';
-                            }
-
-                            return response.responseJSON.message;
+            @else
+                dataTable = $('.resource-datatable').DataTable({
+                processing: true,
+                serverSide: true,
+                rowReorder: {
+                    update: false,
+                    dataSrc: '{{ $table->getSortableColumn() }}'
+                },
+                ajax: '/admin/{{ $resource->getBaseResource()->getSlug() }}/data-table',
+                columns: {!! $table->getColumnConfig()->toJson() !!},
+                order: [{!! isset($table->getOrderBy()['key']) ? '['.$table->getOrderBy()['key'].', "'.$table->getOrderBy()['direction'].'"]' : '' !!}]
+            }).on('draw.dt', function () {
+                $('.js-editable').editable({
+                    error: function (response, newValue) {
+                        if (response.status !== 422) {
+                            return 'Something went wrong, please, try again later.';
                         }
-                    });
-                    $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
 
-                    switchUpdate();
+                        return response.responseJSON.message;
+                    }
                 });
+                $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
 
-            @if ($table->isSortable())
-            dataTable.on('row-reorder', function (e, diff, edit) {
+                switchUpdate();
+            }).on('row-reorder', function (e, diff, edit) {
+                        @if ($table->isSortable())
                 var orderData = [];
 
                 for (var i = 0, ien = diff.length; i < ien; i++) {
@@ -170,8 +196,10 @@
                     data: JSON.stringify(orderData),
                     dataType: 'json'
                 });
+
+                toastr.success('Order successfully changed');
+                @endif
             });
-            @endif
             @endif
 
             $(document).on('click', '.js-delete-resource', function (e) {

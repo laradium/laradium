@@ -128,6 +128,10 @@ abstract class AbstractResource
 
         $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
+        if ($this->table()->isSortable()) {
+            $this->syncOrder($model);
+        }
+
         if ($request->ajax()) {
             return [
                 'success'  => 'Resource successfully created',
@@ -213,6 +217,10 @@ abstract class AbstractResource
         $model->delete();
 
         $this->fireEvent('afterDelete', $request);
+
+        if ($this->table()->isSortable()) {
+            $this->syncOrder($model, 'delete');
+        }
 
         if ($request->ajax()) {
             return [

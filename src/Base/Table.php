@@ -367,11 +367,20 @@ class Table
     public function sortable($value = null)
     {
         $this->sortable = true;
+
         if ($value) {
             $this->sortableColumn = $value;
         }
+
+        $this->orderBy = [
+            'key'       => 0,
+            'column'    => $this->getSortableColumn(),
+            'direction' => 'asc'
+        ];
+
         return $this;
     }
+
     /**
      * @return bool
      */
@@ -379,6 +388,7 @@ class Table
     {
         return $this->sortable;
     }
+
     /**
      * @return string
      */
