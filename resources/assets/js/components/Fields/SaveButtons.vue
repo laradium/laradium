@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div :class="{'col-md-9': data.config.locale_selector, 'col-md-12': !data.config.locale_selector}">
-            <button class="btn btn-primary" :disabled="form.isSubmitted">
+            <button class="btn btn-primary mb-1" :disabled="form.isSubmitted">
                 <span v-if="form.isSubmitted">
                     <i class="fa fa-cog fa-spin fa-fw"></i> Saving...
                 </span>
@@ -10,7 +10,7 @@
                 </span>
             </button>
 
-            <button class="btn btn-primary" @click.stop.prevent="form.onSubmit(form, form.data.actions.index)"
+            <button class="btn btn-primary mb-1" @click.stop.prevent="form.onSubmit(form, form.data.actions.index)"
                     :disabled="form.isSubmitted" v-if="!form.isSubmitted">
                 Save & Return
             </button>
