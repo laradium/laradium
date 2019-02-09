@@ -1,78 +1,26 @@
 <?php
 
-namespace Laradium\Laradium\Traits;
+namespace Laradium\Laradium\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Laradium\Laradium\Base\Form;
+use Laradium\Laradium\Base\Table;
 use Yajra\DataTables\Facades\DataTables;
 
-trait Datatable
+class DatatableController
 {
 
     /**
-     * @param Request $request
+     * @param Table $table
      * @return array
      */
-    public function editable(Request $request, $locale = null)
+    public function index(Table $table)
     {
-        $model = $this->model;
-        $resource = $this->resource();
-        $form = (new Form(
-            $this
-                ->getBaseResource($model)
-                ->make($resource->closure())
-                ->build())
-        )->build();
-
-        $this->fireEvent('beforeSave', $request);
-
-        $validationRules = $form->getValidationRules();
-        $validationRules = array_only($validationRules, $request->get('name'));
-        $validationRules['value'] = $validationRules[$request->get('name')] ?? '';
-        $request->validate($validationRules);
-
-        $model = $model->where('id', $request->get('pk'))->first();
-
-        if (!$model) {
-            return [
-                'state' => 'error'
-            ];
-        }
-
-        if ($locale && in_array($locale, translate()->languages()->pluck('iso_code')->toArray())) {
-            $translation = $model->translations()->where('locale', $locale)->firstOrCreate([
-                'locale' => $locale
-            ]);
-
-            if ($translation) {
-                $translation->update([$request->get('name') => $request->get('value')]);
-            }
-        }
-
-        if (!$locale) {
-            $model->update([$request->get('name') => $request->get('value')]);
-        }
-
-        $this->fireEvent('afterSave', $request);
-
-        return [
-            'state' => 'success'
-        ];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function dataTable()
-    {
-        $resource = $this;
-        $table = $this->table();
-        $slug = $this->getBaseResource()->getSlug();
+        $slug = $table->getSlug();
+        $resource = $table->getResource();
 
         if (count($table->getRelations())) {
-            $model = $this->model->with($table->getRelations())->select('*');
+            $model = $table->getModel()->with($table->getRelations())->select('*');
         } else {
-            $model = $this->model->select('*');
+            $model = $table->getModel()->select('*');
         }
 
         if ($table->getTabs()) {
@@ -84,7 +32,7 @@ trait Datatable
             }
         }
 
-        if ($where = $this->resource()->getWhere()) {
+        if ($resource && $where = $resource->getBaseResource()->getWhere()) {
             $model = $model->where($where);
         }
 
@@ -102,7 +50,7 @@ trait Datatable
         $editableColumns = $columns->where('editable', true)->where('translatable', false);
         foreach ($editableColumns as $column) {
             $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
-                return view('laradium::admin.resource._partials.editable', compact('item', 'column', 'slug'))->render();
+                return view('laradium::admin.table._partials.editable', compact('item', 'column', 'slug'))->render();
             });
 
             $editableColumnNames[] = $column['column_parsed'];
@@ -117,7 +65,7 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        // Editable & translatable columns
+//         Editable & translatable columns
         foreach ($columns->where('translatable', true)->where('editable', true) as $column) {
             $dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                 return view('laradium::admin.resource._partials.translation_editable',
@@ -129,11 +77,11 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        // Modified columns
+//         Modified columns
         foreach ($columns->where('modify', '!=', null) as $column) {
             $dataTable->editColumn($column['column_parsed'], $column['modify']);
 
-            // If column is modified AND has editable flag, we need to re-apply it
+//             If column is modified AND has editable flag, we need to re-apply it
             if (in_array($column['column_parsed'], $editableColumnNames)) {
                 $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                     $value = $column['modify']($item);
@@ -157,7 +105,7 @@ trait Datatable
                             compact('item', 'column', 'slug'))->render();
                     }
 
-                    return view('laradium::admin.resource._partials.editable',
+                    return view('laradium::admin.table._partials.editable',
                         compact('item', 'column', 'slug'))->render();
                 });
             }
@@ -165,9 +113,11 @@ trait Datatable
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-        $dataTable->addColumn('action', function ($item) use ($resource, $slug) {
-            return view('laradium::admin.resource._partials.action', compact('item', 'resource', 'slug'))->render();
-        });
+        if ($resource) {
+            $dataTable->addColumn('action', function ($item) use ($resource, $slug) {
+                return view('laradium::admin.table._partials.action', compact('item', 'resource', 'slug'))->render();
+            });
+        }
 
         if ($editableColumns->count()) {
             $rawColumns = array_merge($rawColumns, $editableColumns->pluck('column')->toArray());

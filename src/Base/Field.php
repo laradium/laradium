@@ -84,6 +84,10 @@ class Field
     protected $htmlAttributes = [];
 
     /**
+     * @var null|\Closure
+     */
+    private $modifiedValue;
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -153,22 +157,39 @@ class Field
     }
 
     /**
+     * @param $closure
+     * @return $this
+     */
+    public function modifyValue($closure)
+    {
+        $this->modifiedValue = $closure;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function formattedResponse()
     {
+        $closure = $this->modifiedValue;
+        if ($closure && $this->getModel()->exists) {
+            $value = $closure($this->getModel());
+        } else {
+            $value = !$this->isTranslatable() ? $this->getValue() : null;
+        }
+
         return [
-            'type'         => $this->getType(),
-            'label'        => $this->getLabel(),
-            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
-            'value'        => !$this->isTranslatable() ? $this->getValue() : null,
+            'type' => $this->getType(),
+            'label' => $this->getLabel(),
+            'name' => !$this->isTranslatable() ? $this->getNameAttribute() : null,
+            'value' => $value,
             'translations' => $this->getTranslations(),
-            'config'       => [
+            'config' => [
                 'is_translatable' => $this->isTranslatable(),
-                'col'             => $this->getCol()
+                'col' => $this->getCol(),
             ],
-            'info'         => $this->getInfo(),
-            'attr'         => $this->getAttr()
+            'info' => $this->getInfo()
         ];
     }
 

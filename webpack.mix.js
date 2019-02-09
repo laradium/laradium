@@ -35,6 +35,8 @@ mix.webpackConfig(webpack => {
         },
     };
 })
+mix.js('resources/assets/js/misc/datatable/table.js', 'public/laradium/assets/js/misc/datatable/table.js')
+;
 
 mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
 	.extract(['jquery', 'bootstrap', 'vue', 'jquery-datetimepicker'])
