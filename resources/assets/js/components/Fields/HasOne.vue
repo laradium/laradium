@@ -7,18 +7,23 @@
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
         <div v-for="(entry, index) in field.entries">
             <div class="col-md-12 border" style="padding: 10px; border-radius: 2px; margin: 5px;">
-                <h4>
-                    <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
-                    <div class="pull-right" v-if="entry.config.is_deleted">
-                        <button class="btn btn-primary btn-sm"
-                                @click.prevent="restore(index)"><i class="fa fa-undo"></i> Restore</button>
-                    </div>
-                    <div class="pull-right" v-if="!entry.config.is_deleted">
-                        <button class="btn btn-danger btn-sm"
-                                @click.prevent="remove(entry, field.name, index)">
-                            <i class="fa fa-trash"></i></button>
-                    </div>
+                <h4 class="d-inline-block">
+                    <span>Entry</span> <span v-if="entry.config.is_deleted"><i>Deleted</i></span>
                 </h4>
+
+                <div class="pull-right" style="margin-top: 7px;">
+                    <button class="btn btn-primary btn-sm"
+                            @click.prevent="restore(index)"
+                            v-if="entry.config.is_deleted && field.config.actions.includes('delete')">
+                        <i class="fa fa-undo"></i> Restore
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            @click.prevent="remove(entry, field.name, index)"
+                            v-if="!entry.config.is_deleted && field.config.actions.includes('delete')">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
                 <div class="row">
                     <div v-for="(field, index) in entry.fields" :class="field.config.col">
                         <component
@@ -87,19 +92,6 @@
                 });
             },
 
-            onUpdate(items) {
-                let i = 0;
-                for (let item in items) {
-                    let fields = items[item].fields;
-                    for (let field in fields) {
-                        if (fields[field].label === 'Sequence no') {
-                            fields[field].value = i;
-                        }
-                    }
-                    i++;
-                }
-            },
-
             remove(item, field_name, index) {
                 swal({
                     title: 'Are you sure?',
@@ -110,7 +102,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes'
                 })
-                    .then(function (result) {
+                    .then((result) => {
                         if (result.value) {
                             if (item.id !== undefined) {
                                 this.removed_items[index] = _.cloneDeep(this.field.entries[index]);
@@ -142,7 +134,6 @@
                             }
                         }
                     });
-
             },
 
             restore(index) {

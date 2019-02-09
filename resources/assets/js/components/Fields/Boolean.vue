@@ -2,8 +2,9 @@
     <div>
         <div class="form-group">
             <br>
-            <template v-if="field.config.is_translatable" v-for="item in field.translations">
+            <template v-if="field.config.is_translatable">
                 <div v-show="language === item.iso_code"
+                     v-for="item in field.translations"
                      class="checkbox checkbox-primary">
                     <input type="hidden" value="0" :name="item.name">
                     <input type="checkbox" value="1" v-model="item.checked" :name="item.name" :id="item.name"

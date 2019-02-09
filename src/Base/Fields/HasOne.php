@@ -32,6 +32,11 @@ class HasOne extends Field
     private $templateData = [];
 
     /**
+     * @var
+     */
+    private $actions = ['create', 'delete'];
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -69,6 +74,7 @@ class HasOne extends Field
 
         $data['entries'] = $this->getEntries();
         $data['template_data'] = $this->templateData;
+        $data['config']['actions'] = $this->getActions();
 
         return $data;
     }
@@ -111,7 +117,9 @@ class HasOne extends Field
     {
         $entries = [];
 
-        foreach ($this->getRelationCollection() as $item) {
+        $item = $this->getRelationCollection();
+
+        if ($item) {
             $entry = [
                 'fields' => [],
                 'config' => [
@@ -135,7 +143,6 @@ class HasOne extends Field
             $entries[] = $entry;
         }
 
-
         return $entries;
     }
 
@@ -150,6 +157,25 @@ class HasOne extends Field
         $closure($fieldSet);
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function actions($value)
+    {
+        $this->actions = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
 }

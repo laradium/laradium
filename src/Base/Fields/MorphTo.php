@@ -122,6 +122,7 @@ class MorphTo extends Field
 
         foreach ($this->fieldSet->fields() as $temporaryField) {
             $field = clone $temporaryField;
+
             if ($this->getModel()->exists) {
                 $field->model($this->getModel())
                     ->build(array_merge($this->getAttributes(), [$this->getModel()->id]));
@@ -130,13 +131,15 @@ class MorphTo extends Field
                     ->replacementAttributes($this->getReplacementAttributes())
                     ->build(array_merge($this->getAttributes(), $lastReplacementAttribute));
             }
-            if ($field->getRules()) {
-                $validationRules[$field->getValidationKey()] = $field->getRules();
+
+            if ($field->getValidationRules()) {
+                $validationRules[] = $field->getValidationRules();
             }
+
             $fields[] = $field->formattedResponse();
         }
 
-        $this->validationRules($validationRules);
+        $this->validationRules(array_collapse($validationRules));
 
         return $fields;
     }
