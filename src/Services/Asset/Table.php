@@ -72,7 +72,7 @@ class Table
     public function config(\Laradium\Laradium\Base\Table $table): string
     {
         return view('laradium::admin.table._partials.config', [
-            'table' => $table
+            'config' => $table->getTableConfig(),
         ])->render();
     }
 }

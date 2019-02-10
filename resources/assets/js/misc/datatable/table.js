@@ -1,5 +1,5 @@
-const deleteFn = require('./delete');
-const switchFn = require('./switch');
+import changeActiveStateWithSwitch from './switch'
+import deleteItemFromDataTable from './delete'
 
 for (let index in datatables) {
     let config = datatables[index];
@@ -52,7 +52,7 @@ for (let index in datatables) {
     }
 
     // Alert for delete button
-    deleteFn.deleteItemFromDataTable(dataTable);
+    deleteItemFromDataTable(dataTable);
     // Automatically update switch states in backend
-    switchFn.changeActiveStateWithSwitch(dataTable);
+    changeActiveStateWithSwitch(dataTable);
 }

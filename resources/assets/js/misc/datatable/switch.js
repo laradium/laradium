@@ -1,4 +1,4 @@
-exports.changeActiveStateWithSwitch = () => {
+export default () => {
     $(document).on('change', '.js-switch', function () {
         let id = $(this).data('id');
         let column = $(this).attr('name');

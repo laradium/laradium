@@ -120,6 +120,28 @@ class Table
     }
 
     /**
+     * @return string
+     */
+    public function getTableConfig(): string
+    {
+        $config = [
+            'id' => $this->getResourceId(),
+            'columns' => $this->getColumnConfig(),
+            'order' => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : [],
+            'slug' => $this->getSlug(),
+            'has_tabs' => false,
+            'selector' => '.' . $this->getResourceId(),
+        ];
+
+        if ($this->getTabs()) {
+            $config['selector'] = '.tab-pane.active .' . $this->getResourceId();
+            $config['has_tabs'] = true;
+        }
+
+        return json_encode($config);
+    }
+
+    /**
      * @return mixed
      */
     public function data()
