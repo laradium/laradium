@@ -14,29 +14,12 @@ class RouteRegistry
     private $router;
 
     /**
-     * @var array
-     */
-    private $predefinedRoutes = [
-        [
-            'method' => 'get',
-            'route_slug' => '/admin/datatable',
-            'controller' => '\Laradium\Laradium\Base\Table@test',
-//            'controller' => '\Laradium\Laradium\Http\Controllers\Admin\DatatableController@index',
-            'middleware' => ['web', 'laradium'],
-        ]
-    ];
-
-    /**
      * RouteRegistry constructor.
      * @param Router $router
      */
     public function __construct(Router $router)
     {
         $this->router = $router;
-
-        foreach($this->predefinedRoutes as $route) {
-            $this->register($route);
-        }
     }
 
     /**
