@@ -1,5 +1,4 @@
-@extends('laradium::layouts.main', ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
-
+@extends($layout->get(), ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
 @section('content')
     @include('laradium::admin._partials.breadcrumbs', [
         'items' => $resource->getBreadcrumbs('index')
@@ -23,14 +22,14 @@
 @endsection
 
 @push('scripts')
-    {!! $assetManager->table()->js()->base() !!}
+    {!! $layout->assetManager()->table()->js()->base() !!}
 
     {!! $table->config() !!}
 
-    {!! $assetManager->table()->scripts() !!}
+    {!! $layout->assetManager()->table()->scripts() !!}
 
 @endpush
 
 @push('styles')
-    {!! $assetManager->table()->css()->base() !!}
+    {!! $layout->assetManager()->table()->css()->base() !!}
 @endpush

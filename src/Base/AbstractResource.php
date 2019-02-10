@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Services\Asset\AssetManager;
+use Laradium\Laradium\Services\Layout;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
@@ -35,6 +36,11 @@ abstract class AbstractResource
      * @var string
      */
     protected $slug;
+
+    /**
+     * @var bool
+     */
+    protected $isShared = false;
 
     /**
      * @var array
@@ -70,9 +76,14 @@ abstract class AbstractResource
     private $baseResource;
 
     /**
-     * @var AssetManager
+     * @var array
      */
-    private $assetManager;
+    private $middleware = [];
+
+    /**
+     * @var Layout
+     */
+    protected $layout;
 
     /**
      * AbstractResource constructor.
@@ -82,9 +93,9 @@ abstract class AbstractResource
         if (class_exists($this->resource)) {
             $this->model(new $this->resource);
         }
+        $this->layout = new Layout;
 
         $this->events = collect([]);
-        $this->assetManager = app(AssetManager::class);
     }
 
     /**
@@ -92,10 +103,10 @@ abstract class AbstractResource
      */
     public function index()
     {
-        return view($this->getView('index'), [
-            'assetManager' => $this->assetManager,
+        return view($this->layout->getView('index'), [
             'table' => $this->table()->resource($this)->model($this->getModel()),
-            'resource' => $this
+            'resource' => $this,
+            'layout' => $this->layout
         ]);
     }
 
@@ -232,7 +243,6 @@ abstract class AbstractResource
     }
 
 
-
     /**
      * @return array
      */
@@ -290,7 +300,7 @@ abstract class AbstractResource
                 ->getBaseResource($this->getModel())
                 ->make($this->resource()->closure())
                 ->build())
-        )->build();
+        )->abstractResource($this)->build();
 
         return $form;
     }
@@ -428,6 +438,26 @@ abstract class AbstractResource
     public function resourceName()
     {
         return $this->resource;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShared()
+    {
+        return $this->isShared;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResourceMiddleware()
+    {
+        if ($this->isShared()) {
+            return array_merge(['web'], $this->middleware);
+        }
+
+        return array_merge(['web', 'laradium'], $this->middleware);
     }
 
     /**

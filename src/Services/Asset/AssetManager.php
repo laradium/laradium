@@ -6,12 +6,16 @@ use Illuminate\Support\Collection;
 
 class AssetManager
 {
-
     /**
-     * @return string
+     * @return Table
      */
     public function table()
     {
         return new Table();
+    }
+
+    public function core()
+    {
+
     }
 }

@@ -257,11 +257,16 @@ class Table
      */
     public function getSlug()
     {
-        if ($this->getResource()) {
-            return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
+        if (!$this->getResource()) {
+            return $this->slug;
         }
 
-        return $this->slug;
+        if ($this->getResource()->isShared()) {
+            return '/' . $this->getResource()->getBaseResource()->getSlug();
+
+        }
+
+        return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
     }
 
     /**

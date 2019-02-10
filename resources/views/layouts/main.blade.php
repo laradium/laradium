@@ -15,12 +15,7 @@
     <link href="{{ asset('/laradium/admin/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
-          rel="stylesheet"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-    <link href="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('/laradium/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/laradium/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
@@ -37,16 +32,15 @@
 
         /*
         theme styles
-
         @TODO: šo varētu uz atsevišķu view iznest ko pieprasot caur linku atgrieztu atpakaļ kā css
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
         }
 
         .user-box ul li a:hover {
@@ -54,16 +48,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}        !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
         }
 
         a:hover {
@@ -193,11 +187,6 @@
 <script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
 <script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/plugins/toastr/toastr.min.js') }}"></script>
-
-<!-- App js -->
-<script src="{{ asset('/laradium/admin/assets/js/jquery.core.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/jquery.app.js') }}"></script>
 
 @stack('scripts')
 

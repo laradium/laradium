@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'template_layout' => 'laradium::layouts.main',
+
     'default_models_directory' => 'App\\Models',
 
     'custom_field_directory' => app_path('Laradium/Fields'),
