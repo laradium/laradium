@@ -12,17 +12,12 @@
     @endif
 
 <!-- Styles -->
-    <link href="{{ asset('/laradium/admin/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    {!! $layout->assetManager()->css()->bundle([
+        asset('/laradium/admin/assets/css/icons.css'),
+        asset('/laradium/admin/assets/css/style.css')
+    ]) !!}
 
-    <link href="{{ asset('/laradium/admin/assets/css/icons.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('/laradium/admin/assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
-
-    <script src="{{ asset('/laradium/admin/assets/js/modernizr.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ versionedAsset('laradium/assets/css/laradium.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 
     <style>
@@ -70,7 +65,6 @@
 
     </style>
 
-    @include('laradium::admin._partials.variables')
 </head>
 <body>
 <!-- Begin page -->
@@ -167,26 +161,14 @@
 </div>
 <!-- END wrapper -->
 @yield('crud-url')
-<script src="{{ versionedAsset('laradium/assets/js/manifest.js') }}"></script>
-<script src="{{ versionedAsset('laradium/assets/js/vendor.js') }}"></script>
+
+{!! $layout->assetManager()->js()->bundle() !!}
 
 @isset($jsBeforeSource)
     @foreach($jsBeforeSource as $asset)
         <script src="{{ $asset }}"></script>
     @endforeach
 @endisset
-
-<script src="{{ versionedAsset('laradium/assets/js/laradium.js') }}"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-
-<script src="{{ asset('/laradium/admin/assets/js/detect.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/fastclick.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/jquery.blockUI.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/waves.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/jquery.nicescroll.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/jquery.slimscroll.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/js/jquery.scrollTo.min.js') }}"></script>
-<script src="{{ asset('/laradium/admin/assets/plugins/switchery/switchery.min.js') }}"></script>
 
 @stack('scripts')
 

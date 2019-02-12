@@ -25,6 +25,7 @@
     "vue-template-compiler": "^2.5.22"
   },
   "dependencies": {
+    "font-awesome": "^4.7.0",
     "jquery-datetimepicker": "^2.5.20",
     "jquery-resizable-dom": "^0.32.0",
     "jquery-ui": "^1.12.1",

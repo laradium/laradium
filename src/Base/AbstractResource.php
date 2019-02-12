@@ -115,14 +115,14 @@ abstract class AbstractResource
      */
     public function create()
     {
-        $form = $this->getForm();
-        $resource = $this;
-
-        $js = $this->resource()->getJs();
-        $jsBeforeSource = $this->resource()->getJsBeforeSource();
-        $css = $this->resource()->getCss();
-
-        return view($this->getView('create'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
+        return view($this->getView('create'), [
+            'form' => $this->getForm(),
+            'resource' => $this,
+            'js' => $this->resource()->getJs(),
+            'css' => $this->resource()->getCss(),
+            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
+            'layout' => $this->layout
+        ]);
     }
 
     /**
@@ -169,14 +169,15 @@ abstract class AbstractResource
         }
 
         $this->model($model->findOrFail($id));
-        $form = $this->getForm();
-        $resource = $this;
 
-        $js = $this->resource()->getJs();
-        $jsBeforeSource = $this->resource()->getJsBeforeSource();
-        $css = $this->resource()->getCss();
-
-        return view($this->getView('edit'), compact('form', 'resource', 'js', 'css', 'jsBeforeSource'));
+        return view($this->getView('edit'), [
+            'form' => $this->getForm(),
+            'resource' => $this,
+            'js' => $this->resource()->getJs(),
+            'css' => $this->resource()->getCss(),
+            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
+            'layout' => $this->layout
+        ]);
     }
 
     /**
