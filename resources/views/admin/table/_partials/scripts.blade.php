@@ -1,0 +1,1 @@
+<script src="{{ versionedAsset('laradium/assets/js/misc/datatable/table.js') }}"></script>

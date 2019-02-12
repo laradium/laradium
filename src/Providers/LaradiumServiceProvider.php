@@ -12,6 +12,7 @@ use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
+use Laradium\Laradium\Registries\RouteRegistry;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
@@ -62,6 +63,10 @@ class LaradiumServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind(RouteRegistry::class, function ($app) {
+            return new RouteRegistry($app->make(\Illuminate\Routing\Router::class));
+        });
+
         $this->app->singleton(FieldRegistry::class, function () {
             $registry = new FieldRegistry();
 

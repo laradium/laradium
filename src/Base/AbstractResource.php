@@ -6,14 +6,15 @@ use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\PassThroughs\Resource\Import;
+use Laradium\Laradium\Services\Asset\AssetManager;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
-use Laradium\Laradium\Traits\Datatable;
+use Laradium\Laradium\Traits\Editable;
 
 abstract class AbstractResource
 {
 
-    use Crud, CrudEvent, Datatable;
+    use Crud, CrudEvent, Editable;
 
     /**
      * @var
@@ -48,9 +49,9 @@ abstract class AbstractResource
      * @var array
      */
     protected $defaultViews = [
-        'index'  => 'laradium::admin.resource.index',
+        'index' => 'laradium::admin.resource.index',
         'create' => 'laradium::admin.resource.create',
-        'edit'   => 'laradium::admin.resource.edit'
+        'edit' => 'laradium::admin.resource.edit'
     ];
 
     /**
@@ -69,6 +70,11 @@ abstract class AbstractResource
     private $baseResource;
 
     /**
+     * @var AssetManager
+     */
+    private $assetManager;
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -78,6 +84,7 @@ abstract class AbstractResource
         }
 
         $this->events = collect([]);
+        $this->assetManager = app(AssetManager::class);
     }
 
     /**
@@ -85,10 +92,11 @@ abstract class AbstractResource
      */
     public function index()
     {
-        $table = $this->table()->setModel($this->getModel());
-        $resource = $this;
-
-        return view($this->getView('index'), compact('table', 'resource'));
+        return view($this->getView('index'), [
+            'assetManager' => $this->assetManager,
+            'table' => $this->table()->resource($this)->model($this->getModel()),
+            'resource' => $this
+        ]);
     }
 
     /**
@@ -130,7 +138,7 @@ abstract class AbstractResource
 
         if ($request->ajax()) {
             return [
-                'success'  => 'Resource successfully created',
+                'success' => 'Resource successfully created',
                 'redirect' => $form->getAction('edit')
             ];
         }
@@ -189,7 +197,7 @@ abstract class AbstractResource
 
         if ($request->ajax()) {
             return [
-                'success'  => 'Resource successfully updated!',
+                'success' => 'Resource successfully updated!',
                 'redirect' => $form->getAction('edit')
             ];
         }
@@ -221,6 +229,16 @@ abstract class AbstractResource
         }
 
         return back()->withSuccess('Resource successfully deleted!');
+    }
+
+
+
+    /**
+     * @return array
+     */
+    public function dataTable()
+    {
+        return $this->table()->model($this->getModel())->resource($this)->data();
     }
 
     /**
@@ -325,16 +343,16 @@ abstract class AbstractResource
         }
 
         $allActions = collect([
-            'index'  => 'index',
+            'index' => 'index',
             'create' => [
                 'create',
                 'store'
             ],
-            'edit'   => [
+            'edit' => [
                 'edit',
                 'update'
             ],
-            'show'   => 'show',
+            'show' => 'show',
             'delete' => 'destroy'
         ]);
 
@@ -352,30 +370,30 @@ abstract class AbstractResource
         $form = $this->getForm();
 
         $breadcrumbs = [
-            'index'  => [
+            'index' => [
                 [
                     'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'url' => $form->getAction('index')
                 ]
             ],
             'create' => [
                 [
                     'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'url' => $form->getAction('index')
                 ],
                 [
                     'name' => 'Create',
-                    'url'  => $form->getAction('create')
+                    'url' => $form->getAction('create')
                 ]
             ],
-            'edit'   => [
+            'edit' => [
                 [
                     'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'url' => $form->getAction('index')
                 ],
                 [
                     'name' => 'Edit',
-                    'url'  => $form->getAction('edit')
+                    'url' => $form->getAction('edit')
                 ]
             ],
         ];

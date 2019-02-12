@@ -3,6 +3,8 @@
 namespace Laradium\Laradium\Base;
 
 use Illuminate\Support\Collection;
+use Laradium\Laradium\Http\Controllers\Admin\DatatableController;
+use Laradium\Laradium\Services\Asset\AssetManager;
 
 class Table
 {
@@ -58,10 +60,15 @@ class Table
     protected $js = [];
 
     /**
+     * @var
+     */
+    private $title;
+
+    /**
      * @var array
      */
     protected $orderBy = [
-        'column'    => 'id',
+        'column' => 'id',
         'direction' => 'desc'
     ];
 
@@ -71,11 +78,77 @@ class Table
     protected $search;
 
     /**
+     * @var
+     */
+    private $slug;
+
+    /**
+     * @var
+     */
+    private $resource;
+
+    /**
+     * @var AssetManager
+     */
+    private $assetManager;
+
+    /**
      * Table constructor.
      */
     public function __construct()
     {
+        $this->assetManager = app(AssetManager::class);
         $this->columnSet = new ColumnSet;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function render()
+    {
+        return view('laradium::admin.table.index', [
+            'table' => $this
+        ])->render();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function config()
+    {
+        return $this->assetManager->table()->config($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableConfig(): string
+    {
+        $config = [
+            'id' => $this->getResourceId(),
+            'columns' => $this->getColumnConfig(),
+            'order' => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : [],
+            'slug' => $this->getSlug(),
+            'has_tabs' => false,
+            'selector' => '.' . $this->getResourceId(),
+        ];
+
+        if ($this->getTabs()) {
+            $config['selector'] = '.tab-pane.active .' . $this->getResourceId();
+            $config['has_tabs'] = true;
+        }
+
+        return json_encode($config);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function data()
+    {
+        $datatableController = new DatatableController();
+
+        return $datatableController->index($this);
     }
 
     /**
@@ -112,7 +185,7 @@ class Table
      * @param $model
      * @return $this
      */
-    public function setModel($model)
+    public function model($model)
     {
         $this->model = $model;
 
@@ -120,9 +193,9 @@ class Table
     }
 
     /**
-     * @return mixed
+     * @return Model
      */
-    public function model()
+    public function getModel()
     {
         return $this->model;
     }
@@ -144,6 +217,59 @@ class Table
         $this->dataTable = $value;
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return Table
+     */
+    public function title($value): self
+    {
+        $this->title = $value;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        if ($this->title) {
+            return $this->title;
+        }
+
+        $model = new $this->model;
+
+        return ucfirst(str_replace('_', ' ', $model->getTable()));
+    }
+
+    /**
+     * @param $value
+     * @return Table
+     */
+    public function slug($value): self
+    {
+        $this->slug = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        if ($this->getResource()) {
+            return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
+        }
+
+        return $this->slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResourceId()
+    {
+        return trim(str_replace('/', '-', $this->getSlug()), '-');
     }
 
     /**
@@ -184,6 +310,25 @@ class Table
     }
 
     /**
+     * @param $value
+     * @return Table
+     */
+    public function resource($value): self
+    {
+        $this->resource = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    /**
      * @return Collection
      */
     public function getColumnConfig(): Collection
@@ -192,24 +337,23 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data'       => $column['column'],
-                'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
-                'title'      => $column['title'] ?? $this->parseTitle($column['column']),
+                'data' => $column['column'],
+                'name' => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
                 'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
-                'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
+                'orderable' => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
         }
 
-        if ($this->columns()->where('column', 'action')->first()) {
+        if ($this->columns()->where('column', 'action')->first() || !$this->getResource()) {
             return $config;
         }
 
         $config->push([
-            'data'       => 'action',
-            'name'       => 'action',
+            'data' => 'action',
+            'name' => 'action',
             'searchable' => false,
-            'orderable'  => false,
-            'class'      => 'text-center'
+            'orderable' => false,
+            'class' => 'text-center'
         ]);
 
         return $config;
@@ -304,8 +448,8 @@ class Table
         }
 
         $this->orderBy = [
-            'key'       => $key,
-            'column'    => $column,
+            'key' => $key,
+            'column' => $column,
             'direction' => $direction
         ];
 
@@ -337,17 +481,5 @@ class Table
     public function getSearch()
     {
         return $this->search;
-    }
-
-    /**
-     * @param $title
-     * @return string
-     */
-    protected function parseTitle($title): string
-    {
-        $title = str_replace(['.', '_'], ' ', $title);
-        $title = ucwords($title);
-
-        return $title;
     }
 }
