@@ -39,5 +39,21 @@ mix.js('resources/assets/js/misc/datatable/table.js', 'public/laradium/assets/js
 ;
 
 mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
-	.extract(['jquery', 'bootstrap', 'vue', 'jquery-datetimepicker'])
+	.extract([
+	    'jquery',
+        'bootstrap',
+        'vue',
+        'vue-trumbowyg',
+        'jquery-datetimepicker',
+        'jquery-resizable-dom',
+        'switchery',
+        'toastr',
+        'vuedraggable',
+        'sweetalert2',
+        'select2',
+        'axios',
+        'jquery-ui',
+        'jstree'
+    ])
+	.sass('resources/assets/sass/bundle.scss', 'public/laradium/assets/css')
 	.sass('resources/assets/sass/laradium.scss', 'public/laradium/assets/css');

@@ -48,6 +48,28 @@ class Menu extends Model
     }
 
     /**
+     * @return string
+     */
+    public function getDataForAdminMenu()
+    {
+        $items = [];
+        foreach($this->items as $item) {
+            $items[] = [
+                'id' => $item->id,
+                'parent' => $item->parent_id ?: '#',
+                'data' => [
+                    'name' => $item->name,
+                    'url' => $item->url,
+                    'icon' => $item->icon,
+                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                ]
+            ];
+        }
+
+        return json_encode($items);
+    }
+
+    /**
      * @param $elements
      * @param int $parentId
      * @return array

@@ -15,6 +15,11 @@ class {{resource}}Resource extends AbstractResource
     /**
      * @var string
      */
+    public $isShared = true;
+
+    /**
+     * @var string
+     */
     protected $resource = {{resource}}::class;
 
     /**

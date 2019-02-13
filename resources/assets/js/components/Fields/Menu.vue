@@ -17,11 +17,14 @@
         data() {
             return {
                 form_data: {},
-                items: [],
+                items: {},
             };
         },
 
         created() {
+            let data = document.getElementsByName('vue-menu');
+            this.items = this.flatToTree(JSON.parse(data[0].value));
+
             serverBus.$on('formatted', (data) => {
                 this.items = this.flatToTree(data);
             });

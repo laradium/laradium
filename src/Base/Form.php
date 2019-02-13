@@ -198,18 +198,44 @@ class Form
      */
     public function getAction($action = 'index'): string
     {
-        $slug = $this->getResource()->getSlug();
         if ($action === 'create') {
-            return url('/admin/' . $slug . '/create');
+            return $this->getUrl('create');
         } else if ($action === 'edit') {
-            return url('/admin/' . $slug . '/' . $this->getModel()->id . '/edit');
+            return $this->getUrl($this->getModel()->id . '/edit');
         } else if ($action === 'store') {
-            return url('/admin/' . $slug);
+            return $this->getUrl();
         } else if ($action === 'update') {
-            return url('/admin/' . $slug . '/' . $this->model->id);
+            return $this->getUrl($this->model->id);
         }
 
-        return url('/admin/' . $slug);
+        return $this->getUrl();
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function getUrl($value = '')
+    {
+        if(!$this->abstractResource) {
+            return '';
+        }
+        if($this->abstractResource->isShared()) {
+            return url('/' . $this->getResource()->getSlug() . '/' . $value);
+        }
+
+        return url('/admin/' . $this->getResource()->getSlug() . '/' . $value);
+    }
+
+    /**
+     * @param $value
+     * @return Form
+     */
+    public function abstractResource($value)
+    {
+        $this->abstractResource = $value;
+
+        return $this;
     }
 
     /**

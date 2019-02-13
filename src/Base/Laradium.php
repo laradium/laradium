@@ -61,26 +61,8 @@ class Laradium
     public function resources(): array
     {
         $baseResources = [];
-        $projectResources = [];
-
-        // Project resources
-        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources');
-        $namespace = app()->getNamespace();
-        $resourcePath = str_replace($namespace, '', $resources);
-        $resourcePath = str_replace('\\', '/', $resourcePath);
-        $resourcePath = app_path($resourcePath);
-        if (file_exists($resourcePath)) {
-            foreach (\File::files($resourcePath) as $path) {
-                $resource = $path->getPathname();
-                $baseName = basename($resource, '.php');
-                $resource = $resources . '\\' . $baseName;
-                $r = new $resource;
-                if(!class_exists($r->resourceName())) {
-                    continue;
-                }
-                $projectResources[] = $resource;
-            }
-        }
+        $projectResources = $this->getResourcesFromPath(config('laradium.resource_path', 'App\\Laradium\\Resources'));
+        $sharedResources = $this->getResourcesFromPath(config('laradium.shared_resource_path', 'App\\Laradium\\Resources\Shared'));
 
         // CMS resources
         foreach ($this->baseResources as $path => $namespace) {
@@ -102,7 +84,35 @@ class Laradium
             }
         }
 
-        return array_merge($baseResources, $projectResources);
+        return array_merge($baseResources, $projectResources, $sharedResources);
+    }
+
+    /**
+     * @param $path
+     * @return array
+     */
+    private function getResourcesFromPath($path)
+    {
+        $resources = [];
+
+        $namespace = app()->getNamespace();
+        $resourcePath = str_replace($namespace, '', $path);
+        $resourcePath = str_replace('\\', '/', $resourcePath);
+        $resourcePath = app_path($resourcePath);
+        if (file_exists($resourcePath)) {
+            foreach (\File::files($resourcePath) as $filePath) {
+                $resource = $filePath->getPathname();
+                $baseName = basename($resource, '.php');
+                $resource = $path . '\\' . $baseName;
+                $r = new $resource;
+                if(!class_exists($r->resourceName())) {
+                    continue;
+                }
+                $resources[] = $resource;
+            }
+        }
+
+        return $resources;
     }
 
     /**

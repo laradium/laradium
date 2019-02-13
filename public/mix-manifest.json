@@ -3,5 +3,6 @@
     "/laradium/assets/js/vendor.js": "/laradium/assets/js/vendor.js",
     "/laradium/assets/js/laradium.js": "/laradium/assets/js/laradium.js",
     "/laradium/assets/js/misc/datatable/table.js": "/laradium/assets/js/misc/datatable/table.js",
+    "/laradium/assets/css/bundle.css": "/laradium/assets/css/bundle.css",
     "/laradium/assets/css/laradium.css": "/laradium/assets/css/laradium.css"
 }

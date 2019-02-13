@@ -1,5 +1,12 @@
 import changeActiveStateWithSwitch from './switch'
 import deleteItemFromDataTable from './delete'
+import initSwitchery from './switchery'
+
+$.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
+$.fn.editable.defaults.mode = 'inline';
+$.fn.editableform.buttons =
+    '<button type="submit" class="btn btn-success editable-submit btn-sm"><i class="fa fa-check"></i></button>' +
+    '<button type="button" class="btn editable-cancel btn-mini btn-sm"><i class="fa fa-close"></i></button>';
 
 for (let index in datatables) {
     let config = datatables[index];

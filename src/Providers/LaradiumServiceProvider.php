@@ -13,6 +13,9 @@ use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
 use Laradium\Laradium\Registries\RouteRegistry;
+use Laradium\Laradium\ViewComposers\MenuComposer;
+use Laradium\Laradium\ViewComposers\ResourceComposer;
+use Laradium\Laradium\ViewComposers\VariableComposer;
 
 class LaradiumServiceProvider extends ServiceProvider
 {
@@ -288,8 +291,25 @@ class LaradiumServiceProvider extends ServiceProvider
      */
     private function registerViewComposers()
     {
-        View::composer(
-            'laradium::layouts.main', 'Laradium\Laradium\ViewComposers\VariableComposer'
-        );
+        $composers = [
+            [
+                'views'    => [
+                    'laradium::layouts.main',
+                ],
+                'composer' => ResourceComposer::class
+            ],
+            [
+                'views'    => ['laradium::layouts.main'],
+                'composer' => VariableComposer::class
+            ],
+            [
+                'views'    => ['laradium::admin._partials.menu'],
+                'composer' => MenuComposer::class
+            ],
+        ];
+
+        foreach ($composers as $composer) {
+            view()->composer($composer['views'], $composer['composer']);
+        }
     }
 }
