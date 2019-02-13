@@ -93,10 +93,15 @@ class MakeLaradiumResource extends Command
     {
         $namespace = $this->getNamespace();
 
-        $resourceStub = $this->getResourceStub();
-        $resource = str_replace('{{namespace}}', $namespace, $resourceStub);
-        $resource = str_replace('{{resource}}', $this->name, $resource);
-        $resource = str_replace('{{modelNamespace}}', config('laradium.default_models_directory', 'App'), $resource);
+        $resource = str_replace([
+            '{{namespace}}',
+            '{{resource}}',
+            '{{modelNamespace}}'
+        ], [
+            $namespace,
+            $this->name,
+            config('laradium.default_models_directory', 'App')
+        ], $this->getResourceStub());
 
         return $resource;
     }
