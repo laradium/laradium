@@ -63,5 +63,7 @@ return [
         //\Laradium\Laradium\Base\Resources\MenuResource::class,
         //\Laradium\Laradium\Base\Resources\SettingResource::class,
         //\Laradium\Laradium\Base\Resources\TranslationResource::class,
-    ]
+    ],
+
+    'disable_permissions' => false
 ];
