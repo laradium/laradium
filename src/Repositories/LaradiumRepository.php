@@ -54,6 +54,10 @@ class LaradiumRepository
      */
     public function hasPermissionTo($user, $resource = null, $action = 'index')
     {
+        if (config('laradium.disable_permissions')) {
+            return true;
+        }
+
         return !method_exists($user, 'hasPermissionTo') || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($resource, $action));
     }
 }
