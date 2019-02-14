@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Laradium\Laradium\Services\Layout;
 
 class LoginController extends BaseController
 {
@@ -41,7 +42,11 @@ class LoginController extends BaseController
      */
     public function index()
     {
-        return view('laradium::admin.login');
+        $layout = app(Layout::class);
+
+        return view('laradium::admin.login', [
+            'layout' => $layout
+        ]);
     }
 
     /**
