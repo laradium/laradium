@@ -25,11 +25,26 @@ class RouteRegistry
     /**
      * @param $route
      */
-    public function register($route)
+    public function register($route, $shared = false)
     {
         if (isset($route['name'])) {
             $this->router->{$route['method']}($route['route_slug'],
                 $route['controller'])->middleware($route['middleware'])->name($route['name']);
+
+            return;
+        }
+
+        if ($shared) {
+            if ($route['method'] === 'resource') {
+                $this->router->{$route['method']}($route['route_slug'],
+                    $route['controller'])->middleware($route['middleware'])->only($route['only']);
+
+                return;
+            }
+
+            $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
+            $this->router->name($name)->{$route['method']}($route['route_slug'],
+                $route['controller'])->middleware($route['middleware']);
 
             return;
         }
@@ -39,8 +54,9 @@ class RouteRegistry
                 $this->router->{$route['method']}($route['route_slug'],
                     $route['controller'])->middleware($route['middleware'])->only($route['only']);
 
-                return false;
+                return;
             }
+            
             $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
             $this->router->name($name)->{$route['method']}($route['route_slug'],
                 $route['controller'])->middleware($route['middleware']);

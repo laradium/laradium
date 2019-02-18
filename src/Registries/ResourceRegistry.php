@@ -63,66 +63,67 @@ class ResourceRegistry
         // Add custom routes
         foreach ($this->resource->getCustomRoutes() as $name => $route) {
             $route = [
-                'method' => $route['method'],
-                'name' => $route['name'] ?? $name,
+                'method'     => $route['method'],
+                'name'       => $route['name'] ?? $name,
                 'route_slug' => $this->getRouteName(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
                 'middleware' => $route['middleware'] ?? $this->resource->getResourceMiddleware()
             ];
 
-            $this->routeRegistry->register($route);
+            $this->routeRegistry->register($route, $this->resource->isShared());
         }
 
         $routeList = [
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-                'middleware' => $this->resource->getResourceMiddleware()
+                'middleware' => $this->resource->getResourceMiddleware(),
+                'name'       => $this->getName($routeSlug . '.data-table')
             ],
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable/{locale?}'),
                 'controller' => $this->getRouteController('editable'),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'name' => $this->getName($routeSlug . '.editable')
+                'name'       => $this->getName($routeSlug . '.editable')
             ],
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('toggle/{id?}'),
                 'controller' => $this->getRouteController('toggle'),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'name' => $this->getName($routeSlug . '.toggle')
+                'name'       => $this->getName($routeSlug . '.toggle')
             ],
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'name' => $this->getName($routeSlug . '.form')
+                'name'       => $this->getName($routeSlug . '.form')
             ],
             // Import
             [
-                'method' => 'post',
+                'method'     => 'post',
                 'route_slug' => $this->getRouteName('import'),
                 'controller' => $this->getRouteController('import'),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'name' => $this->getName($routeSlug . '.import')
+                'name'       => $this->getName($routeSlug . '.import')
             ],
             // Export
             [
-                'method' => 'get',
+                'method'     => 'get',
                 'route_slug' => $this->getRouteName('export'),
                 'controller' => $this->getRouteController('export'),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'name' => $this->getName($routeSlug . '.export')
+                'name'       => $this->getName($routeSlug . '.export')
             ],
             [
-                'method' => 'resource',
+                'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
                 'middleware' => $this->resource->getResourceMiddleware(),
-                'only' => $this->resource->getActions()
+                'only'       => $this->resource->getActions()
             ],
         ];
 
@@ -143,7 +144,7 @@ class ResourceRegistry
                 continue;
             }
 
-            $this->routeRegistry->register($route);
+            $this->routeRegistry->register($route, $this->resource->isShared());
         }
 
         return $this;

@@ -3,14 +3,13 @@
 namespace Laradium\Laradium\Models;
 
 use Dimsav\Translatable\Translatable;
-use Illuminate\Database\Eloquent\Model;
 
 class MenuItem extends \Baum\Node
 {
     use Translatable;
 
     /**
-     * 
+     *
      * @var array
      */
     protected $fillable = [
@@ -18,6 +17,8 @@ class MenuItem extends \Baum\Node
         'target',
         'sequence_no',
         'icon',
+        'type',
+        'route',
         'resource',
         'parent_id',
     ];
@@ -41,16 +42,33 @@ class MenuItem extends \Baum\Node
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
     public function getUrlAttribute()
     {
-        if ($this->resource !== '' && class_exists($this->resource)) {
-            $url = route('admin.' . (new $this->resource)->getBaseResource()->getSlug() . '.index');
-        } else {
-            $url = $this->translateOrNew(session('locale', config('app.locale')))->url;
+        if ($this->type === 'resource') {
+            try {
+                if (!$this->resource) {
+                    return '';
+                }
+
+                $resource = (new $this->resource);
+                $slug = $resource->getBaseResource()->getSlug();
+
+                return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
+            } catch (\Exception $e) {
+                return '';
+            }
         }
 
-        return $url ?? '#';
+        if ($this->type === 'route') {
+            try {
+                return route($this->route);
+            } catch (\Exception $e) {
+                return '';
+            }
+        }
+
+        return $this->translateOrNew(app()->getLocale())->url ?? '';
     }
 }

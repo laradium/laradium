@@ -22,7 +22,6 @@ class AddNestedsetForMenuItemsTable extends Migration
         });
 
         if (!\Laradium\Laradium\Models\MenuItem::get()->count()) {
-
             $menus = [];
             $laradium = app(\Laradium\Laradium\Base\Laradium::class);
 
@@ -37,6 +36,10 @@ class AddNestedsetForMenuItemsTable extends Migration
                     }
 
                     $resource = new $resource;
+                    if ($resource->isShared()) {
+                        continue;
+                    }
+
                     $menus['Admin menu'][] = [
                         'is_active'    => 1,
                         'resource'     => get_class($resource),

@@ -18,6 +18,15 @@ class Menu extends Model
     /**
      * @var array
      */
+    public static $types = [
+        'url'      => 'URL',
+        'route'    => 'Route',
+        'resource' => 'Resource'
+    ];
+
+    /**
+     * @var array
+     */
     protected $fillable = [
         'key',
         'is_active',
@@ -53,14 +62,14 @@ class Menu extends Model
     public function getDataForAdminMenu()
     {
         $items = [];
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $items[] = [
-                'id' => $item->id,
+                'id'     => $item->id,
                 'parent' => $item->parent_id ?: '#',
-                'data' => [
-                    'name' => $item->name,
-                    'url' => $item->url,
-                    'icon' => $item->icon,
+                'data'   => [
+                    'name'           => $item->name,
+                    'url'            => $item->url,
+                    'icon'           => $item->icon,
                     'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
                 ]
             ];
@@ -89,5 +98,40 @@ class Menu extends Model
         }
 
         return $branch;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRoutes($type = 'admin')
+    {
+        $routes = ['' => '- Select -'];
+
+        foreach (\Route::getRoutes() as $route) {
+            if (!$route->getName() || !in_array('GET', $route->methods())) {
+                continue;
+            }
+
+            $action = array_last(explode('.', $route->getName()));
+            $name = str_replace(['.', 'admin', 'index'], ' ', $route->getName());
+            if ($type === 'admin' &&
+                in_array('laradium', $route->middleware()) &&
+                in_array($action, ['index', 'create', 'dashboard']) &&
+                $route->getName() !== 'admin.index'
+            ) {
+                $routes[$route->getName()] = ucfirst(trim($name));
+            } else if ($type === 'public' &&
+                !in_array('laradium', $route->middleware()) &&
+                !in_array($action, ['data-table']) &&
+                !count($route->parameterNames()) &&
+                !str_contains($route->getName(), 'admin.')
+            ) {
+                $routes[$route->getName()] = ucfirst(trim($name));
+            }
+        }
+
+        asort($routes);
+
+        return $routes;
     }
 }
