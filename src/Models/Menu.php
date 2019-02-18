@@ -101,9 +101,10 @@ class Menu extends Model
     }
 
     /**
+     * @param string $type
      * @return array
      */
-    public static function getRoutes($type = 'admin')
+    public function getRoutes($type = 'admin'): array
     {
         $routes = ['' => '- Select -'];
 
@@ -112,20 +113,8 @@ class Menu extends Model
                 continue;
             }
 
-            $action = array_last(explode('.', $route->getName()));
             $name = str_replace(['.', 'admin', 'index'], ' ', $route->getName());
-            if ($type === 'admin' &&
-                in_array('laradium', $route->middleware()) &&
-                in_array($action, ['index', 'create', 'dashboard']) &&
-                $route->getName() !== 'admin.index'
-            ) {
-                $routes[$route->getName()] = ucfirst(trim($name));
-            } else if ($type === 'public' &&
-                !in_array('laradium', $route->middleware()) &&
-                !in_array($action, ['data-table']) &&
-                !count($route->parameterNames()) &&
-                !str_contains($route->getName(), 'admin.')
-            ) {
+            if ($this->filterRoute($type, $route)) {
                 $routes[$route->getName()] = ucfirst(trim($name));
             }
         }
@@ -133,5 +122,26 @@ class Menu extends Model
         asort($routes);
 
         return $routes;
+    }
+
+    /**
+     * @param $type
+     * @param $route
+     * @return bool
+     */
+    private function filterRoute($type, $route): bool
+    {
+        $action = array_last(explode('.', $route->getName()));
+
+        if ($type === 'admin') {
+            return in_array('laradium', $route->middleware()) &&
+                in_array($action, ['index', 'create', 'dashboard']) &&
+                $route->getName() !== 'admin.index';
+        }
+
+        return !in_array('laradium', $route->middleware()) &&
+            !in_array($action, ['data-table']) &&
+            !count($route->parameterNames()) &&
+            !str_contains($route->getName(), 'admin.');
     }
 }

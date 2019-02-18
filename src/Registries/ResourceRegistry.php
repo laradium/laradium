@@ -70,7 +70,7 @@ class ResourceRegistry
                 'middleware' => $route['middleware'] ?? $this->resource->getResourceMiddleware()
             ];
 
-            $this->routeRegistry->register($route, $this->resource->isShared());
+            $this->routeRegistry->shared($this->resource->isShared())->register($route);
         }
 
         $routeList = [
@@ -144,7 +144,7 @@ class ResourceRegistry
                 continue;
             }
 
-            $this->routeRegistry->register($route, $this->resource->isShared());
+            $this->routeRegistry->shared($this->resource->isShared())->register($route);
         }
 
         return $this;

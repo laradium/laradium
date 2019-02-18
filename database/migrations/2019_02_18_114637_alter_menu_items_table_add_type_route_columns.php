@@ -20,14 +20,18 @@ class AlterMenuItemsTableAddTypeRouteColumns extends Migration
         });
 
         $adminMenu = Menu::where('key', 'admin_menu')->first();
-        if ($adminMenu) {
-            foreach ($adminMenu->items as $item) {
-                if ($item->resource) {
-                    $item->update([
-                        'type' => 'resource'
-                    ]);
-                }
+        if (!$adminMenu) {
+            return;
+        }
+
+        foreach ($adminMenu->items as $item) {
+            if (!$item->resource) {
+                continue;
             }
+
+            $item->update([
+                'type' => 'resource'
+            ]);
         }
 
         cache()->forget(Menu::$cacheKey);

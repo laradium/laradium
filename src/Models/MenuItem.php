@@ -47,28 +47,44 @@ class MenuItem extends \Baum\Node
     public function getUrlAttribute()
     {
         if ($this->type === 'resource') {
-            try {
-                if (!$this->resource) {
-                    return '';
-                }
-
-                $resource = (new $this->resource);
-                $slug = $resource->getBaseResource()->getSlug();
-
-                return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
-            } catch (\Exception $e) {
-                return '';
-            }
+            return $this->getUrlFromResource();
         }
 
         if ($this->type === 'route') {
-            try {
-                return route($this->route);
-            } catch (\Exception $e) {
-                return '';
-            }
+            return $this->getUrlFromRoute();
         }
 
         return $this->translateOrNew(app()->getLocale())->url ?? '';
+    }
+
+    /**
+     * @return string
+     */
+    private function getUrlFromResource()
+    {
+        try {
+            if (!$this->resource) {
+                return '';
+            }
+
+            $resource = new $this->resource;
+            $slug = $resource->getBaseResource()->getSlug();
+
+            return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getUrlFromRoute()
+    {
+        try {
+            return route($this->route);
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 }
