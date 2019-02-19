@@ -14,7 +14,7 @@ Class MenuResource extends AbstractResource
     /**
      * @var Laradium
      */
-    protected $laradium;
+    private $laradium;
 
     /**
      * @var string
