@@ -18,6 +18,15 @@ class Menu extends Model
     /**
      * @var array
      */
+    public static $types = [
+        'url'      => 'URL',
+        'route'    => 'Route',
+        'resource' => 'Resource'
+    ];
+
+    /**
+     * @var array
+     */
     protected $fillable = [
         'key',
         'is_active',
@@ -53,14 +62,14 @@ class Menu extends Model
     public function getDataForAdminMenu()
     {
         $items = [];
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $items[] = [
-                'id' => $item->id,
+                'id'     => $item->id,
                 'parent' => $item->parent_id ?: '#',
-                'data' => [
-                    'name' => $item->name,
-                    'url' => $item->url,
-                    'icon' => $item->icon,
+                'data'   => [
+                    'name'           => $item->name,
+                    'url'            => $item->url,
+                    'icon'           => $item->icon,
                     'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
                 ]
             ];

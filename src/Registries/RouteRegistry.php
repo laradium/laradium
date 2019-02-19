@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Registries;
 
-use Illuminate\Support\Collection;
 use Illuminate\Routing\Router;
 
 class RouteRegistry
@@ -14,6 +13,11 @@ class RouteRegistry
     private $router;
 
     /**
+     * @var bool
+     */
+    private $shared = false;
+
+    /**
      * RouteRegistry constructor.
      * @param Router $router
      */
@@ -23,27 +27,52 @@ class RouteRegistry
     }
 
     /**
+     * @param $value
+     * @return $this
+     */
+    public function shared($value): self
+    {
+        $this->shared = $value;
+
+        return $this;
+    }
+
+    /**
      * @param $route
      */
-    public function register($route)
+    public function register($route): void
     {
         if (isset($route['name'])) {
             $this->router->{$route['method']}($route['route_slug'],
                 $route['controller'])->middleware($route['middleware'])->name($route['name']);
+            return;
+        }
+
+        if ($this->shared) {
+            $this->registerRoute($route);
 
             return;
         }
 
         $this->router->name('admin.')->group(function () use ($route) {
-            if ($route['method'] === 'resource') {
-                $this->router->{$route['method']}($route['route_slug'],
-                    $route['controller'])->middleware($route['middleware'])->only($route['only']);
-
-                return false;
-            }
-            $name = str_replace('/', '.', str_replace('/admin/', '', $route['route_slug']));
-            $this->router->name($name)->{$route['method']}($route['route_slug'],
-                $route['controller'])->middleware($route['middleware']);
+            $this->registerRoute($route);
         });
+    }
+
+    /**
+     * @param $route
+     */
+    private function registerRoute($route): void
+    {
+        if ($route['method'] === 'resource') {
+            $this->router->{$route['method']}($route['route_slug'],
+                $route['controller'])->middleware($route['middleware'])->only($route['only']);
+
+            return;
+        }
+
+        $name = str_replace(['/admin/', '/'], ['', '.'], $route['route_slug']);
+        $this->router->name($name)->{$route['method']}($route['route_slug'],
+            $route['controller'])->middleware($route['middleware']);
     }
 }
