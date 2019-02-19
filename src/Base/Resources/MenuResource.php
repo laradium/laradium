@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
+use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
@@ -57,8 +58,8 @@ Class MenuResource extends AbstractResource
     {
         return laradium()->table(function (ColumnSet $column) {
             $column->add('key');
-            $column->add('is_active')->switchable();
             $column->add('name')->translatable();
+            $column->add('is_active')->switchable();
         })->relations(['translations']);
     }
 
@@ -67,8 +68,8 @@ Class MenuResource extends AbstractResource
      */
     public function getResourceOptions(): array
     {
-        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($r) {
-            return [$r => (new $r)->getBaseResource()->getName()];
+        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($resource) {
+            return [$resource => (new $resource)->getBaseResource()->getName()];
         })->toArray();
 
         return array_merge(['' => '- Select -'], $resources);
@@ -79,6 +80,43 @@ Class MenuResource extends AbstractResource
      */
     public function getRouteOptions()
     {
-        return (new Menu)->getRoutes((request()->route()->menu && request()->route()->menu === '1') ? 'admin' : 'public');
+        $type = (request()->route()->menu && request()->route()->menu === '1') ? 'admin' : 'public';
+        $routes = ['' => '- Select -'];
+
+        foreach (Route::getRoutes() as $route) {
+            if (!$route->getName() || !in_array('GET', $route->methods())) {
+                continue;
+            }
+
+            $name = str_replace(['.', 'admin', 'index'], ' ', $route->getName());
+            if ($this->filterRoute($type, $route)) {
+                $routes[$route->getName()] = ucfirst(trim($name));
+            }
+        }
+
+        asort($routes);
+
+        return $routes;
+    }
+
+    /**
+     * @param $type
+     * @param $route
+     * @return bool
+     */
+    private function filterRoute($type, $route): bool
+    {
+        $action = array_last(explode('.', $route->getName()));
+
+        if ($type === 'admin') {
+            return in_array('laradium', $route->middleware()) &&
+                in_array($action, ['index', 'create', 'dashboard']) &&
+                $route->getName() !== 'admin.index';
+        }
+
+        return !in_array('laradium', $route->middleware()) &&
+            !in_array($action, ['data-table']) &&
+            !count($route->parameterNames()) &&
+            !str_contains($route->getName(), 'admin.');
     }
 }
