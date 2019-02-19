@@ -11,11 +11,25 @@ use Laradium\Laradium\Models\Menu;
 
 Class MenuResource extends AbstractResource
 {
+    /**
+     * @var Laradium
+     */
+    protected $laradium;
 
     /**
      * @var string
      */
     protected $resource = Menu::class;
+
+    /**
+     * MenuResource constructor.
+     */
+    public function __construct()
+    {
+        $this->laradium = app(Laradium::class);
+
+        parent::__construct();
+    }
 
     /**
      * @return \Laradium\Laradium\Base\Resource
@@ -68,7 +82,7 @@ Class MenuResource extends AbstractResource
      */
     public function getResourceOptions(): array
     {
-        $resources = collect((new Laradium)->resources())->mapWithKeys(function ($resource) {
+        $resources = collect($this->laradium->resources())->mapWithKeys(function ($resource) {
             return [$resource => (new $resource)->getBaseResource()->getName()];
         })->toArray();
 
