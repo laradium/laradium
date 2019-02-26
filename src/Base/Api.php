@@ -23,11 +23,6 @@ class Api
     protected $model;
 
     /**
-     * @var array
-     */
-    protected $customRoutes = [];
-
-    /**
      * @var
      */
     protected $where;
@@ -114,24 +109,5 @@ class Api
     public function getWhere()
     {
         return $this->where;
-    }
-
-    /**
-     * @param $routes
-     * @return $this
-     */
-    public function customRoutes($routes)
-    {
-        $this->customRoutes = $routes;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCustomRoutes()
-    {
-        return $this->customRoutes;
     }
 }

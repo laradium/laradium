@@ -12,21 +12,21 @@
   "devDependencies": {
     "@babel/polyfill": "^7.2.5",
     "axios": "^0.18",
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^4.3.1",
     "cross-env": "^5.1",
     "jquery": "^3.2",
     "laravel-mix": "^4.0.14",
     "lodash": "^4.17.11",
     "popper.js": "^1.14.7",
     "resolve-url-loader": "2.3.1",
-    "sass": "^1.16.1",
+    "sass": "^1.17.2",
     "sass-loader": "7.*",
-    "vue": "^2.5.22",
-    "vue-template-compiler": "^2.5.22"
+    "vue": "^2.6.7",
+    "vue-template-compiler": "^2.6.7"
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
-    "jquery-datetimepicker": "^2.5.20",
+    "jquery-datetimepicker": "^2.5.21",
     "jquery-resizable-dom": "^0.32.0",
     "jquery-ui": "^1.12.1",
     "jstree": "^3.3.7",
@@ -35,7 +35,7 @@
     "switchery": "0.0.2",
     "toastr": "^2.1.4",
     "vue-trumbowyg": "^3.4.0",
-    "vuedraggable": "^2.16.0",
+    "vuedraggable": "^2.18.1",
     "x-editable": "^1.5.1"
   }
 }
