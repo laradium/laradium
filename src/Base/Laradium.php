@@ -75,7 +75,7 @@ class Laradium
                     $resource = $namespace . $baseName;
 
                     // Check if there is a overridden resource in the project
-                    if ($this->resourceExists($projectResources, $baseName)) {
+                    if ($this->resourceExists($projectResources, $baseName) || str_contains($baseName, 'Api')) {
                         continue;
                     }
 
@@ -85,6 +85,45 @@ class Laradium
         }
 
         return array_merge($baseResources, $projectResources, $sharedResources);
+    }
+
+    /**
+     * @return array
+     */
+    public function apiResources(): array
+    {
+        $baseResources = [];
+        $projectResources = $this->getResourcesFromPath(config('laradium.api_resource_path', 'App\\Laradium\\Resources\\Api'));
+
+        // CMS resources
+        foreach ($this->baseResources as $path => $namespace) {
+            $resourcesPath = base_path($path . '/Api');
+
+            if (file_exists($resourcesPath)) {
+                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                    $resource = $resourcePath->getPathname();
+                    $baseName = basename($resource, '.php');
+                    $resource = $namespace . 'Api\\' . $baseName;
+
+                    // Check if there is a overridden resource in the project
+                    if ($this->resourceExists($projectResources, $baseName)) {
+                        continue;
+                    }
+
+                    $baseResources[] = $resource;
+                }
+            }
+        }
+
+        return array_merge($baseResources, $projectResources);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function all()
+    {
+        return $this->resourceRegistry->all();
     }
 
     /**
@@ -105,7 +144,7 @@ class Laradium
                 $baseName = basename($resource, '.php');
                 $resource = $path . '\\' . $baseName;
                 $r = new $resource;
-                if(!class_exists($r->resourceName())) {
+                if (!class_exists($r->resourceName())) {
                     continue;
                 }
                 $resources[] = $resource;
@@ -113,37 +152,6 @@ class Laradium
         }
 
         return $resources;
-    }
-
-    /**
-     * @return array
-     */
-    public function apiResources(): array
-    {
-        $resourceList = [];
-        $resources = config('laradium.resource_path', 'App\\Laradium\\Resources\\Api') . '\\Api';
-        $namespace = app()->getNamespace();
-        $resourcePath = str_replace($namespace, '', $resources);
-        $resourcePath = str_replace('\\', '/', $resourcePath);
-        $resourcePath = app_path($resourcePath);
-        if (file_exists($resourcePath)) {
-            foreach (\File::allFiles($resourcePath) as $path) {
-                $resource = $path->getPathname();
-                $baseName = basename($resource, '.php');
-                $resource = $resources . '\\' . $baseName;
-                $resourceList[] = $resource;
-            }
-        }
-
-        return $resourceList;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function all()
-    {
-        return $this->resourceRegistry->all();
     }
 
     /**
