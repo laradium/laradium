@@ -63,6 +63,15 @@
             color: {{setting()->get('design.admin_theme_color', '#71b6f9')}};
         }
 
+        .btn-primary {
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+        }
+
+        .page-item.active .page-link {
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+        }
     </style>
 
 </head>
