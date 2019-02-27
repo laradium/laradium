@@ -126,7 +126,7 @@ if (!function_exists('is_image')) {
     function is_image($path)
     {
         $extensions = [
-            'jpg', 'jpeg', 'png', 'bmp', 'gif'
+            'jpg', 'jpeg', 'png', 'bmp', 'gif', 'svg'
         ];
 
         $info = pathinfo($path);
