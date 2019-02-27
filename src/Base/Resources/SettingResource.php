@@ -32,7 +32,9 @@ Class SettingResource extends AbstractResource
             $fieldType = $set->getModel()->type;
 
             if ($set->getModel()->is_translatable) {
-                $set->$fieldType($fieldType === 'file' ? 'file' : 'value')->translatable()->label($set->getModel()->name);
+                $set->$fieldType($fieldType === 'file' ? 'file' : 'value')
+                    ->translatable()
+                    ->label($set->getModel()->name);
             } else if ($fieldType === 'file') {
                 $set->$fieldType('file')->label($set->getModel()->name);
             } else {
@@ -82,7 +84,8 @@ Class SettingResource extends AbstractResource
 
     /**
      * @param $item
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string|array
+     * @throws \Throwable
      */
     public function modifyValueColumn($item)
     {
@@ -98,7 +101,10 @@ Class SettingResource extends AbstractResource
             if ($item->is_translatable) {
                 $html = '';
                 foreach ($item->translations as $translation) {
-                    $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . ($translation->file->exists() ? $translation->file->url() : '- empty -') . '</li>';
+                    $html .= view('laradium::admin.table._partials.file', [
+                        'item' => $translation,
+                        'locale' => $translation->locale
+                    ])->render();
                 }
 
                 return [
@@ -109,7 +115,7 @@ Class SettingResource extends AbstractResource
 
             return [
                 'type'  => 'file',
-                'value' => $item->file->exists() ? $item->file->url() : '- empty -'
+                'value' => view('laradium::admin.table._partials.file', ['item' => $item])->render()
             ];
         }
 

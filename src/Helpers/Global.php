@@ -117,3 +117,59 @@ if (!function_exists('getTabId')) {
         return strtolower(str_replace('-', '_', str_replace('\\', '_', $id)));
     }
 }
+
+if (!function_exists('is_image')) {
+    /**
+     * @param $path
+     * @return bool
+     */
+    function is_image($path)
+    {
+        $extensions = [
+            'jpg', 'jpeg', 'png', 'bmp', 'gif'
+        ];
+
+        $info = pathinfo($path);
+
+        if (!isset($info['extension'])) {
+            return false;
+        }
+
+        return in_array($info['extension'], $extensions, true);
+    }
+}
+
+if (!function_exists('extension_image')) {
+    /**
+     * @param $path
+     * @param string $size
+     * @return string
+     */
+    function extension_image($path, $size = 'md')
+    {
+        $ignoredExtensions = [
+            'jpg', 'jpeg', 'png', 'bmp', 'gif', 'svg'
+        ];
+
+        $sizes = [
+            'xs' => '16px',
+            'sm' => '32px',
+            'md' => '48px',
+            'lg' => '512px',
+        ];
+
+        if (!isset($sizes[$size])) {
+            throw \Exception('Size ' . $size . ' doesn\'t exist. Available sizes - xs, sm, md, lg');
+        }
+
+        $size = $sizes[$size];
+        $info = pathinfo($path);
+        $extension = $info['extension'];
+
+        if (in_array($extension, $ignoredExtensions, true)) {
+            return asset($path);
+        }
+
+        return asset('laradium/admin/assets/images/icons/' . $size . '/' . $extension . '.png');
+    }
+}
