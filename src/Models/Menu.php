@@ -62,7 +62,7 @@ class Menu extends Model
     public function getDataForAdminMenu()
     {
         $items = [];
-        foreach ($this->items as $item) {
+        foreach ($this->items()->orderBy('sequence_no')->get() as $item) {
             $items[] = [
                 'id'     => $item->id,
                 'parent' => $item->parent_id ?: '#',
