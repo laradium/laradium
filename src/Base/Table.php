@@ -68,7 +68,7 @@ class Table
      * @var array
      */
     protected $orderBy = [
-        'column' => 'id',
+        'column'    => 'id',
         'direction' => 'desc'
     ];
 
@@ -125,10 +125,10 @@ class Table
     public function getTableConfig(): string
     {
         $config = [
-            'id' => $this->getResourceId(),
-            'columns' => $this->getColumnConfig(),
-            'order' => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : [],
-            'slug' => $this->getSlug(),
+            'id'       => $this->getResourceId(),
+            'columns'  => $this->getColumnConfig(),
+            'order'    => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : [],
+            'slug'     => $this->getSlug(),
             'has_tabs' => false,
             'selector' => '.' . $this->getResourceId(),
         ];
@@ -342,10 +342,10 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data' => $column['column'],
-                'name' => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
+                'data'       => $column['column'],
+                'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
                 'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
-                'orderable' => $column['translatable'] || $column['not_sortable'] ? false : true,
+                'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
             ]);
         }
 
@@ -353,12 +353,16 @@ class Table
             return $config;
         }
 
+        if (!$this->hasActions()) {
+            return $config;
+        }
+
         $config->push([
-            'data' => 'action',
-            'name' => 'action',
+            'data'       => 'action',
+            'name'       => 'action',
             'searchable' => false,
-            'orderable' => false,
-            'class' => 'text-center'
+            'orderable'  => false,
+            'class'      => 'text-center'
         ]);
 
         return $config;
@@ -453,8 +457,8 @@ class Table
         }
 
         $this->orderBy = [
-            'key' => $key,
-            'column' => $column,
+            'key'       => $key,
+            'column'    => $column,
             'direction' => $direction
         ];
 
@@ -486,5 +490,15 @@ class Table
     public function getSearch()
     {
         return $this->search;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasActions(): bool
+    {
+        $actions = $this->getResource()->getActions();
+
+        return in_array('edit', $actions) || in_array('destroy', $actions);
     }
 }

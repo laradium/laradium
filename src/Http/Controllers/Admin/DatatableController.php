@@ -65,7 +65,7 @@ class DatatableController
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-//         Editable & translatable columns
+        // Editable & translatable columns
         foreach ($columns->where('translatable', true)->where('editable', true) as $column) {
             $dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                 return view('laradium::admin.resource._partials.translation_editable',
@@ -77,11 +77,11 @@ class DatatableController
             $rawColumns = array_merge($rawColumns, [$column['column_parsed']]);
         }
 
-//         Modified columns
+        // Modified columns
         foreach ($columns->where('modify', '!=', null) as $column) {
             $dataTable->editColumn($column['column_parsed'], $column['modify']);
 
-//             If column is modified AND has editable flag, we need to re-apply it
+            // If column is modified AND has editable flag, we need to re-apply it
             if (in_array($column['column_parsed'], $editableColumnNames)) {
                 $dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
                     $value = $column['modify']($item);

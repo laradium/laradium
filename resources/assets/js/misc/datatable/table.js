@@ -20,7 +20,7 @@ for (let index in datatables) {
             serverSide: true,
             ajax: config.has_tabs ? $(config.selector).data('url') : config.slug + '/data-table',
             columns: config.columns,
-            order: config.order
+            order: $.parseJSON(config.order)
         }).on('draw.dt', function () {
             $('.js-editable').editable({
                 error: function (response) {
