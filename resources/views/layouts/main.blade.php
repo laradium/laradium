@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name') }} {{ isset($title) ? '- ' . $title :'' }}</title>
+    <title>{{ setting()->get('design.project_title', 'Laradium') }} {{ isset($title) ? '- ' . $title :'' }}</title>
 
     @if(setting()->get('design.admin_theme_favicon'))
         <link rel="shortcut icon" href="{{ setting()->get('design.admin_theme_favicon') }}">
@@ -31,11 +31,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
         }
 
         .user-box ul li a:hover {
@@ -43,16 +43,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}         !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
         }
 
         a:hover {
@@ -64,13 +64,13 @@
         }
 
         .btn-primary {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
         }
 
         .page-item.active .page-link {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
         }
     </style>
 
@@ -86,9 +86,10 @@
         <div class="topbar-left">
             <a href="{{ url('/') }}" class="logo">
                 @if(setting()->get('design.admin_theme_logo'))
-                    <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
+                    <img src="{!! setting()->get('design.admin_theme_logo') !!}"
+                         alt="{{ setting()->get('design.project_title', 'Laradium') }}">
                 @else
-                    Laradium
+                    {{ setting()->get('design.project_title', 'Laradium') }}
                 @endif
             </a>
         </div>
@@ -104,7 +105,7 @@
                         </button>
                     </li>
                     <li class="list-inline-item">
-                        <h4 class="page-title">{{ $title ?? 'Laradium' }}</h4>
+                        <h4 class="page-title">{{ $title ?? setting()->get('design.project_title', 'Laradium') }}</h4>
                     </li>
                 </ul>
 
@@ -131,9 +132,12 @@
 
                 <!-- User -->
                 <div class="user-box">
-                    <form id="logout-form" action="/admin/logout" method="POST"
-                          style="display: none;">{{ csrf_field() }}</form>
-                    <h5>{{ auth()->user()->full_name ?? auth()->user()->name }}
+                    @includeIf(config('laradium.component_views.user-box-top', 'admin._partials.user-box-top'))
+                    <form id="logout-form" action="/admin/logout" method="POST" style="display: none;">
+                        {{ csrf_field() }}
+                    </form>
+                    <h5>
+                        {{ auth()->user()->full_name ?? auth()->user()->name }}
                         <a href="javascript:;"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                            class="text-custom"
@@ -141,6 +145,7 @@
                             <i class="mdi mdi-power"></i>
                         </a>
                     </h5>
+                    @includeIf(config('laradium.component_views.user-box-bottom', 'admin._partials.user-box-bottom'))
                 </div>
                 <!-- End User -->
 
@@ -160,7 +165,9 @@
                 </div> <!-- container -->
             </div> <!-- content -->
 
-            <footer class="footer text-right">© Laradium. <a href="https://netcore.agency">netcore.agency</a></footer>
+            <footer class="footer text-right">
+                © {{ setting()->get('design.project_title', 'Laradium') }}. <a href="https://netcore.agency">netcore.agency</a>
+            </footer>
         </div>
     </div>
     <!-- ============================================================== -->

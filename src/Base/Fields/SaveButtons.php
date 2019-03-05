@@ -40,7 +40,8 @@ class SaveButtons extends Element
             'fields' => $this->getFields(),
             'config' => [
                 'locale_selector' => $this->locale_selector
-            ]
+            ],
+            'attr'   => $this->getAttributes(),
         ];
     }
 
