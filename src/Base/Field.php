@@ -189,7 +189,8 @@ class Field
                 'is_translatable' => $this->isTranslatable(),
                 'col' => $this->getCol(),
             ],
-            'info' => $this->getInfo()
+            'info' => $this->getInfo(),
+            'attr'   => $this->getAttributes()
         ];
     }
 

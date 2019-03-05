@@ -42,15 +42,32 @@ class AssetManager
     /**
      * @return Table
      */
-    public function table()
+    public function table(): Table
     {
         return new Table();
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function core()
+    public function customJs(): array
+    {
+        return config('laradium.custom_js', []);
+    }
+
+    /**
+     * @return array
+     */
+    public function customCss(): array
+    {
+        return config('laradium.custom_css', []);
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public function core(): string
     {
         if ($this->js) {
             return view('laradium::admin._partials.assets.js', [
@@ -75,7 +92,7 @@ class AssetManager
     public function bundle(array $customAssets = []): string
     {
         if ($this->js) {
-            $customAssets = array_merge($customAssets, config('laradium.custom_js', []));
+            $customAssets = array_merge($customAssets, $this->customJs());
 
             return view('laradium::admin._partials.assets.js', [
                     'assets' => array_merge([
@@ -86,7 +103,7 @@ class AssetManager
                 ])->render() . $this->js()->core();
         }
 
-        $customAssets = array_merge($customAssets, config('laradium.custom_css', []));
+        $customAssets = array_merge($customAssets, $this->customCss());
 
         return view('laradium::admin._partials.assets.css', [
                 'assets' => array_merge([
