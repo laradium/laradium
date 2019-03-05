@@ -11,37 +11,50 @@ class LaradiumRepository
 {
 
     /**
-     * @param \Closure $closure
-     * @return \Laradium\Laradium\Base\Resource
+     * @var SystemRepository
      */
-    public function resource(\Closure $closure): \Laradium\Laradium\Base\Resource
+    private $systemRepo;
+
+    /**
+     * LaradiumRepository constructor.
+     */
+    public function __construct()
+    {
+        $this->systemRepo = new SystemRepository();
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return Resource
+     */
+    public function resource(\Closure $closure): Resource
     {
         return (new Resource)->make($closure);
     }
 
     /**
      * @param \Closure $closure
-     * @return \Laradium\Laradium\Base\Table
+     * @return Table
      */
-    public function table(\Closure $closure): \Laradium\Laradium\Base\Table
+    public function table(\Closure $closure): Table
     {
         return (new Table)->make($closure);
     }
 
     /**
      * @param \Closure $closure
-     * @return \Laradium\Laradium\Base\ApiResource
+     * @return ApiResource
      */
-    public function apiResource(\Closure $closure): \Laradium\Laradium\Base\ApiResource
+    public function apiResource(\Closure $closure): ApiResource
     {
         return (new ApiResource)->make($closure);
     }
 
     /**
      * @param \Closure $closure
-     * @return \Laradium\Laradium\Base\Validation
+     * @return Validation
      */
-    public function validation(\Closure $closure): \Laradium\Laradium\Base\Validation
+    public function validation(\Closure $closure): Validation
     {
         return (new Validation)->make($closure);
     }
@@ -49,15 +62,24 @@ class LaradiumRepository
     /**
      * @param $user
      * @param null $resource
-     * @param null $route
+     * @param string $action
      * @return bool
      */
-    public function hasPermissionTo($user, $resource = null, $action = 'index')
+    public function hasPermissionTo($user, $resource = null, $action = 'index'): bool
     {
         if (config('laradium.disable_permissions')) {
             return true;
         }
 
-        return !method_exists($user, 'hasPermissionTo') || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($resource, $action));
+        return !method_exists($user, 'hasPermissionTo') ||
+            (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($resource, $action));
+    }
+
+    /**
+     * @return SystemRepository
+     */
+    public function system(): SystemRepository
+    {
+        return $this->systemRepo;
     }
 }

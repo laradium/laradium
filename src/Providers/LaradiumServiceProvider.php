@@ -39,9 +39,10 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadRoutes();
         $this->registerViewComposers();
 
-        // Global helpers, icons
+        // Global helpers, icons, system
         require_once __DIR__ . '/../Helpers/Global.php';
         require_once __DIR__ . '/../Helpers/Icons.php';
+        require_once __DIR__ . '/../Helpers/System.php';
 
         // Mail config
         $this->setMailConfig();
@@ -217,6 +218,7 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
+            __DIR__ . '/../../config/laradium-system.php'  => config_path('laradium-system.php'),
             __DIR__ . '/../../config/laradium.php'         => config_path('laradium.php'),
             __DIR__ . '/../../config/paperclip.php'        => config_path('paperclip.php'),
             __DIR__ . '/../../config/javascript.php'       => config_path('javascript.php'),
@@ -278,7 +280,7 @@ class LaradiumServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
-            __DIR__ . '/../../public/images' => public_path('images'),
+            __DIR__ . '/../../public/images'   => public_path('images'),
         ], 'laradium');
 
         $this->publishes([
