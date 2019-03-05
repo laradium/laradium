@@ -127,7 +127,7 @@ class Table
         $config = [
             'id'       => $this->getResourceId(),
             'columns'  => $this->getColumnConfig(),
-            'order'    => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : [],
+            'order'    => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : ['[0, "desc"]'],
             'slug'     => $this->getSlug(),
             'has_tabs' => false,
             'selector' => '.' . $this->getResourceId(),
