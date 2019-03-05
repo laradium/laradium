@@ -16,7 +16,6 @@ return [
     'translations_file' => 'translations',
 
     'user'      => [
-
         'email'    => 'admin@laradium.com',
         'password' => 'laradium2018'
     ],
@@ -55,7 +54,7 @@ return [
         ]
     ],
 
-    'menu_class' => \Laradium\Laradium\Models\Menu::class,
+    'menu_class'      => \Laradium\Laradium\Models\Menu::class,
     'menu_item_class' => \Laradium\Laradium\Models\MenuItem::class,
 
     'disable_menus' => [
@@ -65,5 +64,18 @@ return [
         //\Laradium\Laradium\Base\Resources\TranslationResource::class,
     ],
 
-    'disable_permissions' => false
+    'disable_permissions' => false,
+
+    'custom_js' => [
+        //
+    ],
+
+    'custom_css' => [
+        //
+    ],
+
+    'component_views' => [
+        'user-box-top'    => 'admin._partials.user-box-top',
+        'user-box-bottom' => 'admin._partials.user-box-bottom'
+    ]
 ];

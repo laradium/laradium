@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div :class="{'col-md-9': data.config.locale_selector, 'col-md-12': !data.config.locale_selector}">
+        <div :class="classes" v-bind="fieldAttributes">
             <button class="btn btn-primary mb-1" :disabled="form.isSubmitted">
                 <span v-if="form.isSubmitted">
                     <i class="fa fa-cog fa-spin fa-fw"></i> Saving...
@@ -16,17 +16,18 @@
             </button>
 
             <component
-                    v-for="(field, index) in data.fields"
-                    :is="field.type + '-field'"
-                    :field="field"
-                    :data="field"
-                    :language="language"
-                    :replacement_ids="{}"
-                    :key="'save-button-field-' + index"
+                v-for="(field, index) in data.fields"
+                :is="field.type + '-field'"
+                :field="field"
+                :data="field"
+                :language="language"
+                :replacement_ids="{}"
+                :key="'save-button-field-' + index"
             ></component>
         </div>
         <div class="col-md-3"
-             v-if="data.config.locale_selector && form.data.is_translatable && form.data.languages.length">
+             v-if="data.config.locale_selector && form.data.is_translatable && form.data.languages.length"
+             v-bind="fieldAttributes">
             <div class="row">
                 <div class="col-md-4 my-auto text-right">
                     <label>Language</label>
@@ -50,6 +51,25 @@
         data() {
             return {
                 form: this.getForm()
+            }
+        },
+
+        computed: {
+            classes() {
+                let classes = '';
+
+                if (this.data.config.locale_selector) {
+                    classes += 'col-md-9 '
+                } else {
+                    classes += 'col-md-12 '
+                }
+
+                let attributes = this.fieldAttributes;
+                if (typeof attributes['class'] !== 'undefined') {
+                    classes += attributes['class'];
+                }
+
+                return classes;
             }
         },
 

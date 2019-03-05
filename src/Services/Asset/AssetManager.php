@@ -70,10 +70,13 @@ class AssetManager
     /**
      * @param array $customAssets
      * @return string
+     * @throws \Throwable
      */
-    public function bundle(array $customAssets = [])
+    public function bundle(array $customAssets = []): string
     {
         if ($this->js) {
+            $customAssets = array_merge($customAssets, config('laradium.custom_js', []));
+
             return view('laradium::admin._partials.assets.js', [
                     'assets' => array_merge([
                         versionedAsset('laradium/assets/js/manifest.js'),
@@ -82,6 +85,8 @@ class AssetManager
                     ], $customAssets)
                 ])->render() . $this->js()->core();
         }
+
+        $customAssets = array_merge($customAssets, config('laradium.custom_css', []));
 
         return view('laradium::admin._partials.assets.css', [
                 'assets' => array_merge([

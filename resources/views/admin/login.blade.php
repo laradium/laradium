@@ -18,9 +18,9 @@
 
     <style>
         .btn-bordred.btn-custom {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
-            border-bottom: 2px solid {{setting()->get('design.admin_theme_color', '#4fa4f8')}} !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}} !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            border-bottom: 2px solid {{setting()->get('design.admin_theme_color', '#4fa4f8')}}  !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
         }
     </style>
 </head>
@@ -33,9 +33,10 @@
     <div class="text-center">
         <a href="{{ url('/') }}" class="logo">
             @if(setting()->get('design.admin_theme_logo'))
-                <img src="{!! setting()->get('design.admin_theme_logo') !!}" alt="Laradium">
+                <img src="{!! setting()->get('design.admin_theme_logo') !!}"
+                     alt="{{ setting()->get('design.project_title', 'Laradium') }}">
             @else
-                Laradium
+                {{ $title ?? setting()->get('design.project_title', 'Laradium') }}
             @endif
         </a>
     </div>
@@ -74,7 +75,9 @@
 
                 <div class="form-group text-center m-t-30">
                     <div class="col-xs-12">
-                        <button class="btn btn-custom btn-bordred btn-block waves-effect waves-light" type="submit">Log In</button>
+                        <button class="btn btn-custom btn-bordred btn-block waves-effect waves-light" type="submit">Log
+                            In
+                        </button>
                     </div>
                 </div>
             </form>
