@@ -42,15 +42,49 @@ class AssetManager
     /**
      * @return Table
      */
-    public function table()
+    public function table(): Table
     {
         return new Table();
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function core()
+    public function customJs(): array
+    {
+        return config('laradium.custom_js', []);
+    }
+
+    /**
+     * @return array
+     */
+    public function customCss(): array
+    {
+        return config('laradium.custom_css', []);
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public function custom(): string
+    {
+        if ($this->js) {
+            return view('laradium::admin._partials.assets.js', [
+                'assets' => $this->customJs()
+            ])->render();
+        }
+
+        return view('laradium::admin._partials.assets.css', [
+            'assets' => $this->customCss()
+        ])->render();
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public function core(): string
     {
         if ($this->js) {
             return view('laradium::admin._partials.assets.js', [
@@ -70,8 +104,9 @@ class AssetManager
     /**
      * @param array $customAssets
      * @return string
+     * @throws \Throwable
      */
-    public function bundle(array $customAssets = [])
+    public function bundle(array $customAssets = []): string
     {
         if ($this->js) {
             return view('laradium::admin._partials.assets.js', [
@@ -80,7 +115,7 @@ class AssetManager
                         versionedAsset('laradium/assets/js/vendor.js'),
                         asset('/laradium/admin/assets/plugins/switchery/switchery.min.js'),
                     ], $customAssets)
-                ])->render() . $this->js()->core();
+                ])->render() . $this->js()->core() . $this->js()->custom();
         }
 
         return view('laradium::admin._partials.assets.css', [
@@ -89,6 +124,6 @@ class AssetManager
                     'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
                     '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'
                 ], $customAssets)
-            ])->render() . $this->css()->core();
+            ])->render() . $this->css()->core() . $this->css()->custom();
     }
 }

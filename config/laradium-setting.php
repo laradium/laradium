@@ -105,6 +105,13 @@ return [
         ],
         [
             'group' => 'design',
+            'name'  => 'Title',
+            'key'   => 'project_title',
+            'type'  => 'text',
+            'value' => 'Laradium'
+        ],
+        [
+            'group' => 'design',
             'name'  => 'Admin theme color',
             'key'   => 'admin_theme_color',
             'type'  => 'color'
