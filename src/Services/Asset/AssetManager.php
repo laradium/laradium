@@ -67,6 +67,23 @@ class AssetManager
      * @return string
      * @throws \Throwable
      */
+    public function custom(): string
+    {
+        if ($this->js) {
+            return view('laradium::admin._partials.assets.js', [
+                'assets' => $this->customJs()
+            ])->render();
+        }
+
+        return view('laradium::admin._partials.assets.css', [
+            'assets' => $this->customCss()
+        ])->render();
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
     public function core(): string
     {
         if ($this->js) {
@@ -92,18 +109,14 @@ class AssetManager
     public function bundle(array $customAssets = []): string
     {
         if ($this->js) {
-            $customAssets = array_merge($customAssets, $this->customJs());
-
             return view('laradium::admin._partials.assets.js', [
                     'assets' => array_merge([
                         versionedAsset('laradium/assets/js/manifest.js'),
                         versionedAsset('laradium/assets/js/vendor.js'),
                         asset('/laradium/admin/assets/plugins/switchery/switchery.min.js'),
                     ], $customAssets)
-                ])->render() . $this->js()->core();
+                ])->render() . $this->js()->core() . $this->js()->custom();
         }
-
-        $customAssets = array_merge($customAssets, $this->customCss());
 
         return view('laradium::admin._partials.assets.css', [
                 'assets' => array_merge([
@@ -111,6 +124,6 @@ class AssetManager
                     'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
                     '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'
                 ], $customAssets)
-            ])->render() . $this->css()->core();
+            ])->render() . $this->css()->core() . $this->css()->custom();
     }
 }
