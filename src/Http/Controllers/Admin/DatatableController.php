@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Http\Controllers\Admin;
 
 use Laradium\Laradium\Base\Table;
+use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Yajra\DataTables\Facades\DataTables;
 
 class DatatableController
@@ -38,6 +39,10 @@ class DatatableController
 
         if ($table->getWhere()) {
             $model = $model->where($table->getWhere());
+        }
+
+        if ($resource instanceof ResourceFilterInterface) {
+            $model = $resource->filter($model);
         }
 
         $dataTable = DataTables::of($model);

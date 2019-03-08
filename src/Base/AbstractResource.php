@@ -5,8 +5,8 @@ namespace Laradium\Laradium\Base;
 use File;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
+use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
-use Laradium\Laradium\Services\Asset\AssetManager;
 use Laradium\Laradium\Services\Layout;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
@@ -168,6 +168,10 @@ abstract class AbstractResource
             $model = $model->where($where);
         }
 
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
+        }
+
         $this->model($model->findOrFail($id));
 
         return view($this->getView('edit'), [
@@ -191,6 +195,10 @@ abstract class AbstractResource
         $model = $this->model;
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
+        }
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
         }
 
         $this->model($model->findOrFail($id));
@@ -227,6 +235,10 @@ abstract class AbstractResource
         $model = $this->model;
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
+        }
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
         }
 
         $model = $model->findOrFail($id);
