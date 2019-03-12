@@ -38,6 +38,11 @@ abstract class AbstractResource
     protected $slug;
 
     /**
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * @var bool
      */
     protected $isShared = false;
@@ -93,9 +98,12 @@ abstract class AbstractResource
         if (class_exists($this->resource)) {
             $this->model(new $this->resource);
         }
-        $this->layout = new Layout;
 
         $this->events = collect([]);
+        $this->layout = new Layout;
+        if ($template = config('laradium.shared_resources_template')) {
+            $this->layout->set($template);
+        }
     }
 
     /**
@@ -163,13 +171,10 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
-        }
-
-        if ($this instanceof ResourceFilterInterface) {
-            $model = $this->filter($model);
         }
 
         $this->model($model->findOrFail($id));
@@ -192,13 +197,10 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
-        }
-
-        if ($this instanceof ResourceFilterInterface) {
-            $model = $this->filter($model);
         }
 
         $this->model($model->findOrFail($id));
@@ -232,16 +234,13 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
         }
 
-        if ($this instanceof ResourceFilterInterface) {
-            $model = $this->filter($model);
-        }
-
-        $model = $model->findOrFail($id);
+        $this->model($model->findOrFail($id));
         $model->delete();
 
         $this->fireEvent('afterDelete', $request);
@@ -254,7 +253,6 @@ abstract class AbstractResource
 
         return back()->withSuccess('Resource successfully deleted!');
     }
-
 
     /**
      * @return array
@@ -300,7 +298,8 @@ abstract class AbstractResource
 
         return (new Resource)->model($model)
             ->name($this->name)
-            ->slug($this->slug);
+            ->slug($this->slug)
+            ->prefix($this->prefix);
     }
 
     /**
@@ -334,7 +333,13 @@ abstract class AbstractResource
      */
     public function getModel()
     {
-        return $this->model;
+        $model = $this->model;
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model)->getModel();
+        }
+
+        return $model;
     }
 
     /**
@@ -390,33 +395,34 @@ abstract class AbstractResource
      */
     public function getBreadcrumbs($action)
     {
-        $form = $this->getForm();
+        $baseResource = $this->getBaseResource();
+        $name = $baseResource->getName();
 
         $breadcrumbs = [
             'index'  => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ]
             ],
             'create' => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ],
                 [
                     'name' => 'Create',
-                    'url'  => $form->getAction('create')
+                    'url'  => $this->getAction('create')
                 ]
             ],
             'edit'   => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ],
                 [
                     'name' => 'Edit',
-                    'url'  => $form->getAction('edit')
+                    'url'  => $this->getAction('edit')
                 ]
             ],
         ];
@@ -471,6 +477,38 @@ abstract class AbstractResource
         }
 
         return array_merge(['web', 'laradium'], $this->middleware);
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getAction($action = 'index'): string
+    {
+        if ($action === 'create') {
+            return $this->getUrl('create');
+        } else if ($action === 'edit') {
+            return $this->getUrl($this->getModel()->id . '/edit');
+        } else if ($action === 'store') {
+            return $this->getUrl();
+        } else if ($action === 'update') {
+            return $this->getUrl($this->model->id);
+        }
+
+        return $this->getUrl();
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function getUrl($value = '')
+    {
+        if ($this->isShared()) {
+            return url('/' . $this->getBaseResource()->getSlug() . '/' . $value);
+        }
+
+        return url('/admin/' . $this->getBaseResource()->getSlug() . '/' . $value);
     }
 
     /**
