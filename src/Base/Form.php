@@ -4,7 +4,6 @@ namespace Laradium\Laradium\Base;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Base\Fields\Col;
 use Laradium\Laradium\Base\Fields\Tab;
 
 class Form
@@ -217,10 +216,11 @@ class Form
      */
     private function getUrl($value = '')
     {
-        if(!$this->abstractResource) {
+        if (!$this->abstractResource) {
             return '';
         }
-        if($this->abstractResource->isShared()) {
+
+        if ($this->abstractResource->isShared()) {
             return url('/' . $this->getResource()->getSlug() . '/' . $value);
         }
 
