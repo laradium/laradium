@@ -83,7 +83,7 @@ abstract class AbstractResource
     /**
      * @var array
      */
-    private $middleware = [];
+    protected $middleware = [];
 
     /**
      * @var Layout
@@ -101,7 +101,7 @@ abstract class AbstractResource
 
         $this->events = collect([]);
         $this->layout = new Layout;
-        if ($template = config('laradium.shared_resources_template')) {
+        if ($this->isShared() && $template = config('laradium.shared_resources_template')) {
             $this->layout->set($template);
         }
     }
@@ -477,6 +477,14 @@ abstract class AbstractResource
         }
 
         return array_merge(['web', 'laradium'], $this->middleware);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
