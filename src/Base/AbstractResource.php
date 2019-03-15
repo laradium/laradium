@@ -2,8 +2,10 @@
 
 namespace Laradium\Laradium\Base;
 
+use App\Http\Controllers\Controller;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -12,7 +14,7 @@ use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
 
-abstract class AbstractResource
+abstract class AbstractResource extends Controller
 {
 
     use Crud, CrudEvent, Editable;
@@ -81,11 +83,6 @@ abstract class AbstractResource
     private $baseResource;
 
     /**
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
      * @var Layout
      */
     protected $layout;
@@ -103,6 +100,12 @@ abstract class AbstractResource
         $this->layout = new Layout;
         if ($this->isShared() && $template = config('laradium.shared_resources_template')) {
             $this->layout->set($template);
+        }
+
+        if ($this->isShared()) {
+            $this->middleware('web');
+        } else {
+            $this->middleware(['web', 'laradium']);
         }
     }
 
@@ -371,14 +374,21 @@ abstract class AbstractResource
         }
 
         $allActions = collect([
-            'index'  => 'index',
+            'index'  => [
+                'index',
+                'data-table',
+                'export',
+                'toggle'
+            ],
             'create' => [
                 'create',
-                'store'
+                'store',
+                'import'
             ],
             'edit'   => [
                 'edit',
-                'update'
+                'update',
+                'editable'
             ],
             'show'   => 'show',
             'delete' => 'destroy'
@@ -468,23 +478,20 @@ abstract class AbstractResource
     }
 
     /**
-     * @return array
-     */
-    public function getResourceMiddleware()
-    {
-        if ($this->isShared()) {
-            return array_merge(['web'], $this->middleware);
-        }
-
-        return array_merge(['web', 'laradium'], $this->middleware);
-    }
-
-    /**
      * @return string
      */
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getPermission($action = 'view')
+    {
+        return $action . ' ' . Str::plural(Str::snake(class_basename($this->resource)));
     }
 
     /**

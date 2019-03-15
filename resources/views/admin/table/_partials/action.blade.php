@@ -1,10 +1,10 @@
 @if($resource)
-    @if($resource->hasAction('edit') && laradium()->hasPermissionTo(auth()->user(), $resource, 'edit'))
+    @if($resource->hasAction('edit') && laradium()->hasPermissionTo(auth()->user(), $resource->getPermission('update')))
         <a href="/{{ $resource->isShared() ? '' : 'admin/' }}{{ $resource->getBaseResource()->getSlug() }}/{{ $item->id }}/edit" class="btn btn-primary btn-sm"><i class="mdi mdi-pencil"></i>
             Edit</a>
     @endif
 
-    @if($resource->hasAction('delete') && laradium()->hasPermissionTo(auth()->user(), $resource, 'destroy'))
+    @if($resource->hasAction('delete') && laradium()->hasPermissionTo(auth()->user(), $resource->getPermission('delete')))
         <a href="javascript:;"
            data-url="/{{ $resource->isShared() ? '' : 'admin/' }}{{ $resource->getBaseResource()->getSlug() }}/{{ $item->id }}"
            class="btn btn-danger btn-sm js-delete-resource">
