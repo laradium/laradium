@@ -3,7 +3,12 @@
 namespace Laradium\Laradium\Base;
 
 use File;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -12,10 +17,9 @@ use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
 
-abstract class AbstractResource
+abstract class AbstractResource extends Controller
 {
-
-    use Crud, CrudEvent, Editable;
+    use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
      * @var
@@ -81,11 +85,6 @@ abstract class AbstractResource
     private $baseResource;
 
     /**
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
      * @var Layout
      */
     protected $layout;
@@ -104,6 +103,8 @@ abstract class AbstractResource
         if ($this->isShared() && $template = config('laradium.shared_resources_template')) {
             $this->layout->set($template);
         }
+
+        $this->middleware($this->isShared() ? ['web'] : ['web', 'laradium']);
     }
 
     /**
@@ -371,14 +372,23 @@ abstract class AbstractResource
         }
 
         $allActions = collect([
-            'index'  => 'index',
+            'index'  => [
+                'index',
+                'data-table',
+                'export',
+                'toggle'
+            ],
             'create' => [
                 'create',
-                'store'
+                'store',
+                'import',
+                'form'
             ],
             'edit'   => [
                 'edit',
-                'update'
+                'update',
+                'editable',
+                'form'
             ],
             'show'   => 'show',
             'delete' => 'destroy'
@@ -468,23 +478,24 @@ abstract class AbstractResource
     }
 
     /**
-     * @return array
-     */
-    public function getResourceMiddleware()
-    {
-        if ($this->isShared()) {
-            return array_merge(['web'], $this->middleware);
-        }
-
-        return array_merge(['web', 'laradium'], $this->middleware);
-    }
-
-    /**
      * @return string
      */
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getPermission($action = 'view')
+    {
+        $model = class_basename($this->resource);
+        $model = trim(preg_replace('/([A-Z])/', ' $1', $model));
+        $model = strtolower(Str::plural($model));
+
+        return $action . ' ' . $model;
     }
 
     /**
