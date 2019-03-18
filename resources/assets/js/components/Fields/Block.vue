@@ -1,6 +1,6 @@
 <template>
     <div :class="data.config.col" v-bind="fieldAttributes">
-        <div class="card-box table-responsive">
+        <div class="card-box">
             <slot></slot>
 
             <div class="row">
