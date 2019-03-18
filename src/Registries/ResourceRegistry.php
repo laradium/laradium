@@ -50,7 +50,7 @@ class ResourceRegistry
     {
         $this->resource = new $resourceName;
 
-        $routeName = strtolower($this->resource->getBaseResource()->getName());
+        $routeName = str_slug($this->resource->getBaseResource()->getName());
         $routeSlug = $this->resource->getBaseResource()->getSlug();
         $this->resources->push($resourceName);
 
@@ -71,7 +71,7 @@ class ResourceRegistry
                 'middleware' => $route['middleware'] ?? []
             ];
 
-            $this->routeRegistry->shared($this->resource->isShared())->register($route);
+            $this->routeRegistry->resource($this->resource)->register($route);
         }
 
         $routeList = [
