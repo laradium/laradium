@@ -33,11 +33,13 @@ trait ResourcePermissions
         foreach ($this->permissionsMap() as $method => $permissions) {
             if (is_array($permissions)) {
                 foreach ($permissions as $permission) {
-                    $middleware["permission:{$permission} {$parameter}"][] = $method;
+                    $middleware[sprintf('permission:%s %s', $permission, $parameter)][] = $method;
                 }
-            } else {
-                $middleware["permission:{$permissions} {$parameter}"][] = $method;
+
+                continue;
             }
+
+            $middleware[sprintf('permission:%s %s', $permissions, $parameter)][] = $method;
         }
 
         foreach ($middleware as $middlewareName => $methods) {

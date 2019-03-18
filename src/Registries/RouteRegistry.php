@@ -58,8 +58,7 @@ class RouteRegistry
      */
     public function register($route): void
     {
-        $prefix = $this->resource->getPrefix();
-        $name = $this->resource->isShared() ? ($prefix ? $prefix : '') : ($prefix ? 'admin.' . $prefix : 'admin');
+        $name = $this->getName($this->resource->getPrefix());
 
         $this->router->name($name ? $name . '.' : '')->group(function () use ($route) {
             $this->registerRoute($route);
@@ -80,5 +79,18 @@ class RouteRegistry
         if (isset($route['only'])) {
             $router = $router->only($route['only']);
         }
+    }
+
+    /**
+     * @param $prefix
+     * @return string
+     */
+    private function getName($prefix)
+    {
+        if ($this->resource->isShared()) {
+            return $prefix ?? '';
+        }
+
+        return $prefix ? 'admin.' . $prefix : 'admin';
     }
 }

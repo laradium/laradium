@@ -2,9 +2,12 @@
 
 namespace Laradium\Laradium\Base;
 
-use App\Http\Controllers\Controller;
 use File;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Interfaces\ResourceFilterInterface;
@@ -16,8 +19,7 @@ use Laradium\Laradium\Traits\Editable;
 
 abstract class AbstractResource extends Controller
 {
-
-    use Crud, CrudEvent, Editable;
+    use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
      * @var
@@ -102,11 +104,7 @@ abstract class AbstractResource extends Controller
             $this->layout->set($template);
         }
 
-        if ($this->isShared()) {
-            $this->middleware('web');
-        } else {
-            $this->middleware(['web', 'laradium']);
-        }
+        $this->middleware($this->isShared() ? ['web'] : ['web', 'laradium']);
     }
 
     /**
@@ -383,12 +381,14 @@ abstract class AbstractResource extends Controller
             'create' => [
                 'create',
                 'store',
-                'import'
+                'import',
+                'form'
             ],
             'edit'   => [
                 'edit',
                 'update',
-                'editable'
+                'editable',
+                'form'
             ],
             'show'   => 'show',
             'delete' => 'destroy'
@@ -491,7 +491,11 @@ abstract class AbstractResource extends Controller
      */
     public function getPermission($action = 'view')
     {
-        return $action . ' ' . Str::plural(Str::snake(class_basename($this->resource)));
+        $model = class_basename($this->resource);
+        $model = trim(preg_replace('/([A-Z])/', ' $1', $model));
+        $model = strtolower(Str::plural($model));
+
+        return $action . ' ' . $model;
     }
 
     /**
