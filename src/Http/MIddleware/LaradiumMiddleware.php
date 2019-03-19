@@ -26,16 +26,6 @@ class LaradiumMiddleware
             return redirect('/admin/login');
         }
 
-        if (!laradium()->hasPermissionTo($user)) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Access denied'
-                ], 403);
-            }
-
-            return redirect('/admin/access-denied');
-        }
-
         return $next($request);
     }
 }
