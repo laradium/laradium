@@ -16,6 +16,8 @@ class LaradiumMiddleware
      */
     public function handle($request, Closure $next)
     {
+        auth()->shouldUse('admin');
+
         $user = auth()->user();
 
         if (!$user) {

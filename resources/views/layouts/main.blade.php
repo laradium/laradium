@@ -111,7 +111,7 @@
 
                 @if(isset($resource))
                     <nav class="navbar-custom d-flex align-items-center justify-content-center margin-elements">
-                        @if($resource->hasAction('create') && laradium()->hasPermissionTo(auth()->user(), $resource, 'create'))
+                        @if($resource->hasAction('create') && $resource->hasPermission('create'))
                             <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create"
                                class="btn btn-primary btn-sm">
                                 <i class="fa fa-plus"></i> Create
