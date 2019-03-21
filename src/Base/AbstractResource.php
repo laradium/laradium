@@ -90,6 +90,11 @@ abstract class AbstractResource extends Controller
     protected $layout;
 
     /**
+     * @var bool
+     */
+    protected $usesPermissions = false;
+
+    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -515,6 +520,39 @@ abstract class AbstractResource extends Controller
         }
 
         return $this->getUrl();
+    }
+
+    /**
+     * @return string
+     */
+    public function getGuard()
+    {
+        return $this->isShared() ? 'web' : 'admin';
+    }
+
+    /**
+     * @param $action
+     * @param null $user
+     * @return bool
+     */
+    public function hasPermission($action, $user = null)
+    {
+        $guard = $this->getGuard();
+        $user = $user ?? auth($guard)->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if (!method_exists($user, 'hasPermissionTo')) {
+            return true;
+        }
+
+        if (!$this->usesPermissions) {
+            return true;
+        }
+
+        return $user->hasPermissionTo($this->getPermission($action), $guard);
     }
 
     /**

@@ -2,16 +2,16 @@
 
 namespace Laradium\Laradium\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\RedirectsUsers;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Laradium\Laradium\Services\Layout;
 
 class LoginController extends BaseController
@@ -19,7 +19,6 @@ class LoginController extends BaseController
 
     use RedirectsUsers, ThrottlesLogins;
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
 
 
     /**
@@ -141,7 +140,7 @@ class LoginController extends BaseController
      */
     protected function authenticated(Request $request, $user)
     {
-        //
+        return redirect()->to($this->redirectTo);
     }
 
     /**
@@ -202,6 +201,6 @@ class LoginController extends BaseController
      */
     protected function guard()
     {
-        return Auth::guard();
+        return Auth::guard('admin');
     }
 }

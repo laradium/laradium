@@ -70,7 +70,7 @@ class Menu extends Model
                     'name'           => $item->name,
                     'url'            => $item->url,
                     'icon'           => $item->icon,
-                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                    'has_permission' => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true
                 ]
             ];
         }

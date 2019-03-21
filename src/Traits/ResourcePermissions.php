@@ -13,6 +13,7 @@ trait ResourcePermissions
     {
         parent::__construct();
 
+        $this->usesPermissions = true;
         $this->authorizePermissionsFor($this->resource);
     }
 

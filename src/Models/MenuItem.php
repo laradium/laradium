@@ -58,6 +58,18 @@ class MenuItem extends \Baum\Node
     }
 
     /**
+     * @return mixed
+     */
+    public function getResource()
+    {
+        try {
+            return new $this->resource;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * @return string
      */
     private function getUrlFromResource()
