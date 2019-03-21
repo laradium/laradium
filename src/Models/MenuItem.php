@@ -62,11 +62,15 @@ class MenuItem extends \Baum\Node
      */
     public function getResource()
     {
-        try {
-            return new $this->resource;
-        } catch (\Exception $e) {
+        if (!$this->resource) {
             return null;
         }
+
+        if (!class_exists($this->resource)) {
+            return null;
+        }
+
+        return new $this->resource;
     }
 
     /**
@@ -74,18 +78,18 @@ class MenuItem extends \Baum\Node
      */
     private function getUrlFromResource()
     {
-        try {
-            if (!$this->resource) {
-                return '';
-            }
-
-            $resource = new $this->resource;
-            $slug = $resource->getBaseResource()->getSlug();
-
-            return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
-        } catch (\Exception $e) {
+        if (!$this->resource) {
             return '';
         }
+
+        if (!class_exists($this->resource)) {
+            return '';
+        }
+
+        $resource = new $this->resource;
+        $slug = $resource->getBaseResource()->getSlug();
+
+        return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
     }
 
     /**
