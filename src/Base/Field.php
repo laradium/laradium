@@ -87,6 +87,7 @@ class Field
      * @var null|\Closure
      */
     private $modifiedValue;
+
     /**
      * Field constructor.
      * @param $parameters
@@ -180,17 +181,17 @@ class Field
         }
 
         return [
-            'type' => $this->getType(),
-            'label' => $this->getLabel(),
-            'name' => !$this->isTranslatable() ? $this->getNameAttribute() : null,
-            'value' => $value,
+            'type'         => $this->getType(),
+            'label'        => $this->getLabel(),
+            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
+            'value'        => $value,
             'translations' => $this->getTranslations(),
-            'config' => [
+            'config'       => [
                 'is_translatable' => $this->isTranslatable(),
-                'col' => $this->getCol(),
+                'col'             => $this->getCol(),
             ],
-            'info' => $this->getInfo(),
-            'attr'   => $this->getAttributes()
+            'info'         => $this->getInfo(),
+            'attr'         => $this->getAttr()
         ];
     }
 
