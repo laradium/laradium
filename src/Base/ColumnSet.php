@@ -44,6 +44,7 @@ class ColumnSet
             'not_sortable'   => false,
             'not_searchable' => false,
             'switchable'     => false,
+            'width'          => $column === 'action' ? '150px' : null
         ]);
 
         $this->column = $column;
@@ -165,6 +166,23 @@ class ColumnSet
         $this->list = $this->list->map(function ($item) use ($title) {
             if ($this->column === $item['column']) {
                 $item['title'] = $title;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param $width
+     * @return $this
+     */
+    public function width($width)
+    {
+        $this->list = $this->list->map(function ($item) use ($width) {
+            if ($this->column === $item['column']) {
+                $item['width'] = $width;
             }
 
             return $item;
