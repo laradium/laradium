@@ -26,7 +26,6 @@ class Block extends Element
     {
         return [
             'name'   => $this->getName(),
-            'slug'   => str_slug($this->getName(), '_'),
             'type'   => 'block',
             'fields' => $this->getFields(),
             'config' => [
