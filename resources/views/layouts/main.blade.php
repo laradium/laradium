@@ -178,13 +178,13 @@
 <!-- END wrapper -->
 @yield('crud-url')
 
-{!! $layout->assetManager()->js()->bundle() !!}
-
 @isset($jsBeforeSource)
     @foreach($jsBeforeSource as $asset)
         <script src="{{ $asset }}"></script>
     @endforeach
 @endisset
+
+{!! $layout->assetManager()->js()->bundle() !!}
 
 @stack('scripts')
 
