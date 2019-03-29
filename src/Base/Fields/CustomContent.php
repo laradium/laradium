@@ -13,7 +13,7 @@ class CustomContent extends Element
     protected $content;
 
     /**
-     * Col constructor.
+     * CustomContent constructor.
      * @param $parameters
      * @param Model $model
      */
@@ -38,7 +38,6 @@ class CustomContent extends Element
     {
         return [
             'name'    => $this->getName(),
-            'slug'    => str_slug($this->getName(), '_'),
             'type'    => 'custom-content',
             'config'  => [
                 'is_translatable' => $this->getIsTranslatable(),
