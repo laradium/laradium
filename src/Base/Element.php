@@ -183,6 +183,14 @@ class Element
     /**
      * @return bool
      */
+    public function isTranslatable(): bool
+    {
+        return $this->isTranslatable;
+    }
+
+    /**
+     * @return bool
+     */
     public function getIsTranslatable(): bool
     {
         return $this->isTranslatable;
