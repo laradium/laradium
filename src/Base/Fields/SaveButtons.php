@@ -10,7 +10,7 @@ class SaveButtons extends Element
     /**
      * @var bool
      */
-    private $locale_selector = true;
+    private $languageSelect = true;
 
     /**
      * SaveButtons constructor.
@@ -39,7 +39,7 @@ class SaveButtons extends Element
             'type'   => 'save-buttons',
             'fields' => $this->getFields(),
             'config' => [
-                'locale_selector' => $this->locale_selector
+                'language_select' => $this->languageSelect
             ],
             'attr'   => $this->getAttributes(),
         ];
@@ -50,7 +50,7 @@ class SaveButtons extends Element
      */
     public function withoutLanguageSelect(): self
     {
-        $this->locale_selector = false;
+        $this->languageSelect = false;
 
         return $this;
     }
