@@ -35,7 +35,6 @@ class SaveButtons extends Element
     {
         return [
             'name'   => 'save-buttons',
-            'slug'   => 'save-buttons',
             'type'   => 'save-buttons',
             'fields' => $this->getFields(),
             'config' => [

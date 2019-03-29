@@ -11,7 +11,7 @@ class Row extends Element
     /**
      * @var boolean
      */
-    private $use_block = false;
+    private $useBlock = false;
 
     /**
      * Row constructor.
@@ -40,7 +40,7 @@ class Row extends Element
             'type'   => 'row',
             'fields' => $this->getFields(),
             'config' => [
-                'use_block' => $this->use_block,
+                'use_block' => $this->useBlock,
                 'col'       => 'col-md-12'
             ],
             'attr'   => $this->getAttributes()
@@ -52,7 +52,7 @@ class Row extends Element
      */
     public function block(): self
     {
-        $this->use_block = true;
+        $this->useBlock = true;
 
         return $this;
     }

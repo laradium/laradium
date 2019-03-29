@@ -34,7 +34,6 @@
             if (!this.columns.length) {
                 this.columns.push({
                     name: 'col-md-12',
-                    slug: 'col-md-12',
                     fields: this.data.fields,
                     config: {
                         col: 'col-md-12'
