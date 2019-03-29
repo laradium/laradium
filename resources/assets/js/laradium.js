@@ -39,6 +39,7 @@ Vue.component('save-buttons-field', require('./components/fields/SaveButtons.vue
 Vue.component('language-selector-field', require('./components/fields/LanguageSelect.vue').default);
 Vue.component('link-field', require('./components/fields/Link.vue').default);
 Vue.component('button-field', require('./components/fields/Button.vue').default);
+Vue.component('custom-content-field', require('./components/fields/CustomContent.vue').default);
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);
