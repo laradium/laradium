@@ -26,7 +26,7 @@
             ></component>
         </div>
         <div class="col-md-3"
-             v-if="data.config.locale_selector && form.data.is_translatable && form.data.languages.length"
+             v-if="data.config.language_select && form.data.is_translatable && form.data.languages.length"
              v-bind="fieldAttributes">
             <div class="row">
                 <div class="col-md-4 my-auto text-right">
@@ -58,7 +58,7 @@
             classes() {
                 let classes = '';
 
-                if (this.data.config.locale_selector) {
+                if (this.data.config.language_select) {
                     classes += 'col-md-9 '
                 } else {
                     classes += 'col-md-12 '
