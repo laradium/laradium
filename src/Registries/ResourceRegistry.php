@@ -50,6 +50,7 @@ class ResourceRegistry
     {
         $this->resource = new $resourceName;
 
+        $routeName = str_slug($this->resource->getBaseResource()->getName());
         $routeSlug = $this->resource->getBaseResource()->getSlug();
         $this->resources->push($resourceName);
 
@@ -64,13 +65,13 @@ class ResourceRegistry
         foreach ($this->resource->getCustomRoutes() as $name => $route) {
             $route = [
                 'method'     => $route['method'],
-                'name'       => $route['name'] ?? $name,
+                'name'       => $route['name'] ?? $routeName . '.' . $name,
                 'route_slug' => $this->getRouteName(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
                 'controller' => $this->getRouteController($name),
-                'middleware' => $route['middleware'] ?? $this->resource->getResourceMiddleware()
+                'middleware' => $route['middleware'] ?? []
             ];
 
-            $this->routeRegistry->shared($this->resource->isShared())->register($route);
+            $this->routeRegistry->resource($this->resource)->register($route);
         }
 
         $routeList = [
@@ -78,73 +79,54 @@ class ResourceRegistry
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
                 'controller' => $this->getRouteController('dataTable'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.data-table')
+                'name'       => $this->getName($routeName . '.data-table')
             ],
             [
                 'method'     => 'post',
                 'route_slug' => $this->getRouteName('editable/{locale?}'),
                 'controller' => $this->getRouteController('editable'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.editable')
+                'name'       => $this->getName($routeName . '.editable')
             ],
             [
                 'method'     => 'post',
                 'route_slug' => $this->getRouteName('toggle/{id?}'),
                 'controller' => $this->getRouteController('toggle'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.toggle')
+                'name'       => $this->getName($routeName . '.toggle')
             ],
             [
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('get-form/{id?}'),
                 'controller' => $this->getRouteController('getForm'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.form')
+                'name'       => $this->getName($routeName . '.form')
             ],
             // Import
             [
                 'method'     => 'post',
                 'route_slug' => $this->getRouteName('import'),
                 'controller' => $this->getRouteController('import'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.import')
+                'name'       => $this->getName($routeName . '.import')
             ],
             // Export
             [
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('export'),
                 'controller' => $this->getRouteController('export'),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'name'       => $this->getName($routeSlug . '.export')
+                'name'       => $this->getName($routeName . '.export')
             ],
             [
                 'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'middleware' => $this->resource->getResourceMiddleware(),
-                'only'       => $this->resource->getActions()
+                'only'       => $this->resource->getActions(),
             ],
         ];
 
         foreach ($routeList as $route) {
-            if (
-                isset($route['name']) &&
-                $route['name'] === $this->getName($routeSlug . '.import') &&
-                !method_exists($this->resource, 'import')
-            ) {
+            if (!$this->isAllowed($route, $this->resource)) {
                 continue;
             }
 
-            if (
-                isset($route['name']) &&
-                $route['name'] === $this->getName($routeSlug . '.export') &&
-                !method_exists($this->resource, 'export')
-            ) {
-                continue;
-            }
-
-            $this->routeRegistry->shared($this->resource->isShared())->register($route);
+            $this->routeRegistry->resource($this->resource)->register($route);
         }
 
         return $this;
@@ -156,11 +138,7 @@ class ResourceRegistry
      */
     private function getName(string $value)
     {
-        if ($this->resource->isShared()) {
-            return $value;
-        }
-
-        return 'admin.' . $value;
+        return $value;
     }
 
     /**
@@ -169,6 +147,43 @@ class ResourceRegistry
     public function all()
     {
         return $this->resources;
+    }
+
+    /**
+     * @param $route
+     * @param $resource
+     * @return bool
+     */
+    protected function isAllowed($route, $resource)
+    {
+        $routeName = strtolower($resource->getBaseResource()->getName());
+        $actions = $this->resource->getActions();
+
+        if (!isset($route['name'])) {
+            return true;
+        }
+
+        $methodName = array_last(explode('.', $route['name']));
+
+        if (
+            $route['name'] === $this->getName($routeName . '.import') &&
+            !method_exists($resource, 'import')
+        ) {
+            return false;
+        }
+
+        if (
+            $route['name'] === $this->getName($routeName . '.export') &&
+            !method_exists($resource, 'export')
+        ) {
+            return false;
+        }
+
+        if (!in_array($methodName, $actions)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

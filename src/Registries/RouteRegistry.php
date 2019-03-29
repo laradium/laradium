@@ -18,6 +18,11 @@ class RouteRegistry
     private $shared = false;
 
     /**
+     * @var
+     */
+    private $resource;
+
+    /**
      * RouteRegistry constructor.
      * @param Router $router
      */
@@ -38,23 +43,24 @@ class RouteRegistry
     }
 
     /**
+     * @param $resource
+     * @return $this
+     */
+    public function resource($resource): self
+    {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
      * @param $route
      */
     public function register($route): void
     {
-        if (isset($route['name'])) {
-            $this->router->{$route['method']}($route['route_slug'],
-                $route['controller'])->middleware($route['middleware'])->name($route['name']);
-            return;
-        }
+        $name = $this->getName($this->resource->getPrefix());
 
-        if ($this->shared) {
-            $this->registerRoute($route);
-
-            return;
-        }
-
-        $this->router->name('admin.')->group(function () use ($route) {
+        $this->router->name($name ? $name . '.' : '')->group(function () use ($route) {
             $this->registerRoute($route);
         });
     }
@@ -64,15 +70,27 @@ class RouteRegistry
      */
     private function registerRoute($route): void
     {
-        if ($route['method'] === 'resource') {
-            $this->router->{$route['method']}($route['route_slug'],
-                $route['controller'])->middleware($route['middleware'])->only($route['only']);
+        $router = $this->router->{$route['method']}($route['route_slug'], $route['controller']);
 
-            return;
+        if (isset($route['name'])) {
+            $router = $router->name($route['name']);
         }
 
-        $name = str_replace(['/admin/', '/'], ['', '.'], $route['route_slug']);
-        $this->router->name($name)->{$route['method']}($route['route_slug'],
-            $route['controller'])->middleware($route['middleware']);
+        if (isset($route['only'])) {
+            $router = $router->only($route['only']);
+        }
+    }
+
+    /**
+     * @param $prefix
+     * @return string
+     */
+    private function getName($prefix)
+    {
+        if ($this->resource->isShared()) {
+            return $prefix ?? '';
+        }
+
+        return $prefix ? 'admin.' . $prefix : 'admin';
     }
 }

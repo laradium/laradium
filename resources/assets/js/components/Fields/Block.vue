@@ -1,6 +1,6 @@
 <template>
     <div :class="data.config.col" v-bind="fieldAttributes">
-        <div class="card-box table-responsive">
+        <div class="card-box">
             <slot></slot>
 
             <div class="row">
@@ -34,7 +34,6 @@
             if (!this.columns.length) {
                 this.columns.push({
                     name: 'col-md-12',
-                    slug: 'col-md-12',
                     fields: this.data.fields,
                     config: {
                         col: 'col-md-12'

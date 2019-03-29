@@ -42,6 +42,8 @@ return [
 
     'dashboard-view' => 'laradium::admin.dashboard',
 
+    'shared_resources_template' => null,
+
     'menus' => [
         'Admin menu' => [
 //            [

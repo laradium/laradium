@@ -53,7 +53,7 @@ class Element
     private $attributes = [];
 
     /**
-     * Col constructor.
+     * Element constructor.
      * @param $parameters
      * @param Model $model
      */
@@ -70,12 +70,10 @@ class Element
     {
         return [
             'name'   => $this->name,
-            'slug'   => str_slug($this->name, '_'),
             'type'   => str_slug($this->getType()),
             'fields' => $this->fields,
             'config' => [
                 'is_translatable' => $this->isTranslatable,
-                'col'             => $this->name,
             ],
             'attr'   => $this->getAttributes()
         ];
@@ -137,14 +135,6 @@ class Element
     }
 
     /**
-     * @return bool
-     */
-    public function isTranslatable(): bool
-    {
-        return $this->isTranslatable;
-    }
-
-    /**
      * @param $value
      * @return $this
      */
@@ -188,6 +178,14 @@ class Element
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranslatable(): bool
+    {
+        return $this->isTranslatable;
     }
 
     /**

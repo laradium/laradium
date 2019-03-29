@@ -16,6 +16,8 @@ class LaradiumMiddleware
      */
     public function handle($request, Closure $next)
     {
+        auth()->shouldUse('admin');
+
         $user = auth()->user();
 
         if (!$user) {
@@ -24,16 +26,6 @@ class LaradiumMiddleware
 
         if (!$user->is_admin) {
             return redirect('/admin/login');
-        }
-
-        if (!laradium()->hasPermissionTo($user)) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Access denied'
-                ], 403);
-            }
-
-            return redirect('/admin/access-denied');
         }
 
         return $next($request);

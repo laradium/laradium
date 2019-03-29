@@ -33,6 +33,11 @@ class Resource
     private $slug;
 
     /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
      * @var array
      */
     private $requestParams = [];
@@ -83,6 +88,17 @@ class Resource
     public function slug($value)
     {
         $this->slug = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function prefix($value)
+    {
+        $this->prefix = $value;
 
         return $this;
     }
@@ -152,14 +168,14 @@ class Resource
     {
         if (!$this->slug && $this->name) {
             $this->slug = strtolower(str_replace(' ', '-', $this->name));
+        }
 
-            return $this->slug;
-        } else {
-            if (!$this->slug && !$this->name) {
-                $this->name = str_replace('_', '-', $this->model->getTable());
+        if (!$this->slug && !$this->name) {
+            $this->slug = str_replace('_', '-', $this->model->getTable());
+        }
 
-                return $this->name;
-            }
+        if ($this->prefix) {
+            $this->slug = $this->prefix . '/' . $this->slug;
         }
 
         return $this->slug;
@@ -172,14 +188,15 @@ class Resource
     {
         if (!$this->name && !$this->slug) {
             return ucfirst(str_replace('_', ' ', $this->model->getTable()));
-        } else {
-            if (!$this->name && $this->slug) {
-                return ucfirst(str_replace('-', ' ', $this->slug));
-            }
+        }
+
+        if (!$this->name && $this->slug) {
+            return ucfirst(str_replace('-', ' ', $this->slug));
         }
 
         return ucfirst($this->name);
     }
+
 
     /**
      * @param string $action
@@ -249,8 +266,6 @@ class Resource
 
         return $this;
     }
-
-
 
     /**
      * @param array $assets

@@ -1,7 +1,8 @@
 @extends($layout->get(), ['title' => $resource->getBaseResource()->getName(), 'table' => $table])
+
 @section('content')
     @include('laradium::admin._partials.breadcrumbs', [
-        'items' => $resource->getBreadcrumbs('index')
+        'breadcrumbs' => $resource->getBreadcrumbs('index')
     ])
 
     <div class="row">

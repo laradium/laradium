@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Providers;
 
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
@@ -46,8 +45,8 @@ class LaradiumServiceProvider extends ServiceProvider
 
         // Mail config
         $this->setMailConfig();
-
         $this->setTranslatableConfig();
+        $this->setAdminGuard();
     }
 
     /**
@@ -312,6 +311,26 @@ class LaradiumServiceProvider extends ServiceProvider
 
         foreach ($composers as $composer) {
             view()->composer($composer['views'], $composer['composer']);
+        }
+    }
+
+    /**
+     * Set translatable config
+     *
+     * @return void
+     */
+    private function setAdminGuard()
+    {
+        try {
+            config([
+                'auth.guards' => array_merge(config('auth.guards'), [
+                    'admin' => [
+                        'driver'   => 'session',
+                        'provider' => 'users',
+                    ],
+                ])
+            ]);
+        } catch (\Exception $e) {
         }
     }
 }

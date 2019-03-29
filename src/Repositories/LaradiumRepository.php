@@ -65,14 +65,13 @@ class LaradiumRepository
      * @param string $action
      * @return bool
      */
-    public function hasPermissionTo($user, $resource = null, $action = 'index'): bool
+    public function hasPermissionTo($user, $permission)
     {
         if (config('laradium.disable_permissions')) {
             return true;
         }
 
-        return !method_exists($user, 'hasPermissionTo') ||
-            (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($resource, $action));
+        return !method_exists($user, 'hasPermissionTo') || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($permission));
     }
 
     /**

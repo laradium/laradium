@@ -3,19 +3,23 @@
 namespace Laradium\Laradium\Base;
 
 use File;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
+use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
-use Laradium\Laradium\Services\Asset\AssetManager;
 use Laradium\Laradium\Services\Layout;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
 
-abstract class AbstractResource
+abstract class AbstractResource extends Controller
 {
-
-    use Crud, CrudEvent, Editable;
+    use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
      * @var
@@ -36,6 +40,11 @@ abstract class AbstractResource
      * @var string
      */
     protected $slug;
+
+    /**
+     * @var string
+     */
+    protected $prefix;
 
     /**
      * @var bool
@@ -76,14 +85,14 @@ abstract class AbstractResource
     private $baseResource;
 
     /**
-     * @var array
-     */
-    private $middleware = [];
-
-    /**
      * @var Layout
      */
     protected $layout;
+
+    /**
+     * @var bool
+     */
+    protected $usesPermissions = false;
 
     /**
      * AbstractResource constructor.
@@ -93,9 +102,14 @@ abstract class AbstractResource
         if (class_exists($this->resource)) {
             $this->model(new $this->resource);
         }
-        $this->layout = new Layout;
 
         $this->events = collect([]);
+        $this->layout = new Layout;
+        if ($this->isShared() && $template = config('laradium.shared_resources_template')) {
+            $this->layout->set($template);
+        }
+
+        $this->middleware($this->isShared() ? ['web'] : ['web', 'laradium']);
     }
 
     /**
@@ -163,7 +177,8 @@ abstract class AbstractResource
      */
     public function edit($id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
         }
@@ -188,7 +203,8 @@ abstract class AbstractResource
      */
     public function update(Request $request, $id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
         }
@@ -224,12 +240,13 @@ abstract class AbstractResource
      */
     public function destroy(Request $request, $id)
     {
-        $model = $this->model;
+        $model = $this->getModel();
+
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
         }
 
-        $model = $model->findOrFail($id);
+        $this->model($model->findOrFail($id));
         $model->delete();
 
         $this->fireEvent('afterDelete', $request);
@@ -242,7 +259,6 @@ abstract class AbstractResource
 
         return back()->withSuccess('Resource successfully deleted!');
     }
-
 
     /**
      * @return array
@@ -288,7 +304,8 @@ abstract class AbstractResource
 
         return (new Resource)->model($model)
             ->name($this->name)
-            ->slug($this->slug);
+            ->slug($this->slug)
+            ->prefix($this->prefix);
     }
 
     /**
@@ -322,7 +339,13 @@ abstract class AbstractResource
      */
     public function getModel()
     {
-        return $this->model;
+        $model = $this->model;
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model)->getModel();
+        }
+
+        return $model;
     }
 
     /**
@@ -354,14 +377,23 @@ abstract class AbstractResource
         }
 
         $allActions = collect([
-            'index'  => 'index',
+            'index'  => [
+                'index',
+                'data-table',
+                'export',
+                'toggle'
+            ],
             'create' => [
                 'create',
-                'store'
+                'store',
+                'import',
+                'form'
             ],
             'edit'   => [
                 'edit',
-                'update'
+                'update',
+                'editable',
+                'form'
             ],
             'show'   => 'show',
             'delete' => 'destroy'
@@ -378,33 +410,34 @@ abstract class AbstractResource
      */
     public function getBreadcrumbs($action)
     {
-        $form = $this->getForm();
+        $baseResource = $this->getBaseResource();
+        $name = $baseResource->getName();
 
         $breadcrumbs = [
             'index'  => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ]
             ],
             'create' => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ],
                 [
                     'name' => 'Create',
-                    'url'  => $form->getAction('create')
+                    'url'  => $this->getAction('create')
                 ]
             ],
             'edit'   => [
                 [
-                    'name' => $this->getBaseResource()->getName(),
-                    'url'  => $form->getAction('index')
+                    'name' => $name,
+                    'url'  => $this->getAction('index')
                 ],
                 [
                     'name' => 'Edit',
-                    'url'  => $form->getAction('edit')
+                    'url'  => $this->getAction('edit')
                 ]
             ],
         ];
@@ -450,15 +483,89 @@ abstract class AbstractResource
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getResourceMiddleware()
+    public function getPrefix()
     {
-        if ($this->isShared()) {
-            return array_merge(['web'], $this->middleware);
+        return $this->prefix;
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getPermission($action = 'view')
+    {
+        $model = class_basename($this->resource);
+        $model = trim(preg_replace('/([A-Z])/', ' $1', $model));
+        $model = strtolower(Str::plural($model));
+
+        return $action . ' ' . $model;
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getAction($action = 'index'): string
+    {
+        if ($action === 'create') {
+            return $this->getUrl('create');
+        } else if ($action === 'edit') {
+            return $this->getUrl($this->getModel()->id . '/edit');
+        } else if ($action === 'store') {
+            return $this->getUrl();
+        } else if ($action === 'update') {
+            return $this->getUrl($this->model->id);
         }
 
-        return array_merge(['web', 'laradium'], $this->middleware);
+        return $this->getUrl();
+    }
+
+    /**
+     * @return string
+     */
+    public function getGuard()
+    {
+        return $this->isShared() ? 'web' : 'admin';
+    }
+
+    /**
+     * @param $action
+     * @param null $user
+     * @return bool
+     */
+    public function hasPermission($action, $user = null)
+    {
+        $guard = $this->getGuard();
+        $user = $user ?? auth($guard)->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if (!method_exists($user, 'hasPermissionTo')) {
+            return true;
+        }
+
+        if (!$this->usesPermissions) {
+            return true;
+        }
+
+        return $user->hasPermissionTo($this->getPermission($action), $guard);
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    private function getUrl($value = '')
+    {
+        if ($this->isShared()) {
+            return url('/' . $this->getBaseResource()->getSlug() . '/' . $value);
+        }
+
+        return url('/admin/' . $this->getBaseResource()->getSlug() . '/' . $value);
     }
 
     /**
