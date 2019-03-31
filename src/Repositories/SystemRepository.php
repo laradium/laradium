@@ -37,10 +37,14 @@ class SystemRepository
         $serverMemory = serverMemory();
         $networkStats = networkStats();
 
+        $totalDiskSpace = disk_total_space('/');
+        $freeDiskSpace = disk_free_space('/');
+
         return (object)[
             'disk'    => (object)[
-                'total' => formatBytes(disk_total_space('/')),
-                'free'  => formatBytes(disk_total_space('/') - disk_free_space('/'))
+                'percent' => round(($freeDiskSpace / $totalDiskSpace) * 100, 2),
+                'total'   => formatBytes($totalDiskSpace),
+                'free'    => formatBytes($totalDiskSpace - $freeDiskSpace)
             ],
             'ram'     => (object)[
                 'percent' => round($serverMemory->percent, 2),

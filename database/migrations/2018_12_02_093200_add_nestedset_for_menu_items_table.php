@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Laradium\Laradium\Base\Laradium;
+use Laradium\Laradium\Models\MenuItem;
 
 class AddNestedsetForMenuItemsTable extends Migration
 {
@@ -21,9 +23,9 @@ class AddNestedsetForMenuItemsTable extends Migration
             $table->integer('depth')->nullable()->after('rgt');
         });
 
-        if (!\Laradium\Laradium\Models\MenuItem::get()->count()) {
+        if (!MenuItem::get()->count()) {
             $menus = [];
-            $laradium = app(\Laradium\Laradium\Base\Laradium::class);
+            $laradium = app(Laradium::class);
 
             foreach ($laradium->resources() as $resource) {
                 $laradium->register($resource);
@@ -84,7 +86,8 @@ class AddNestedsetForMenuItemsTable extends Migration
             'PageResource'        => 'fa fa-file-text-o',
             'MenuResource'        => 'fa fa-link',
             'SettingResource'     => 'fa fa-cogs',
-            'UserResource'        => 'fa fa-users'
+            'UserResource'        => 'fa fa-users',
+            'SystemLogResource'   => 'fa fa-tachometer'
         ];
 
         $resource = array_last(explode('\\', get_class($resource)));
