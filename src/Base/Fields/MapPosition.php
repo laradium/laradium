@@ -28,7 +28,7 @@ class MapPosition extends Field
      * @param $longitude
      * @return $this
      */
-    public function longitude($longitude)
+    public function longitude($longitude): self
     {
         $this->longitude = $longitude;
 
@@ -39,7 +39,7 @@ class MapPosition extends Field
      * @param $latitude
      * @return $this
      */
-    public function latitude($latitude)
+    public function latitude($latitude): self
     {
         $this->latitude = $latitude;
 
@@ -50,7 +50,7 @@ class MapPosition extends Field
      * @param $field
      * @return $this
      */
-    public function zoomable($field)
+    public function zoomable($field): self
     {
         $this->zoom = [
             'enabled' => true,
@@ -63,7 +63,7 @@ class MapPosition extends Field
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function formattedResponse(): array
     {
         $attributes = $this->getAttributes();
         array_pop($attributes);
@@ -84,5 +84,4 @@ class MapPosition extends Field
 
         return array_merge(parent::formattedResponse(), $data);
     }
-
 }
