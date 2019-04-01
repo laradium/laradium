@@ -335,6 +335,7 @@ class Field
     }
 
     /**
+     * @param null $attributes
      * @return string
      */
     public function getNameAttribute($attributes = null)

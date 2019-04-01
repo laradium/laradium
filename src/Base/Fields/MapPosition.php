@@ -7,7 +7,17 @@ use Laradium\Laradium\Base\Field;
 class MapPosition extends Field
 {
     /**
-     * @var bool
+     * @var string
+     */
+    protected $longitude = '';
+
+    /**
+     * @var string
+     */
+    protected $latitude = '';
+
+    /**
+     * @var array
      */
     protected $zoom = [
         'enabled' => false,
@@ -16,6 +26,7 @@ class MapPosition extends Field
 
     /**
      * @param $longitude
+     * @return $this
      */
     public function longitude($longitude)
     {
@@ -26,6 +37,7 @@ class MapPosition extends Field
 
     /**
      * @param $latitude
+     * @return $this
      */
     public function latitude($latitude)
     {
@@ -35,9 +47,10 @@ class MapPosition extends Field
     }
 
     /**
+     * @param $field
      * @return $this
      */
-    public function zoomable($field): self
+    public function zoomable($field)
     {
         $this->zoom = [
             'enabled' => true,
@@ -52,7 +65,6 @@ class MapPosition extends Field
      */
     public function formattedResponse()
     {
-        $data = parent::formattedResponse();
         $attributes = $this->getAttributes();
         array_pop($attributes);
 
