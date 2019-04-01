@@ -10,7 +10,7 @@
     "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
-    "@babel/polyfill": "^7.2.5",
+    "@babel/polyfill": "^7.4.0",
     "axios": "^0.18",
     "bootstrap": "^4.3.1",
     "cross-env": "^5.1",
@@ -21,8 +21,8 @@
     "resolve-url-loader": "2.3.1",
     "sass": "^1.17.3",
     "sass-loader": "7.*",
-    "vue": "^2.6.9",
-    "vue-template-compiler": "^2.6.9"
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10"
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
@@ -35,7 +35,8 @@
     "switchery": "0.0.2",
     "toastr": "^2.1.4",
     "vue-trumbowyg": "^3.4.2",
-    "vuedraggable": "^2.19.2",
+    "vue2-google-maps": "^0.10.2",
+    "vuedraggable": "^2.20.0",
     "x-editable": "^1.5.1"
   }
 }

@@ -335,11 +335,12 @@ class Field
     }
 
     /**
+     * @param null $attributes
      * @return string
      */
-    public function getNameAttribute()
+    public function getNameAttribute($attributes = null)
     {
-        return implode('', collect($this->getAttributes())->filter(function ($item) {
+        return implode('', collect($attributes ?? $this->getAttributes())->filter(function ($item) {
             return $item !== null;
         })->map(function ($item, $index) {
             if ($index !== 0) {

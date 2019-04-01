@@ -40,6 +40,7 @@ Vue.component('language-selector-field', require('./components/fields/LanguageSe
 Vue.component('link-field', require('./components/fields/Link.vue').default);
 Vue.component('button-field', require('./components/fields/Button.vue').default);
 Vue.component('custom-content-field', require('./components/fields/CustomContent.vue').default);
+Vue.component('mapposition-field', require('./components/fields/MapPosition.vue').default);
 
 Vue.component('hasone-field', require('./components/fields/HasOne.vue').default);
 Vue.component('hasmany-field', require('./components/fields/HasMany.vue').default);
@@ -83,6 +84,15 @@ import 'trumbowyg/dist/plugins/history/trumbowyg.history.min';
 
 $.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
 Vue.use(VueTrumbowyg);
+
+// Google maps
+import * as VueGoogleMaps from 'vue2-google-maps'
+Vue.use(VueGoogleMaps, {
+	load: {
+		key: Laradium.settings['credentials.google_maps_api_key'],
+		libraries: 'places'
+	},
+});
 
 Vue.mixin({
     methods: {
