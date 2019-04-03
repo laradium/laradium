@@ -246,7 +246,8 @@ abstract class AbstractResource extends Controller
             $model = $model->where($where);
         }
 
-        $this->model($model->findOrFail($id));
+        $this->model($model = $model->findOrFail($id));
+
         $model->delete();
 
         $this->fireEvent('afterDelete', $request);
