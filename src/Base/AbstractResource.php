@@ -183,7 +183,11 @@ abstract class AbstractResource extends Controller
             $model = $model->where($where);
         }
 
-        $this->model($model->findOrFail($id));
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
+        }
+
+        $this->model($model = $model->findOrFail($id));
 
         return view($this->getView('edit'), [
             'form'           => $this->getForm(),
@@ -207,6 +211,10 @@ abstract class AbstractResource extends Controller
 
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
+        }
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
         }
 
         $this->model($model->findOrFail($id));
@@ -246,6 +254,10 @@ abstract class AbstractResource extends Controller
             $model = $model->where($where);
         }
 
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
+        }
+
         $this->model($model = $model->findOrFail($id));
 
         $model->delete();
@@ -283,6 +295,10 @@ abstract class AbstractResource extends Controller
         $model = $this->getModel();
         if ($where = $this->resource()->getWhere()) {
             $model = $model->where($where);
+        }
+
+        if ($this instanceof ResourceFilterInterface) {
+            $model = $this->filter($model);
         }
 
         $model = $model->findOrFail($id);
@@ -340,13 +356,7 @@ abstract class AbstractResource extends Controller
      */
     public function getModel()
     {
-        $model = $this->model;
-
-        if ($this instanceof ResourceFilterInterface) {
-            $model = $this->filter($model)->getModel();
-        }
-
-        return $model;
+        return $this->model;
     }
 
     /**
