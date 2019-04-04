@@ -33,7 +33,7 @@ class LoginController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest:admin')->except('logout');
     }
 
     /**

@@ -87,7 +87,7 @@ class MenuItem extends \Baum\Node
         }
 
         $resource = new $this->resource;
-        $slug = $resource->getBaseResource()->getSlug();
+        $slug = str_replace('/', '.', $resource->getBaseResource()->getSlug());
 
         return $resource->isShared() ? route($slug . '.index') : route('admin.' . $slug . '.index');
     }
