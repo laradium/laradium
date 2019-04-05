@@ -107,3 +107,103 @@
     }
   }
 }
+
+$baseFontSize: 16;
+$green: #1abc9c;
+$yellow: #f1c40f;
+$red: #c0392b;
+$blue: #3498db;
+$grey: #f2f2f2;
+
+@function rem($val) {
+    @return #{$val / $baseFontSize}rem;
+}
+
+
+// Gauge
+.mask {
+    position: relative;
+    overflow: hidden;
+
+    display: block;
+    width: rem(200);
+    height: rem(100);
+    margin: rem(20);
+
+    .info-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+
+        .info {
+            position: relative;
+            left: -50%;
+            font-size: 16pt;
+        }
+    }
+}
+
+.semi-circle {
+    position: relative;
+
+    display: block;
+    width: rem(200);
+    height: rem(100);
+
+    background: linear-gradient(to right, $green 0%, $yellow 50%, $red 100%);
+
+    border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+
+    &::before {
+        content: "";
+
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        z-index: 2;
+
+        display: block;
+        width: rem(140);
+        height: rem(70);
+        margin-left: rem(-70);
+
+        background: #fff;
+
+        border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+    }
+}
+
+.semi-circle--mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: rem(200);
+    height: rem(200);
+
+    background: transparent;
+
+    transform: rotate(120deg) translate3d(0, 0, 0);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    transition: all .3s ease-in-out;
+
+    &::before {
+        content: "";
+
+        position: absolute;
+        top: 0;
+        left: 0%;
+        z-index: 2;
+
+        display: block;
+        width: rem(202);
+        height: rem(102);
+        margin: -1px 0 0 -1px;
+
+        background: #f2f2f2;
+
+        border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+    }
+}

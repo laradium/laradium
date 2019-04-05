@@ -25,6 +25,7 @@ class Laradium
     protected $baseResources = [
         'vendor/laradium/laradium/src/Base/Resources'            => 'Laradium\\Laradium\\Base\\Resources\\',
         'vendor/laradium/laradium-content/src/Base/Resources'    => 'Laradium\\Laradium\\Content\\Base\\Resources\\',
+        'vendor/laradium/laradium-system/src/Base/Resources'     => 'Laradium\\Laradium\\System\\Base\\Resources\\',
         'vendor/laradium/laradium-permission/src/Base/Resources' => 'Laradium\\Laradium\\Permission\\Base\\Resources\\',
     ];
 

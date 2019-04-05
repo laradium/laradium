@@ -6,9 +6,20 @@ use Laradium\Laradium\Base\ApiResource;
 use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Base\Validation;
+use Laradium\Laradium\System\Repositories\SystemRepository;
 
 class LaradiumRepository
 {
+
+    /**
+     * LaradiumRepository constructor.
+     */
+    public function __construct()
+    {
+        $systemRepo = 'Laradium\\Laradium\\System\\Repositories\\SystemRepository';
+
+        $this->systemRepo = class_exists($systemRepo) ? new $systemRepo() : null;
+    }
 
     /**
      * @param \Closure $closure
@@ -59,5 +70,13 @@ class LaradiumRepository
         }
 
         return !method_exists($user, 'hasPermissionTo') || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($permission));
+    }
+
+    /**
+     * @return SystemRepository|null
+     */
+    public function system(): ?SystemRepository
+    {
+        return $this->systemRepo;
     }
 }
