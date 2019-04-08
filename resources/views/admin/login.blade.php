@@ -11,16 +11,17 @@
     <title>{{ config('app.name') }} - Login</title>
 
     <!-- App css -->
-    {!! $layout->assetManager()->css()->bundle([
+    {!! $layout->assetManager()->css()->custom([
+        asset('/laradium/assets/css/bundle.css'),
         asset('/laradium/admin/assets/css/icons.css'),
         asset('/laradium/admin/assets/css/style.css')
-    ]) !!}
+     ])->render() !!}
 
     <style>
         .btn-bordred.btn-custom {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
-            border-bottom: 2px solid {{setting()->get('design.admin_theme_color', '#4fa4f8')}}  !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
+            border-bottom: 2px solid {{setting()->get('design.admin_theme_color', '#4fa4f8')}}    !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}    !important;
         }
     </style>
 </head>
