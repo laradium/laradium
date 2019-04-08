@@ -45,6 +45,7 @@ window.select2 = require('select2');
 window.jstree = require('jstree');
 window.toastr = require('toastr');
 window.editable = require('x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min');
+window.slimScroll = require('jquery-slimscroll');
 
 $.ajaxSetup({
 	headers: {
@@ -60,4 +61,12 @@ $(function() {
    if($(document).find('li.has_sub a').hasClass('active')) {
        $('li.has_sub a.active').next('ul').slideDown()
    }
+   
+	$('.slimscrollleft').slimScroll({
+		height: 'auto',
+		position: 'right',
+		size: "7px",
+		color: '#828e94',
+		wheelStep: 5
+	});
 });
