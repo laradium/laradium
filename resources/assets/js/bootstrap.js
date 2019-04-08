@@ -60,4 +60,12 @@ $(function() {
    if($(document).find('li.has_sub a').hasClass('active')) {
        $('li.has_sub a.active').next('ul').slideDown()
    }
+   
+	$('.slimscrollleft').slimScroll({
+		height: 'auto',
+		position: 'right',
+		size: "7px",
+		color: '#828e94',
+		wheelStep: 5
+	});
 });

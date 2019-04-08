@@ -18,6 +18,25 @@ class AssetManager
     private $css = false;
 
     /**
+     * @var \Illuminate\Support\Collection
+     */
+    private $assetsJs;
+
+    /**
+     * @var \Illuminate\Support\Collection
+     */
+    private $assetsCss;
+
+    /**
+     * AssetManager constructor.
+     */
+    public function __construct()
+    {
+        $this->assetsJs = collect([]);
+        $this->assetsCss = collect([]);
+    }
+
+    /**
      * @return AssetManager
      */
     public function css(): self
@@ -50,6 +69,26 @@ class AssetManager
     /**
      * @return array
      */
+    public function coreJs(): array
+    {
+        return [
+            versionedAsset('laradium/assets/js/laradium.js')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function coreCss(): array
+    {
+        return [
+            versionedAsset('laradium/assets/css/laradium.css')
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function customJs(): array
     {
         return config('laradium.custom_js', []);
@@ -64,66 +103,107 @@ class AssetManager
     }
 
     /**
-     * @return string
-     * @throws \Throwable
+     * Custom assets
+     *
+     * @return $this
      */
-    public function custom(): string
+    public function custom($assets = []): self
     {
         if ($this->js) {
-            return view('laradium::admin._partials.assets.js', [
-                'assets' => $this->customJs()
-            ])->render();
+            $this->assetsJs->push(array_merge($assets, $this->customJs()));
+
+            return $this;
         }
 
-        return view('laradium::admin._partials.assets.css', [
-            'assets' => $this->customCss()
-        ])->render();
+        $this->assetsCss->push(array_merge($assets, $this->customCss()));
+
+        return $this;
     }
 
     /**
-     * @return string
-     * @throws \Throwable
+     * Core assets
+     *
+     * @return $this
      */
-    public function core(): string
+    public function core(): self
     {
         if ($this->js) {
-            return view('laradium::admin._partials.assets.js', [
-                'assets' => [
-                    versionedAsset('laradium/assets/js/laradium.js')
-                ]
-            ])->render();
+            $this->assetsJs->push($this->coreJs());
+
+            return $this;
         }
 
-        return view('laradium::admin._partials.assets.css', [
-            'assets' => [
-                versionedAsset('laradium/assets/css/laradium.css')
-            ]
-        ])->render();
+        $this->assetsCss->push($this->coreCss());
+
+        return $this;
     }
 
     /**
-     * @param array $customAssets
-     * @return string
-     * @throws \Throwable
+     * Bundle assets
+     *
+     * @return $this
      */
-    public function bundle(array $customAssets = []): string
+    public function bundle(): self
     {
         if ($this->js) {
-            return view('laradium::admin._partials.assets.js', [
-                    'assets' => array_merge([
+            $this->assetsJs->push(
+                array_merge(
+                    [
                         versionedAsset('laradium/assets/js/manifest.js'),
                         versionedAsset('laradium/assets/js/vendor.js'),
+                    ],
+                    $this->coreJs(),
+                    [
                         asset('/laradium/admin/assets/plugins/switchery/switchery.min.js'),
-                    ], $customAssets)
-                ])->render() . $this->js()->core() . $this->js()->custom();
+                        asset('/laradium/admin/assets/js/jquery.slimscroll.js'),
+                    ],
+                    $this->customJs()
+                ));
+
+            return $this;
         }
 
-        return view('laradium::admin._partials.assets.css', [
-                'assets' => array_merge([
+        $this->assetsCss->push(
+            array_merge(
+                [
                     versionedAsset('laradium/assets/css/bundle.css'),
                     'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
                     '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'
-                ], $customAssets)
-            ])->render() . $this->css()->core() . $this->css()->custom();
+                ],
+                $this->customCss(),
+                $this->coreCss()
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public function render(): string
+    {
+        if ($this->js) {
+            return view('laradium::admin._partials.assets.js', [
+                'assets' => $this->assetsJs->collapse()->toArray()
+            ])->render();
+        }
+
+        return view('laradium::admin._partials.assets.css', [
+            'assets' => $this->assetsCss->collapse()->toArray()
+        ])->render();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function collection(): Collection
+    {
+        if ($this->js) {
+            return $this->assetsJs->collapse();
+        }
+
+        return $this->assetsCss->collapse();
     }
 }

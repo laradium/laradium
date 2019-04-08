@@ -13,10 +13,10 @@
 
 <!-- Styles -->
 
-    {!! $layout->assetManager()->css()->bundle([
+    {!! $layout->assetManager()->css()->bundle()->custom([
         asset('/laradium/admin/assets/css/icons.css'),
         asset('/laradium/admin/assets/css/style.css')
-    ]) !!}
+    ])->render() !!}
 
     @stack('styles')
 
@@ -31,11 +31,11 @@
         */
 
         .navbar-default {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}           !important;
         }
 
         .topbar .topbar-left {
-            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
+            border-top: 3px solid {{setting()->get('design.admin_theme_color', '#71b6f9')}}           !important;
         }
 
         .user-box ul li a:hover {
@@ -43,16 +43,16 @@
         }
 
         .text-custom {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}           !important;
         }
 
         #sidebar-menu > ul > li > a.active {
             border-left: 3px solid{{setting()->get('design.admin_theme_color', '#71b6f9')}};
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}           !important;
         }
 
         #sidebar-menu > ul > li > a:hover {
-            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}          !important;
+            color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}           !important;
         }
 
         a:hover {
@@ -64,13 +64,13 @@
         }
 
         .btn-primary {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
 
         .page-item.active .page-link {
-            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
-            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}  !important;
+            background: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
+            border-color: {{setting()->get('design.admin_theme_color', '#71b6f9')}}   !important;
         }
     </style>
 
@@ -184,7 +184,7 @@
     @endforeach
 @endisset
 
-{!! $layout->assetManager()->js()->bundle() !!}
+{!! $layout->assetManager()->js()->bundle()->render() !!}
 
 @stack('scripts')
 
