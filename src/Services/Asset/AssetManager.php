@@ -154,8 +154,7 @@ class AssetManager
                     ],
                     $this->coreJs(),
                     [
-                        asset('/laradium/admin/assets/plugins/switchery/switchery.min.js'),
-                        asset('/laradium/admin/assets/js/jquery.slimscroll.js'),
+                        asset('/laradium/admin/assets/plugins/switchery/switchery.min.js')
                     ],
                     $this->customJs()
                 ));

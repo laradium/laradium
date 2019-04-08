@@ -45,6 +45,7 @@ window.select2 = require('select2');
 window.jstree = require('jstree');
 window.toastr = require('toastr');
 window.editable = require('x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min');
+window.slimScroll = require('jquery-slimscroll');
 
 $.ajaxSetup({
 	headers: {

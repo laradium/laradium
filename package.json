@@ -28,6 +28,7 @@
     "font-awesome": "^4.7.0",
     "jquery-datetimepicker": "^2.5.21",
     "jquery-resizable-dom": "^0.32.0",
+    "jquery-slimscroll": "^1.3.8",
     "jquery-ui": "^1.12.1",
     "jstree": "^3.3.7",
     "select2": "^4.0.6-rc.1",
