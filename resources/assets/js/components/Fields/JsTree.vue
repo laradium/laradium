@@ -93,7 +93,6 @@
                 tree.jstree('open_all');
 
                 let modified_tree = tree.jstree(true).get_json('#', {flat: true});
-                console.log(field.attr.length, field.attr.key);
                 if(field.attr.key !== undefined && field.attr.key === 'admin_menu') {
                     serverBus.$emit('formatted', modified_tree);
                 }
