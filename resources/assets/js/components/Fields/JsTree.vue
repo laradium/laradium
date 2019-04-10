@@ -63,7 +63,7 @@
                 ]
             }).bind("move_node.jstree", () => {
                 let modified_tree = tree.jstree(true).get_json('#', {flat: true});
-                if(field.attr.key !== undefined && field.attr.key === 'admin_menu') {
+                if(field.attr.key !== 'undefined' && field.attr.key === 'admin_menu') {
                     serverBus.$emit('formatted', modified_tree);
                 }
 
@@ -93,7 +93,7 @@
                 tree.jstree('open_all');
 
                 let modified_tree = tree.jstree(true).get_json('#', {flat: true});
-                if(field.attr.key !== undefined && field.attr.key === 'admin_menu') {
+                if(field.attr.key !== 'undefined' && field.attr.key === 'admin_menu') {
                     serverBus.$emit('formatted', modified_tree);
                 }
             }).on("select_node.jstree", (e, data) => {
