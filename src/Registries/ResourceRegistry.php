@@ -50,8 +50,8 @@ class ResourceRegistry
     {
         $this->resource = new $resourceName;
 
-        $routeName = str_slug($this->resource->getBaseResource()->getName());
-        $routeSlug = $this->resource->getBaseResource()->getSlug();
+        $routeName = str_slug($this->resource->getResource()->getName());
+        $routeSlug = $this->resource->getResource()->getSlug();
         $this->resources->push($resourceName);
 
         if (!$routeSlug) {
@@ -62,7 +62,7 @@ class ResourceRegistry
         $this->namespace = $resourceName;
 
         // Add custom routes
-        foreach ($this->resource->getCustomRoutes() as $name => $route) {
+        foreach ($this->resource->getResource()->getCustomRoutes() as $name => $route) {
             $route = [
                 'method'     => $route['method'],
                 'name'       => $route['name'] ?? $routeName . '.' . $name,
@@ -75,6 +75,12 @@ class ResourceRegistry
         }
 
         $routeList = [
+            [
+                'method'     => 'get',
+                'route_slug' => $this->getRouteName('form/{resource?}'),
+                'controller' => $this->getRouteController('form'),
+                'name'       => $this->getName($routeName . '.form')
+            ],
             [
                 'method'     => 'get',
                 'route_slug' => $this->getRouteName('data-table'),
@@ -92,12 +98,6 @@ class ResourceRegistry
                 'route_slug' => $this->getRouteName('toggle/{id?}'),
                 'controller' => $this->getRouteController('toggle'),
                 'name'       => $this->getName($routeName . '.toggle')
-            ],
-            [
-                'method'     => 'get',
-                'route_slug' => $this->getRouteName('get-form/{id?}'),
-                'controller' => $this->getRouteController('getForm'),
-                'name'       => $this->getName($routeName . '.form')
             ],
             // Import
             [
@@ -117,7 +117,7 @@ class ResourceRegistry
                 'method'     => 'resource',
                 'route_slug' => $this->getRouteName(),
                 'controller' => $this->getRouteController(),
-                'only'       => $this->resource->getActions(),
+                'only'       => $this->resource->getResource()->getActions(),
             ],
         ];
 
@@ -156,8 +156,8 @@ class ResourceRegistry
      */
     protected function isAllowed($route, $resource)
     {
-        $routeName = strtolower($resource->getBaseResource()->getName());
-        $actions = $this->resource->getActions();
+        $routeName = strtolower($resource->getResource()->getName());
+        $actions = $resource->getResource()->getActions();
 
         if (!isset($route['name'])) {
             return true;
@@ -193,7 +193,7 @@ class ResourceRegistry
      */
     protected function getRouteName($uri = '', $routeSlug = true)
     {
-        if ($this->resource->isShared()) {
+        if ($this->resource->getResource()->isShared()) {
             return ($routeSlug ? '/' . $this->routeSlug : '') . ($uri ? '/' . $uri : '');
         }
 

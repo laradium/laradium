@@ -44,7 +44,7 @@ class AddNestedsetForMenuItemsTable extends Migration
                         'is_active'    => 1,
                         'resource'     => get_class($resource),
                         'translations' => [
-                            'name' => $resource->getBaseResource()->getName(),
+                            'name' => $resource->getResource()->getName(),
                             'url'  => ''
                         ],
                         'icon'         => $this->getIcon($resource)

@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Base;
 
 use File;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -19,6 +20,7 @@ use Laradium\Laradium\Traits\Editable;
 
 abstract class AbstractResource extends Controller
 {
+
     use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
@@ -63,15 +65,6 @@ abstract class AbstractResource extends Controller
     /**
      * @var array
      */
-    protected $defaultViews = [
-        'index'  => 'laradium::admin.resource.index',
-        'create' => 'laradium::admin.resource.create',
-        'edit'   => 'laradium::admin.resource.edit'
-    ];
-
-    /**
-     * @var array
-     */
     protected $views = [];
 
     /**
@@ -99,17 +92,39 @@ abstract class AbstractResource extends Controller
      */
     public function __construct()
     {
-        if (class_exists($this->resource)) {
-            $this->model(new $this->resource);
-        }
+        $this->baseResource = $this
+            ->resource()
+            ->model($this->getModel())
+            ->build(
+                $this->slug,
+                $this->name,
+                $this->prefix,
+                $this->isShared,
+                $this->actions,
+                $this->views,
+                $this->usesPermissions
+            );
+        
 
-        $this->events = collect([]);
         $this->layout = new Layout;
-        if ($this->isShared() && $template = config('laradium.shared_resources_template')) {
+        if ($this->getResource()->isShared() && $template = config('laradium.shared_resources_template')) {
             $this->layout->set($template);
         }
 
-        $this->middleware($this->isShared() ? ['web'] : ['web', 'laradium']);
+        $this->middleware($this->getResource()->isShared() ? ['web'] : ['web', 'laradium']);
+    }
+    
+    public function getResource()
+    {
+        return $this->baseResource;
+    }
+
+    public function form($model = null)
+    {
+        $model = $model ?? new $this->resource;
+        $resource = $this->getResource();
+
+        return $resource->getForm($model)->returnUrl(route($this->getResource()->getRouteName('index')));
     }
 
     /**
@@ -177,60 +192,33 @@ abstract class AbstractResource extends Controller
      */
     public function edit($id)
     {
-        $model = $this->getModel();
+        $form = $this->form($this->getModel($id))
+            ->url(route($this->getResource()->getRouteName('update'), $id));
 
-        if ($where = $this->resource()->getWhere()) {
-            $model = $model->where($where);
-        }
+        $resource = $this->getResource();
 
-        $this->model($model->findOrFail($id));
-
-        return view($this->getView('edit'), [
-            'form'           => $this->getForm(),
-            'resource'       => $this,
-            'js'             => $this->resource()->getJs(),
-            'css'            => $this->resource()->getCss(),
-            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
-            'layout'         => $this->layout
+        return view($this->getResource()->getView('edit'), [
+            'form'        => $form,
+            'resource'    => $resource,
+            'breadcrumbs' => $this->getResource()->getBreadcrumbs('edit'),
+//            'js'             => $this->resource()->getJs(),
+//            'css'            => $this->resource()->getCss(),
+//            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
+            'layout'      => $this->layout,
+            'title'       => 'Edit ' . $resource->getName()
         ]);
     }
 
     /**
      * @param Request $request
      * @param $id
-     * @return mixed
-     * @throws \ReflectionException
+     * @return array
      */
     public function update(Request $request, $id)
     {
-        $model = $this->getModel();
-
-        if ($where = $this->resource()->getWhere()) {
-            $model = $model->where($where);
-        }
-
-        $this->model($model->findOrFail($id));
-
-        $form = $this->getForm();
-        $validationRequest = $this->prepareRequest($request);
-
-        $this->fireEvent('beforeSave', $request);
-
-        $validationRules = $form->getValidationRules();
-        $validationRequest->validate($validationRules);
-
-        $this->saveData($request->all(), $this->getModel());
-
-        $this->fireEvent('afterSave', $request);
-
-        if ($request->ajax()) {
-            return [
-                'success'  => 'Resource successfully updated!',
-                'redirect' => $form->getAction('edit')
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully updated!');
+        return $this
+            ->form($this->getModel($id))
+            ->update($request);
     }
 
     /**
@@ -295,57 +283,26 @@ abstract class AbstractResource extends Controller
     }
 
     /**
-     * @param null $model
-     * @return Resource
+     * @return Model
      */
-    public function getBaseResource($model = null)
+    public function getModel($id = null): Model
     {
-        $model = $model ?? $this->getModel();
-
-        return (new Resource)->model($model)
-            ->name($this->name)
-            ->slug($this->slug)
-            ->prefix($this->prefix);
-    }
-
-    /**
-     * @return Form
-     */
-    private function getForm()
-    {
-        $form = (new Form(
-            $this
-                ->getBaseResource($this->getModel())
-                ->make($this->resource()->closure())
-                ->build())
-        )->abstractResource($this)->build();
-
-        return $form;
-    }
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function model($value)
-    {
-        $this->model = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getModel()
-    {
-        $model = $this->model;
+        $model = $this->getModelInstance($id);
 
         if ($this instanceof ResourceFilterInterface) {
             $model = $this->filter($model)->getModel();
         }
 
         return $model;
+    }
+
+    public function getModelInstance($id)
+    {
+        if ($id) {
+            return $this->resource::findOrFail($id);
+        }
+
+        return new $this->resource;
     }
 
     /**
@@ -355,218 +312,7 @@ abstract class AbstractResource extends Controller
     {
         return new Import($this);
     }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function hasAction($value)
-    {
-        return in_array($value, $this->actions);
-    }
-
-    /**
-     * @return array
-     */
-    public function getActions()
-    {
-        $actions = collect($this->actions)->push('index'); // Index is allowed by default
-
-        if ($this instanceof PageResource) {
-            $actions->push('create');
-        }
-
-        $allActions = collect([
-            'index'  => [
-                'index',
-                'data-table',
-                'export',
-                'toggle'
-            ],
-            'create' => [
-                'create',
-                'store',
-                'import',
-                'form'
-            ],
-            'edit'   => [
-                'edit',
-                'update',
-                'editable',
-                'form'
-            ],
-            'show'   => 'show',
-            'delete' => 'destroy'
-        ]);
-
-        $availableActions = $actions->diffAssoc($allActions);
-
-        return $allActions->only($availableActions)->flatten()->all();
-    }
-
-    /**
-     * @param $action
-     * @return array|mixed
-     */
-    public function getBreadcrumbs($action)
-    {
-        $baseResource = $this->getBaseResource();
-        $name = $baseResource->getName();
-
-        $breadcrumbs = [
-            'index'  => [
-                [
-                    'name' => $name,
-                    'url'  => $this->getAction('index')
-                ]
-            ],
-            'create' => [
-                [
-                    'name' => $name,
-                    'url'  => $this->getAction('index')
-                ],
-                [
-                    'name' => 'Create',
-                    'url'  => $this->getAction('create')
-                ]
-            ],
-            'edit'   => [
-                [
-                    'name' => $name,
-                    'url'  => $this->getAction('index')
-                ],
-                [
-                    'name' => 'Edit',
-                    'url'  => $this->getAction('edit')
-                ]
-            ],
-        ];
-
-        return $breadcrumbs[$action] ?? [];
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    public function getView($name): string
-    {
-        if (!isset($this->views[$name])) {
-            return $this->defaultViews[$name];
-        }
-
-        return $this->views[$name];
-    }
-
-    /**
-     * @return array
-     */
-    public function getCustomRoutes()
-    {
-        return $this->customRoutes;
-    }
-
-    /**
-     * @return string
-     */
-    public function resourceName()
-    {
-        return $this->resource;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShared()
-    {
-        return $this->isShared;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * @param string $action
-     * @return string
-     */
-    public function getPermission($action = 'view')
-    {
-        $model = class_basename($this->resource);
-        $model = trim(preg_replace('/([A-Z])/', ' $1', $model));
-        $model = strtolower(Str::plural($model));
-
-        return $action . ' ' . $model;
-    }
-
-    /**
-     * @param string $action
-     * @return string
-     */
-    public function getAction($action = 'index'): string
-    {
-        if ($action === 'create') {
-            return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($this->getModel()->id . '/edit');
-        } else if ($action === 'store') {
-            return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($this->model->id);
-        }
-
-        return $this->getUrl();
-    }
-
-    /**
-     * @return string
-     */
-    public function getGuard()
-    {
-        return $this->isShared() ? 'web' : 'admin';
-    }
-
-    /**
-     * @param $action
-     * @param null $user
-     * @return bool
-     */
-    public function hasPermission($action, $user = null)
-    {
-        $guard = $this->getGuard();
-        $user = $user ?? auth($guard)->user();
-
-        if (!$user) {
-            return false;
-        }
-
-        if (!method_exists($user, 'hasPermissionTo')) {
-            return true;
-        }
-
-        if (!$this->usesPermissions) {
-            return true;
-        }
-
-        return $user->hasPermissionTo($this->getPermission($action), $guard);
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    private function getUrl($value = '')
-    {
-        if ($this->isShared()) {
-            return url('/' . $this->getBaseResource()->getSlug() . '/' . $value);
-        }
-
-        return url('/admin/' . $this->getBaseResource()->getSlug() . '/' . $value);
-    }
+    
 
     /**
      * @return \Laradium\Laradium\Base\Resource

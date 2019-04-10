@@ -70,7 +70,7 @@ class Menu extends Model
                     'name'           => $item->name,
                     'url'            => $item->url,
                     'icon'           => $item->icon,
-                    'has_permission' => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true
+                    'has_permission' => ($resource = $item->getResource()) ? $resource->getResource()->hasPermission('view') : true
                 ]
             ];
         }

@@ -5,6 +5,8 @@ namespace Laradium\Laradium\Base;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Registries\ApiResourceRegistry;
 use Laradium\Laradium\Registries\ResourceRegistry;
+use ReflectionClass;
+use Illuminate\Support\Arr;
 
 class Laradium
 {
@@ -39,18 +41,18 @@ class Laradium
 
     /**
      * @param $resource
-     * @return mixed
+     * @return ResourceRegistry
      */
-    public function register($resource)
+    public function register($resource): ResourceRegistry
     {
         return $this->resourceRegistry->register($resource);
     }
 
     /**
      * @param $resource
-     * @return mixed
+     * @return ApiResourceRegistry
      */
-    public function registerApi($resource)
+    public function registerApi($resource): ApiResourceRegistry
     {
         return $this->apiResourceRegistry->register($resource);
     }
@@ -121,7 +123,7 @@ class Laradium
     /**
      * @return Collection
      */
-    public function all()
+    public function all(): Collection
     {
         return $this->resourceRegistry->all();
     }
@@ -130,7 +132,7 @@ class Laradium
      * @param $path
      * @return array
      */
-    private function getResourcesFromPath($path)
+    private function getResourcesFromPath($path): array
     {
         $resources = [];
 
@@ -143,10 +145,15 @@ class Laradium
                 $resource = $filePath->getPathname();
                 $baseName = basename($resource, '.php');
                 $resource = $path . '\\' . $baseName;
-                $r = new $resource;
-                if (!class_exists($r->resourceName())) {
+
+                $reflector = new ReflectionClass($resource);
+                $properties = $reflector->getDefaultProperties();
+                $resourceModel = Arr::get($properties, 'resource');
+
+                if (!class_exists($resourceModel)) {
                     continue;
                 }
+
                 $resources[] = $resource;
             }
         }

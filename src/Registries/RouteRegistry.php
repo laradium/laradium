@@ -58,7 +58,7 @@ class RouteRegistry
      */
     public function register($route): void
     {
-        $name = $this->getName($this->resource->getPrefix());
+        $name = $this->getName($this->resource->getResource()->getPrefix());
 
         $this->router->name($name ? $name . '.' : '')->group(function () use ($route) {
             $this->registerRoute($route);
@@ -87,7 +87,7 @@ class RouteRegistry
      */
     private function getName($prefix)
     {
-        if ($this->resource->isShared()) {
+        if ($this->resource->getResource()->isShared()) {
             return $prefix ?? '';
         }
 

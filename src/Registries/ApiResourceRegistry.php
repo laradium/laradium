@@ -40,7 +40,7 @@ class ApiResourceRegistry
      * @param $resourceName
      * @return $this
      */
-    public function register($resourceName)
+    public function register($resourceName): self
     {
         $resource = new $resourceName;
         $routeSlug = $resource->getBaseResource()->getSlug();

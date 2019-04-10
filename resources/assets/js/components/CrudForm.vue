@@ -2,11 +2,11 @@
     <form class="crud-form"
           :action="url"
           method="POST"
-          @submit.prevent="onSubmit(this)">
+          @submit.prevent="onSubmit($event)">
 
         <input type="hidden" name="_method" :value="method" v-if="method">
 
-        <div class="alert alert-danger" v-show="errors.length">
+        <div class="alert alert-danger" v-if="errors.length">
             <li v-for="error in errors">
                 {{ error }}
             </li>
@@ -31,8 +31,10 @@
                         </span>
                     </button>
 
-                    <button class="btn btn-primary" @click.stop.prevent="onSubmit(this, data.actions.index)"
-                            :disabled="isSubmitted" v-if="!isSubmitted">
+                    <button class="btn btn-primary"
+                            @click.stop.prevent="onSubmit($event, data.actions.index)"
+                            :disabled="isSubmitted"
+                            v-if="!isSubmitted">
                         Save & Return
                     </button>
                 </div>
@@ -55,7 +57,7 @@
     export default {
         name: 'CrudForm',
 
-        props: ['url', 'method'],
+        props: ['url', 'method', 'form_data'],
 
         data() {
             return {
@@ -72,8 +74,7 @@
         },
 
         created() {
-            let data = document.getElementsByName('data');
-            this.data = JSON.parse(data[0].value).data;
+            this.data = JSON.parse(this.form_data).data;
 
             let fields = this.data.form;
             for (let field in fields) {
@@ -98,8 +99,11 @@
         methods: {
             onSubmit(el, redirect) {
                 this.isSubmitted = true;
-                let form = document.getElementsByClassName('crud-form')[0];
+                let form = el.target;
                 let form_data = new FormData();
+                this.errors = [];
+                this.success = null;
+
                 /*
                  * Fix for safari FormData bug
                  */
@@ -126,8 +130,7 @@
                     data: form_data
                 }).then(res => {
                     // this.data = res.data.data;
-                    this.errors = [];
-                    $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
+                    $('html, body').animate({'scrollTop': $(form).find('.alert.alert-danger').offset().top - 50});
                     this.success = res.data.success;
 
                     if (redirect) {
@@ -139,6 +142,9 @@
                     if (typeof res.data.redirect !== "undefined") {
                         window.location = res.data.redirect;
                     }
+
+                    this.data = res.data;
+                    this.isSubmitted = false;
 
                 }).catch(res => {
                     this.isSubmitted = false;
@@ -158,7 +164,7 @@
                     }
 
                     this.$nextTick(() => {
-                        $('html, body').animate({'scrollTop': $('.alert.alert-danger').offset().top - 50});
+                        $('html, body').animate({'scrollTop': $(form).find('.alert.alert-danger').offset().top - 50});
                     });
                 });
 

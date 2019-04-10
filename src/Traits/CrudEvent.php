@@ -11,6 +11,14 @@ trait CrudEvent
      */
     private $events;
 
+    public function __construct()
+    {
+        $this->events = collect([]);
+
+
+        parent::__construct();
+    }
+
     /**
      * @param $name
      * @param \Closure $callable
@@ -18,13 +26,14 @@ trait CrudEvent
      */
     public function event($name, \Closure $callable)
     {
-        if (is_array($name)) {
-            foreach ($name as $event) {
-                $this->events->put($event, $callable);
-            }
-        } else {
-            $this->events->put($name, $callable);
-        }
+//        dd($this->events);
+//        if (is_array($name)) {
+//            foreach ($name as $event) {
+//                $this->events->put($event, $callable);
+//            }
+//        } else {
+//            $this->events->put($name, $callable);
+//        }
 
         return $this;
     }

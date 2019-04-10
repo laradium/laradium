@@ -264,12 +264,12 @@ class Table
             return $this->slug;
         }
 
-        if ($this->getResource()->isShared()) {
-            return '/' . $this->getResource()->getBaseResource()->getSlug();
+        if ($this->getResource()->getResource()->isShared()) {
+            return '/' . $this->getResource()->getResource()->getSlug();
 
         }
 
-        return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
+        return '/admin/' . $this->getResource()->getResource()->getSlug();
     }
 
     /**
@@ -500,7 +500,7 @@ class Table
      */
     public function hasActions(): bool
     {
-        $actions = $this->getResource()->getActions();
+        $actions = $this->getResource()->getResource()->getActions();
 
         return in_array('edit', $actions) || in_array('destroy', $actions);
     }

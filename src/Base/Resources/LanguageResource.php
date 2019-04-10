@@ -9,20 +9,19 @@ use Laradium\Laradium\Models\Language;
 
 Class LanguageResource extends AbstractResource
 {
+
     /**
      * @var string
      */
     protected $resource = Language::class;
 
-    /**
-     * @return \Laradium\Laradium\Base\Resource
-     */
     public function resource()
     {
         $this->event(['afterSave', 'afterDelete'], function () {
             cache()->forget('laradium::languages');
         });
 
+        
         return laradium()->resource(function (FieldSet $set) {
             $set->text('iso_code')->rules('required|min:2|max:2');
             $set->text('title')->rules('required|min:2|max:255');

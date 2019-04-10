@@ -1,23 +1,21 @@
-@extends($layout->get(), ['title' => 'Edit ' . $form->getResource()->getName()])
+@extends($layout->get(), ['title' => $title])
 
 @section('content')
     @include('laradium::admin._partials.breadcrumbs', [
-        'breadcrumbs' => $resource->getBreadcrumbs('index')
+        'breadcrumbs' => $breadcrumbs
     ])
 
-    <crud-form url="{{ $form->getAction('update') }}"
-               method="PUT"></crud-form>
-    <input type="hidden" name="data" value="{{ json_encode($form->data()) }}">
+    {!! $form->render() !!}
 @endsection
 
-@push('scripts')
-    @foreach($js as $asset)
-        <script src="{{ $asset }}"></script>
-    @endforeach
-@endpush
+{{--@push('scripts')--}}
+    {{--@foreach($js as $asset)--}}
+        {{--<script src="{{ $asset }}"></script>--}}
+    {{--@endforeach--}}
+{{--@endpush--}}
 
-@push('styles')
-    @foreach($css as $asset)
-        <link href="{{ $asset }}" rel="stylesheet" type="text/css"/>
-    @endforeach
-@endpush
+{{--@push('styles')--}}
+    {{--@foreach($css as $asset)--}}
+        {{--<link href="{{ $asset }}" rel="stylesheet" type="text/css"/>--}}
+    {{--@endforeach--}}
+{{--@endpush--}}

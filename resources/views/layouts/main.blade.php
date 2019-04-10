@@ -111,8 +111,8 @@
 
                 @if(isset($resource))
                     <nav class="navbar-custom d-flex align-items-center justify-content-center margin-elements">
-                        @if($resource->hasAction('create') && $resource->hasPermission('create'))
-                            <a href="/admin/{{ $resource->getBaseResource()->getSlug() }}/create"
+                        @if($resource->getResource()->hasAction('create') && $resource->getResource()->hasPermission('create'))
+                            <a href="/admin/{{ $resource->getResource()->getSlug() }}/create"
                                class="btn btn-primary btn-sm">
                                 <i class="fa fa-plus"></i> Create
                             </a>
@@ -137,7 +137,7 @@
                         {{ csrf_field() }}
                     </form>
                     <h5>
-                        {{ auth()->user()->full_name ?? auth()->user()->name }}
+                        {{ auth('admin')->user()->full_name ?? auth('admin')->user()->name }}
                         <a href="javascript:;"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                            class="text-custom"

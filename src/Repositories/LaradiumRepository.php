@@ -14,7 +14,7 @@ class LaradiumRepository
      * @param \Closure $closure
      * @return \Laradium\Laradium\Base\Resource
      */
-    public function resource(\Closure $closure): \Laradium\Laradium\Base\Resource
+    public function resource(\Closure $closure)
     {
         return (new Resource)->make($closure);
     }

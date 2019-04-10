@@ -19,7 +19,7 @@ trait Editable
         $resource = $this->resource();
         $form = (new Form(
             $this
-                ->getBaseResource($model)
+                ->getResource($model)
                 ->make($resource->closure())
                 ->build())
         )->build();

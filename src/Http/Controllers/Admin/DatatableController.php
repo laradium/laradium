@@ -33,7 +33,7 @@ class DatatableController
             }
         }
 
-        if ($resource && $where = $resource->getBaseResource()->getWhere()) {
+        if ($resource && $where = $resource->getResource()->getWhere()) {
             $model = $model->where($where);
         }
 

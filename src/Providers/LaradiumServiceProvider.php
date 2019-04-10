@@ -22,8 +22,13 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
+
+        // Global helpers, icons
+        require_once __DIR__ . '/../Helpers/Global.php';
+        require_once __DIR__ . '/../Helpers/Icons.php';
+
         $this->registerPaperClipConfig();
         $this->registerResources();
         $this->registerProviders();
@@ -38,10 +43,6 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadRoutes();
         $this->registerViewComposers();
 
-        // Global helpers, icons
-        require_once __DIR__ . '/../Helpers/Global.php';
-        require_once __DIR__ . '/../Helpers/Icons.php';
-
         // Mail config
         $this->setMailConfig();
         $this->setTranslatableConfig();
@@ -51,7 +52,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerProviders()
+    private function registerProviders(): void
     {
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
         $this->app->register(\Baum\Providers\BaumServiceProvider::class);
@@ -63,7 +64,7 @@ class LaradiumServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(RouteRegistry::class, function ($app) {
             return new RouteRegistry($app->make(\Illuminate\Routing\Router::class));
@@ -83,7 +84,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerPaperClipConfig()
+    private function registerPaperClipConfig(): void
     {
         $disk = config('paperclip.storage.disk', 'public') == 'paperclip' ? 'public' : config('paperclip.storage.disk',
             'public');
@@ -97,7 +98,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return array
      */
-    private function getFieldList()
+    private function getFieldList(): array
     {
         $fieldPath = base_path('vendor/laradium/laradium/src/Base/Fields');
         $contentFieldPath = base_path('vendor/laradium/laradium-content/src/Base/Fields');
@@ -137,7 +138,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * Registers all resources
      */
-    private function registerResources()
+    private function registerResources(): void
     {
         $laradium = app(\Laradium\Laradium\Base\Laradium::class);
 
@@ -155,7 +156,7 @@ class LaradiumServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    private function setMailConfig()
+    private function setMailConfig(): void
     {
         try {
             config([
@@ -175,7 +176,7 @@ class LaradiumServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    private function setTranslatableConfig()
+    private function setTranslatableConfig(): void
     {
         try {
             config([
@@ -188,7 +189,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerBindings()
+    private function registerBindings(): void
     {
         \App::bind('Translate', function () {
             return new Translate;
@@ -198,7 +199,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerDirectives()
+    private function registerDirectives(): void
     {
         Blade::directive('lg', function ($expression) {
             return "<?php echo lg($expression); ?>";
@@ -212,7 +213,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function publishConfig()
+    private function publishConfig(): void
     {
         $this->publishes([
             __DIR__ . '/../../config/laradium-setting.php' => config_path('laradium-setting.php'),
@@ -226,7 +227,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerMiddleware()
+    private function registerMiddleware(): void
     {
         $this->app['router']->aliasMiddleware('laradium', LaradiumMiddleware::class);
     }
@@ -234,7 +235,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerCommands()
+    private function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -249,7 +250,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function loadRoutes()
+    private function loadRoutes(): void
     {
         $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
     }
@@ -257,7 +258,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function loadViews()
+    private function loadViews(): void
     {
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laradium');
     }
@@ -265,7 +266,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function loadMigrations()
+    private function loadMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
@@ -273,7 +274,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function publishAssets()
+    private function publishAssets(): void
     {
         $this->publishes([
             __DIR__ . '/../../public/laradium' => public_path('laradium'),
@@ -288,7 +289,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerViewComposers()
+    private function registerViewComposers(): void
     {
         $composers = [
             [
@@ -317,7 +318,7 @@ class LaradiumServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    private function setAdminGuard()
+    private function setAdminGuard(): void
     {
         try {
             config([
