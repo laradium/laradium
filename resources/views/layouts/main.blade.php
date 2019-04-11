@@ -169,6 +169,7 @@
                 © {{ setting()->get('design.project_title', 'Laradium') }}. <a href="https://netcore.agency">netcore.agency</a>
             </footer>
         </div>
+        <media-manager></media-manager>
     </div>
     <!-- ============================================================== -->
     <!-- End Right content here -->

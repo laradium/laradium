@@ -43,7 +43,6 @@ mix.js('resources/assets/js/laradium.js', 'public/laradium/assets/js')
 	    'jquery',
         'bootstrap',
         'vue',
-        'vue-trumbowyg',
         'jquery-datetimepicker',
         'jquery-resizable-dom',
         'switchery',
