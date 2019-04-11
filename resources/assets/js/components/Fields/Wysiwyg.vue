@@ -16,10 +16,7 @@
                        :name="item.name"
                        v-model="item.value"
                 >
-                <trumbowyg v-model="item.value"
-                           :key="index"
-                           :config="config"
-                ></trumbowyg>
+                <editor v-model="item.value" :init="config" :key="index"></editor>
             </div>
 
         </div>
@@ -28,53 +25,61 @@
                    :name="field.name"
                    v-model="field.value"
             >
-            <trumbowyg v-model="field.value"
-                       :config="config"
-            ></trumbowyg>
+            <editor v-model="field.value" :init="config" :key="index"></editor>
         </div>
     </div>
 </template>
 
 <script>
+    import Editor from '@tinymce/tinymce-vue';
+
     export default {
         props: ['field', 'language'],
-
+        components: {
+            'editor': Editor // <- Important part
+        },
         data() {
             return {
                 config: {
-                    removeformatPasted: false,
-                    btnsDef: {
-                        image: {
-                            dropdown: ['insertImage', this.field.config.upload_url ? 'upload' : ''],
-                            ico: 'insertImage'
-                        }
+                    plugins: 'preview autolink code fullscreen image link media table hr lists',
+                    toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link image media | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat',
+                    forced_root_block: '',
+                    images_upload_url: this.field.config.upload_url,
+                    automatic_uploads: true,
+                    images_reuse_filename: true,
+                    relative_urls : false,
+                    remove_script_host : false,
+                    convert_urls : true,
+                    images_upload_handler:  (blobInfo, success, failure) => {
+                        let xhr, formData;
+
+                        xhr = new XMLHttpRequest();
+                        xhr.withCredentials = false;
+                        xhr.open('POST', '/admin/attachments/upload');
+
+                        xhr.onload = function() {
+                            let json;
+
+                            if (xhr.status != 200) {
+                                failure('HTTP Error: ' + xhr.status);
+                                return;
+                            }
+
+                            json = JSON.parse(xhr.responseText);
+
+                            if (!json || typeof json.data.url != 'string') {
+                                failure('Invalid JSON: ' + xhr.responseText);
+                                return;
+                            }
+
+                            success(json.data.url);
+                        };
+
+                        formData = new FormData();
+                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                        xhr.send(formData);
                     },
-                    btns: [
-                        ['strong', 'em', 'del'],
-                        ['superscript', 'subscript'],
-                        ['fontsize', 'fontfamily'],
-                        ['foreColor', 'backColor', 'lineheight'],
-                        ['link'],
-                        ['image'],
-                        ['noembed'],
-                        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                        ['unorderedList', 'orderedList'],
-                        ['horizontalRule'],
-                        ['table'],
-                        ['formatting'],
-                        ['historyUndo', 'historyRedo'],
-                        ['removeformat'],
-                        ['viewHTML'],
-                        ['fullscreen']
-                    ],
-                    plugins: {
-                        upload: {
-                            serverPath: this.field.config.upload_url,
-                            fileFieldName: 'image',
-                            headers: {},
-                            urlPropertyName: 'data.url'
-                        }
-                    }
                 },
             }
         },
