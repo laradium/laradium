@@ -68,6 +68,23 @@ for (let key in window.laradiumFields) {
     }
 }
 
+// Trumbowyg
+import VueTrumbowyg from 'vue-trumbowyg';
+import 'trumbowyg/dist/plugins/upload/trumbowyg.upload.min';
+import 'trumbowyg/dist/plugins/table/trumbowyg.table.min';
+import 'trumbowyg/dist/plugins/colors/trumbowyg.colors.min';
+
+require('./trumbowyg/plugins/noembed/trumbowyg.noembed');
+require('./trumbowyg/plugins/cleanpaste/trumbowyg.cleanpaste');
+import 'trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min';
+import 'trumbowyg/dist/plugins/fontsize/trumbowyg.fontsize.min';
+import 'trumbowyg/dist/plugins/fontfamily/trumbowyg.fontfamily.min';
+import 'trumbowyg/dist/plugins/lineheight/trumbowyg.lineheight.min';
+import 'trumbowyg/dist/plugins/history/trumbowyg.history.min';
+
+$.trumbowyg.svgPath = '/laradium/admin/assets/images/trumbowyg/icons.svg';
+Vue.use(VueTrumbowyg);
+
 // Google maps
 import * as VueGoogleMaps from 'vue2-google-maps'
 Vue.use(VueGoogleMaps, {
@@ -76,22 +93,6 @@ Vue.use(VueGoogleMaps, {
 		libraries: 'places'
 	},
 });
-
-// Import TinyMCE
-import 'tinymce';
-import 'tinymce/themes/silver/theme';
-
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/media';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/autolink';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/hr';
-import 'tinymce/plugins/fullscreen';
-import 'tinymce/plugins/preview';
 
 Vue.mixin({
     methods: {
