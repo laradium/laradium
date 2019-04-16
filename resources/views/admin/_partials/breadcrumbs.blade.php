@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        @if (in_array('laradium', request()->route()->middleware()))
+        @if (in_array('laradium', request()->route()->computedMiddleware))
             <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Admin</a></li>
         @endif
         @if ($prefix = $resource->getPrefix())

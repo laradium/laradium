@@ -2,7 +2,7 @@
 
 @section('content')
     @include('laradium::admin._partials.breadcrumbs', [
-        'breadcrumbs' => $resource->getBreadcrumbs('index')
+        'breadcrumbs' => $resource->getBreadcrumbs('create')
     ])
 
     <crud-form

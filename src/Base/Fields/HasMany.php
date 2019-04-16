@@ -3,9 +3,8 @@
 namespace Laradium\Laradium\Base\Fields;
 
 use App\Models\MenuItem;
-use Laradium\Laradium\Base\Field;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Laradium\Laradium\Base\Field;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Traits\Nestable;
 use Laradium\Laradium\Traits\Relation;
@@ -209,7 +208,7 @@ class HasMany extends Field
                     'name'           => $item->name,
                     'url'            => $item->url,
                     'icon'           => $item->icon,
-                    'has_permission' => laradium()->hasPermissionTo(auth()->user(), $item->resource),
+                    'has_permission' => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true,
                 ];
             }
 
@@ -282,6 +281,7 @@ class HasMany extends Field
     }
 
     /**
+     * @param Model $model
      * @return string
      */
     public function getEntryLabel(Model $model)

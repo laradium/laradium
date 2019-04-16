@@ -33,6 +33,11 @@ class MenuItem extends \Baum\Node
     ];
 
     /**
+     * @var array
+     */
+    protected $with = ['translations'];
+
+    /**
      * @param $query
      * @return mixed
      */

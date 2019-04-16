@@ -2,7 +2,7 @@
 
 @section('content')
     @include('laradium::admin._partials.breadcrumbs', [
-        'breadcrumbs' => $resource->getBreadcrumbs('index')
+        'breadcrumbs' => $resource->getBreadcrumbs('edit')
     ])
 
     <crud-form url="{{ $form->getAction('update') }}"

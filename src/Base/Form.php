@@ -66,13 +66,12 @@ class Form
             $field->build();
             $this->setValidationRules($field->getValidationRules());
 
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
+
             $this->fields->push($field);
-
         }
-
-//        if ($field->isTranslatable()) {
-        $this->isTranslatable = true;
-//        }
 
         return $this;
     }
@@ -92,7 +91,7 @@ class Form
                 'is_translatable'  => $this->isTranslatable(),
                 'default_language' => array_first($languages)['iso_code'],
                 'actions'          => [
-                    'index' => $this->getAction('index')
+                    'index' => $this->getAction()
                 ]
             ]
         ];
@@ -147,7 +146,8 @@ class Form
     }
 
     /**
-     * @return Model
+     * @param $value
+     * @return Form
      */
     public function model($value)
     {
@@ -169,7 +169,7 @@ class Form
      */
     public function resourceName(): string
     {
-        return str_replace('_', '-', $this->model()->getTable());
+        return str_replace('_', '-', $this->getModel()->getTable());
     }
 
     /**
@@ -214,7 +214,7 @@ class Form
      * @param string $value
      * @return string
      */
-    private function getUrl($value = '')
+    private function getUrl($value = ''): string
     {
         if (!$this->abstractResource) {
             return '';
