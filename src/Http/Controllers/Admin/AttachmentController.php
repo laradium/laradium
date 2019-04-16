@@ -37,9 +37,9 @@ class AttachmentController
 
     /**
      * @param Request $request
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function upload(Request $request): JsonResponse
+    public function upload(Request $request): AnonymousResourceCollection
     {
         $files = $request->file('files');
 
