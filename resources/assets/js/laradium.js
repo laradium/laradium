@@ -56,7 +56,10 @@ Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
 Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
 Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
 
-require('./misc/import-form')
+
+Vue.component('media-manager', require('./components/MediaManager.vue').default);
+
+require('./misc/import-form');
 
 if (typeof window.laradiumFields === 'undefined') {
     window.laradiumFields = {};
@@ -92,6 +95,11 @@ import 'tinymce/plugins/table';
 import 'tinymce/plugins/hr';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/preview';
+
+Vue.component('editor', require('@tinymce/tinymce-vue').default);
+
+// import Editor from '@tinymce/tinymce-vue';
+
 
 Vue.mixin({
     methods: {

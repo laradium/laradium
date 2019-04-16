@@ -31,13 +31,13 @@
 </template>
 
 <script>
-    import Editor from '@tinymce/tinymce-vue';
+    // import Editor from '@tinymce/tinymce-vue';
 
     export default {
         props: ['field', 'language'],
-        components: {
-            'editor': Editor // <- Important part
-        },
+        // components: {
+        //     'editor': Editor
+        // },
         data() {
             return {
                 config: {

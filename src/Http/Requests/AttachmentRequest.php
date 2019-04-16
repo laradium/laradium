@@ -24,7 +24,7 @@ class AttachmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required|max:' . config('laradium.file_size')
+//            'file' => 'required|max:' . config('laradium.file_size')
         ];
     }
 }

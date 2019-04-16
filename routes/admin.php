@@ -22,6 +22,16 @@ Route::group([
             'as'   => 'attachment.store'
         ]);
 
+        Route::post('/attachments/upload', [
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AttachmentController@upload',
+            'as'   => 'attachment.upload'
+        ]);
+
+        Route::delete('/attachments/{attachment}', [
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AttachmentController@destroy',
+            'as'   => 'attachment.destroy'
+        ]);
+
         Route::get('dashboard', [
             'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@dashboard',
             'as'   => 'dashboard'

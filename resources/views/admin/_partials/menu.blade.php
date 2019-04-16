@@ -1,3 +1,14 @@
+<div id="sidebar-menu">
+    <ul>
+        <li>
+            <a href="javascript:;"
+               data-toggle="modal"
+               data-target="#media-modal">
+                <i class="mdi mdi-folder"></i> Media manager
+            </a>
+        </li>
+    </ul>
+</div>
 <!--- Sidemenu -->
 @php($uriExploded = explode('/', trim(request()->getRequestUri(), '/')))
 <input type="hidden" value="{{ $items }}" name="vue-menu">
