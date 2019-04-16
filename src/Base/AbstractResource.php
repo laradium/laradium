@@ -149,7 +149,7 @@ abstract class AbstractResource extends Controller
         $form = $this->getForm();
         $validationRequest = $this->prepareRequest($request);
 
-        $this->fireEvent('beforeSave', $request);
+        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
 
         $validationRules = $form->getValidationRules();
         $validationRequest->validate($validationRules);
@@ -222,14 +222,14 @@ abstract class AbstractResource extends Controller
         $form = $this->getForm();
         $validationRequest = $this->prepareRequest($request);
 
-        $this->fireEvent('beforeSave', $request);
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
 
         $validationRules = $form->getValidationRules();
         $validationRequest->validate($validationRules);
 
         $this->saveData($request->all(), $this->getModel());
 
-        $this->fireEvent('afterSave', $request);
+        $this->fireEvent(['afterSave', 'afterUpdate'], $request);
 
         if ($request->ajax()) {
             return [
@@ -259,6 +259,8 @@ abstract class AbstractResource extends Controller
         }
 
         $this->model($model = $model->findOrFail($id));
+
+        $this->fireEvent('beforeDelete', $request);
 
         $model->delete();
 

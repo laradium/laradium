@@ -15,6 +15,11 @@ class BelongsToMany extends Field
     private $relationName;
 
     /**
+     * @var FieldSet
+     */
+    private $fieldSet;
+
+    /**
      * @var string
      */
     private $title = 'name';
@@ -82,7 +87,7 @@ class BelongsToMany extends Field
             ];
         });
 
-        $this->validationRules($this->getTemplateData()['validation_rules']);
+        $this->validationRules(array_merge($this->getValidationRules(), $this->getTemplateData()['validation_rules']));
 
         return $this;
     }
@@ -157,6 +162,8 @@ class BelongsToMany extends Field
     }
 
     /**
+     * @param null $model
+     * @param null $id
      * @return array
      */
     private function getTemplateData($model = null, $id = null)

@@ -48,9 +48,9 @@ trait Crud
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\Password::class) {
                     $this->passwordWorker($model, array_except($worker, 'crud_worker'));
-                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
+                } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
                     $this->morphToWorker($model, array_except($worker, 'crud_worker'));
-                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
+                } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
                     $this->belongsToManyToWorker($model, $key, array_except($worker, 'crud_worker'));
                 }
             }
@@ -58,7 +58,6 @@ trait Crud
 
         return $model;
     }
-
 
     /**
      * @param $data
@@ -88,19 +87,20 @@ trait Crud
      */
     private function recursiveUnset(&$array)
     {
-            foreach ($array as $index => &$value) {
-                if(in_array($index, $this->unwantedKeys)) {
+        foreach ($array as $index => &$value) {
+            if (in_array($index, $this->unwantedKeys) && !is_numeric($index)) {
+                unset($array[$index]);
+            }
+
+            if (is_array($value)) {
+                if (array_get($value, 'remove', null)) {
                     unset($array[$index]);
                 }
-                if (is_array($value)) {
-                    if (array_get($value, 'remove', null)) {
-                        unset($array[$index]);
-                    }
-                    $this->recursiveUnset($value, $this->unwantedKeys);
-                }
+
+                $this->recursiveUnset($value, $this->unwantedKeys);
             }
+        }
 
         return true;
     }
-
 }
