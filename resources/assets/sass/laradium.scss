@@ -26,41 +26,6 @@
   opacity: 0;
 }
 
-
-.loader {
-  border: 4px solid #ccc;
-  border-radius: 50%;
-  border-top: 4px solid #000;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-  margin: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 2;
-
-  @-webkit-keyframes spin {
-    0% {
-      -webkit-transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(360deg);
-    }
-  }
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-}
-
 .crud-bottom {
   width: 100%;
   background-color: #f8f9fa;
@@ -206,4 +171,53 @@ $grey: #f2f2f2;
 
         border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
     }
+}
+
+#media-modal {
+  .btn-container {
+    position: absolute;
+    right: 5px;
+  }
+  .card {
+    width: rem(170);
+    .image-container {
+      width: rem(170);
+      height: rem(100);
+
+      img.card-img-top {
+        width: rem(170);
+        max-height: rem(100);
+      }
+    }
+    .card-body {
+      height: rem(80);
+    }
+
+  }
+
+}
+
+
+.btn-loader {
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #ccc;
+  width: 15px;
+  height: 15px;
+  position: relative;
+  top: 3px;
+  right: 5px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  display: inline-block;
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 }
