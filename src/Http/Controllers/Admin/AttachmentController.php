@@ -85,7 +85,7 @@ class AttachmentController
         $attachment->file->setToBeDeleted();
         $attachment->save();
 
-        // delete databe entry
+        // delete database entry
         $attachment->delete();
 
         return response()->json([

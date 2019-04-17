@@ -23,7 +23,7 @@ class Attachment extends Model implements \Czim\Paperclip\Contracts\AttachableIn
     public function __construct(array $attributes = [])
     {
         $this->hasAttachedFile('file', [
-            'path'     => '/attachment/:hash/:filename',
+            'path' => '/attachment/:hash/:filename',
         ]);
 
         parent::__construct($attributes);

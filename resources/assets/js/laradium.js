@@ -98,8 +98,6 @@ import 'tinymce/plugins/preview';
 
 Vue.component('editor', require('@tinymce/tinymce-vue').default);
 
-// import Editor from '@tinymce/tinymce-vue';
-
 
 Vue.mixin({
     methods: {

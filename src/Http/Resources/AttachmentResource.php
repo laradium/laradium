@@ -17,10 +17,10 @@ class AttachmentResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->file_file_name,
-            'url'        => $this->file->url(),
-            'is_image'   => $this->isImageMimeType($this->file_content_type),
+            'id'        => $this->id,
+            'name'      => $this->file_file_name,
+            'url'       => $this->file->url(),
+            'is_image'  => $this->isImageMimeType($this->file_content_type),
             'extension' => pathinfo($this->file_file_name, PATHINFO_EXTENSION)
         ];
     }
