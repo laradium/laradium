@@ -11,7 +11,7 @@
                     <h4 class="d-inline-block">
                         <i class="mdi mdi-arrow-all handle"
                            v-if="field.config.is_sortable && !block.config.is_deleted"></i>
-                        {{ block.label }}
+                        {{ getBlockTitle(block) }}
                         <span v-if="block.config.is_deleted"><i>Deleted</i></span>
                     </h4>
 
@@ -182,7 +182,20 @@
                             }
                         }
                     });
+            },
 
+            getBlockTitle(block) {
+                let fields = block.fields;
+
+                let field = _.filter(fields, (field) => {
+                    return field.label === 'Widget title';
+                });
+
+                if(field[0] !== undefined && field[0].value) {
+                    return field[0].value;
+                }
+
+                return block.label;
             },
 
             restore(index) {
