@@ -40,6 +40,11 @@ for (let index in datatables) {
     let dataTable = $();
     if (!config.has_tabs) {
         dataTable = loadDataTable();
+		
+		// Alert for delete button
+		deleteItemFromDataTable(dataTable);
+		// Automatically update switch states in backend
+		changeActiveStateWithSwitch(dataTable);
     } else {
         let onTabChange = function () {
             if ($.fn.DataTable.isDataTable(config.selector)) {
@@ -47,6 +52,11 @@ for (let index in datatables) {
             }
 
             dataTable = loadDataTable();
+			
+			// Alert for delete button
+			deleteItemFromDataTable(dataTable);
+			// Automatically update switch states in backend
+			changeActiveStateWithSwitch(dataTable);
         };
 
         // When page loads, we initialize first tab
@@ -57,9 +67,4 @@ for (let index in datatables) {
             onTabChange();
         });
     }
-
-    // Alert for delete button
-    deleteItemFromDataTable(dataTable);
-    // Automatically update switch states in backend
-    changeActiveStateWithSwitch(dataTable);
 }
