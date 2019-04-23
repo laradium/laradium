@@ -20,11 +20,11 @@ export default (dataTable) => {
                 data: {
                     _method: 'delete',
                 }
-            });
+            }).done(function() {
+				dataTable.ajax.reload();
 
-            dataTable.ajax.reload(); // TODO: Fix this for multiple dts
-
-            swal('Item has been deleted!');
+				swal('Item has been deleted!');
+			});
         }
     });
 }
