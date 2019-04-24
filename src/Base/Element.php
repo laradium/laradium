@@ -53,6 +53,11 @@ class Element
     private $attributes = [];
 
     /**
+     * @var bool
+     */
+    protected $shared = false;
+
+    /**
      * Element constructor.
      * @param $parameters
      * @param Model $model
@@ -232,5 +237,23 @@ class Element
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    /**
+     * @param $value
+     */
+    public function shared($value)
+    {
+        $this->shared = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShared()
+    {
+        return $this->shared;
     }
 }

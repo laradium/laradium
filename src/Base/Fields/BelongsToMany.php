@@ -126,6 +126,8 @@ class BelongsToMany extends Field
 
     /**
      * BelongsToMany
+     * @param bool $renderAsTags
+     * @return BelongsToMany
      */
     public function tags($renderAsTags = true)
     {
@@ -216,6 +218,7 @@ class BelongsToMany extends Field
             $field = clone $temporaryField;
 
             $field->model($model)
+                ->shared($this->isShared())
                 ->value($model ? $model->pivot->{$field->getFieldName()} : '')
                 ->build(array_merge($this->getAttributes(), ['pivot', $id]));
 
