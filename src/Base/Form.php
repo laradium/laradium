@@ -63,7 +63,7 @@ class Form
                 $field->model($this->getModel());
             }
 
-            $field->build();
+            $field->shared($this->abstractResource->isShared())->build();
             $this->setValidationRules($field->getValidationRules());
 
             if ($field->isTranslatable()) {

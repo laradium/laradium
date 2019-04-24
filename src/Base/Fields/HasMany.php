@@ -191,6 +191,7 @@ class HasMany extends Field
             $field = clone $temporaryField;
 
             $entry['fields'][] = $field->model($item)
+                ->shared($this->isShared())
                 ->build(array_merge($this->getAttributes(), [$item->id]))
                 ->formattedResponse();
         }

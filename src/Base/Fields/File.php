@@ -6,7 +6,6 @@ use Laradium\Laradium\Base\Field;
 
 class File extends Field
 {
-
     /**
      * @return array
      */
@@ -14,6 +13,7 @@ class File extends Field
     {
         $data = parent::formattedResponse();
         $model = $this->getModel();
+        $fieldName = $this->getFieldName();
 
         $data['worker'] = (new Hidden('crud_worker', $this->getModel()))
             ->build([$this->getNameAttribute()])
@@ -21,13 +21,11 @@ class File extends Field
             ->formattedResponse();
 
         if (!$this->isTranslatable()) {
-            if ($model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
-                $url = $model->{$this->getFieldName()}->url();
-                $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
-                $name = $model->{$this->getFieldName()}->originalFilename();
-                $deleteUrl = route('admin.resource.destroy-file', [
-                    get_class($model), $model->id, $this->getFieldName()
-                ]);
+            if ($model->{$fieldName} && $model->{$fieldName}->exists()) {
+                $url = $this->getUrl($model, 'get');
+                $size = number_format($model->{$fieldName}->size() / 1000, 2);
+                $name = $model->{$fieldName}->originalFilename();
+                $deleteUrl = $this->getUrl($model, 'destroy');
             }
 
             $data['file'] = [
@@ -42,12 +40,26 @@ class File extends Field
     }
 
     /**
+     * @return string
+     */
+    public function getUrl($model, $action = 'get')
+    {
+        $fieldName = $this->getFieldName();
+        $attachment = $model->{$fieldName};
+        $storage = $attachment->getConfig()['storage'] ?? '';
+        $url = encrypt([get_class($model), $model->id, $fieldName]);
+
+        return $storage === 'local' ? route($this->isShared() ? 'resource.' . $action . '-file' : 'admin.resource.' . $action . '-file', $url) : $attachment->url();
+    }
+
+    /**
      * @return array
      */
     public function getTranslations(): array
     {
         $translations = [];
         $model = $this->getModel();
+        $fieldName = $this->getFieldName();
 
         if ($this->isTranslatable()) {
             $attributes = $this->getAttributes();
@@ -62,13 +74,11 @@ class File extends Field
                 $name = null;
                 $deleteUrl = null;
 
-                if ($model && $model->{$this->getFieldName()} && $model->{$this->getFieldName()}->exists()) {
-                    $url = $model->{$this->getFieldName()}->url();
-                    $size = number_format($model->{$this->getFieldName()}->size() / 1000, 2);
-                    $name = $model->{$this->getFieldName()}->originalFilename();
-                    $deleteUrl = route('admin.resource.destroy-file', [
-                        get_class($model), $model->id, $this->getFieldName(), $language->iso_code
-                    ]);
+                if ($model->{$fieldName} && $model->{$fieldName}->exists()) {
+                    $url = $this->getUrl($model, 'get');
+                    $size = number_format($model->{$fieldName}->size() / 1000, 2);
+                    $name = $model->{$fieldName}->originalFilename();
+                    $deleteUrl = $this->getUrl($model, 'destroy');
                 }
 
                 $translations[] = [

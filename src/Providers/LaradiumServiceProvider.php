@@ -252,6 +252,7 @@ class LaradiumServiceProvider extends ServiceProvider
     private function loadRoutes()
     {
         $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
     }
 
     /**
