@@ -58,7 +58,7 @@ class ColumnSet
     public function editable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['editable'] = true;
             }
 
@@ -106,7 +106,7 @@ class ColumnSet
     public function notSearchable()
     {
         $this->list = $this->list->map(function ($item) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['not_searchable'] = true;
             }
 
@@ -123,7 +123,7 @@ class ColumnSet
     public function modify($closure)
     {
         $this->list = $this->list->map(function ($item) use ($closure) {
-            if ($this->column == $item['column'] && !$item['switchable']) {
+            if ($this->column === $item['column'] && !$item['switchable']) {
                 $item['modify'] = $closure;
             }
 
@@ -134,12 +134,13 @@ class ColumnSet
     }
 
     /**
+     * @param bool $disabled
      * @return $this
      */
     public function switchable($disabled = false)
     {
         $this->list = $this->list->map(function ($item) use ($disabled) {
-            if ($this->column == $item['column']) {
+            if ($this->column === $item['column']) {
                 $item['modify'] = function ($row) use ($item, $disabled) {
                     return view('laradium::admin.resource._partials.switcher', [
                         'row'      => $row,
@@ -183,6 +184,26 @@ class ColumnSet
         $this->list = $this->list->map(function ($item) use ($width) {
             if ($this->column === $item['column']) {
                 $item['width'] = $width;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param string $width
+     * @param string $height
+     * @return $this
+     */
+    public function image($width = '75px', $height = '75px')
+    {
+        $this->list = $this->list->map(function ($item) use ($width, $height) {
+            if ($this->column === $item['column'] && !$item['switchable'] && !$item['editable']) {
+                $item['modify'] = function ($row) use ($item, $width, $height) {
+                    return '<img src="' . $row->{$item['column']}->url() . '" alt="image" style="width: ' . $width . '; height: ' . $height . '">';
+                };
             }
 
             return $item;
