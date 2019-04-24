@@ -43,6 +43,11 @@ class BelongsToMany extends Field
     protected $where;
 
     /**
+     * bool
+     */
+    private $renderAsTags = false;
+
+    /**
      * BelongsToMany constructor.
      * @param $parameters
      * @param Model $model
@@ -100,7 +105,10 @@ class BelongsToMany extends Field
         $data = parent::formattedResponse();
         $data['value'] = get_class($this);
         $data['items'] = $this->items;
+        $data['options'] = $this->getOptions();
+        $data['selected'] = $this->getSelected();
         $data['config']['field_col'] = $this->fieldCol;
+        $data['config']['render_as_tags'] = $this->renderAsTags;
 
         return $data;
     }
@@ -116,6 +124,39 @@ class BelongsToMany extends Field
         return $this;
     }
 
+    /**
+     * BelongsToMany
+     */
+    public function tags($renderAsTags = true)
+    {
+        $this->renderAsTags = $renderAsTags;
+
+        return $this;
+    }
+
+    /**
+     * Collection
+     */
+    public function getOptions()
+    {
+        return $this->items->map(function ($item) {
+            return [
+                'id'       => $item['id'],
+                'text'     => $item['name'],
+                'selected' => $item['is_checked'],
+            ];
+        });
+    }
+
+    /**
+     * Collection
+     */
+    public function getSelected()
+    {
+        return $this->items->filter(function ($item) {
+            return $item['is_checked'] === true;
+        })->pluck('id');
+    }
 
     /**
      * @param int $size
