@@ -81,7 +81,9 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   created: function created() {
+    console.log(123);
     this.data = JSON.parse(this.form_data).data;
+    console.log(this.data);
     var fields = this.data.form;
 
     for (var field in fields) {

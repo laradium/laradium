@@ -12,7 +12,6 @@ use Laradium\Laradium\Traits\CrudEvent;
 
 class FormNew
 {
-
     private const CODE_RESPONSE_SUCCESSFUL = 200;
 
     use Crud, CrudEvent;
