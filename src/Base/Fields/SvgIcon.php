@@ -56,21 +56,21 @@ class SvgIcon extends Field
     public function getOptions()
     {
         $icons = [];
-        $i = 1;
         foreach (\File::allFiles($this->path) as $path) {
             $fileName = pathinfo($path->getPathname(), PATHINFO_FILENAME);
             if ($this->filter && !str_contains($fileName, $this->filter)) {
                 continue;
             }
+
             $name = str_replace('-', ' ', $fileName);
             $name = str_replace('_', ' ', $name);
             $name = ucfirst($name);
+
             $icons[] = [
                 'id'       => $path->getPathname(),
                 'text'     => '<span class="svg-wrapper">' . \File::get($path->getPathname()) . '</span> ' . $name,
-                'selected' => $fileName === $this->getValue()
+                'selected' => $path->getPathname() === $this->getValue()
             ];
-            $i++;
         }
 
         return $icons;
