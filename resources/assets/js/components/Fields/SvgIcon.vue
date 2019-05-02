@@ -10,7 +10,7 @@
 				</span>
             </label>
             <input type="hidden" :value="selected" :name="field.name">
-            <select2 :options="field.options" :config="config" v-model="selected">
+            <select2 :options="field.options" v-model="selected">
                 <option disabled value="0">Select one</option>
             </select2>
         </div>
@@ -25,7 +25,7 @@
             return {
                 selected: null,
                 config: {
-                    data: field.options,
+                    data: this.field.options,
                     placeholder: 'Select',
                     width: '100%',
                     height: '100px',
@@ -36,7 +36,7 @@
             };
         },
 
-        mounted() {
+        created() {
             let options = this.field.options;
             for (let option in options) {
                 if (options[option].id == this.field.value) {
