@@ -31,25 +31,21 @@
 </template>
 
 <script>
-    // import Editor from '@tinymce/tinymce-vue';
-
     export default {
         props: ['field', 'language'],
-        // components: {
-        //     'editor': Editor
-        // },
         data() {
             return {
                 config: {
+                    height: this.field.config.height ? this.field.config.height : 400,
                     plugins: 'preview autolink code fullscreen image link media table hr lists',
                     toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link image media | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat',
                     forced_root_block: '',
                     images_upload_url: this.field.config.upload_url,
                     automatic_uploads: true,
                     images_reuse_filename: true,
-                    relative_urls : false,
-                    remove_script_host : false,
-                    convert_urls : true,
+                    relative_urls: false,
+                    remove_script_host: false,
+                    convert_urls: true,
                     images_upload_handler: async (blobInfo, success, failure) => {
                         let form_data = new FormData();
                         form_data.append('file', blobInfo.blob(), blobInfo.filename());
@@ -60,7 +56,7 @@
                             success(request.data.data.url);
 
                             return true;
-                        } catch(error) {
+                        } catch (error) {
                             failure(error.response.data.message);
 
                             return false;
@@ -68,6 +64,6 @@
                     },
                 },
             }
-        },
+        }
     }
 </script>
