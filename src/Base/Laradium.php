@@ -70,7 +70,7 @@ class Laradium
             $resourcesPath = base_path($path);
 
             if (file_exists($resourcesPath)) {
-                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                foreach (\File::files($resourcesPath) as $resourcePath) {
                     $resource = $resourcePath->getPathname();
                     $baseName = basename($resource, '.php');
                     $resource = $namespace . $baseName;
@@ -101,7 +101,7 @@ class Laradium
             $resourcesPath = base_path($path . '/Api');
 
             if (file_exists($resourcesPath)) {
-                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                foreach (\File::files($resourcesPath) as $resourcePath) {
                     $resource = $resourcePath->getPathname();
                     $baseName = basename($resource, '.php');
                     $resource = $namespace . 'Api\\' . $baseName;
