@@ -55,7 +55,7 @@ Vue.component('tree-field', require('./components/fields/Tree.vue').default);
 Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
 Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
 Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
-
+Vue.component('vue-chart', require('./components/Chart.vue').default);
 
 Vue.component('media-manager', require('./components/MediaManager.vue').default);
 

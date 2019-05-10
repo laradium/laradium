@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Repositories;
 
 use Laradium\Laradium\Base\ApiResource;
+use Laradium\Laradium\Base\Charts;
 use Laradium\Laradium\Base\Resource;
 use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Base\Validation;
@@ -55,6 +56,14 @@ class LaradiumRepository
     public function validation(\Closure $closure): \Laradium\Laradium\Base\Validation
     {
         return (new Validation)->make($closure);
+    }
+
+    /**
+     * @return Charts
+     */
+    public function charts(): \Laradium\Laradium\Base\Charts
+    {
+        return (new Charts());
     }
 
     /**
