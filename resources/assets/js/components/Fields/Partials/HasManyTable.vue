@@ -7,7 +7,7 @@
 
         <input type="hidden" :name="field.name + '[crud_worker]'" :value="field.value">
 
-        <table class="table table-striped">
+        <table class="table table-striped" v-if="field.entries.length">
             <thead>
             <tr>
                 <th v-for="templateField in field.template_data.fields">
@@ -36,7 +36,7 @@
                     ></component>
                 </td>
 
-                <td class="actions">
+                <td class="actions text-right">
                     <button class="btn btn-primary btn-sm"
                             @click.prevent="restore(index)"
                             v-if="entry.config.is_deleted && field.config.actions.includes('delete')">
