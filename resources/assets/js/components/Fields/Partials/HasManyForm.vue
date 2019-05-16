@@ -64,8 +64,12 @@
 </template>
 
 <script>
+    import hasManyMixin from '../../../mixins/hasMany';
+
     export default {
         props: ['field', 'language', 'replacement_ids'],
+
+        mixins: [hasManyMixin],
 
         data() {
             return {
@@ -83,98 +87,24 @@
         },
 
         methods: {
-            addItem() {
-                let generate_replacements = this.generateReplacementIds(this.replacement_ids, this.field.template_data.replacement_ids);
-                this.new_replacement_ids = generate_replacements.replacement_ids;
-                let template_fields = _.cloneDeep(this.field.template_data.fields);
-
-                for (let field in template_fields) {
-                    for (let id in this.new_replacement_ids) {
-                        if (!template_fields[field].config.is_translatable) {
-                            template_fields[field].name = template_fields[field].name.replace(id, this.new_replacement_ids[id]);
-                        } else {
-                            let translations = template_fields[field].translations;
-                            for (let translation in translations) {
-                                translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
-                            }
-                        }
-                    }
-                }
-
-                this.field.entries.push({
-                    fields: template_fields,
-                    config: {
-                        is_deleted: false,
-                        is_collapsed: false
-                    },
-                    label: 'Entry'
-                });
-
-            },
-
             onUpdate(items) {
                 let i = 0;
                 for (let item in items) {
+                    if (!items.hasOwnProperty(item)) {
+                        continue
+                    }
+
                     let fields = items[item].fields;
                     for (let field in fields) {
-                        if (fields[field].label == 'Sequence no') {
+                        if (!fields.hasOwnProperty(field)) {
+                            continue;
+                        }
+
+                        if (fields[field].label === 'Sequence no') {
                             fields[field].value = i;
                         }
                     }
                     i++;
-                }
-            },
-
-            remove(item, field_name, index) {
-                swal({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this after you press 'Save'!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes'
-                })
-                    .then((result) => {
-                        if (result.value) {
-                            if (item.id !== undefined) {
-                                let item_copy = _.cloneDeep(this.field.entries[index]);
-                                this.removed_items[index] = item_copy;
-
-                                this.field.entries[index].fields = [{
-                                    type: "hidden",
-                                    label: "Id",
-                                    name: field_name + "[" + item.id + "][remove]",
-                                    value: 1,
-                                    config: {
-                                        is_translatable: false,
-                                    },
-                                    translations: []
-                                }, {
-                                    type: "hidden",
-                                    label: "Id",
-                                    name: field_name + "[" + item.id + "][id]",
-                                    value: item.id,
-                                    config: {
-                                        is_translatable: false,
-                                    },
-                                    translations: []
-                                }];
-                                if (this.field.entries[index].config.is_deleted !== undefined) {
-                                    this.field.entries[index].config.is_deleted = true;
-                                }
-                            } else {
-                                this.field.entries.splice(index, 1);
-                            }
-                        }
-                    });
-
-            },
-
-            restore(index) {
-                this.field.entries[index].fields = this.removed_items[index].fields;
-                if (this.field.entries[index].config.is_deleted !== undefined) {
-                    this.field.entries[index].config.is_deleted = false;
                 }
             },
 
