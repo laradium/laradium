@@ -56,6 +56,11 @@ class HasMany extends Field
     private $letters = [];
 
     /**
+     * @var bool
+     */
+    private $renderAsTable = false;
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param Model $model
@@ -99,6 +104,7 @@ class HasMany extends Field
         $data['template_data'] = $this->templateData;
         $data['config']['is_sortable'] = $this->isSortable();
         $data['config']['actions'] = $this->getActions();
+        $data['config']['render_as_table'] = $this->renderAsTable;
 
         return $data;
     }
@@ -295,4 +301,14 @@ class HasMany extends Field
         return $model->{$this->entryLabel} ?? 'Entry';
     }
 
+    /**
+     * @param bool $value
+     * @return HasMany
+     */
+    public function renderAsTable($value = true): self
+    {
+        $this->renderAsTable = $value;
+
+        return $this;
+    }
 }
