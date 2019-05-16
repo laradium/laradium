@@ -39,6 +39,16 @@ class BelongsTo extends Field
     protected $where;
 
     /**
+     * @var bool
+     */
+    protected $hasPlaceholder = false;
+
+    /**
+     * @var string
+     */
+    protected $placeholder = '- Select -';
+
+    /**
      * BelongsTo constructor.
      * @param $parameters
      * @param Model $model
@@ -59,7 +69,7 @@ class BelongsTo extends Field
         $model = $this->getModel();
         $this->relation = $model->{$this->relationName}();
         $this->relationModel = $this->relation->getRelated();
-        $this->label(ucfirst($this->relation->getRelation()));
+        $this->label($this->getLabel() ?? ucfirst($this->relation->getRelation()));
         $this->fieldName($this->relation->getForeignKey());
 
         parent::build($attributes);
@@ -78,10 +88,20 @@ class BelongsTo extends Field
         }
 
         if (method_exists($this->relationModel, 'translations')) {
-            return $options->get()->pluck($this->getTitle(), 'id')->toArray();
+            $options = $options->get()->pluck($this->getTitle(), 'id');
+            if ($placeholder = $this->getPlaceholder()) {
+                $options = $options->prepend($placeholder, '');
+            }
+
+            return $options->toArray();
         }
 
-        return $options->pluck($this->getTitle(), 'id')->toArray();
+        $options = $options->pluck($this->getTitle(), 'id');
+        if ($placeholder = $this->getPlaceholder()) {
+            $options = $options->prepend($placeholder, '');
+        }
+
+        return $options->toArray();
     }
 
     /**
@@ -111,6 +131,26 @@ class BelongsTo extends Field
         $this->nullable = true;
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function placeholder($value)
+    {
+        $this->placeholder = $value;
+        $this->hasPlaceholder = true;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlaceholder()
+    {
+        return $this->hasPlaceholder ? $this->placeholder : '';
     }
 
     /**
