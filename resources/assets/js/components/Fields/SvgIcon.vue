@@ -10,9 +10,11 @@
 				</span>
             </label>
             <input type="hidden" :value="selected" :name="field.name">
-            <select2 :options="field.options" v-model="selected">
-                <option disabled value="0">Select one</option>
-            </select2>
+            <div class="icon-select">
+                <select2 :options="field.options" v-model="selected">
+                    <option disabled value="0">Select one</option>
+                </select2>
+            </div>
         </div>
     </div>
 </template>
