@@ -79,5 +79,9 @@ return [
     'component_views' => [
         'user-box-top'    => 'admin._partials.user-box-top',
         'user-box-bottom' => 'admin._partials.user-box-bottom'
+    ],
+
+    'additional_translation_scan_paths' => [
+        //
     ]
 ];
