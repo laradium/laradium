@@ -131,12 +131,13 @@ class FindTranslations extends Command
      */
     protected function getPaths(): array
     {
-        $paths = [
+        $paths = array_merge([
             base_path('app'),
             base_path('modules'),
             base_path('resources'),
             base_path('routes'),
-        ];
+        ], (array)config('laradium.additional_translation_scan_paths', []));
+
         foreach ($paths as $i => $path) {
             if (!File::isDirectory($path)) {
                 unset($paths[$i]);
