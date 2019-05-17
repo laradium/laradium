@@ -27,6 +27,7 @@ class Laradium
         'vendor/laradium/laradium-content/src/Base/Resources'    => 'Laradium\\Laradium\\Content\\Base\\Resources\\',
         'vendor/laradium/laradium-system/src/Base/Resources'     => 'Laradium\\Laradium\\System\\Base\\Resources\\',
         'vendor/laradium/laradium-permission/src/Base/Resources' => 'Laradium\\Laradium\\Permission\\Base\\Resources\\',
+        'vendor/laradium/laradium-documents/src/Base/Resources' => 'Laradium\\Laradium\\Documents\\Base\\Resources\\',
     ];
 
     /**
@@ -70,7 +71,7 @@ class Laradium
             $resourcesPath = base_path($path);
 
             if (file_exists($resourcesPath)) {
-                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                foreach (\File::files($resourcesPath) as $resourcePath) {
                     $resource = $resourcePath->getPathname();
                     $baseName = basename($resource, '.php');
                     $resource = $namespace . $baseName;
@@ -101,7 +102,7 @@ class Laradium
             $resourcesPath = base_path($path . '/Api');
 
             if (file_exists($resourcesPath)) {
-                foreach (\File::allFiles($resourcesPath) as $resourcePath) {
+                foreach (\File::files($resourcesPath) as $resourcePath) {
                     $resource = $resourcePath->getPathname();
                     $baseName = basename($resource, '.php');
                     $resource = $namespace . 'Api\\' . $baseName;

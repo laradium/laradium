@@ -85,7 +85,8 @@ class AddNestedsetForMenuItemsTable extends Migration
             'MenuResource'        => 'fa fa-link',
             'SettingResource'     => 'fa fa-cogs',
             'UserResource'        => 'fa fa-users',
-            'SystemLogResource'   => 'fa fa-tachometer'
+            'SystemLogResource'   => 'fa fa-tachometer',
+            'DocumentResource'    => 'fa fa-file-text'
         ];
 
         $resource = array_last(explode('\\', get_class($resource)));
