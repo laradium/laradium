@@ -12,6 +12,7 @@ use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
 use Laradium\Laradium\Registries\RouteRegistry;
+use Laradium\Laradium\Services\Asset\AssetManager;
 use Laradium\Laradium\ViewComposers\MenuComposer;
 use Laradium\Laradium\ViewComposers\ResourceComposer;
 use Laradium\Laradium\ViewComposers\VariableComposer;
@@ -37,10 +38,6 @@ class LaradiumServiceProvider extends ServiceProvider
         $this->loadViews();
         $this->loadRoutes();
         $this->registerViewComposers();
-
-        // Global helpers, icons
-        require_once __DIR__ . '/../Helpers/Global.php';
-        require_once __DIR__ . '/../Helpers/Icons.php';
 
         // Mail config
         $this->setMailConfig();
@@ -78,6 +75,8 @@ class LaradiumServiceProvider extends ServiceProvider
 
             return $registry;
         });
+
+        $this->app->singleton(AssetManager::class);
     }
 
     /**

@@ -25,7 +25,11 @@
   "autoload": {
     "psr-4": {
       "Laradium\\Laradium\\": "src"
-    }
+    },
+    "files": [
+      "src/Helpers/Global.php",
+      "src/Helpers/Icons.php"
+    ]
   },
   "extra": {
     "laravel": {
