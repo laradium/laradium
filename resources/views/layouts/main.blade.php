@@ -137,7 +137,7 @@
                         {{ csrf_field() }}
                     </form>
                     <h5>
-                        {{ auth()->user()->full_name ?? auth()->user()->name }}
+                        {{ auth('admin')->user()->full_name ?? auth('admin')->user()->name }}
                         <a href="javascript:;"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                            class="text-custom"

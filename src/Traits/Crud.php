@@ -48,9 +48,9 @@ trait Crud
                     $this->hasManyWorker($model, $key, array_except($worker, 'crud_worker'));
                 } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\Password::class) {
                     $this->passwordWorker($model, array_except($worker, 'crud_worker'));
-                } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\MorphTo::class) {
                     $this->morphToWorker($model, array_except($worker, 'crud_worker'));
-                } else if ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
+                } elseif ($crudWorkerClass === \Laradium\Laradium\Base\Fields\BelongsToMany::class) {
                     $this->belongsToManyToWorker($model, $key, array_except($worker, 'crud_worker'));
                 }
             }
@@ -88,7 +88,7 @@ trait Crud
     private function recursiveUnset(&$array)
     {
         foreach ($array as $index => &$value) {
-            if (in_array($index, $this->unwantedKeys) && !is_numeric($index)) {
+            if(in_array($index, $this->unwantedKeys)) {
                 unset($array[$index]);
             }
 
@@ -96,7 +96,6 @@ trait Crud
                 if (array_get($value, 'remove', null)) {
                     unset($array[$index]);
                 }
-
                 $this->recursiveUnset($value, $this->unwantedKeys);
             }
         }

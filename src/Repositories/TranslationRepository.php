@@ -2,15 +2,22 @@
 
 namespace Laradium\Laradium\Repositories;
 
+use Exception;
+use Illuminate\Contracts\Cache\Repository;
 use Laradium\Laradium\Models\Language;
+use Illuminate\Support\Collection;
 
 class TranslationRepository
 {
 
     /**
+     * @var Collection
+     */
+    private $languages;
+    /**
      * @param bool $exceptCurrent
-     * @return array|\Illuminate\Contracts\Cache\Repository|mixed
-     * @throws \Exception
+     * @return Collection
+     * @throws Exception
      */
     public function languages($exceptCurrent = false)
     {
@@ -32,14 +39,16 @@ class TranslationRepository
             });
         }
 
-        return collect($languages)->transform(function ($language) {
+        $this->languages = collect($languages)->transform(function ($language) {
             return (object)$language;
         });
+
+        return $this->languages;
     }
 
     /**
      * @return object
-     * @throws \Exception
+     * @throws Exception
      */
     public function getLanguage()
     {
@@ -60,5 +69,20 @@ class TranslationRepository
         $language->iso_code = $isoCode;
 
         return (object)$language;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function languagesForForm(): array
+    {
+        return $this->languages()->map(function ($item) {
+            return [
+                'name'     => $item->title_localized,
+                'iso_code' => $item->iso_code,
+                'id'       => $item->id,
+            ];
+        })->toArray();
     }
 }

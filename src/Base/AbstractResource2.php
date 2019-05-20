@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base;
 
-use App\Models\User;
 use File;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -20,7 +19,6 @@ use Laradium\Laradium\Traits\Editable;
 
 abstract class AbstractResource extends Controller
 {
-
     use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
@@ -97,11 +95,6 @@ abstract class AbstractResource extends Controller
     protected $usesPermissions = false;
 
     /**
-     * @var InterfaceBuilder
-     */
-    private $builder;
-
-    /**
      * AbstractResource constructor.
      */
     public function __construct()
@@ -117,19 +110,6 @@ abstract class AbstractResource extends Controller
         }
 
         $this->middleware($this->isShared() ? ['web'] : ['web', 'laradium']);
-
-        $this->builder = new InterfaceBuilder;
-    }
-
-    private function form($url = null, $method = 'post'): FormNew
-    {
-        $model = $this->getModel();
-
-        return (new FormNew('crud-form'))
-            ->model($model)
-            ->url($url)
-            ->method($method)
-            ->fields($this->resource()->closure());
     }
 
     /**
@@ -209,15 +189,13 @@ abstract class AbstractResource extends Controller
 
         $this->model($model = $model->findOrFail($id));
 
-        $this->builder->components(function (FieldSet $set) {
-            $set->crud($this->form($this->getAction('update'), 'put'));
-        });
-
-
         return view($this->getView('edit'), [
-            'resource' => $this,
-            'layout'   => $this->layout,
-            'builder'  => $this->builder
+            'form'           => $this->getForm(),
+            'resource'       => $this,
+            'js'             => $this->resource()->getJs(),
+            'css'            => $this->resource()->getCss(),
+            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
+            'layout'         => $this->layout
         ]);
     }
 
@@ -241,7 +219,26 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->form()->update($request);
+        $form = $this->getForm();
+        $validationRequest = $this->prepareRequest($request);
+
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
+
+        $validationRules = $form->getValidationRules();
+        $validationRequest->validate($validationRules);
+
+        $this->saveData($request->all(), $this->getModel());
+
+        $this->fireEvent(['afterSave', 'afterUpdate'], $request);
+
+        if ($request->ajax()) {
+            return [
+                'success'  => 'Resource successfully updated!',
+                'redirect' => $form->getAction('edit')
+            ];
+        }
+
+        return back()->withSuccess('Resource successfully updated!');
     }
 
     /**
@@ -287,25 +284,6 @@ abstract class AbstractResource extends Controller
     }
 
     /**
-     * @param string $action
-     * @return string
-     */
-    public function getAction($action = 'index'): string
-    {
-        if ($action === 'create') {
-            return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($this->getModel()->id . '/edit');
-        } else if ($action === 'store') {
-            return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($this->getModel()->id);
-        }
-
-        return $this->getUrl();
-    }
-
-    /**
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
@@ -347,6 +325,21 @@ abstract class AbstractResource extends Controller
             ->name($this->name)
             ->slug($this->slug)
             ->prefix($this->prefix);
+    }
+
+    /**
+     * @return Form
+     */
+    private function getForm()
+    {
+        $form = (new Form(
+            $this
+                ->getBaseResource($this->getModel())
+                ->make($this->resource()->closure())
+                ->build())
+        )->abstractResource($this)->build();
+
+        return $form;
     }
 
     /**
@@ -521,6 +514,25 @@ abstract class AbstractResource extends Controller
         $model = strtolower(Str::plural($model));
 
         return $action . ' ' . $model;
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getAction($action = 'index'): string
+    {
+        if ($action === 'create') {
+            return $this->getUrl('create');
+        } else if ($action === 'edit') {
+            return $this->getUrl($this->getModel()->id . '/edit');
+        } else if ($action === 'store') {
+            return $this->getUrl();
+        } else if ($action === 'update') {
+            return $this->getUrl($this->model->id);
+        }
+
+        return $this->getUrl();
     }
 
     /**

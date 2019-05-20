@@ -12,7 +12,7 @@ class Block extends Element
      * @param $parameters
      * @param Model $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, $model)
     {
         $this->setName('col-' . array_get($parameters, 1, 'md') . '-' . array_get($parameters, 0, '12'));
 

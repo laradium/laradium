@@ -37,7 +37,7 @@ class FieldSet
      * @param Model $model
      * @return $this
      */
-    public function model(Model $model)
+    public function model($model)
     {
         $this->model = $model;
 
@@ -68,8 +68,13 @@ class FieldSet
     public function __call($method, $parameters)
     {
         $class = $this->fieldRegistry->getClassByName($method);
+        $model = $this->getModel();
+        if(!$model) {
+            $model = null;
+        }
+
         if (class_exists($class)) {
-            $field = new $class($parameters, $this->getModel());
+            $field = new $class($parameters, $model);
             $this->fields->push($field);
 
             return $field;

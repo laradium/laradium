@@ -51,6 +51,11 @@ class Field
     private $value;
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * @var array
      */
     protected $col = [
@@ -93,7 +98,7 @@ class Field
      * @param $parameters
      * @param Model $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, $model)
     {
         $this->fieldName = array_first($parameters);
         $this->model = $model;
@@ -161,7 +166,7 @@ class Field
      * @param $closure
      * @return $this
      */
-    public function modifyValue($closure)
+    public function modifyValue($closure): self
     {
         $this->modifiedValue = $closure;
 
@@ -183,7 +188,7 @@ class Field
         return [
             'type'         => $this->getType(),
             'label'        => $this->getLabel(),
-            'name'         => !$this->isTranslatable() ? $this->getNameAttribute() : null,
+            'name'         => $this->getName(),
             'value'        => $value,
             'translations' => $this->getTranslations(),
             'config'       => [
@@ -196,10 +201,37 @@ class Field
     }
 
     /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        if ($this->name) {
+            return $this->name;
+        }
+
+        if (!$this->isTranslatable()) {
+            $this->getNameAttribute();
+        }
+
+        return $this->name ?? null;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function name(string $value): self
+    {
+        $this->name = $value;
+
+        return $this;
+    }
+
+    /**
      * @param $value
      * @return $this
      */
-    public function value($value)
+    public function value($value): self
     {
         $this->value = $value;
 
@@ -207,11 +239,11 @@ class Field
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getValue()
     {
-        return $this->value ?? $this->model->{$this->getFieldName()};
+        return $this->value ?? ($this->model ? $this->model->{$this->getFieldName()} : null);
     }
 
     /**
@@ -336,11 +368,11 @@ class Field
 
     /**
      * @param null $attributes
-     * @return string
+     * @return Field
      */
-    public function getNameAttribute($attributes = null)
+    public function getNameAttribute($attributes = null): Field
     {
-        return implode('', collect($attributes ?? $this->getAttributes())->filter(function ($item) {
+        $this->name = implode('', collect($attributes ?? $this->getAttributes())->filter(function ($item) {
             return $item !== null;
         })->map(function ($item, $index) {
             if ($index !== 0) {
@@ -349,6 +381,8 @@ class Field
 
             return $item;
         })->toArray());
+
+        return $this;
     }
 
     /**
