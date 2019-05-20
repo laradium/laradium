@@ -8,13 +8,17 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 window.resizable = require('jquery-resizable-dom');
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('crud-form', require('./components/CrudForm.vue').default);
+Vue.component('interface-builder', require('./components/InterfaceBuilder.vue').default);
+Vue.component('crud-field', require('./components/fields/Crud.vue').default);
+
+Vue.component('form-submit-field', require('./components/fields/FormSubmit.vue').default);
 Vue.component('text-field', require('./components/fields/Text.vue').default);
 Vue.component('textarea-field', require('./components/fields/Textarea.vue').default);
 Vue.component('boolean-field', require('./components/fields/Boolean.vue').default);
