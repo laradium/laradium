@@ -15,6 +15,7 @@ window.resizable = require('jquery-resizable-dom');
  */
 
 Vue.component('crud-form', require('./components/CrudForm.vue').default);
+Vue.component('code-field', require('./components/Fields/Code.vue').default);
 Vue.component('text-field', require('./components/fields/Text.vue').default);
 Vue.component('textarea-field', require('./components/fields/Textarea.vue').default);
 Vue.component('boolean-field', require('./components/fields/Boolean.vue').default);
