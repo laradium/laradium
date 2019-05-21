@@ -16,7 +16,7 @@ class File extends Field
         $model = $this->getModel();
 
         $data['worker'] = (new Hidden('crud_worker', $this->getModel()))
-            ->build([$this->getNameAttribute()])
+            ->build([$this->getName()])
             ->value(get_class($this))
             ->formattedResponse();
 
@@ -74,7 +74,7 @@ class File extends Field
                 $translations[] = [
                     'iso_code' => $isoCode,
                     'value'    => $this->getValue(),
-                    'name'     => $this->getNameAttribute(),
+                    'name'     => $this->getName(),
                     'file'     => [
                         'url'       => $url,
                         'file_name' => $name,
