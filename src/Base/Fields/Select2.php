@@ -42,10 +42,10 @@ class Select2 extends Field
     protected $options = [];
 
     /**
-     * @param $value
+     * @param string $value
      * @return $this
      */
-    public function source($value): self
+    public function source(string $value): self
     {
         $this->source = $value;
 
@@ -53,10 +53,10 @@ class Select2 extends Field
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return $this
      */
-    public function dataProperty($value): self
+    public function dataProperty(string $value): self
     {
         $this->dataProperty = $value;
 
@@ -64,10 +64,10 @@ class Select2 extends Field
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return $this
      */
-    public function searchParam($value): self
+    public function searchParam(string $value): self
     {
         $this->searchParam = $value;
 
@@ -75,10 +75,10 @@ class Select2 extends Field
     }
 
     /**
-     * @param $value
+     * @param array $value
      * @return $this
      */
-    public function queryParams($value): self
+    public function queryParams(array $value): self
     {
         $this->queryParams = $value;
 
@@ -86,10 +86,10 @@ class Select2 extends Field
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return $this
      */
-    public function idField($value): self
+    public function idField(string $value): self
     {
         $this->idField = $value;
 
@@ -97,10 +97,10 @@ class Select2 extends Field
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return $this
      */
-    public function textField($value): self
+    public function textField(string $value): self
     {
         $this->textField = $value;
 
