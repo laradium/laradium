@@ -26,6 +26,9 @@
   },
   "dependencies": {
     "@tinymce/tinymce-vue": "^2.0.0",
+    "datatables": "^1.10.18",
+    "datatables.net-bs4": "^1.10.19",
+    "datatables.net-responsive-bs4": "^2.2.3",
     "font-awesome": "^4.7.0",
     "jquery-datetimepicker": "^2.5.21",
     "jquery-resizable-dom": "^0.32.0",

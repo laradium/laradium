@@ -17,6 +17,7 @@ window.resizable = require('jquery-resizable-dom');
 
 Vue.component('interface-builder', require('./components/InterfaceBuilder.vue').default);
 Vue.component('crud-field', require('./components/fields/Crud.vue').default);
+Vue.component('table-field', require('./components/fields/Table.vue').default);
 
 Vue.component('form-submit-field', require('./components/fields/FormSubmit.vue').default);
 Vue.component('text-field', require('./components/fields/Text.vue').default);
@@ -59,6 +60,8 @@ Vue.component('tree-field', require('./components/fields/Tree.vue').default);
 Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
 Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
 Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
+
+Vue.component('breadcrumbs-field', require('./components/fields/Breadcrumbs.vue').default);
 
 
 Vue.component('media-manager', require('./components/MediaManager.vue').default);

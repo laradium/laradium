@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Http\Controllers\Admin\DatatableController;
 use Laradium\Laradium\Services\Asset\AssetManager;
@@ -93,6 +94,16 @@ class Table
     private $assetManager;
 
     /**
+     * @var string
+     */
+    private $url;
+
+    /**
+     * @var string
+     */
+    private $toggleUrl;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -102,7 +113,8 @@ class Table
     }
 
     /**
-     * @return mixed
+     * @return string
+     * @throws \Throwable
      */
     public function render()
     {
@@ -120,25 +132,17 @@ class Table
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getTableConfig(): string
+    public function getTableConfig(): array
     {
-        $config = [
-            'id'       => $this->getResourceId(),
-            'columns'  => $this->getColumnConfig(),
-            'order'    => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : ['[0, "desc"]'],
-            'slug'     => $this->getSlug(),
-            'has_tabs' => false,
-            'selector' => '.' . $this->getResourceId(),
+        return [
+            'columns'      => $this->getColumnConfig(),
+            'base_columns' => $this->columns(),
+            'order'        => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : ['[0, "desc"]'],
+            'url'          => $this->getUrl(),
+            'toggle_url'   => $this->getToggleUrl(),
         ];
-
-        if ($this->getTabs()) {
-            $config['selector'] = '.tab-pane.active .' . $this->getResourceId();
-            $config['has_tabs'] = true;
-        }
-
-        return json_encode($config);
     }
 
     /**
@@ -185,7 +189,7 @@ class Table
      * @param $model
      * @return $this
      */
-    public function model($model)
+    public function model($model): self
     {
         $this->model = $model;
 
@@ -195,15 +199,15 @@ class Table
     /**
      * @return Model
      */
-    public function getModel()
+    public function getModel(): Model
     {
         return $this->model;
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function columns()
+    public function columns(): Collection
     {
         return $this->columnSet->list;
     }
@@ -248,6 +252,45 @@ class Table
      * @param $value
      * @return Table
      */
+    public function url($value): self
+    {
+        $this->url = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+
+    /**
+     * @param $value
+     * @return Table
+     */
+    public function toggleUrl($value): self
+    {
+        $this->toggleUrl = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getToggleUrl():? string
+    {
+        return $this->toggleUrl;
+    }
+
+    /**
+     * @param $value
+     * @return Table
+     */
     public function slug($value): self
     {
         $this->slug = $value;
@@ -270,14 +313,6 @@ class Table
         }
 
         return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
-    }
-
-    /**
-     * @return string
-     */
-    public function getResourceId()
-    {
-        return trim(str_replace('/', '-', $this->getSlug()), '-');
     }
 
     /**

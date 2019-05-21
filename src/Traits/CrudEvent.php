@@ -16,7 +16,7 @@ trait CrudEvent
      * @param \Closure $callable
      * @return $this
      */
-    public function event($name, \Closure $callable)
+    public function event($name, \Closure $callable): self
     {
         if (is_array($name)) {
             foreach ($name as $event) {
@@ -41,7 +41,7 @@ trait CrudEvent
      * @param $name
      * @param $request
      */
-    public function fireEvent($name, $request)
+    public function fireEvent($name, $request): void
     {
         if (is_array($name)) {
             foreach ($name as $eventName) {

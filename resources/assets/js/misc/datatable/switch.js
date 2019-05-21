@@ -1,9 +1,9 @@
-export default () => {
-    $(document).on('change', '.js-switch', function () {
-        let id = $(this).data('id');
-        let column = $(this).attr('name');
+export default (datatable, toggleUrl) => {
+    $(document).on('change', '.js-switch', (event) => {
+        let id = $(event.target).data('id');
+        let column = $(event.target).attr('name');
 
-        $.post(datatable_config.slug + '/toggle/' + id, {
+        $.post(toggleUrl + '/' + id, {
             column: column
         }, function () {
             try {

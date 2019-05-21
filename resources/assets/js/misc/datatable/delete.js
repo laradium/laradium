@@ -1,7 +1,7 @@
 export default (dataTable) => {
-    $(document).on('click', '.js-delete-resource', async function (e) {
+    $(document).on('click', '.js-delete-resource', async (e) => {
         e.preventDefault();
-        let url = $(this).data('url');
+        let url = $(e.target).data('url');
 
         let result = await swal({
             title: 'Are you sure?',
@@ -20,8 +20,8 @@ export default (dataTable) => {
                 data: {
                     _method: 'delete',
                 }
-            }).done(function() {
-				dataTable.ajax.reload();
+            }).done(() => {
+                dataTable.api().ajax.reload();
 
 				swal('Item has been deleted!');
 			});

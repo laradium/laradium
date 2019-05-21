@@ -36,6 +36,7 @@ class ColumnSet
             'column'         => $column,
             'column_parsed'  => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
             'name'           => $name ?? $column,
+            'pretty_name'    => ucfirst(str_replace('_', ' ', $name ?? $column)),
             'title'          => null,
             'relation'       => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
             'editable'       => false,

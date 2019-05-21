@@ -15,9 +15,9 @@ class CustomContent extends Element
     /**
      * CustomContent constructor.
      * @param $parameters
-     * @param Model $model
+     * @param $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, $model)
     {
         $this->setName('customContent');
 

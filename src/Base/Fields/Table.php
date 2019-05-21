@@ -9,6 +9,9 @@ use Laradium\Laradium\Base\FormNew;
 class Table
 {
 
+    /**
+     * @var \Laradium\Laradium\Base\Table
+     */
     private $table;
 
     /**
@@ -25,8 +28,6 @@ class Table
      */
     public function build(): self
     {
-        $this->form->build();
-
         return $this;
     }
 
@@ -36,11 +37,8 @@ class Table
     public function formattedResponse(): array
     {
         return [
-            'type'   => 'crud',
-            'fields' => $this->form->getFormattedFieldResponse(),
-            'url'    => $this->form->getUrl(),
-            'method' => $this->form->getMethod(),
-            'name'   => $this->form->getName(),
+            'type'   => 'table',
+            'table'  => $this->table->getTableConfig(),
             'config' => [
                 'is_translatable' => $this->isTranslatable(),
                 'col'             => 'col-md-12',
@@ -53,7 +51,7 @@ class Table
      */
     public function getValidationRules(): array
     {
-        return $this->form->getValidationRules();
+        return [];
     }
 
     /**
@@ -61,7 +59,7 @@ class Table
      */
     public function getFields(): Collection
     {
-        return $this->form->getFields();
+        return collect([]);
     }
 
     /**
@@ -69,6 +67,6 @@ class Table
      */
     public function isTranslatable(): bool
     {
-        return $this->form->isTranslatable();
+        return false;
     }
 }

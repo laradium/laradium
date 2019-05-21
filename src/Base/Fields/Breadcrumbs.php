@@ -4,20 +4,34 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Element;
-use Laradium\Laradium\Base\FieldSet;
 
-class Col extends Element
+class Breadcrumbs extends Element
 {
+
     /**
-     * Col constructor.
+     * @var array
+     */
+    private $breadcrumbs;
+
+    /**
+     * Block constructor.
      * @param $parameters
-     * @param $model
+     * @param Model $model
      */
     public function __construct($parameters, $model)
     {
-        $this->setName('col-' . array_get($parameters, 1, 'md') . '-' . array_get($parameters, 0, '12'));
+        $this->breadcrumbs = array_first($parameters);
+        $this->setName('Breadcrumbs');
 
         parent::__construct($parameters, $model);
+    }
+
+    /**
+     * @return array
+     */
+    public function getBreadcrumbs(): array
+    {
+        return $this->breadcrumbs;
     }
 
     /**
@@ -27,12 +41,10 @@ class Col extends Element
     {
         return [
             'name'   => $this->getName(),
-            'slug'   => str_slug($this->getName(), '_'),
-            'type'   => 'col',
-            'fields' => $this->getFields(),
+            'type'   => 'breadcrumbs',
+            'breadcrumbs' => $this->getBreadcrumbs(),
             'config' => [
-                'is_translatable' => $this->getIsTranslatable(),
-                'col'             => $this->getName(),
+                'col' => 'col-md-12',
             ],
             'attr'   => $this->getAttributes()
         ];

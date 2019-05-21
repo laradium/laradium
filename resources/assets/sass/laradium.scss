@@ -231,3 +231,7 @@ $grey: #f2f2f2;
     100% { transform: rotate(360deg); }
   }
 }
+
+.dataTables_paginate, .dataTables_filter {
+  float: right;
+}

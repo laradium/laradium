@@ -2,6 +2,8 @@
 
 namespace Laradium\Laradium\Traits;
 
+use ReflectionException;
+
 trait Crud
 {
     use Worker;
@@ -15,7 +17,7 @@ trait Crud
      * @param $inputs
      * @param $model
      * @return bool
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function saveData($inputs, $model)
     {

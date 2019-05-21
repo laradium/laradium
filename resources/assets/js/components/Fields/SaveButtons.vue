@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div :class="classes" v-bind="fieldAttributes">
-            <button class="btn btn-primary mb-1" :disabled="form.isSubmitted">
+            <button class="btn btn-primary mb-1" :disabled="form.isSubmitted" @click.stop.prevent="form.onSubmit(form.$el)">
                 <span v-if="form.isSubmitted">
                     <i class="fa fa-cog fa-spin fa-fw"></i> Saving...
                 </span>
@@ -10,7 +10,7 @@
                 </span>
             </button>
 
-            <button class="btn btn-primary mb-1" @click.stop.prevent="form.onSubmit(form, form.data.actions.index)"
+            <button class="btn btn-primary mb-1" @click.stop.prevent="form.onSubmit(form.$el, true)"
                     :disabled="form.isSubmitted" v-if="!form.isSubmitted">
                 Save & Return
             </button>
@@ -78,7 +78,7 @@
                 let component = null;
                 let parent = this.$parent;
                 while (parent && !component) {
-                    if (parent.$options.name === 'CrudForm') {
+                    if (parent.$options.name === 'Crud') {
                         component = parent
                     }
                     parent = parent.$parent

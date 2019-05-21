@@ -4,12 +4,15 @@ namespace Laradium\Laradium\Base;
 
 use App\Models\User;
 use File;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
@@ -17,6 +20,7 @@ use Laradium\Laradium\Services\Layout;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
+use ReflectionException;
 
 abstract class AbstractResource extends Controller
 {
@@ -99,7 +103,7 @@ abstract class AbstractResource extends Controller
     /**
      * @var InterfaceBuilder
      */
-    private $builder;
+    protected $builder;
 
     /**
      * AbstractResource constructor.
@@ -121,74 +125,98 @@ abstract class AbstractResource extends Controller
         $this->builder = new InterfaceBuilder;
     }
 
-    private function form($url = null, $method = 'post'): FormNew
+    /**
+     * @return FormNew
+     */
+    protected function getForm(): FormNew
     {
         $model = $this->getModel();
 
         return (new FormNew('crud-form'))
             ->model($model)
-            ->url($url)
-            ->method($method)
+            ->returnUrl($this->getAction())
             ->fields($this->resource()->closure());
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param $url
+     * @param string $method
+     * @return InterfaceBuilder
+     */
+    protected function formBuilder(string $url, string $method = 'post'): InterfaceBuilder
+    {
+        return $this->builder->components(function (FieldSet $set) use ($url, $method) {
+            $set->col(12)->fields(function (FieldSet $set) {
+                $set->breadcrumbs($this->getBreadcrumbs('edit'));
+            });
+
+            $set->crud($this->getForm()->url($url)->method($method));
+        });
+    }
+
+    /**
+     * @return View
      */
     public function index()
     {
+        $this->builder->components(function (FieldSet $set) {
+            $set->col(12)->fields(function (FieldSet $set) {
+                $set->breadcrumbs($this->getBreadcrumbs('edit'));
+
+                $set->customContent(function () {
+                    return view('laradium::admin._partials.import', [
+                        'resource' => $this,
+                    ])->render();
+                });
+            });
+
+            $set->block(12)->fields(function (FieldSet $set) {
+                $set->table($this->table()
+                    ->url($this->getAction('data-table'))
+                    ->toggleUrl($this->getAction('toggle'))
+                    ->make(function (ColumnSet $column) {
+                        $column->add('action')->modify(function ($item) {
+                            return view('laradium::admin.table._partials.action', [
+                                'resource' => $this,
+                                'item'     => $item
+                            ])->render();
+                        })
+                            ->notSortable()
+                            ->notSearchable();
+                    })
+                );
+            });
+        });
+
         return view($this->layout->getView('index'), [
-            'table'    => $this->table()->resource($this)->model($this->getModel()),
             'resource' => $this,
+            'builder'  => $this->builder,
             'layout'   => $this->layout
         ]);
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create()
     {
         return view($this->getView('create'), [
-            'form'           => $this->getForm(),
-            'resource'       => $this,
-            'js'             => $this->resource()->getJs(),
-            'css'            => $this->resource()->getCss(),
-            'jsBeforeSource' => $this->resource()->getJsBeforeSource(),
-            'layout'         => $this->layout
+            'resource' => $this,
+            'layout'   => $this->layout,
+            'builder'  => $this->formBuilder($this->getAction('store'))
         ]);
     }
 
     /**
      * @param Request $request
-     * @return mixed
-     * @throws \ReflectionException
+     * @return JsonResponse
+     * @throws ReflectionException
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $form = $this->getForm();
-        $validationRequest = $this->prepareRequest($request);
-
-        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
-
-        $validationRules = $form->getValidationRules();
-        $validationRequest->validate($validationRules);
-
-        $model = $this->saveData($request->all(), $this->getModel());
-
-        $form->model($model);
-        $this->model($model);
-
-        $this->fireEvent(['afterSave', 'afterCreate'], $request);
-
-        if ($request->ajax()) {
-            return [
-                'success'  => 'Resource successfully created',
-                'redirect' => $form->getAction('edit')
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully created!');
+        return $this->getForm()->events($this->getEvents())->redirectTo(function($model) {
+            return $this->getAction('edit', $model->id);
+        })->store($request);
     }
 
     /**
@@ -209,25 +237,20 @@ abstract class AbstractResource extends Controller
 
         $this->model($model = $model->findOrFail($id));
 
-        $this->builder->components(function (FieldSet $set) {
-            $set->crud($this->form($this->getAction('update'), 'put'));
-        });
-
-
         return view($this->getView('edit'), [
             'resource' => $this,
             'layout'   => $this->layout,
-            'builder'  => $this->builder
+            'builder'  => $this->formBuilder($this->getAction('update'), 'put')
         ]);
     }
 
     /**
      * @param Request $request
      * @param $id
-     * @return mixed
-     * @throws \ReflectionException
+     * @return JsonResponse
+     * @throws ReflectionException
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         $model = $this->getModel();
 
@@ -241,7 +264,7 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->form()->update($request);
+        return $this->getForm()->events($this->getEvents())->update($request);
     }
 
     /**
@@ -290,17 +313,24 @@ abstract class AbstractResource extends Controller
      * @param string $action
      * @return string
      */
-    public function getAction($action = 'index'): string
+    public function getAction($action = 'index', $id = null): string
     {
+        $id = $id ?? ($this->getModel() ? $this->getModel()->id : null);
+
         if ($action === 'create') {
             return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($this->getModel()->id . '/edit');
-        } else if ($action === 'store') {
+        } elseif ($action === 'edit') {
+            return $this->getUrl($id . '/edit');
+        } elseif ($action === 'store') {
             return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($this->getModel()->id);
+        } elseif ($action === 'update') {
+            return $this->getUrl($id);
+        } elseif ($action === 'data-table') {
+            return $this->getUrl('data-table');
+        } elseif ($action === 'toggle') {
+            return $this->getUrl('toggle/' . $id);
         }
+
 
         return $this->getUrl();
     }
@@ -432,18 +462,33 @@ abstract class AbstractResource extends Controller
     {
         $baseResource = $this->getBaseResource();
         $name = $baseResource->getName();
+        $defaultBreadcrumbs = [];
+
+        if (in_array('laradium', request()->route()->computedMiddleware)) {
+            $defaultBreadcrumbs[] = [
+                'name' => 'Admin',
+                'url'  => url('/admin')
+            ];
+        }
+
+        if ($this->getPrefix()) {
+            $defaultBreadcrumbs[] = [
+                'name' => ucfirst($this->getPrefix()),
+                'url'  => url($this->getPrefix())
+            ];
+        }
 
         $breadcrumbs = [
             'index'  => [
                 [
                     'name' => $name,
-                    'url'  => $this->getAction('index')
+                    'url'  => $this->getAction()
                 ]
             ],
             'create' => [
                 [
                     'name' => $name,
-                    'url'  => $this->getAction('index')
+                    'url'  => $this->getAction()
                 ],
                 [
                     'name' => 'Create',
@@ -453,7 +498,7 @@ abstract class AbstractResource extends Controller
             'edit'   => [
                 [
                     'name' => $name,
-                    'url'  => $this->getAction('index')
+                    'url'  => $this->getAction()
                 ],
                 [
                     'name' => 'Edit',
@@ -462,7 +507,7 @@ abstract class AbstractResource extends Controller
             ],
         ];
 
-        return $breadcrumbs[$action] ?? [];
+        return array_merge($defaultBreadcrumbs, $breadcrumbs[$action] ?? []);
     }
 
     /**

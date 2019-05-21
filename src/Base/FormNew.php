@@ -2,13 +2,16 @@
 
 namespace Laradium\Laradium\Base;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use Laradium\Laradium\Base\Fields\Tab;
 use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
+use ReflectionException;
 
 class FormNew
 {
@@ -69,8 +72,13 @@ class FormNew
     private $redirectTo;
 
     /**
+     * @var string|null
+     */
+    private $returnUrl;
+
+    /**
      * Form constructor.
-     * @param $resource
+     * @param string $name
      */
     public function __construct(string $name)
     {
@@ -80,9 +88,10 @@ class FormNew
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
+     * @return FormNew
      */
-    public function fields(\Closure $closure): self
+    public function fields(Closure $closure): self
     {
         $fieldSet = (new FieldSet)->model($this->getModel());
         $closure($fieldSet);
@@ -95,7 +104,7 @@ class FormNew
     /**
      * @return Collection
      */
-    private function getFieldSetFields()
+    private function getFieldSetFields(): Collection
     {
         return $this->fieldSetFields;
     }
@@ -104,7 +113,7 @@ class FormNew
      * @param $value
      * @return $this
      */
-    public function model($value)
+    public function model($value): self
     {
         $this->model = $value;
 
@@ -114,7 +123,7 @@ class FormNew
     /**
      * @return Model
      */
-    public function getModel()
+    public function getModel(): Model
     {
         return $this->model;
     }
@@ -122,27 +131,39 @@ class FormNew
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @param Collection $events
+     * @return $this
+     */
+    public function events(Collection $events): self
+    {
+        $this->events = $events;
+
+        return $this;
+    }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ReflectionException
      */
     public function store(Request $request): JsonResponse
     {
         $this->build();
         $validationRequest = $this->prepareRequest($request);
 
-        $this->fireEvent('beforeSave', $request);
+        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
 
         $validationRules = $this->getValidationRules();
         $validationRequest->validate($validationRules);
 
         $model = $this->saveData($request->all(), $this->getModel());
+        $this->model($model);
 
         $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
@@ -151,27 +172,28 @@ class FormNew
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ReflectionException
      */
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $this->build();
         $validationRequest = $this->prepareRequest($request);
-        $this->fireEvent('beforeSave', $request);
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
 
         $validationRules = $this->getValidationRules();
         $validationRequest->validate($validationRules);
 
 
-        $this->saveData($request->all(), $this->getModel());
+        $model = $this->saveData($request->all(), $this->getModel());
+        $this->model($model);
 
-        $this->fireEvent('afterSave', $request);
+        $this->fireEvent(['afterSave', 'afterUpdate'], $request);
 
         return response()->json($this->data());
     }
 
     /**
-     * @param string $value
      * @return string
      */
     public function getMethod(): string
@@ -191,10 +213,9 @@ class FormNew
     }
 
     /**
-     * @param string $value
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -214,7 +235,7 @@ class FormNew
     /**
      * @return $this
      */
-    public function build()
+    public function build(): self
     {
         foreach ($this->getFieldSetFields() as $field) {
             $field->build();
@@ -228,9 +249,9 @@ class FormNew
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return View
      */
-    public function render()
+    public function render(): View
     {
         return view('laradium::admin._partials.form', [
             'form' => $this
@@ -240,7 +261,7 @@ class FormNew
     /**
      * @return array
      */
-    public function data()
+    public function data(): array
     {
         return [
             'success' => true,
@@ -250,18 +271,19 @@ class FormNew
                 'form'             => $this->getFormattedFieldResponse(),
                 'is_translatable'  => $this->isTranslatable(),
                 'default_language' => translate()->getLanguage()->iso_code,
-                'redirectTo'       => $this->getRedirectTo()
+                'redirect_to'      => $this->getRedirectTo(),
+                'return_to'        => $this->getReturnUrl(),
             ]
         ];
     }
 
     /**
-     * @param $value
+     * @param Closure $closure
      * @return $this
      */
-    public function redirectTo($value)
+    public function redirectTo(Closure $closure): self
     {
-        $this->redirectTo = $value;
+        $this->redirectTo = $closure;
 
         return $this;
     }
@@ -271,7 +293,31 @@ class FormNew
      */
     public function getRedirectTo(): ?string
     {
-        return $this->redirectTo;
+        if(!$this->redirectTo) {
+            return null;
+        }
+        $closure = $this->redirectTo;
+
+        return $closure($this->getModel());
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function returnUrl(string $value): self
+    {
+        $this->returnUrl = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getReturnUrl(): ?string
+    {
+        return $this->returnUrl;
     }
 
     /**

@@ -12,6 +12,10 @@ try {
     global.$ = global.jQuery = require('jquery');
 
     require('bootstrap');
+
+    require( 'datatables.net-bs4' )( global.$ );
+    require( 'datatables.net-responsive-bs4' )( global.$ );
+
 } catch (e) {}
 
 /**
