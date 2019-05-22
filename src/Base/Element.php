@@ -101,7 +101,7 @@ class Element
 
             $field = $field->replacementAttributes($this->getReplacementAttributes())->build($attributes);
 
-            if ($field->isTranslatable()) {
+            if (method_exists($field, 'isTranslatable') && $field->isTranslatable()) {
                 $this->isTranslatable = true;
             }
 
