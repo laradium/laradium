@@ -10,24 +10,12 @@ export default {
                     continue;
                 }
 
-                for (let id in this.new_replacement_ids) {
-                    if (!this.new_replacement_ids.hasOwnProperty(id)) {
-                        continue;
-                    }
+                template_fields[field] = this.replaceIds(template_fields[field]);
 
-                    if (!template_fields[field].config.is_translatable) {
-                        template_fields[field].name = template_fields[field].name.replace(id, this.new_replacement_ids[id]);
-                    } else {
-                        let translations = template_fields[field].translations;
-
-                        for (let translation in translations) {
-                            if (!translations.hasOwnProperty(translation)) {
-                                continue;
-                            }
-
-                            translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
-                        }
-                    }
+                if (template_fields[field].type === 'col' || template_fields[field].type === 'row' || template_fields[field].type === 'block') {
+                    template_fields[field].fields.forEach((childField, childKey) => {
+                        template_fields[field].fields[childKey] = this.replaceIds(childField);
+                    });
                 }
             }
 
@@ -40,6 +28,30 @@ export default {
                 label: 'Entry'
             });
 
+        },
+
+        replaceIds(field) {
+            for (let id in this.new_replacement_ids) {
+                if (!this.new_replacement_ids.hasOwnProperty(id)) {
+                    continue;
+                }
+
+                if (!field.config.is_translatable) {
+                    field.name = field.name.replace(id, this.new_replacement_ids[id]);
+                } else {
+                    let translations = field.translations;
+
+                    for (let translation in translations) {
+                        if (!translations.hasOwnProperty(translation)) {
+                            continue;
+                        }
+
+                        translations[translation].name = translations[translation].name.replace(id, this.new_replacement_ids[id]);
+                    }
+                }
+            }
+
+            return field;
         },
 
         async remove(item, field_name, index) {
