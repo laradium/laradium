@@ -73,7 +73,7 @@ trait Crud
      * @param $request
      * @return \Illuminate\Http\Request
      */
-    private function prepareRequest($request)
+    protected function prepareRequest($request)
     {
         $data = $request->all();
         $this->recursiveUnset($data);
