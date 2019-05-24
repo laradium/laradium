@@ -10,11 +10,6 @@ class Element
     /**
      * @var
      */
-    private $fieldSet;
-
-    /**
-     * @var
-     */
     private $name;
 
     /**
@@ -33,7 +28,7 @@ class Element
     private $model;
 
     /**
-     * @var
+     * @var array
      */
     private $fields;
 
@@ -53,6 +48,11 @@ class Element
     private $attributes = [];
 
     /**
+     * @var array
+     */
+    private $replacementAttributes = [];
+
+    /**
      * Element constructor.
      * @param $parameters
      * @param Model $model
@@ -60,7 +60,6 @@ class Element
     public function __construct($parameters, Model $model)
     {
         $this->model = $model;
-        $this->fieldSet = new FieldSet;
     }
 
     /**
@@ -80,11 +79,12 @@ class Element
     }
 
     /**
+     * @param array $attributes
      * @return $this
      */
-    public function build(): self
+    public function build($attributes = []): self
     {
-        $fieldSet = $this->fieldSet;
+        $fieldSet = new FieldSet();
         $fieldSet->model($this->model);
         $closure = $this->closure;
 
@@ -93,14 +93,15 @@ class Element
         }
 
         $fields = [];
-        foreach ($fieldSet->fields() as $field) {
+
+        foreach ($fieldSet->fields as $field) {
             if ($field instanceof Tab) {
                 $field->model($this->getModel());
             }
 
-            $field->build();
+            $field->replacementAttributes($this->getReplacementAttributes())->build($attributes);
 
-            if ($field->isTranslatable()) {
+            if (method_exists($field, 'isTranslatable') && $field->isTranslatable()) {
                 $this->isTranslatable = true;
             }
 
@@ -154,9 +155,9 @@ class Element
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
@@ -232,5 +233,40 @@ class Element
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    /**
+     * @param array $value
+     * @return $this
+     */
+    public function replacementAttributes(array $value): self
+    {
+        $this->replacementAttributes = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addReplacementAttribute(): self
+    {
+        $attributes = array_merge($this->replacementAttributes, ['__ID__']);
+
+        $replacementAttributes = [];
+        foreach ($attributes as $index => $value) {
+            $replacementAttributes[] = '__ID' . ($index + 1) . '__';
+        }
+        $this->replacementAttributes = $replacementAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReplacementAttributes(): array
+    {
+        return $this->replacementAttributes;
     }
 }

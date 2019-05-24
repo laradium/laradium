@@ -330,7 +330,7 @@ abstract class AbstractResource extends Controller
     /**
      * @return Form
      */
-    private function getForm()
+    protected function getForm()
     {
         $form = (new Form(
             $this

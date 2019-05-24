@@ -31,7 +31,7 @@ class Link extends Field
             'slug'   => str_slug($this->getFieldName(), '_'),
             'type'   => $this->getType(),
             'value'  => $this->getValue(),
-            'attr'   => $this->getAttributes(),
+            'attr'   => $this->getAttr(),
             'config' => [
                 'col' => $this->getCol(),
             ]

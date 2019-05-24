@@ -1,5 +1,5 @@
 <template>
-    <div :class="data.config.col ? data.config.col : 'col-md-12'" v-bind="fieldAttributes">
+    <div :class="data.config.col && !fullWidth ? data.config.col : 'col-md-12'" v-bind="fieldAttributes">
         <div class="row" v-if="tabs.length">
             <div class="col-md-12">
                 <ul class="nav nav-tabs">
@@ -29,7 +29,7 @@
 
 <script>
     export default {
-        props: ['data', 'language'],
+        props: ['data', 'language', 'fullWidth'],
 
         data() {
             return {

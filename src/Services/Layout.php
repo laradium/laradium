@@ -82,6 +82,6 @@ class Layout
      */
     public function assetManager(): AssetManager
     {
-        return new AssetManager;
+        return app(AssetManager::class);
     }
 }

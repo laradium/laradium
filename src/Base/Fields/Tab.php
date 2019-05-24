@@ -3,9 +3,10 @@
 namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Base\Field;
 use Laradium\Laradium\Base\FieldSet;
 
-class Tab
+class Tab extends Field
 {
 
     /**
@@ -71,9 +72,10 @@ class Tab
     }
 
     /**
-     * @return $this
+     * @param array $attributes
+     * @return $this|Field
      */
-    public function build()
+    public function build($attributes = [])
     {
         $fieldSet = $this->fieldSet;
         $fieldSet->model($this->model);
@@ -116,7 +118,7 @@ class Tab
     /**
      * @return array
      */
-    public function getValidationRules()
+    public function getValidationRules(): array
     {
         return $this->validationRules;
     }
@@ -124,7 +126,7 @@ class Tab
     /**
      * @return bool
      */
-    public function isTranslatable()
+    public function isTranslatable(): bool
     {
         return $this->isTranslatable;
     }

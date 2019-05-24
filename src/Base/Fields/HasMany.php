@@ -2,10 +2,12 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
-use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Model;
+use Laradium\Laradium\Base\Element;
 use Laradium\Laradium\Base\Field;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Menu;
+use Laradium\Laradium\Models\MenuItem;
 use Laradium\Laradium\Traits\Nestable;
 use Laradium\Laradium\Traits\Relation;
 use Laradium\Laradium\Traits\Sortable;
@@ -83,8 +85,8 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
-        if (get_class($this->getModel()) === config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class)) {
-            config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)::rebuild();
+        if (get_class($this->getModel()) === config('laradium.menu_class', Menu::Class)) {
+            config('laradium.menu_item_class', MenuItem::class)::rebuild();
         }
 
         $this->templateData = $this->getTemplateData();
@@ -96,7 +98,7 @@ class HasMany extends Field
     /**
      * @return array
      */
-    public function formattedResponse()
+    public function formattedResponse(): array
     {
         $data = parent::formattedResponse();
         $data['value'] = get_class($this);
@@ -112,7 +114,7 @@ class HasMany extends Field
     /**
      * @return array
      */
-    private function getTemplateData()
+    private function getTemplateData(): array
     {
         $fields = [];
         $validationRules = [];
@@ -134,7 +136,11 @@ class HasMany extends Field
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute));
 
-            if ($field->getRules()) {
+            if ($field instanceof Element) {
+                foreach ($field->getValidationRules() as $key => $rules) {
+                    $validationRules[$key] = $rules;
+                }
+            } else if ($field->getRules()) {
                 $validationRules[$field->getValidationKey()] = $field->getRules();
             }
 
@@ -152,7 +158,7 @@ class HasMany extends Field
     /**
      * @return array
      */
-    private function getEntries()
+    private function getEntries(): array
     {
         $entries = [];
         $collection = $this->getRelationCollection()->sortBy($this->getSortableColumn());
@@ -168,7 +174,7 @@ class HasMany extends Field
      * @param $item
      * @return array
      */
-    private function formattedEntry($item)
+    private function formattedEntry($item): array
     {
         $entry = [
             'label'  => $this->getEntryLabel($item),
@@ -209,7 +215,7 @@ class HasMany extends Field
                 'children' => [],
             ];
 
-            if (get_class($item) === config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)) {
+            if (get_class($item) === config('laradium.menu_item_class', MenuItem::class)) {
                 $tree['data'] = [
                     'name'           => $item->name,
                     'url'            => $item->url,
@@ -228,7 +234,7 @@ class HasMany extends Field
      * @param $closure
      * @return $this
      */
-    public function fields($closure)
+    public function fields($closure): self
     {
         $fieldSet = $this->fieldSet;
         $fieldSet->model($this->getModel());
@@ -241,7 +247,7 @@ class HasMany extends Field
      * @param $value
      * @return $this
      */
-    public function actions($value)
+    public function actions($value): self
     {
         $this->actions = $value;
 
@@ -251,7 +257,7 @@ class HasMany extends Field
     /**
      * @return array
      */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
@@ -260,7 +266,7 @@ class HasMany extends Field
      * @param $value
      * @return $this
      */
-    public function collapse($value)
+    public function collapse($value): self
     {
         $this->isCollapsed = $value;
 
@@ -270,7 +276,7 @@ class HasMany extends Field
     /**
      * @return bool
      */
-    public function isCollapsed()
+    public function isCollapsed(): bool
     {
         return $this->isCollapsed;
     }
@@ -279,7 +285,7 @@ class HasMany extends Field
      * @param $value
      * @return $this
      */
-    public function entryLabel($value)
+    public function entryLabel($value): self
     {
         $this->entryLabel = $value;
 
@@ -290,7 +296,7 @@ class HasMany extends Field
      * @param Model $model
      * @return string
      */
-    public function getEntryLabel(Model $model)
+    public function getEntryLabel(Model $model): string
     {
         if (!is_string($this->entryLabel)) {
             $closure = $this->entryLabel;

@@ -37,9 +37,11 @@
                         <div v-for="(field, index) in entry.fields" :class="field.config.col">
                             <component
                                 :is="field.type + '-field'"
+                                :data="field"
                                 :field="field"
                                 :language="language"
                                 :replacement_ids="new_replacement_ids"
+                                :fullWidth="true"
                                 :key="index"
                             ></component>
                         </div>
