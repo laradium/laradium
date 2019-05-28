@@ -8,9 +8,9 @@ use Laradium\Laradium\Base\Fields\Tab;
 class Element
 {
     /**
-     * @var
+     * @var FieldSet
      */
-    private $fieldSet;
+    protected $fieldSet;
 
     /**
      * @var
@@ -25,7 +25,7 @@ class Element
     /**
      * @var bool
      */
-    private $isTranslatable = false;
+    protected $isTranslatable = false;
 
     /**
      * @var
@@ -40,7 +40,7 @@ class Element
     /**
      * @var array
      */
-    private $validationRules = [];
+    protected $validationRules = [];
 
     /**
      * @var string

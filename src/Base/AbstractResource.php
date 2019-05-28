@@ -33,6 +33,11 @@ abstract class AbstractResource extends Controller
     protected $model;
 
     /**
+     * @var bool
+     */
+    protected $withoutCard = false;
+
+    /**
      * @var string
      */
     protected $resource;
@@ -150,7 +155,8 @@ abstract class AbstractResource extends Controller
                 $set->breadcrumbs($this->getBreadcrumbs('edit'));
             });
 
-            $set->crud($this->getForm()->url($url)->method($method));
+            $set->crud($this->getForm()->url($url)->method($method))
+                ->withoutCard($this->withoutCard);
         });
     }
 
@@ -264,7 +270,9 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->getForm()->events($this->getEvents())->update($request);
+        return $this->getForm()->events($this->getEvents())->redirectTo(function($model) {
+            return $this->getAction('edit', $model->id);
+        })->update($request);
     }
 
     /**

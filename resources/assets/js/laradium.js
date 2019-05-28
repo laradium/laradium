@@ -22,9 +22,11 @@ Vue.component('table-field', require('./components/fields/Table.vue').default);
 Vue.component('code-field', require('./components/Fields/Code.vue').default);
 Vue.component('form-submit-field', require('./components/fields/FormSubmit.vue').default);
 Vue.component('text-field', require('./components/fields/Text.vue').default);
+Vue.component('number-field', require('./components/fields/Number.vue').default);
 Vue.component('textarea-field', require('./components/fields/Textarea.vue').default);
 Vue.component('boolean-field', require('./components/fields/Boolean.vue').default);
 Vue.component('tab-field', require('./components/fields/Tab.vue').default);
+Vue.component('tabs-field', require('./components/fields/Tabs.vue').default);
 Vue.component('hidden-field', require('./components/fields/Hidden.vue').default);
 Vue.component('select-field', require('./components/fields/Select.vue').default);
 Vue.component('select2-field', require('./components/fields/Select2.vue').default);
@@ -82,10 +84,10 @@ for (let key in window.laradiumFields) {
 // Google maps
 import * as VueGoogleMaps from 'vue2-google-maps'
 Vue.use(VueGoogleMaps, {
-	load: {
-		key: Laradium.settings['credentials.google_maps_api_key'],
-		libraries: 'places'
-	},
+    load: {
+        key: Laradium.settings['credentials.google_maps_api_key'],
+        libraries: 'places'
+    },
 });
 
 // Import TinyMCE

@@ -15,6 +15,11 @@ class Crud
     private $form;
 
     /**
+     * @var bool
+     */
+    private $withoutCard = false;
+
+    /**
      * CrudForm constructor.
      * @param $parameters
      */
@@ -47,8 +52,28 @@ class Crud
             'config' => [
                 'is_translatable' => $this->isTranslatable(),
                 'col'             => 'col-md-12',
+                'without_card'    => $this->getWithoutCard()
             ],
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function getWithoutCard(): bool
+    {
+        return $this->withoutCard;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function withoutCard(bool $value): self
+    {
+        $this->withoutCard = $value;
+
+        return $this;
     }
 
     /**

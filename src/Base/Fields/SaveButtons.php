@@ -15,9 +15,9 @@ class SaveButtons extends Element
     /**
      * SaveButtons constructor.
      * @param $parameters
-     * @param Model $model
+     * @param $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, $model)
     {
         $closure = array_first($parameters, null, false);
 

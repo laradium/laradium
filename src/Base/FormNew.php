@@ -158,7 +158,6 @@ class FormNew
         $validationRequest = $this->prepareRequest($request);
 
         $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
-
         $validationRules = $this->getValidationRules();
         $validationRequest->validate($validationRules);
 
@@ -177,6 +176,7 @@ class FormNew
      */
     public function update(Request $request): JsonResponse
     {
+//        dd($request->all());
         $this->build();
         $validationRequest = $this->prepareRequest($request);
         $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);

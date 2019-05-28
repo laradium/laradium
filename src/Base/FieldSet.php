@@ -35,7 +35,9 @@ use Laradium\Laradium\Base\Fields\Select;
 use Laradium\Laradium\Base\Fields\Select2;
 use Laradium\Laradium\Base\Fields\SvgIcon;
 use Laradium\Laradium\Base\Fields\Tab;
+use Laradium\Laradium\Base\Fields\Tabs;
 use Laradium\Laradium\Base\Fields\Text;
+use Laradium\Laradium\Base\Fields\Number;
 use Laradium\Laradium\Base\Fields\Table;
 use Laradium\Laradium\Base\Fields\Textarea;
 use Laradium\Laradium\Base\Fields\Time;
@@ -48,6 +50,7 @@ use Illuminate\Support\Collection;
 /**
  * Basic fields
  * @method Text text(string $name)
+ * @method Number number(string $name)
  * @method Textarea textarea(string $name)
  * @method Wysiwyg wysiwyg(string $name)
  * @method Select select(string $name)
@@ -92,6 +95,7 @@ use Illuminate\Support\Collection;
  * @method Modal modal(string $name)
  * @method ModalButton modalButton(string $name)
  * @method Tree tree(string $name)
+ * @method Tabs tabs()
  */
 class FieldSet
 {

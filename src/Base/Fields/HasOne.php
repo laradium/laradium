@@ -119,7 +119,7 @@ class HasOne extends Field
 
         $item = $this->getRelationCollection();
 
-        if ($item) {
+        if ($item && object_get($item, 'id')) {
             $entry = [
                 'fields' => [],
                 'config' => [
