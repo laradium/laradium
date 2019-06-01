@@ -44,6 +44,8 @@
                     data: (params) => this.processQuery(params),
                     processResults: (data) => this.processResults(data)
                 }
+            } else {
+                config.data = this.options;
             }
 
             select
