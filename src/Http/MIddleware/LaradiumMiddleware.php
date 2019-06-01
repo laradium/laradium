@@ -16,10 +16,19 @@ class LaradiumMiddleware
      */
     public function handle($request, Closure $next)
     {
+        logger()->error([
+            $request->getRequestUri(),
+            $request->session()->all(),
+            $request->user()
+        ]);
         auth()->shouldUse('admin');
 
         $user = auth()->user();
-
+        logger()->error([
+            $request->getRequestUri(),
+            $request->session()->all(),
+            $request->user()
+        ]);
         if (!$user) {
             return redirect('/admin/login');
         }
