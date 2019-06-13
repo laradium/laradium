@@ -79,6 +79,22 @@ class MenuItem extends \Baum\Node
     }
 
     /**
+     * @return bool
+     */
+    public function hasPermission(): bool
+    {
+        return ($resource = $this->getResource()) ? $resource->hasPermission('view') : true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function childrenHasPermissions(): bool
+    {
+        return (bool)collect($this->children)->filter->hasPermission()->count();
+    }
+
+    /**
      * @return string
      */
     private function getUrlFromResource()
