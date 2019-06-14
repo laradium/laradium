@@ -181,14 +181,16 @@ abstract class AbstractResource extends Controller
                     ->url($this->getAction('data-table'))
                     ->toggleUrl($this->getAction('toggle'))
                     ->make(function (ColumnSet $column) {
-                        $column->add('action')->modify(function ($item) {
-                            return view('laradium::admin.table._partials.action', [
-                                'resource' => $this,
-                                'item'     => $item
-                            ])->render();
-                        })
-                            ->notSortable()
-                            ->notSearchable();
+                        if (!$column->has('action')) {
+                            $column->add('action')->modify(function ($item) {
+                                return view('laradium::admin.table._partials.action', [
+                                    'resource' => $this,
+                                    'item'     => $item
+                                ])->render();
+                            })
+                                ->notSortable()
+                                ->notSearchable();
+                        }
                     })
                 );
             });

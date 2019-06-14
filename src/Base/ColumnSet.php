@@ -212,4 +212,13 @@ class ColumnSet
 
         return $this;
     }
+
+    /**
+     * @param $column
+     * @return bool
+     */
+    public function has($column): bool
+    {
+        return (bool)$this->list->where('column', $column)->count();
+    }
 }
