@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base;
 
-use App\Models\User;
 use File;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -151,8 +150,8 @@ abstract class AbstractResource extends Controller
     protected function formBuilder(string $url, string $method = 'post'): InterfaceBuilder
     {
         return $this->builder->components(function (FieldSet $set) use ($url, $method) {
-            $set->col(12)->fields(function (FieldSet $set) {
-                $set->breadcrumbs($this->getBreadcrumbs('edit'));
+            $set->col(12)->fields(function (FieldSet $set) use ($method) {
+                $set->breadcrumbs($this->getBreadcrumbs($method === 'post' ? 'create' : 'edit'));
             });
 
             $set->crud($this->getForm()->url($url)->method($method))
@@ -167,7 +166,7 @@ abstract class AbstractResource extends Controller
     {
         $this->builder->components(function (FieldSet $set) {
             $set->col(12)->fields(function (FieldSet $set) {
-                $set->breadcrumbs($this->getBreadcrumbs('edit'));
+                $set->breadcrumbs($this->getBreadcrumbs('index'));
 
                 $set->customContent(function () {
                     return view('laradium::admin._partials.import', [
@@ -222,7 +221,7 @@ abstract class AbstractResource extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->getForm()->events($this->getEvents())->redirectTo(function($model) {
+        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
             return $this->getAction('edit', $model->id);
         })->store($request);
     }
@@ -272,7 +271,7 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->getForm()->events($this->getEvents())->redirectTo(function($model) {
+        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
             return $this->getAction('edit', $model->id);
         })->update($request);
     }
@@ -329,18 +328,17 @@ abstract class AbstractResource extends Controller
 
         if ($action === 'create') {
             return $this->getUrl('create');
-        } elseif ($action === 'edit') {
+        } else if ($action === 'edit') {
             return $this->getUrl($id . '/edit');
-        } elseif ($action === 'store') {
+        } else if ($action === 'store') {
             return $this->getUrl();
-        } elseif ($action === 'update') {
+        } else if ($action === 'update') {
             return $this->getUrl($id);
-        } elseif ($action === 'data-table') {
+        } else if ($action === 'data-table') {
             return $this->getUrl('data-table');
-        } elseif ($action === 'toggle') {
+        } else if ($action === 'toggle') {
             return $this->getUrl('toggle/' . $id);
         }
-
 
         return $this->getUrl();
     }
