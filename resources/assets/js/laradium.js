@@ -56,17 +56,16 @@ Vue.component('belongsto-field', require('./components/fields/BelongsTo.vue').de
 Vue.component('belongstomany-field', require('./components/fields/BelongsToMany.vue').default);
 Vue.component('morphto-field', require('./components/fields/MorphTo.vue').default);
 Vue.component('widgetconstructor-field', require('./components/fields/WidgetConstructor.vue').default);
+Vue.component('tree-field', require('./components/fields/Tree.vue').default);
+Vue.component('breadcrumbs-field', require('./components/fields/Breadcrumbs.vue').default);
+Vue.component('charts-field', require('./components/fields/Charts.vue').default);
 
 Vue.component('select2', require('./components/Select2.vue').default);
 Vue.component('draggable', require('vuedraggable'));
-Vue.component('tree-field', require('./components/fields/Tree.vue').default);
 Vue.component('vue-menu', require('./components/fields/Menu.vue').default);
 Vue.component('menuitems', require('./components/fields/MenuItems.vue').default);
 Vue.component('js-tree', require('./components/fields/JsTree.vue').default);
-
-Vue.component('breadcrumbs-field', require('./components/fields/Breadcrumbs.vue').default);
-
-
+Vue.component('vue-chart', require('./components/Chart.vue').default);
 Vue.component('media-manager', require('./components/MediaManager.vue').default);
 
 require('./misc/import-form');
@@ -107,7 +106,6 @@ import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/preview';
 
 Vue.component('editor', require('@tinymce/tinymce-vue').default);
-
 
 Vue.mixin({
     methods: {

@@ -8,6 +8,7 @@ use Laradium\Laradium\Base\Fields\Block;
 use Laradium\Laradium\Base\Fields\Boolean;
 use Laradium\Laradium\Base\Fields\Breadcrumbs;
 use Laradium\Laradium\Base\Fields\Button;
+use Laradium\Laradium\Base\Fields\Charts;
 use Laradium\Laradium\Base\Fields\Code;
 use Laradium\Laradium\Base\Fields\Col;
 use Laradium\Laradium\Base\Fields\Color;
@@ -96,6 +97,7 @@ use Illuminate\Support\Collection;
  * @method ModalButton modalButton(string $name)
  * @method Tree tree(string $name)
  * @method Tabs tabs()
+ * @method Charts charts()
  */
 class FieldSet
 {
