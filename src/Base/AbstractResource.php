@@ -180,7 +180,11 @@ abstract class AbstractResource extends Controller
                     ->url($this->getAction('data-table'))
                     ->toggleUrl($this->getAction('toggle'))
                     ->make(function (ColumnSet $column) {
-                        if (!$column->has('action')) {
+                        $hasActions = collect($this->getActions())->filter(function ($action) {
+                            return in_array($action, ['create', 'edit']);
+                        })->count();
+
+                        if (!$column->has('action') && $hasActions) {
                             $column->add('action')->modify(function ($item) {
                                 return view('laradium::admin.table._partials.action', [
                                     'resource' => $this,
