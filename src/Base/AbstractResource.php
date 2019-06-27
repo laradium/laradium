@@ -16,7 +16,6 @@ use Laradium\Laradium\Content\Base\Resources\PageResource;
 use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Services\Layout;
-use Laradium\Laradium\Traits\Crud;
 use Laradium\Laradium\Traits\CrudEvent;
 use Laradium\Laradium\Traits\Editable;
 use ReflectionException;
@@ -24,7 +23,7 @@ use ReflectionException;
 abstract class AbstractResource extends Controller
 {
 
-    use Crud, CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
      * @var
@@ -125,13 +124,13 @@ abstract class AbstractResource extends Controller
     }
 
     /**
-     * @return FormNew
+     * @return Form
      */
-    protected function getForm(): FormNew
+    protected function getForm(): Form
     {
         $model = $this->getModel();
 
-        return (new FormNew('crud-form'))
+        return (new Form('crud-form'))
             ->model($model)
             ->returnUrl($this->getAction())
             ->fields($this->resource()->closure());

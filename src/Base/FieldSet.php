@@ -87,7 +87,7 @@ use Illuminate\Support\Collection;
  * Addition fields
  * @method SaveButtons saveButtons()
  * @method Breadcrumbs breadcrumbs(array $breadcrumbs)
- * @method Crud crud(FormNew $form)
+ * @method Crud crud(Form $form)
  * @method Table table(\Laradium\Laradium\Base\Table $table)
  * @method CustomContent customContent($content)
  * @method FormSubmit formSubmit(string $formName)

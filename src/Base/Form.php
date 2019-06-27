@@ -2,13 +2,20 @@
 
 namespace Laradium\Laradium\Base;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Base\Fields\Tab;
+use Illuminate\View\View;
+use Laradium\Laradium\Services\Crud\CrudDataHandler;
+use Laradium\Laradium\Traits\CrudEvent;
+use ReflectionException;
 
 class Form
 {
 
+    use CrudEvent;
     /**
      * @var Collection
      */
@@ -32,7 +39,7 @@ class Form
     /**
      * @var bool
      */
-    protected $isTranslatable = false;
+    protected $isTranslatable = true;
 
     /**
      * @var
@@ -40,93 +47,319 @@ class Form
     protected $abstractResource;
 
     /**
-     * Form constructor.
-     * @param $resource
+     * @var Collection
      */
-    public function __construct($resource)
+    private $fieldSetFields;
+
+    private $url;
+
+    /**
+     * @var string
+     */
+    private $method = 'post';
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string|null
+     */
+    private $redirectTo;
+
+    /**
+     * @var string|null
+     */
+    private $returnUrl;
+
+    /**
+     * @var CrudDataHandler
+     */
+    private $crudDataHandler;
+
+    /**
+     * Form constructor.
+     * @param string $name
+     */
+    public function __construct(string $name)
     {
-        $this->resource = $resource;
+        $this->name = $name;
         $this->fields = new Collection;
+        $this->events = collect([]);
+        $this->crudDataHandler = new CrudDataHandler;
     }
+
+    /**
+     * @param Closure $closure
+     * @return Form
+     */
+    public function fields(Closure $closure): self
+    {
+        $fieldSet = (new FieldSet)->model($this->getModel());
+        $closure($fieldSet);
+
+        $this->fieldSetFields = $fieldSet->fields();
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    private function getFieldSetFields(): Collection
+    {
+        return $this->fieldSetFields;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function model($value): self
+    {
+        $this->model = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getModel(): Model
+    {
+        return $this->model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param Collection $events
+     * @return $this
+     */
+    public function events(Collection $events): self
+    {
+        $this->events = $events;
+
+        return $this;
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ReflectionException
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $this->build();
+        $validationRequest = $this->crudDataHandler->prepareRequest($request);
+
+        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
+        $validationRules = $this->getValidationRules();
+        $validationRequest->validate($validationRules);
+
+        $model = $this->crudDataHandler->saveData($request->all(), $this->getModel());
+        $this->model($model);
+
+        $this->fireEvent(['afterSave', 'afterCreate'], $request);
+
+        return response()->json($this->data(), 201);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ReflectionException
+     */
+    public function update(Request $request): JsonResponse
+    {
+        $this->build();
+        $validationRequest = $this->crudDataHandler->prepareRequest($request);
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
+
+        $validationRules = $this->getValidationRules();
+        $validationRequest->validate($validationRules);
+
+
+        $model = $this->crudDataHandler->saveData($request->all(), $this->getModel());
+        $this->model($model);
+
+        $this->fireEvent(['afterSave', 'afterUpdate'], $request);
+
+        return response()->json($this->data());
+    }
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function editable(Request $request): JsonResponse
+    {
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
+
+        $model = $this->getModel();
+        $model->{$request->get('name')} = $request->get('value');
+        $model->save();
+
+        $this->fireEvent(['afterSave', 'afterUpdate'], $request);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function method($value): Form
+    {
+        $this->method = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function url($value): Form
+    {
+        $this->url = $value;
+
+        return $this;
+    }
+
 
     /**
      * @return $this
      */
-    public function build()
+    public function build(): self
     {
-        $resource = $this->getResource();
-        $fields = $resource->fieldSet()->fields();
-        $this->model($resource->getModel());
-
-        foreach ($fields as $field) {
-            if ($field instanceof Tab) {
-                $field->model($this->getModel());
-            }
-
+        foreach ($this->getFieldSetFields() as $field) {
             $field->build();
             $this->setValidationRules($field->getValidationRules());
 
-            if ($field->isTranslatable()) {
-                $this->isTranslatable = true;
-            }
-
             $this->fields->push($field);
+
         }
 
         return $this;
     }
 
     /**
+     * @return View
+     */
+    public function render(): View
+    {
+        return view('laradium::admin._partials.form', [
+            'form' => $this
+        ]);
+    }
+
+    /**
      * @return array
      */
-    public function data()
+    public function data(): array
     {
-        $languages = $this->languages();
-
         return [
-            'state' => 'success',
-            'data'  => [
-                'languages'        => $languages,
-                'form'             => $this->response(),
+            'success' => true,
+            'data'    => [
+                'message'          => 'Form successfully updated',
+                'languages'        => translate()->languagesForForm(),
+                'form'             => $this->getFormattedFieldResponse(),
                 'is_translatable'  => $this->isTranslatable(),
-                'default_language' => array_first($languages)['iso_code'],
-                'actions'          => [
-                    'index' => $this->getAction()
-                ]
+                'default_language' => translate()->getLanguage()->iso_code,
+                'redirect_to'      => $this->getRedirectTo(),
+                'return_to'        => $this->getReturnUrl(),
             ]
         ];
     }
 
     /**
-     * @return array
+     * @param Closure $closure
+     * @return $this
      */
-    private function languages(): array
+    public function redirectTo(Closure $closure): self
     {
-        return translate()->languages()->map(function ($item) {
-            return [
-                'name'     => $item->title_localized,
-                'iso_code' => $item->iso_code,
-                'id'       => $item->id,
-            ];
-        })->toArray();
+        $this->redirectTo = $closure;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRedirectTo(): ?string
+    {
+        if (!$this->redirectTo) {
+            return null;
+        }
+        $closure = $this->redirectTo;
+
+        return $closure($this->getModel());
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function returnUrl(string $value): self
+    {
+        $this->returnUrl = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getReturnUrl(): ?string
+    {
+        return $this->returnUrl;
     }
 
     /**
      * @return array
      */
-    public function response()
+    public function getFormattedFieldResponse(): array
     {
         $fieldList = [];
 
-        foreach ($this->fields as $field) {
-            $response = $field->formattedResponse($field);
-            $fieldList[] = $response;
-            if ($field instanceof Tab && $response['config']['is_translatable']) {
-                $this->isTranslatable = true;
-            }
+        foreach ($this->getFields() as $field) {
+            $fieldList[] = $field->formattedResponse($field);
         }
 
         return $fieldList;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 
     /**
@@ -138,47 +371,12 @@ class Form
     }
 
     /**
-     * @return Collection
-     */
-    public function fields(): Collection
-    {
-        return $this->fields;
-    }
-
-    /**
-     * @param $value
-     * @return Form
-     */
-    public function model($value)
-    {
-        $this->model = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return Model
-     */
-    public function getModel()
-    {
-        return $this->model;
-    }
-
-    /**
-     * @return string
-     */
-    public function resourceName(): string
-    {
-        return str_replace('_', '-', $this->getModel()->getTable());
-    }
-
-    /**
      * @param $rules
      * @return $this
      */
-    public function setValidationRules($rules)
+    public function setValidationRules($rules): self
     {
-        $this->validationRules = array_merge($this->validationRules, $rules);
+        $this->validationRules = array_merge($this->getValidationRules(), $rules);
 
         return $this;
     }
@@ -192,56 +390,9 @@ class Form
     }
 
     /**
-     * @param string $action
-     * @return string
-     */
-    public function getAction($action = 'index'): string
-    {
-        if ($action === 'create') {
-            return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($this->getModel()->id . '/edit');
-        } else if ($action === 'store') {
-            return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($this->model->id);
-        }
-
-        return $this->getUrl();
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    private function getUrl($value = ''): string
-    {
-        if (!$this->abstractResource) {
-            return '';
-        }
-
-        if ($this->abstractResource->isShared()) {
-            return url('/' . $this->getResource()->getSlug() . '/' . $value);
-        }
-
-        return url('/admin/' . $this->getResource()->getSlug() . '/' . $value);
-    }
-
-    /**
-     * @param $value
-     * @return Form
-     */
-    public function abstractResource($value)
-    {
-        $this->abstractResource = $value;
-
-        return $this;
-    }
-
-    /**
      * @return bool
      */
-    public function isTranslatable()
+    public function isTranslatable(): bool
     {
         return $this->isTranslatable;
     }

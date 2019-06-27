@@ -4,13 +4,13 @@ namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Base\FormNew;
+use Laradium\Laradium\Base\Form;
 
 class Crud
 {
 
     /**
-     * @var FormNew
+     * @var Form
      */
     private $form;
 
