@@ -153,7 +153,6 @@ class Form
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws ReflectionException
      */
     public function store(Request $request): JsonResponse
     {
@@ -175,7 +174,6 @@ class Form
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws ReflectionException
      */
     public function update(Request $request): JsonResponse
     {
@@ -195,6 +193,21 @@ class Form
         return response()->json($this->data());
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        $this->build();
+        $this->fireEvent(['beforeDelete'], $request);
+
+        $this->getModel()->delete();
+
+        $this->fireEvent(['afterDelete'], $request);
+
+        return response()->json(null, 204);
+    }
 
     /**
      * @param Request $request

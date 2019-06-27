@@ -277,9 +277,9 @@ abstract class AbstractResource extends Controller
     /**
      * @param Request $request
      * @param $id
-     * @return array
+     * @return JsonResponse
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $id): JsonResponse
     {
         $model = $this->getModel();
 
@@ -291,25 +291,15 @@ abstract class AbstractResource extends Controller
             $model = $this->filter($model);
         }
 
-        $this->model($model = $model->findOrFail($id));
+        $this->model($model->findOrFail($id));
 
-        $this->fireEvent('beforeDelete', $request);
-
-        $model->delete();
-
-        $this->fireEvent('afterDelete', $request);
-
-        if ($request->ajax()) {
-            return [
-                'state' => 'success'
-            ];
-        }
-
-        return back()->withSuccess('Resource successfully deleted!');
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->destroy($request);
     }
 
     /**
-     * @return array
+     * @return mixed
      */
     public function dataTable()
     {
@@ -317,28 +307,17 @@ abstract class AbstractResource extends Controller
     }
 
     /**
-     * @param string $action
-     * @return string
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function getAction($action = 'index', $id = null): string
+    public function editable(Request $request): JsonResponse
     {
-        $id = $id ?? ($this->getModel() ? $this->getModel()->id : null);
+        $model = $this->getModel()->findOrFail($request->get('pk'));
+        $this->model($model);
 
-        if ($action === 'create') {
-            return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($id . '/edit');
-        } else if ($action === 'store') {
-            return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($id);
-        } else if ($action === 'data-table') {
-            return $this->getUrl('data-table');
-        } else if ($action === 'toggle') {
-            return $this->getUrl('toggle/' . $id);
-        }
-
-        return $this->getUrl();
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->editable($request);
     }
 
     /**
@@ -369,6 +348,31 @@ abstract class AbstractResource extends Controller
         return response()->json([
             'state' => 'success'
         ]);
+    }
+
+    /**
+     * @param string $action
+     * @return string
+     */
+    public function getAction($action = 'index', $id = null): string
+    {
+        $id = $id ?? ($this->getModel() ? $this->getModel()->id : null);
+
+        if ($action === 'create') {
+            return $this->getUrl('create');
+        } else if ($action === 'edit') {
+            return $this->getUrl($id . '/edit');
+        } else if ($action === 'store') {
+            return $this->getUrl();
+        } else if ($action === 'update') {
+            return $this->getUrl($id);
+        } else if ($action === 'data-table') {
+            return $this->getUrl('data-table');
+        } else if ($action === 'toggle') {
+            return $this->getUrl('toggle/' . $id);
+        }
+
+        return $this->getUrl();
     }
 
     /**
