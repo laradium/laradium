@@ -4,6 +4,7 @@ namespace Laradium\Laradium\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Laradium\Laradium\Base\Laradium;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
 use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
@@ -136,16 +137,12 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * Registers all resources
      */
-    private function registerResources()
+    private function registerResources(): void
     {
-        $laradium = app(\Laradium\Laradium\Base\Laradium::class);
+        $laradium = app(Laradium::class);
 
         foreach ($laradium->resources() as $resource) {
             $laradium->register($resource);
-        }
-
-        foreach ($laradium->apiResources() as $apiResource) {
-            $laradium->registerApi($apiResource);
         }
     }
 

@@ -3,7 +3,6 @@
 namespace Laradium\Laradium\Base;
 
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Registries\ApiResourceRegistry;
 use Laradium\Laradium\Registries\ResourceRegistry;
 
 class Laradium
@@ -13,11 +12,6 @@ class Laradium
      * @var \Illuminate\Foundation\Application|mixed
      */
     protected $resourceRegistry;
-
-    /**
-     * @var \Illuminate\Foundation\Application|mixed
-     */
-    protected $apiResourceRegistry;
 
     /**
      * @var array
@@ -36,7 +30,6 @@ class Laradium
     public function __construct()
     {
         $this->resourceRegistry = app(ResourceRegistry::class);
-        $this->apiResourceRegistry = app(ApiResourceRegistry::class);
     }
 
     /**
@@ -46,15 +39,6 @@ class Laradium
     public function register($resource)
     {
         return $this->resourceRegistry->register($resource);
-    }
-
-    /**
-     * @param $resource
-     * @return mixed
-     */
-    public function registerApi($resource)
-    {
-        return $this->apiResourceRegistry->register($resource);
     }
 
     /**
