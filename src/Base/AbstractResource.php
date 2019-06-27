@@ -85,11 +85,6 @@ abstract class AbstractResource extends Controller
     protected $views = [];
 
     /**
-     * @var array
-     */
-    protected $customRoutes = [];
-
-    /**
      * @var
      */
     private $baseResource;
@@ -533,14 +528,6 @@ abstract class AbstractResource extends Controller
         }
 
         return $this->views[$name];
-    }
-
-    /**
-     * @return array
-     */
-    public function getCustomRoutes()
-    {
-        return $this->customRoutes;
     }
 
     /**

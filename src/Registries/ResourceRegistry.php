@@ -61,19 +61,6 @@ class ResourceRegistry
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
 
-        // Add custom routes
-        foreach ($this->resource->getCustomRoutes() as $name => $route) {
-            $route = [
-                'method'     => $route['method'],
-                'name'       => $route['name'] ?? $routeName . '.' . $name,
-                'route_slug' => $this->getRouteName(isset($route['params']) ? $route['params'] . '/' . kebab_case($name) : kebab_case($name)),
-                'controller' => $this->getRouteController($name),
-                'middleware' => $route['middleware'] ?? []
-            ];
-
-            $this->routeRegistry->resource($this->resource)->register($route);
-        }
-
         $routeList = [
             [
                 'method'     => 'get',

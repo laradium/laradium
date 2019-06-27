@@ -283,28 +283,6 @@ $set->text('field')->rules('required|min:1|max:255');
 
 - translatable() // Make field translatable
 $set->text('field')->translatable();
-```
-
-## Custom routes
-
-```
-/**
- * @var array
- */
-protected $customRoutes = [
-    'markAsPaid' => [
-        'method'     => 'GET',
-        'params'     => '{id}',
-        'middleware' => ['web'],
-        'name'       => 'admin.resource.mark-as-paid'
-    ],
-];
-
-public function markAsPaid($id)
-{
-    //
-}
-```
 
 # Table
 

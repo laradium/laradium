@@ -29,11 +29,6 @@ abstract class AbstractApiResource
     protected $slug;
 
     /**
-     * @var array
-     */
-    protected $customRoutes = [];
-
-    /**
      * AbstractApiResource constructor.
      */
     public function __construct()
@@ -71,14 +66,6 @@ abstract class AbstractApiResource
     public function getModel()
     {
         return $this->model;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCustomRoutes()
-    {
-        return $this->customRoutes;
     }
 
     /**

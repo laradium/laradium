@@ -48,24 +48,6 @@ class ApiResourceRegistry
         $this->routeSlug = $routeSlug;
         $this->namespace = $resourceName;
 
-        // Add custom routes
-        foreach ($resource->getCustomRoutes() as $name => $route) {
-            $routeName = in_array($name, ['index', 'show']) ? '/' : '/' . kebab_case($name);
-            $routePath = isset($route['params']) ? $route['params'] . $routeName : $routeName;
-
-            $route = [
-                'method'     => $route['method'],
-                'name'       => $name,
-                'route_slug' => $this->getRoutePath($routePath),
-                'controller' => $this->getRouteController($name),
-                'middleware' => $route['middleware'] ?? ['api'],
-                'prefix'     => 'api',
-                'where'      => $route['where'] ?? null
-            ];
-
-            $this->registerRoute($route, $routeSlug);
-        }
-
         return $this;
     }
 
