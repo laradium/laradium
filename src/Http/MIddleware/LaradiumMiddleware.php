@@ -16,12 +16,6 @@ class LaradiumMiddleware
      */
     public function handle($request, Closure $next)
     {
-        logger()->error([
-            $request->getRequestUri(),
-            $request->session()->all(),
-            $request->user()
-        ]);
-
         auth()->shouldUse('admin');
 
         $user = auth()->user();
