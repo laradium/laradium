@@ -29,7 +29,10 @@ class LanguageSelect extends Element
             'slug'   => str_slug($this->getName(), '_'),
             'type'   => 'language-selector',
             'fields' => $this->getFields(),
-            'config' => []
+            'config' => [],
+            'languages'        => translate()->languagesForForm(),
+            'is_translatable'  => true,
+            'default_language' => translate()->getLanguage()->iso_code,
         ];
     }
 }

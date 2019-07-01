@@ -6,6 +6,7 @@ use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Base\Field;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Models\Menu;
 use Laradium\Laradium\Traits\Nestable;
 use Laradium\Laradium\Traits\Relation;
 use Laradium\Laradium\Traits\Sortable;
@@ -63,9 +64,9 @@ class HasMany extends Field
     /**
      * HasMany constructor.
      * @param $parameters
-     * @param Model $model
+     * @param null|Model $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, Model $model = null)
     {
         parent::__construct($parameters, $model);
 
@@ -83,7 +84,7 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
-        if (get_class($this->getModel()) === config('laradium.menu_class', \Laradium\Laradium\Models\Menu::Class)) {
+        if ($this->getModel() && get_class($this->getModel()) === config('laradium.menu_class', Menu::Class)) {
             config('laradium.menu_item_class', \Laradium\Laradium\Models\MenuItem::class)::rebuild();
         }
 

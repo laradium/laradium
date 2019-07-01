@@ -28,6 +28,7 @@
                         this.createChart(response.data);
                     })
                     .catch(function (error) {
+                        // handle error
                         console.log(error);
                     })
             }

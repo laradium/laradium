@@ -14,12 +14,8 @@
             </li>
         </div>
 
-        <div class="alert alert-success" v-show="success">
-            {{ success }}
-        </div>
-
         <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
-                   :language="data.default_language"></row-field>
+                   :language="field.config.default_language"></row-field>
 
         <div v-if="!countFieldsByType('save-buttons') && !countFieldsByType('form-submit')" class="crud-bottom">
             <div class="row">
@@ -38,12 +34,12 @@
                         Save & Return
                     </button>
                 </div>
-                <div class="col-md-1 middle-align" v-if="data.is_translatable && data.languages">
+                <div class="col-md-1 middle-align" v-if="field.config.is_translatable && field.config.languages">
                     Language
                 </div>
-                <div class="col-md-2" v-if="data.is_translatable && data.languages.length">
-                    <select class="form-control language-select" v-model="data.default_language">
-                        <option :value="language.iso_code" v-for="language in data.languages">
+                <div class="col-md-2" v-if="field.config.is_translatable && field.config.languages.length">
+                    <select class="form-control language-select" v-model="field.config.default_language">
+                        <option :value="language.iso_code" v-for="language in field.config.languages">
                             {{ language.iso_code }}
                         </option>
                     </select>
@@ -91,15 +87,20 @@
                 this.rows.push({
                     fields: fields,
                     config: {
-                        use_block: true,
+                        use_block: !this.field.config.without_card,
                         col: 'col-md-12'
                     }
                 });
             }
+
+            $(this.$el).on('keyup', ':input.is-invalid', (el) => {
+                this.removeErrors([el.target]);
+            })
         },
 
         methods: {
             onSubmit(form, redirect = null) {
+                this.removeErrors($(form).find(':input.is-invalid'));
                 this.isSubmitted = true;
                 let form_data = new FormData();
                 this.errors = [];
@@ -137,19 +138,20 @@
                     let response = res.data;
                     this.success = response.data.message;
 
-                    $('html, body').animate({'scrollTop': $(form).find('.alert.alert-danger').offset().top - 50});
+                    $('html, body').animate({'scrollTop': $(form).offset().top - 50});
 
                     if (redirect) {
                         window.location = response.data.return_to;
 
                         return;
                     }
+                    $(form).trigger('form-submitted');
 
                     if (response.data.redirect_to) {
                         window.location = response.data.redirect_to;
                     }
 
-                    this.data = response.data;
+                    this.field.fields = response.data.form;
                     this.isSubmitted = false;
                     formButton.attr('disabled', false);
 
@@ -159,12 +161,7 @@
                     this.success = '';
 
                     let errors = res.response.data.errors;
-
-                    for (let error in errors) {
-                        if (errors.hasOwnProperty(error)) {
-                            this.errors.push(errors[error][0]);
-                        }
-                    }
+                    this.addErrorsToTheInputs(errors);
 
                     if (!errors) {
                         let status = res.response.status;
@@ -172,20 +169,31 @@
                     }
 
                     this.$nextTick(() => {
-                        $('html, body').animate({'scrollTop': $(form).find('.alert.alert-danger').offset().top - 50});
+                        $('html, body').animate({'scrollTop': $(form).find('.is-invalid:first').offset().top - 50});
                     });
 
                     formButton.attr('disabled', false);
+                    $(form).trigger('form-submitted');
+
                 });
             },
-            hasBlockWrapper() {
-                let blockFields = _.filter(this.field.fields, (field) => {
-                    if(field.type === 'block') {
-                        return true;
-                    }
-                });
+            addErrorsToTheInputs(errors) {
+                for (let error in errors) {
+                    let input = '[name="' + this.dotsToBrackets(error) + '"]';
+                    let errorTextBlock = $('<div/>').addClass('invalid-feedback').text(errors[error][0]);
 
-                return blockFields.length;
+                    $(this.$el)
+                        .find(input)
+                        .addClass('is-invalid')
+                        .after(errorTextBlock);
+                }
+            },
+            removeErrors(fields) {
+                _.forEach(fields, (field) => {
+                    let fld = $(field);
+                    fld.removeClass('is-invalid');
+                    fld.next('.invalid-feedback').remove();
+                })
             },
             countFieldsByType(type, fields) {
                 if (!this.data) {
@@ -209,6 +217,16 @@
                 });
 
                 return count;
+            },
+            dotsToBrackets(dottedIdentifier) {
+                let parts = dottedIdentifier.split('.');
+                let bracketedIdentifier = parts.shift();
+
+                for (let part of parts) {
+                    bracketedIdentifier = `${bracketedIdentifier}[${part}]`;
+                }
+
+                return bracketedIdentifier;
             }
         }
     }

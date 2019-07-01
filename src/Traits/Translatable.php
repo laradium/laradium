@@ -45,10 +45,12 @@ trait Translatable
                     $model->translateOrNew($isoCode)
                 );
                 $this->build(array_merge($attributes, ['translations', $isoCode]));
+                $this->getNameAttribute();
+
                 $translations[] = [
                     'iso_code' => $isoCode,
                     'value'    => $this->getValue(),
-                    'name'     => $this->getNameAttribute(),
+                    'name'     => $this->getName(),
                 ];
             }
 

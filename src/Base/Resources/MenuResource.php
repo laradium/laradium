@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base\Resources;
 
+use function foo\func;
 use Illuminate\Support\Facades\Route;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
@@ -13,6 +14,7 @@ use Laradium\Laradium\Models\Menu;
 
 Class MenuResource extends AbstractResource
 {
+
     /**
      * @var Laradium
      */
@@ -22,6 +24,11 @@ Class MenuResource extends AbstractResource
      * @var string
      */
     protected $resource = Menu::class;
+
+    /**
+     * @var bool
+     */
+    protected $withoutCard = true;
 
     /**
      * MenuResource constructor.
@@ -43,28 +50,32 @@ Class MenuResource extends AbstractResource
         });
 
         return laradium()->resource(function (FieldSet $set) {
-            $set->tab('Items')->fields(function (FieldSet $set) {
-                $set->tree('items')->fields(function (FieldSet $set) {
-                    $set->select2('icon')->options(getFontAwesomeIcons());
-                    $set->text('name')->rules('required|max:255')->translatable()->col(6);
-                    $set->select('target')->options([
-                        '_self'  => 'Self',
-                        '_blank' => 'Blank',
-                    ])->rules('required')->col(6);
-                    $set->select('type')->options(Menu::$types);
-                    $set->text('url')->rules('required_if:items.*.type,url|max:255')->translatable()->col(4);
-                    $set->select('resource')->options($this->getResourceOptions())->rules('required_if:items.*.type,resource')->col(4);
-                    $set->select('route')->options($this->getRouteOptions())->rules('required_if:items.*.type,route')->col(4);
-                })->sortable()->attr([
-                    'key' => optional($this->getModel())->key
-                ]);
-            });
-
-            $set->tab('Main')->fields(function (FieldSet $set) {
-                $set->boolean('is_active');
-                $set->text('key')->rules('required|max:255');
-                $set->text('name')->rules('required|max:255')->translatable();
-            });
+            $set->tabs()
+                ->add('Items', function (FieldSet $set) {
+                    $set->block(12)->fields(function (FieldSet $set) {
+                        $set->tree('items')->fields(function (FieldSet $set) {
+                            $set->select2('icon')->options(getFontAwesomeIcons());
+                            $set->text('name')->rules('required|max:255')->translatable()->col(6);
+                            $set->select('target')->options([
+                                '_self'  => 'Self',
+                                '_blank' => 'Blank',
+                            ])->rules('required')->col(6);
+                            $set->select('type')->options(Menu::$types);
+                            $set->text('url')->rules('required_if:items.*.type,url|max:255')->translatable()->col(4);
+                            $set->select('resource')->options($this->getResourceOptions())->rules('required_if:items.*.type,resource')->col(4);
+                            $set->select('route')->options($this->getRouteOptions())->rules('required_if:items.*.type,route')->col(4);
+                        })->sortable()->attr([
+                            'key' => optional($this->getModel())->key
+                        ]);
+                    });
+                })
+                ->add('Basic', function (FieldSet $set) {
+                    $set->block(12)->fields(function (FieldSet $set) {
+                        $set->boolean('is_active');
+                        $set->text('key')->rules('required|max:255');
+                        $set->text('name')->rules('required|max:255')->translatable();
+                    });
+                });
         });
     }
 

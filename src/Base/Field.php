@@ -209,9 +209,7 @@ class Field
             return $this->name;
         }
 
-        if (!$this->isTranslatable()) {
-            $this->getNameAttribute();
-        }
+        $this->getNameAttribute();
 
         return $this->name ?? null;
     }

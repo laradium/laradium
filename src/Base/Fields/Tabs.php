@@ -52,6 +52,11 @@ class Tabs extends Element
     public function add(string $name, Closure $closure): self
     {
         $fieldSet = new FieldSet;
+
+        if($this->getModel()) {
+            $fieldSet->model($this->getModel());
+        }
+
         $closure($fieldSet);
 
         $this->tabs->push([

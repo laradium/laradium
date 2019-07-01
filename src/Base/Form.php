@@ -323,8 +323,8 @@ class Form
             'success' => true,
             'data'    => [
                 'message'          => 'Form successfully updated',
-                'languages'        => translate()->languagesForForm(),
                 'form'             => $this->getFormattedFieldResponse(),
+                'languages'        => translate()->languagesForForm(),
                 'is_translatable'  => $this->isTranslatable(),
                 'default_language' => translate()->getLanguage()->iso_code,
                 'redirect_to'      => $this->getRedirectTo(),

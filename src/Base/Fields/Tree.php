@@ -9,9 +9,9 @@ class Tree extends HasMany
     /**
      * HasMany constructor.
      * @param $parameters
-     * @param Model $model
+     * @param null|Model $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, Model $model = null)
     {
         parent::__construct($parameters, $model);
 

@@ -51,6 +51,8 @@ class Crud
             'name'   => $this->form->getName(),
             'config' => [
                 'is_translatable' => $this->isTranslatable(),
+                'default_language' => translate()->getLanguage()->iso_code,
+                'languages'        => translate()->languagesForForm(),
                 'col'             => 'col-md-12',
                 'without_card'    => $this->getWithoutCard()
             ],

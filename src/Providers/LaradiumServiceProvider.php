@@ -7,7 +7,6 @@ use Illuminate\Support\ServiceProvider;
 use Laradium\Laradium\Base\Laradium;
 use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
-use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
@@ -230,12 +229,11 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function registerCommands()
+    private function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeLaradiumResource::class,
-                MakeLaradiumApiResource::class,
                 ImportTranslations::class,
                 FindTranslations::class
             ]);
@@ -245,7 +243,7 @@ class LaradiumServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function loadRoutes()
+    private function loadRoutes(): void
     {
         $this->loadRoutesFrom(__DIR__ . '/../../routes/admin.php');
     }
