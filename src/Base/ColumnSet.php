@@ -2,6 +2,7 @@
 
 namespace Laradium\Laradium\Base;
 
+use Closure;
 use Illuminate\Support\Collection;
 
 class ColumnSet
@@ -26,26 +27,28 @@ class ColumnSet
     }
 
     /**
-     * @param $column
+     * @param string $column
      * @param null $name
      * @return $this
      */
-    public function add($column, $name = null)
+    public function add(string $column, $name = null): self
     {
         $this->list->push([
             'column'         => $column,
-            'column_parsed'  => str_contains($column, '.') ? array_last(explode('.', $column)) : $column,
+            'column_parsed'  => str_contains($column, '.') ? array_first(explode('.', $column)) : $column,
             'name'           => $name ?? $column,
-            'pretty_name'    => ucfirst(str_replace('_', ' ', $name ?? $column)),
+            'pretty_name'    => $this->getPrettyName($column, $name),
             'title'          => null,
-            'relation'       => count(explode('.', $column)) > 1 ? array_first(explode('.', $column)) : '',
+            'relation'       => null,
             'editable'       => false,
             'translatable'   => false,
             'modify'         => null,
             'not_sortable'   => false,
             'not_searchable' => false,
             'switchable'     => false,
-            'width'          => $column === 'action' ? '150px' : null
+            'width'          => null,
+            'new'            => false,
+            'raw'            => false
         ]);
 
         $this->column = $column;
@@ -54,13 +57,74 @@ class ColumnSet
     }
 
     /**
+     * @param string $column
+     * @param string|null $name
+     * @return string
+     */
+    private function getPrettyName(string $column, string $name = null): string
+    {
+        return ucfirst(str_replace(['_', '.'], ' ', $name ?? $column));
+    }
+
+    /**
      * @return $this
      */
-    public function editable()
+    public function new(): self
+    {
+        $this->list = $this->list->map(function ($item) {
+            if ($this->column === $item['column']) {
+                $item['new'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function relation(string $value): self
+    {
+        $this->list = $this->list->map(function ($item) use ($value) {
+            if ($this->column === $item['column']) {
+                $item['column'] = $value . '.' . $item['column'];
+                $item['new'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function raw(): self
+    {
+        $this->list = $this->list->map(function ($item) {
+            if ($this->column === $item['column']) {
+                $item['raw'] = true;
+            }
+
+            return $item;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function editable(): self
     {
         $this->list = $this->list->map(function ($item) {
             if ($this->column === $item['column']) {
                 $item['editable'] = true;
+                $item['raw'] = true;
             }
 
             return $item;
@@ -72,11 +136,12 @@ class ColumnSet
     /**
      * @return $this
      */
-    public function translatable()
+    public function translatable(): self
     {
         $this->list = $this->list->map(function ($item) {
             if ($this->column === $item['column']) {
                 $item['translatable'] = true;
+                $item['raw'] = true;
             }
 
             return $item;
@@ -88,7 +153,7 @@ class ColumnSet
     /**
      * @return $this
      */
-    public function notSortable()
+    public function notSortable(): self
     {
         $this->list = $this->list->map(function ($item) {
             if ($this->column === $item['column']) {
@@ -104,7 +169,7 @@ class ColumnSet
     /**
      * @return $this
      */
-    public function notSearchable()
+    public function notSearchable(): self
     {
         $this->list = $this->list->map(function ($item) {
             if ($this->column === $item['column']) {
@@ -118,10 +183,10 @@ class ColumnSet
     }
 
     /**
-     * @param $closure
+     * @param Closure $closure
      * @return $this
      */
-    public function modify($closure)
+    public function modify(Closure $closure): self
     {
         $this->list = $this->list->map(function ($item) use ($closure) {
             if ($this->column === $item['column'] && !$item['switchable']) {
@@ -138,7 +203,7 @@ class ColumnSet
      * @param bool $disabled
      * @return $this
      */
-    public function switchable($disabled = false)
+    public function switchable($disabled = false): self
     {
         $this->list = $this->list->map(function ($item) use ($disabled) {
             if ($this->column === $item['column']) {
@@ -160,10 +225,10 @@ class ColumnSet
     }
 
     /**
-     * @param $title
+     * @param string $title
      * @return $this
      */
-    public function title($title)
+    public function title(string $title): self
     {
         $this->list = $this->list->map(function ($item) use ($title) {
             if ($this->column === $item['column']) {
@@ -177,10 +242,10 @@ class ColumnSet
     }
 
     /**
-     * @param $width
+     * @param int|string $width
      * @return $this
      */
-    public function width($width)
+    public function width($width): self
     {
         $this->list = $this->list->map(function ($item) use ($width) {
             if ($this->column === $item['column']) {
@@ -198,7 +263,7 @@ class ColumnSet
      * @param string $height
      * @return $this
      */
-    public function image($width = '75px', $height = '75px')
+    public function image(string $width = '75px', string $height = '75px'): self
     {
         $this->list = $this->list->map(function ($item) use ($width, $height) {
             if ($this->column === $item['column'] && !$item['switchable'] && !$item['editable']) {
@@ -217,7 +282,7 @@ class ColumnSet
      * @param $column
      * @return bool
      */
-    public function has($column): bool
+    public function has(string $column): bool
     {
         return (bool)$this->list->where('column', $column)->count();
     }

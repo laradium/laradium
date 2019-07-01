@@ -17,13 +17,12 @@ use Laradium\Laradium\Interfaces\ResourceFilterInterface;
 use Laradium\Laradium\PassThroughs\Resource\Import;
 use Laradium\Laradium\Services\Layout;
 use Laradium\Laradium\Traits\CrudEvent;
-use Laradium\Laradium\Traits\Editable;
 use ReflectionException;
 
 abstract class AbstractResource extends Controller
 {
 
-    use CrudEvent, Editable, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use CrudEvent, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
      * @var
@@ -173,22 +172,7 @@ abstract class AbstractResource extends Controller
                 $set->table($this->table()
                     ->url($this->getAction('data-table'))
                     ->toggleUrl($this->getAction('toggle'))
-                    ->make(function (ColumnSet $column) {
-                        $hasActions = collect($this->getActions())->filter(function ($action) {
-                            return in_array($action, ['create', 'edit']);
-                        })->count();
-
-                        if (!$column->has('action') && $hasActions) {
-                            $column->add('action')->modify(function ($item) {
-                                return view('laradium::admin.table._partials.action', [
-                                    'resource' => $this,
-                                    'item'     => $item
-                                ])->render();
-                            })
-                                ->notSortable()
-                                ->notSearchable();
-                        }
-                    })
+                    ->make($this->addActionColumn())
                 );
             });
         });
@@ -303,21 +287,48 @@ abstract class AbstractResource extends Controller
      */
     public function dataTable()
     {
-        return $this->table()->model($this->getModel())->resource($this)->data();
+        return $this->table()->model($this->getModel())
+            ->make($this->addActionColumn())->resource($this)->data();
+    }
+
+    /**
+     * @return callable
+     */
+    private function addActionColumn(): callable
+    {
+        return function (ColumnSet $column) {
+            $hasActions = collect($this->getActions())->filter(function ($action) {
+                return in_array($action, ['create', 'edit']);
+            })->count();
+
+            if ($hasActions && !$column->has('action')) {
+                $column->add('action')
+                    ->modify(function ($item) {
+                        return view('laradium::admin.table._partials.action', [
+                            'resource' => $this,
+                            'item'     => $item
+                        ])->render();
+                    })
+                    ->notSortable()
+                    ->raw()
+                    ->new();
+            }
+        };
     }
 
     /**
      * @param Request $request
+     * @param string|null $locale
      * @return JsonResponse
      */
-    public function editable(Request $request): JsonResponse
+    public function editable(Request $request, string $locale = null): JsonResponse
     {
         $model = $this->getModel()->findOrFail($request->get('pk'));
         $this->model($model);
 
         return $this->getForm()
             ->events($this->getEvents())
-            ->editable($request);
+            ->editable($request, $locale);
     }
 
     /**
@@ -360,16 +371,26 @@ abstract class AbstractResource extends Controller
 
         if ($action === 'create') {
             return $this->getUrl('create');
-        } else if ($action === 'edit') {
-            return $this->getUrl($id . '/edit');
-        } else if ($action === 'store') {
-            return $this->getUrl();
-        } else if ($action === 'update') {
-            return $this->getUrl($id);
-        } else if ($action === 'data-table') {
-            return $this->getUrl('data-table');
-        } else if ($action === 'toggle') {
-            return $this->getUrl('toggle/' . $id);
+        } else {
+            if ($action === 'edit') {
+                return $this->getUrl($id . '/edit');
+            } else {
+                if ($action === 'store') {
+                    return $this->getUrl();
+                } else {
+                    if ($action === 'update') {
+                        return $this->getUrl($id);
+                    } else {
+                        if ($action === 'data-table') {
+                            return $this->getUrl('data-table');
+                        } else {
+                            if ($action === 'toggle') {
+                                return $this->getUrl('toggle/' . $id);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return $this->getUrl();

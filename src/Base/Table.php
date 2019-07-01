@@ -2,10 +2,13 @@
 
 namespace Laradium\Laradium\Base;
 
+use Closure;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
-use Laradium\Laradium\Http\Controllers\Admin\DatatableController;
-use Laradium\Laradium\Services\Asset\AssetManager;
+use Laradium\Laradium\Services\Datatable;
+use Throwable;
 
 class Table
 {
@@ -21,47 +24,27 @@ class Table
     protected $columnSet;
 
     /**
-     * @var
+     * @var Model
      */
     protected $model;
 
     /**
-     * @var
+     * @var string
      */
     protected $additionalView;
 
     /**
-     * @var
+     * @var array
      */
     protected $additionalViewData;
 
     /**
-     * @var
+     * @var Closure
      */
     protected $where;
 
     /**
-     * @var
-     */
-    protected $tabs;
-
-    /**
-     * @var
-     */
-    protected $dataTable;
-
-    /**
-     * @var array
-     */
-    protected $css = [];
-
-    /**
-     * @var array
-     */
-    protected $js = [];
-
-    /**
-     * @var
+     * @var string
      */
     private $title;
 
@@ -74,24 +57,19 @@ class Table
     ];
 
     /**
-     * @var
+     * @var Closure
      */
     protected $search;
 
     /**
-     * @var
+     * @var string
      */
     private $slug;
 
     /**
-     * @var
+     * @var AbstractResource
      */
     private $resource;
-
-    /**
-     * @var AssetManager
-     */
-    private $assetManager;
 
     /**
      * @var string
@@ -108,27 +86,18 @@ class Table
      */
     public function __construct()
     {
-        $this->assetManager = app(AssetManager::class);
         $this->columnSet = new ColumnSet;
     }
 
     /**
      * @return string
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function render()
+    public function render(): string
     {
         return view('laradium::admin.table.index', [
             'table' => $this
         ])->render();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function config()
-    {
-        return $this->assetManager->table()->config($this);
     }
 
     /**
@@ -146,20 +115,21 @@ class Table
     }
 
     /**
-     * @return mixed
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function data()
+    public function data(): JsonResponse
     {
-        $datatableController = new DatatableController();
+        $datatable = new Datatable($this);
 
-        return $datatableController->index($this);
+        return $datatable->make();
     }
 
     /**
-     * @param $relations
+     * @param array $relations
      * @return $this
      */
-    public function relations($relations)
+    public function relations(array $relations): self
     {
         $this->relations = $relations;
 
@@ -169,16 +139,16 @@ class Table
     /**
      * @return array
      */
-    public function getRelations()
+    public function getRelations(): array
     {
         return $this->relations;
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
      * @return $this
      */
-    public function make(\Closure $closure)
+    public function make(Closure $closure): self
     {
         $closure($this->columnSet);
 
@@ -213,21 +183,70 @@ class Table
     }
 
     /**
-     * @param $value
-     * @return $this
+     * @return array
      */
-    public function dataTable($value)
+    public function getRawColumnList(): array
     {
-        $this->dataTable = $value;
-
-        return $this;
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['raw'] === true;
+        })->pluck('column_parsed')->toArray();
     }
 
     /**
-     * @param $value
+     * @return array
+     */
+    public function getAddedColumns(): array
+    {
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['new'] === true;
+        })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function getEditableColumns(): array
+    {
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['editable'] === true && $column['translatable'] === false;
+        })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslatableColumns(): array
+    {
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['translatable'] === true && $column['editable'] === false;
+        })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslatableColumnsWithEditable(): array
+    {
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['translatable'] === true;
+        })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function getModifiedColumns(): array
+    {
+        return $this->columnSet->list->filter(function ($column) {
+            return $column['new'] === false && $column['modify'];
+        })->toArray();
+    }
+
+    /**
+     * @param string $value
      * @return Table
      */
-    public function title($value): self
+    public function title(string $value): self
     {
         $this->title = $value;
 
@@ -237,7 +256,7 @@ class Table
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         if ($this->title) {
             return $this->title;
@@ -249,10 +268,10 @@ class Table
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return Table
      */
-    public function url($value): self
+    public function url(string $value): self
     {
         $this->url = $value;
 
@@ -269,10 +288,10 @@ class Table
 
 
     /**
-     * @param $value
+     * @param string $value
      * @return Table
      */
-    public function toggleUrl($value): self
+    public function toggleUrl(string $value): self
     {
         $this->toggleUrl = $value;
 
@@ -282,16 +301,16 @@ class Table
     /**
      * @return string|null
      */
-    public function getToggleUrl():? string
+    public function getToggleUrl(): ?string
     {
         return $this->toggleUrl;
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return Table
      */
-    public function slug($value): self
+    public function slug(string $value): self
     {
         $this->slug = $value;
 
@@ -299,9 +318,9 @@ class Table
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSlug()
+    public function getSlug(): string
     {
         if (!$this->getResource()) {
             return $this->slug;
@@ -315,12 +334,13 @@ class Table
         return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
     }
 
+
     /**
-     * @param $value
-     * @param $data
-     * @return $this
+     * @param string $value
+     * @param array $data
+     * @return Table
      */
-    public function additionalView($value, $data = [])
+    public function additionalView(string $value, array $data = []): self
     {
         $this->additionalView = $value;
         $this->additionalViewData = $data;
@@ -329,17 +349,17 @@ class Table
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getAdditionalView()
+    public function getAdditionalView(): string
     {
         return $this->additionalView;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getAdditionalViewData()
+    public function getAdditionalViewData(): array
     {
         return $this->additionalViewData;
     }
@@ -353,10 +373,10 @@ class Table
     }
 
     /**
-     * @param $value
+     * @param AbstractResource $value
      * @return Table
      */
-    public function resource($value): self
+    public function resource(AbstractResource $value): self
     {
         $this->resource = $value;
 
@@ -380,37 +400,21 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data'       => $column['column'],
-                'name'       => $column['translatable'] ? 'translations.' . $column['column'] : $column['column'],
-                'searchable' => $column['translatable'] || $column['not_searchable'] ? false : true,
-                'orderable'  => $column['translatable'] || $column['not_sortable'] ? false : true,
+                'data'       => $column['column_parsed'],
+                'name'       => $column['column'],
+                'searchable' => !($column['translatable'] || $column['not_searchable']),
+                'orderable'  => !($column['translatable'] || $column['not_sortable']),
             ]);
         }
-
-        if ($this->columns()->where('column', 'action')->first() || !$this->getResource()) {
-            return $config;
-        }
-
-        if (!$this->hasActions()) {
-            return $config;
-        }
-
-        $config->push([
-            'data'       => 'action',
-            'name'       => 'action',
-            'searchable' => false,
-            'orderable'  => false,
-            'class'      => 'text-center'
-        ]);
 
         return $config;
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
      * @return $this
      */
-    public function where(\Closure $closure)
+    public function where(Closure $closure): self
     {
         $this->where = $closure;
 
@@ -418,68 +422,11 @@ class Table
     }
 
     /**
-     * @return mixed
-     */
-    public function getTabs()
-    {
-        return $this->tabs;
-    }
-
-    /**
-     * @param $tabs
-     * @return $this
-     */
-    public function tabs($tabs)
-    {
-        $this->tabs = $tabs;
-
-        return $this;
-    }
-
-    /**
-     * @param array $assets
-     * @return $this
-     */
-    public function css($assets = [])
-    {
-        $this->css = $assets;
-
-        return $this;
-    }
-
-    /**
-     * @param array $assets
-     * @return $this
-     */
-    public function js($assets = [])
-    {
-        $this->js = $assets;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCss()
-    {
-        return $this->css;
-    }
-
-    /**
-     * @return array
-     */
-    public function getJs()
-    {
-        return $this->js;
-    }
-
-    /**
-     * @param $column
+     * @param string $column
      * @param string $direction
      * @return Table
      */
-    public function orderBy($column, $direction = 'desc')
+    public function orderBy(string $column, string $direction = 'desc'): Table
     {
         //was in a hurry couldn't remember if there exists a cleaner way, so feel free to optimize this
         $key = -1;
@@ -506,16 +453,16 @@ class Table
     /**
      * @return array
      */
-    public function getOrderBy()
+    public function getOrderBy(): array
     {
         return $this->orderBy;
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
      * @return $this
      */
-    public function search(\Closure $closure)
+    public function search(Closure $closure): self
     {
         $this->search = $closure;
 
@@ -523,7 +470,7 @@ class Table
     }
 
     /**
-     * @return mixed
+     * @return Closure
      */
     public function getSearch()
     {
@@ -537,6 +484,6 @@ class Table
     {
         $actions = $this->getResource()->getActions();
 
-        return in_array('edit', $actions) || in_array('destroy', $actions);
+        return in_array('edit', $actions, true) || in_array('destroy', $actions, true);
     }
 }

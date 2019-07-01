@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Exports\TranslationExport;
 use Laradium\Laradium\Imports\TranslationImport;
 use Laradium\Laradium\Models\Language;
@@ -22,7 +24,7 @@ Class TranslationResource extends AbstractResource
     protected $resource = Translation::class;
 
     /**
-     * @return \Laradium\Laradium\Base\Resource
+     * @return Resource
      */
     public function resource()
     {
@@ -39,7 +41,7 @@ Class TranslationResource extends AbstractResource
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Table
+     * @return Table
      */
     public function table()
     {
@@ -48,28 +50,7 @@ Class TranslationResource extends AbstractResource
             $column->add('group');
             $column->add('key');
             $column->add('value')->editable();
-        })->tabs([
-            'group' => $this->getTabs()
-        ]);
-    }
-
-
-    /**
-     * @return array
-     */
-    private function getTabs(): array
-    {
-        $tabs = ['all' => 'All'];
-        $availableTabs = Translation::select('group')
-            ->groupBy('group')
-            ->get()
-            ->mapWithKeys(function ($translation) {
-                return [
-                    $translation->group => ucfirst(str_replace('_', ' ', $translation->group))
-                ];
-            })->toArray();
-
-        return array_merge($tabs, $availableTabs);
+        });
     }
 
     /**

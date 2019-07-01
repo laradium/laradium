@@ -3,11 +3,13 @@
 namespace Laradium\Laradium\Traits;
 
 
+use Illuminate\Support\Collection;
+
 trait CrudEvent
 {
 
     /**
-     * @var
+     * @var Collection
      */
     private $events;
 

@@ -54,20 +54,13 @@ Class SettingResource extends AbstractResource
 
             $column->add('name')->modify(function ($row) {
                 return ($row->is_translatable ? $this->translatableIcon() . ' ' : '') . $row->name;
-            });
+            })->raw();
 
             $column->add('value')->modify(function ($item) {
                 return $this->modifyValueColumn($item);
-            })->editable()->translatable()->notSortable();
+            })->notSortable()->new()->raw();
 
-        })->dataTable(false)
-            ->tabs([
-                'group' => Setting::select('group')->groupBy('group')->get()->mapWithKeys(function ($setting) {
-                    return [
-                        $setting->group => ucfirst(str_replace('-', ' ', $setting->group))
-                    ];
-                })->all()
-            ])
+        })
             ->search(function ($query) {
                 if (request()->has('search') && isset(request()->input('search')['value']) && !empty(request()->input('search')['value'])) {
                     $searchTerm = request()->input('search')['value'];
@@ -84,20 +77,18 @@ Class SettingResource extends AbstractResource
 
     /**
      * @param $item
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string|array
+     * @return string
      * @throws \Throwable
      */
     public function modifyValueColumn($item)
     {
         //we do not want to display textarea content in table
         if ($item->type === 'textarea') {
-            return [
-                'type'  => 'textarea',
-                'value' => '- too long to show -'
-            ];
+            return '- too long to show -';
         }
 
         if ($item->type === 'file') {
+
             if ($item->is_translatable) {
                 $html = '';
                 foreach ($item->translations as $translation) {
@@ -107,16 +98,10 @@ Class SettingResource extends AbstractResource
                     ])->render();
                 }
 
-                return [
-                    'type'  => 'file',
-                    'value' => $html
-                ];
+                return $html;
             }
 
-            return [
-                'type'  => 'file',
-                'value' => view('laradium::admin.table._partials.file', ['item' => $item])->render()
-            ];
+            return view('laradium::admin.table._partials.file', ['item' => $item])->render();
         }
 
         if ($item->is_translatable) {
@@ -125,24 +110,26 @@ Class SettingResource extends AbstractResource
                 $html .= '<li><b>' . strtoupper($translation->locale) . ': </b>' . $translation->value . '</li>';
             }
 
-            return [
-                'translatable' => true,
-                'type'         => $item->type,
-                'value'        => $html
-            ];
+            return view('laradium::admin.resource._partials.translation_editable',
+                [
+                    'item' => $item,
+                    'column' => ['column_parsed' => 'value'],
+                    'slug' => 'settings',
+                ])
+                ->render();
         }
 
-        return [
-            'column' => 'non_translatable_value',
-            'type'   => 'text',
-            'value'  => $item->non_translatable_value ? e($item->non_translatable_value) : ''
-        ];
+        return view('laradium::admin.table._partials.editable', [
+            'item' => $item,
+            'column' => ['column_parsed' => 'non_translatable_value'],
+            'slug' => '/admin/settings',
+        ])->render();
     }
 
     /**
      * @return string
      */
-    public function translatableIcon()
+    public function translatableIcon(): string
     {
         return '<span data-toggle="tooltip" data-placement="top" title="" data-original-title="Value is translatable"><i class="fa fa-language"></i></span>';
     }

@@ -3,6 +3,7 @@
 namespace Laradium\Laradium\Base;
 
 use Closure;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,12 +11,12 @@ use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Laradium\Laradium\Services\Crud\CrudDataHandler;
 use Laradium\Laradium\Traits\CrudEvent;
-use ReflectionException;
 
 class Form
 {
 
     use CrudEvent;
+
     /**
      * @var Collection
      */
@@ -196,6 +197,7 @@ class Form
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
     public function destroy(Request $request): JsonResponse
     {
@@ -211,19 +213,40 @@ class Form
 
     /**
      * @param Request $request
+     * @param string|null $locale
      * @return JsonResponse
      */
-    public function editable(Request $request): JsonResponse
+    public function editable(Request $request, string $locale = null): JsonResponse
     {
         $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
 
-        $model = $this->getModel();
-        $model->{$request->get('name')} = $request->get('value');
-        $model->save();
+        $this->updateEditableModel($request, $this->getModel(), $locale);
 
         $this->fireEvent(['afterSave', 'afterUpdate'], $request);
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @param Request $request
+     * @param Model $model
+     * @param null|string $locale
+     */
+    private function updateEditableModel(Request $request, Model $model, string $locale = null): void
+    {
+        if ($locale) {
+            $model->translations()->updateOrCreate([
+                'locale' => $locale
+            ], [
+                'locale'              => $locale,
+                $request->get('name') => $request->get('value')
+            ]);
+
+            return;
+        }
+
+        $model->{$request->get('name')} = $request->get('value');
+        $model->save();
     }
 
     /**
@@ -370,7 +393,7 @@ class Form
     /**
      * @return Collection
      */
-    public function getFields()
+    public function getFields(): Collection
     {
         return $this->fields;
     }
