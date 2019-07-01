@@ -7,6 +7,8 @@ use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
 use Laradium\Laradium\Base\Laradium;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Models\Menu;
 
 Class MenuResource extends AbstractResource
@@ -32,7 +34,7 @@ Class MenuResource extends AbstractResource
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Resource
+     * @return Resource
      */
     public function resource()
     {
@@ -63,19 +65,18 @@ Class MenuResource extends AbstractResource
                 $set->text('key')->rules('required|max:255');
                 $set->text('name')->rules('required|max:255')->translatable();
             });
-            // TODO needs possibility to add attributes
         });
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Table
+     * @return Table
      */
     public function table()
     {
         return laradium()->table(function (ColumnSet $column) {
             $column->add('key');
             $column->add('name')->translatable();
-            $column->add('is_active')->switchable();
+            $column->add('is_active')->switchable()->raw();
         })->relations(['translations']);
     }
 

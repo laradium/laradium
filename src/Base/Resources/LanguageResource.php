@@ -5,6 +5,8 @@ namespace Laradium\Laradium\Base\Resources;
 use Laradium\Laradium\Base\AbstractResource;
 use Laradium\Laradium\Base\ColumnSet;
 use Laradium\Laradium\Base\FieldSet;
+use Laradium\Laradium\Base\Resource;
+use Laradium\Laradium\Base\Table;
 use Laradium\Laradium\Models\Language;
 
 Class LanguageResource extends AbstractResource
@@ -15,7 +17,7 @@ Class LanguageResource extends AbstractResource
     protected $resource = Language::class;
 
     /**
-     * @return \Laradium\Laradium\Base\Resource
+     * @return Resource
      */
     public function resource()
     {
@@ -34,7 +36,7 @@ Class LanguageResource extends AbstractResource
     }
 
     /**
-     * @return \Laradium\Laradium\Base\Table
+     * @return Table
      */
     public function table()
     {
@@ -42,8 +44,8 @@ Class LanguageResource extends AbstractResource
             $column->add('iso_code');
             $column->add('title');
             $column->add('title_localized');
-            $column->add('is_visible')->switchable();
-            $column->add('is_fallback')->switchable();
+            $column->add('is_visible')->switchable()->raw();
+            $column->add('is_fallback')->switchable()->raw();
         });
     }
 }
