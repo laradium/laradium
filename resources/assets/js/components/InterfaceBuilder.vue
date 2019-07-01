@@ -1,7 +1,4 @@
 <template>
-    <!--        <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"-->
-    <!--                   :language="data.default_language"></row-field>-->
-
     <div class="row">
         <template v-for="field in data.fields">
             <component :is="field.type + '-field'"
@@ -43,10 +40,6 @@
             let i = 0;
             for (let field in fields) {
                 if (fields.hasOwnProperty(field)) {
-                    // if (fields[field].type === 'row') {
-                    //     this.rows.push(fields[field]);
-                    // }
-
                     if (fields[field].type === 'tab') {
                         if (i === 0) {
                             this.current_tab = fields[field].slug;
