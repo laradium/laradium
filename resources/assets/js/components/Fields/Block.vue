@@ -1,5 +1,5 @@
 <template>
-    <div :class="data.config.col" v-bind="fieldAttributes">
+    <div :class="!fullWidth ? data.config.col : 'col-md-12'" v-bind="fieldAttributes">
         <div class="card-box">
             <slot></slot>
 
@@ -13,7 +13,7 @@
 
 <script>
     export default {
-        props: ['data', 'language'],
+        props: ['data', 'language', 'fullWidth'],
 
         data() {
             return {

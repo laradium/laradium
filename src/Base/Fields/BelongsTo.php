@@ -70,7 +70,7 @@ class BelongsTo extends Field
         $this->relation = $model->{$this->relationName}();
         $this->relationModel = $this->relation->getRelated();
         $this->label($this->getLabel() ?? ucfirst($this->relation->getRelation()));
-        $this->fieldName($this->relation->getForeignKey());
+        $this->fieldName($this->relation->getForeignKeyName());
 
         parent::build($attributes);
 

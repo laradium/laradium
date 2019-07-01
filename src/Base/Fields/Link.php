@@ -3,11 +3,11 @@
 namespace Laradium\Laradium\Base\Fields;
 
 use Illuminate\Database\Eloquent\Model;
-use Laradium\Laradium\Base\Element;
 use Laradium\Laradium\Base\Field;
 
 class Link extends Field
 {
+
     /**
      * Link constructor.
      * @param $parameters
@@ -31,7 +31,7 @@ class Link extends Field
             'slug'   => str_slug($this->getFieldName(), '_'),
             'type'   => $this->getType(),
             'value'  => $this->getValue(),
-            'attr'   => $this->getAttributes(),
+            'attr'   => $this->getAttr(),
             'config' => [
                 'col' => $this->getCol(),
             ]
