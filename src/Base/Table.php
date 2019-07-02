@@ -323,12 +323,11 @@ class Table
     public function getSlug(): string
     {
         if (!$this->getResource()) {
-            return $this->slug;
+            return $this->slug ?? $this->getModel()->getTable();
         }
 
         if ($this->getResource()->isShared()) {
             return '/' . $this->getResource()->getBaseResource()->getSlug();
-
         }
 
         return '/admin/' . $this->getResource()->getBaseResource()->getSlug();

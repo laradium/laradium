@@ -168,10 +168,10 @@ class Datatable
     private function getModel(): Builder
     {
         if (count($this->table->getRelations())) {
-            return $this->table->getModel()->with($this->table->getRelations())->select($this->table->getResource()->getModel()->getTable() . '.*');
+            return $this->table->getModel()->with($this->table->getRelations())->select($this->table->getModel()->getTable() . '.*');
         }
 
-        return $this->table->getModel()->select($this->table->getResource()->getModel()->getTable() . '.*');
+        return $this->table->getModel()->select($this->table->getModel()->getTable() . '.*');
     }
 
     /**

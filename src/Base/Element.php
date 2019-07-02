@@ -146,9 +146,9 @@ class Element
     }
 
     /**
-     * @return Model
+     * @return Model|null
      */
-    public function getModel(): Model
+    public function getModel()
     {
         return $this->model;
     }
