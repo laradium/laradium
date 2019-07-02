@@ -38,6 +38,26 @@ class MenuItem extends \Baum\Node
     protected $with = ['translations'];
 
     /**
+     * Get the "default" left column name.
+     *
+     * @return string
+     */
+    public function getDefaultLeftColumnName()
+    {
+        return 'lft';
+    }
+
+    /**
+     * Get the "default" right column name.
+     *
+     * @return string
+     */
+    public function getDefaultRightColumnName()
+    {
+        return 'rgt';
+    }
+
+    /**
      * @param $query
      * @return mixed
      */

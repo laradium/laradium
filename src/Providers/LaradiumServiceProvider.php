@@ -51,7 +51,6 @@ class LaradiumServiceProvider extends ServiceProvider
     private function registerProviders()
     {
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
-        $this->app->register(\Baum\Providers\BaumServiceProvider::class);
         $this->app->register(LaradiumTranslationServiceProvider::class);
     }
 
