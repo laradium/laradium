@@ -4,7 +4,6 @@ namespace Laradium\Laradium\Services\Crud\Workers;
 
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Services\Crud\CrudDataHandler;
-use ReflectionException;
 
 class BelongsToManyWorker implements WorkerInterface
 {
@@ -36,7 +35,7 @@ class BelongsToManyWorker implements WorkerInterface
      * @param string $relation
      * @param array $formData
      */
-    public function __construct(CrudDataHandler $crudDataHandler, Model $model, array $formData, string $relation)
+    public function __construct(CrudDataHandler $crudDataHandler, Model $model, string $relation, array $formData)
     {
         $this->crudDataHandler = $crudDataHandler;
         $this->model = $model;
@@ -55,7 +54,7 @@ class BelongsToManyWorker implements WorkerInterface
             return [$value => $value];
         });
 
-        $pivot = collect($data['pivot'] ?? [])->filter(function ($value, $key) use ($checked) {
+        $pivot = collect($this->formData['pivot'] ?? [])->filter(function ($value, $key) use ($checked) {
             return is_array($value) && $checked->contains($key);
         })->mapWithKeys(function ($value, $key) {
             return [$key => $value];
