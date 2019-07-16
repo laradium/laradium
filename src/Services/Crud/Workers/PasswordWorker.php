@@ -35,7 +35,7 @@ class PasswordWorker implements WorkerInterface
      * @param string $relation
      * @param array $formData
      */
-    public function __construct(CrudDataHandler $crudDataHandler, Model $model, array $formData, string $relation)
+    public function __construct(CrudDataHandler $crudDataHandler, Model $model, string $relation, array $formData)
     {
         $this->crudDataHandler = $crudDataHandler;
         $this->model = $model;

@@ -29,7 +29,7 @@ class BelongsToManyWorker implements WorkerInterface
     private $crudDataHandler;
 
     /**
-     * PasswordWorker constructor.
+     * BelongsToManyWorker constructor.
      * @param CrudDataHandler $crudDataHandler
      * @param Model $model
      * @param string $relation
