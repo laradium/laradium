@@ -2,51 +2,21 @@
 
 namespace Laradium\Laradium\Services\Crud\Workers;
 
-use Illuminate\Database\Eloquent\Model;
-use Laradium\Laradium\Services\Crud\CrudDataHandler;
-
-class BelongsToManyWorker implements WorkerInterface
+class BelongsToManyWorker extends AbstractWorker
 {
 
     /**
-     * @var Model
+     * @return void
      */
-    private $model;
-
-    /**
-     * @var string
-     */
-    private $relation;
-
-    /**
-     * @var array
-     */
-    private $formData;
-
-    /**
-     * @var CrudDataHandler
-     */
-    private $crudDataHandler;
-
-    /**
-     * BelongsToManyWorker constructor.
-     * @param CrudDataHandler $crudDataHandler
-     * @param Model $model
-     * @param string $relation
-     * @param array $formData
-     */
-    public function __construct(CrudDataHandler $crudDataHandler, Model $model, string $relation, array $formData)
+    public function beforeSave(): void
     {
-        $this->crudDataHandler = $crudDataHandler;
-        $this->model = $model;
-        $this->relation = $relation;
-        $this->formData = $formData;
+        //
     }
 
     /**
      * @return void
      */
-    public function handle(): void
+    public function afterSave(): void
     {
         $checked = collect($this->formData)->filter(function ($value, $key) {
             return !is_array($value);

@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Services\Crud;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Base\Fields\BelongsToMany;
+use Laradium\Laradium\Base\Fields\DateTime;
 use Laradium\Laradium\Base\Fields\HasMany;
 use Laradium\Laradium\Base\Fields\HasOne;
 use Laradium\Laradium\Base\Fields\MorphTo;
@@ -13,16 +14,22 @@ use Laradium\Laradium\Base\Fields\Password;
 class CrudDataHandler
 {
 
+    /**
+     * Removeable keys
+     */
     private const UNWANTED_KEYS = ['crud_worker', 'morphable_type', 'morphable_name'];
 
+    /**
+     * Workers
+     */
     private const WORKERS = [
         HasMany::class,
         Password::class,
         MorphTo::class,
         BelongsToMany::class,
         HasOne::class,
+        DateTime::class
     ];
-
 
     /**
      * @param array $formData
@@ -31,6 +38,14 @@ class CrudDataHandler
      */
     public function saveData(array $formData, Model $model): Model
     {
+        // Run workers for relations or custom fields (HasMany, HasOne, MorphTo)
+        $workers = $this->getWorkers($formData, $model);
+        foreach ($workers as $worker) {
+            $worker->beforeSave();
+
+            $formData = array_merge($formData, $worker->getData());
+        }
+
         // Update or create base model
         $baseData = collect($formData)->filter(function ($value, $index) {
             return $index !== 'translations' && !is_array($value);
@@ -49,21 +64,9 @@ class CrudDataHandler
 
         $this->putTranslations($translations, $model);
 
-        // Run workers for relations or custom fields (HasMany, HasOne, MorphTo)
-        $workers = collect($formData)->filter(function ($value, $index) {
-            return $index !== 'translations' && is_array($value);
-        })->toArray();
-
-        foreach ($workers as $key => $worker) {
-            $crudWorkerClass = array_get($worker, 'crud_worker');
-            if (!$crudWorkerClass) {
-                continue;
-            }
-
-            $workerClass = $this->getWorkerName($crudWorkerClass);
-            $formData = array_except($worker, 'crud_worker');
-
-            (new $workerClass($this, $model, $key, $formData))->handle();
+        $workers = $this->getWorkers($formData, $model);
+        foreach ($workers as $worker) {
+            $worker->afterSave();
         }
 
         return $model;
@@ -115,10 +118,38 @@ class CrudDataHandler
                 if (array_get($value, 'remove', null)) {
                     unset($array[$index]);
                 }
+
                 $this->recursiveUnset($value, self::UNWANTED_KEYS);
             }
         }
 
         return true;
+    }
+
+    /**
+     * @param $formData
+     * @param $model
+     * @return array
+     */
+    private function getWorkers($formData, $model)
+    {
+        $workerInstances = [];
+        $workers = collect($formData)->filter(function ($value, $index) {
+            return $index !== 'translations' && is_array($value);
+        })->toArray();
+
+        foreach ($workers as $key => $worker) {
+            $crudWorkerClass = array_get($worker, 'crud_worker');
+            if (!$crudWorkerClass) {
+                continue;
+            }
+
+            $workerClass = $this->getWorkerName($crudWorkerClass);
+            $formData = array_except($worker, 'crud_worker');
+
+            $workerInstances[] = (new $workerClass($this, $model, $key, $formData));
+        }
+
+        return $workerInstances;
     }
 }

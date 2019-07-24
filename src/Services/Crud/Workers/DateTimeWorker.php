@@ -2,19 +2,17 @@
 
 namespace Laradium\Laradium\Services\Crud\Workers;
 
-class PasswordWorker extends AbstractWorker
+use Carbon\Carbon;
+
+class DateTimeWorker extends AbstractWorker
 {
     /**
-     * @return void
+     * @return array
      */
     public function beforeSave(): void
     {
         foreach ($this->formData as $fieldName => $value) {
-            if (!str_contains($fieldName, '_confirmation') && $value) {
-                $this->formData[$fieldName] = bcrypt($value);
-            } else {
-                unset($this->formData[$fieldName]);
-            }
+            $this->formData[$fieldName] = $value ? Carbon::parse($value) : null;
         }
     }
 

@@ -2,52 +2,23 @@
 
 namespace Laradium\Laradium\Services\Crud\Workers;
 
-use Illuminate\Database\Eloquent\Model;
-use Laradium\Laradium\Services\Crud\CrudDataHandler;
 use ReflectionException;
 
-class HasManyWorker implements WorkerInterface
+class HasManyWorker extends AbstractWorker
 {
 
     /**
-     * @var Model
+     * @return array
      */
-    private $model;
-
-    /**
-     * @var string
-     */
-    private $relation;
-
-    /**
-     * @var array
-     */
-    private $formData;
-
-    /**
-     * @var CrudDataHandler
-     */
-    private $crudDataHandler;
-
-    /**
-     * HasManyWorker constructor.
-     * @param CrudDataHandler $crudDataHandler
-     * @param Model $model
-     * @param string $relation
-     * @param array $formData
-     */
-    public function __construct(CrudDataHandler $crudDataHandler, Model $model, string $relation, array $formData)
+    public function beforeSave(): void
     {
-        $this->crudDataHandler = $crudDataHandler;
-        $this->model = $model;
-        $this->relation = $relation;
-        $this->formData = $formData;
+        //
     }
 
     /**
      * @throws ReflectionException
      */
-    public function handle(): void
+    public function afterSave(): void
     {
         foreach ($this->formData as $item) {
             // if array has "id" field, it means that this is existing entry, if not, it's new
@@ -58,6 +29,7 @@ class HasManyWorker implements WorkerInterface
                 if (array_get($item, 'remove')) {
                     $relationModel->delete();
                 }
+
                 continue;
             }
 
@@ -66,13 +38,16 @@ class HasManyWorker implements WorkerInterface
                 return !is_array($value);
             })->toArray();
 
+            if (!empty($this->formData)) {
+                dd($this->model);
+            }
+
             $relationModel = $this->model->{$this->relation}()->create($baseData);
 
             // Remove everything which is not base data because we have already saved it
             $item = collect($item)->filter(function ($value) {
                 return is_array($value);
             })->toArray();
-
 
             // save data recursively
             $this->crudDataHandler->saveData(array_except($item, 'id'), $relationModel);

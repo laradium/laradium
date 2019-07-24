@@ -52,6 +52,9 @@ class Form
      */
     private $fieldSetFields;
 
+    /**
+     * @var string
+     */
     private $url;
 
     /**
@@ -149,6 +152,14 @@ class Form
         $this->events = $events;
 
         return $this;
+    }
+
+    /**
+     * @return CrudDataHandler
+     */
+    public function crudDataHandler()
+    {
+        return $this->crudDataHandler;
     }
 
     /**
@@ -298,7 +309,6 @@ class Form
             $this->setValidationRules($field->getValidationRules());
 
             $this->fields->push($field);
-
         }
 
         return $this;

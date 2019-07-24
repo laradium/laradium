@@ -3,52 +3,24 @@
 namespace Laradium\Laradium\Services\Crud\Workers;
 
 use Illuminate\Database\Eloquent\Model;
-use Laradium\Laradium\Services\Crud\CrudDataHandler;
 use ReflectionException;
 
-class MorphToWorker implements WorkerInterface
+class MorphToWorker extends AbstractWorker
 {
 
     /**
-     * @var Model
+     * @return array
      */
-    private $model;
-
-    /**
-     * @var string
-     */
-    private $relation;
-
-    /**
-     * @var array
-     */
-    private $formData;
-
-    /**
-     * @var CrudDataHandler
-     */
-    private $crudDataHandler;
-
-    /**
-     * MorphToWorker constructor.
-     * @param CrudDataHandler $crudDataHandler
-     * @param Model $model
-     * @param string $relation
-     * @param array $formData
-     */
-    public function __construct(CrudDataHandler $crudDataHandler, Model $model, string $relation, array $formData)
+    public function beforeSave(): array
     {
-        $this->crudDataHandler = $crudDataHandler;
-        $this->model = $model;
-        $this->relation = $relation;
-        $this->formData = $formData;
+        return $this->formData;
     }
 
     /**
      * @return void
      * @throws ReflectionException
      */
-    public function handle(): void
+    public function afterSave(): void
     {
         $morphableName = array_get($this->formData, 'morphable_name');
         $morphableType = array_get($this->formData, 'morphable_type');
