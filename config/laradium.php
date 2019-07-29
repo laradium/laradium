@@ -83,5 +83,9 @@ return [
 
     'additional_translation_scan_paths' => [
         //
+    ],
+
+    'media_manager' => [
+        'enabled' => true
     ]
 ];
