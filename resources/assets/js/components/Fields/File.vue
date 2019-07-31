@@ -8,13 +8,12 @@
                 {{ language }}
             </span>
         </label>
-        <br>
         <div v-if="field.config.is_translatable">
             <div v-for="item in field.translations" v-show="language === item.iso_code" v-if="item.file.url">
                 <a :href="item.file.url" target="_blank">
                     {{ item.file.file_name }} ({{ item.file.file_size }} kb)
                 </a>
-                <button class="btn btn-danger btn-sm"
+                <button v-if="field.config.deleteable" class="btn btn-danger btn-sm"
                         @click.prevent="deleteFile(item, item.file.deleteUrl)">
                     <i class="fa fa-trash"></i>
                 </button>
@@ -27,7 +26,7 @@
                 <a :href="field.file.url" target="_blank">
                     {{ field.file.file_name }} ({{ field.file.file_size }} kb)
                 </a>
-                <button class="btn btn-danger btn-sm"
+                <button v-if="field.config.deleteable" class="btn btn-danger btn-sm"
                         @click.prevent="deleteFile(field, field.file.deleteUrl)">
                     <i class="fa fa-trash"></i>
                 </button>
@@ -62,9 +61,9 @@
                                 field.file.url = null;
 
                                 swal({
-									type: 'success',
-									title: 'File has been deleted!',
-								});
+                                    type: 'success',
+                                    title: 'File has been deleted!',
+                                });
                             }).catch(res => {
                                 let error = document.createElement('div');
                                 error.innerHTML = 'Something went wrong! <br> If issue persists, please, contact technical staff.';

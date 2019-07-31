@@ -132,7 +132,8 @@ abstract class AbstractResource extends Controller
         return (new Form('crud-form'))
             ->model($model)
             ->returnUrl($this->getAction())
-            ->fields($this->resource()->closure());
+            ->fields($this->resource()->closure())
+            ->shared($this->isShared());
     }
 
     /**

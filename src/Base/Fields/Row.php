@@ -18,7 +18,7 @@ class Row extends Element
      * @param $parameters
      * @param Model $model
      */
-    public function __construct($parameters, Model $model)
+    public function __construct($parameters, Model $model = null)
     {
         $closure = array_first($parameters, null, true);
 

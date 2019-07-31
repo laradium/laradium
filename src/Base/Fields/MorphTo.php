@@ -123,6 +123,8 @@ class MorphTo extends Field
         foreach ($this->fieldSet->fields() as $temporaryField) {
             $field = clone $temporaryField;
 
+            $field->shared($this->isShared());
+
             if ($this->getModel()->exists) {
                 $field->model($this->getModel())
                     ->build(array_merge($this->getAttributes(), [$this->getModel()->id]));

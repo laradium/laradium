@@ -94,6 +94,11 @@ class Field
     private $modifiedValue;
 
     /**
+     * @var bool
+     */
+    protected $shared = false;
+
+    /**
      * Field constructor.
      * @param $parameters
      * @param Model $model
@@ -531,5 +536,23 @@ class Field
     public function getAttr()
     {
         return $this->htmlAttributes;
+    }
+
+    /**
+     * @param $value
+     */
+    public function shared($value): self
+    {
+        $this->shared = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShared(): bool
+    {
+        return $this->shared;
     }
 }

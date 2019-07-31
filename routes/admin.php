@@ -47,7 +47,12 @@ Route::group([
             'as'   => 'resource.destroy'
         ]);
 
-        Route::delete('resource/{model}/{id}/file/{file}/{locale?}', [
+        Route::get('resource/file/{url}', [
+            'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@getFile',
+            'as'   => 'resource.get-file'
+        ]);
+
+        Route::delete('resource/file/{url}', [
             'uses' => '\Laradium\Laradium\Http\Controllers\Admin\AdminController@destroyFile',
             'as'   => 'resource.destroy-file'
         ]);

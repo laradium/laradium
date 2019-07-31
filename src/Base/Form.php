@@ -53,7 +53,7 @@ class Form
     private $fieldSetFields;
 
     /**
-     * @var string
+     * @var
      */
     private $url;
 
@@ -81,6 +81,11 @@ class Form
      * @var CrudDataHandler
      */
     private $crudDataHandler;
+
+    /**
+     * @var bool
+     */
+    protected $shared = false;
 
     /**
      * Form constructor.
@@ -196,7 +201,6 @@ class Form
         $validationRules = $this->getValidationRules();
         $validationRequest->validate($validationRules);
 
-
         $model = $this->crudDataHandler->saveData($request->all(), $this->getModel());
         $this->model($model);
 
@@ -305,7 +309,7 @@ class Form
     public function build(): self
     {
         foreach ($this->getFieldSetFields() as $field) {
-            $field->build();
+            $field->shared($this->isShared())->build();
             $this->setValidationRules($field->getValidationRules());
 
             $this->fields->push($field);
@@ -441,5 +445,23 @@ class Form
     public function isTranslatable(): bool
     {
         return $this->isTranslatable;
+    }
+
+    /**
+     * @param $value
+     */
+    public function shared($value): self
+    {
+        $this->shared = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShared(): bool
+    {
+        return $this->shared;
     }
 }
