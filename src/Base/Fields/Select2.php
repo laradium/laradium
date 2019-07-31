@@ -38,6 +38,11 @@ class Select2 extends Field
     protected $textField = 'text';
 
     /**
+     * @var bool
+     */
+    protected $multiple = false;
+
+    /**
      * @var array
      */
     protected $options = [];
@@ -120,18 +125,31 @@ class Select2 extends Field
     }
 
     /**
+     * @param bool $value
+     * @return $this
+     */
+    public function multiple($value = true)
+    {
+        $this->multiple = $value;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function formattedResponse(): array
     {
         $data = parent::formattedResponse();
         $data['options'] = $this->getOptions();
+        $data['selected'] = $this->getSelected();
         $data['config']['source'] = $this->source;
         $data['config']['data_property'] = $this->dataProperty;
         $data['config']['search_param'] = $this->searchParam;
         $data['config']['query_params'] = $this->queryParams;
         $data['config']['id_field'] = $this->idField;
         $data['config']['text_field'] = $this->textField;
+        $data['config']['multiple'] = $this->multiple;
 
         return $data;
     }
@@ -152,5 +170,15 @@ class Select2 extends Field
         }
 
         return $options;
+    }
+
+    /**
+     * Collection
+     */
+    public function getSelected()
+    {
+        return collect($this->getOptions())->filter(function ($item) {
+            return $item['selected'] === true;
+        })->pluck('id');
     }
 }
