@@ -38,13 +38,16 @@ class CrudDataHandler
      */
     public function saveData(array $formData, Model $model): Model
     {
+        $unmodifiedData = $formData;
+        $baseModel = $model;
         // Run workers for relations or custom fields (HasMany, HasOne, MorphTo)
-        $workers = $this->getWorkers($formData, $model);
+        $workers = $this->getWorkers($unmodifiedData, $model);
         foreach ($workers as $worker) {
             $worker->beforeSave();
 
-            $formData = array_merge($formData, $worker->getData());
+            $formData = array_merge($unmodifiedData, $worker->getData());
         }
+
 
         // Update or create base model
         $baseData = collect($formData)->filter(function ($value, $index) {
@@ -64,7 +67,8 @@ class CrudDataHandler
 
         $this->putTranslations($translations, $model);
 
-        $workers = $this->getWorkers($formData, $model);
+        $workers = $this->getWorkers($unmodifiedData, $model);
+
         foreach ($workers as $worker) {
             $worker->afterSave();
         }

@@ -21,28 +21,31 @@ class HasManyWorker extends AbstractWorker
     public function afterSave(): void
     {
         foreach ($this->formData as $item) {
-            // if array has "id" field, it means that this is existing entry, if not, it's new
-            if ($id = array_get($item, 'id')) {
-                $relationModel = $this->model->{$this->relation}()->find($id);
-
-                // If entry has remove field, it means that it must be deleted
-                if (array_get($item, 'remove')) {
-                    $relationModel->delete();
-                }
-
-                continue;
-            }
-
-            // We get base data in order to create child
+            // We get base data in order to create or update child
             $baseData = collect($item)->filter(function ($value) {
                 return !is_array($value);
             })->toArray();
 
-            if (!empty($this->formData)) {
-                dd($this->model);
+            // if array has "id" field, it means that this is existing entry, if not, it's new
+            if ($id = array_get($item, 'id')) {
+                $relationModel = $this->model
+                    ->{$this->relation}()
+                    ->find($id);
+
+                $relationModel->update($baseData);
+                // If entry has remove field, it means that it must be deleted
+                if (array_get($item, 'remove')) {
+                    $relationModel->delete();
+
+                    continue;
+                }
             }
 
-            $relationModel = $this->model->{$this->relation}()->create($baseData);
+            if (!isset($relationModel)) {
+                $relationModel = $this->model
+                    ->{$this->relation}()
+                    ->create($baseData);
+            }
 
             // Remove everything which is not base data because we have already saved it
             $item = collect($item)->filter(function ($value) {
