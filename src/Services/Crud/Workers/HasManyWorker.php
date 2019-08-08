@@ -21,10 +21,12 @@ class HasManyWorker extends AbstractWorker
     public function afterSave(): void
     {
         foreach ($this->formData as $item) {
+            $relationModel = null;
             // We get base data in order to create or update child
             $baseData = collect($item)->filter(function ($value) {
                 return !is_array($value);
             })->toArray();
+
 
             // if array has "id" field, it means that this is existing entry, if not, it's new
             if ($id = array_get($item, 'id')) {
@@ -41,7 +43,7 @@ class HasManyWorker extends AbstractWorker
                 }
             }
 
-            if (!isset($relationModel)) {
+            if (!$relationModel) {
                 $relationModel = $this->model
                     ->{$this->relation}()
                     ->create($baseData);
