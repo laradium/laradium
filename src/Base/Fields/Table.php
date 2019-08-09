@@ -15,6 +15,11 @@ class Table
     private $table;
 
     /**
+     * @var bool
+     */
+    private $shared;
+
+    /**
      * CrudForm constructor.
      * @param $parameters
      */
@@ -68,5 +73,16 @@ class Table
     public function isTranslatable(): bool
     {
         return false;
+    }
+
+    /**
+     * @param $value
+     * @return Table
+     */
+    public function shared($value): self
+    {
+        $this->shared = $value;
+
+        return $this;
     }
 }
