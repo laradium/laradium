@@ -28,6 +28,22 @@ class ColumnSet
 
     /**
      * @param string $column
+     * @return string
+     */
+    private function getParsedColumn(string $column): string
+    {
+        if (str_contains($column, '.')) {
+            $parseColumn = explode('.', $column);
+            unset($parseColumn[count($parseColumn) - 1]);
+
+            return implode('.', $parseColumn);
+        }
+
+        return $column;
+    }
+
+    /**
+     * @param string $column
      * @param null $name
      * @return $this
      */
@@ -35,7 +51,7 @@ class ColumnSet
     {
         $this->list->push([
             'column'         => $column,
-            'column_parsed'  => str_contains($column, '.') ? array_first(explode('.', $column)) : $column,
+            'column_parsed'  => $this->getParsedColumn($column),
             'name'           => $name ?? $column,
             'pretty_name'    => $this->getPrettyName($column, $name),
             'title'          => null,

@@ -1,12 +1,12 @@
 <template>
     <table class="resource-datatable table table-bordered">
         <thead>
-            <tr>
-                <th v-for="column in field.table.base_columns"
-                    v-html="column.pretty_name"
-                    :style="'width: ' + column.width + ';'"
-                ></th>
-            </tr>
+        <tr>
+            <th v-for="column in field.table.base_columns"
+                v-html="column.pretty_name"
+                :style="'width: ' + column.width + ';'"
+            ></th>
+        </tr>
         </thead>
     </table>
 </template>
@@ -20,11 +20,6 @@
         name: 'Table',
 
         props: ['field', 'language'],
-
-        data() {
-            return {
-            };
-        },
 
         mounted() {
             $.fn.tooltip && $('[data-toggle="tooltip"]').tooltip();
@@ -60,9 +55,5 @@
             deleteItemFromDataTable(datatable);
             changeActiveStateWithSwitch(datatable, this.field.table.toggle_url);
         },
-
-        methods: {
-
-        }
     }
 </script>
