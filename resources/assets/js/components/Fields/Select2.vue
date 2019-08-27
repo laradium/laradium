@@ -10,11 +10,9 @@
 					{{ language }}
 				</span>
             </label>
-            <input v-if="field.config.multiple" type="hidden" :name="field.name + '[' + index + ']'" :value="value"
-                   v-for="(value, index) in preSelected">
-            <input v-else type="hidden" :value="selected" :name="field.name">
-            <select2 :options="field.options" v-model="preSelected" :multiple="field.config.multiple">
-                <option disabled value="0" v-text="placeholder"></option>
+            <input type="hidden" :value="selected" :name="field.name">
+            <select2 :options="field.options" :config="field.config" v-model="selected">
+                <option disabled value="0">Select one</option>
             </select2>
         </div>
     </div>
@@ -26,15 +24,17 @@
 
         data() {
             return {
-                selected: null,
-                preSelected: this.field.selected,
-                placeholder: this.field.config.multiple ? 'Select multiple' : 'Select one'
+                selected: null
             };
         },
 
         mounted() {
+            this.selected = this.field.value;
             let options = this.field.options;
             for (let option in options) {
+                if (!options.hasOwnProperty(option)) {
+                    continue;
+                }
                 if (options[option].selected) {
                     this.selected = options[option].id;
                 }
