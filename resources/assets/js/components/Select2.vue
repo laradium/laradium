@@ -32,7 +32,7 @@
             let config = this.config ? this.config : this.defaultConfig;
             let select = $(this.$el);
 
-            if (this.config.source) {
+            if (this.config && this.config.source) {
                 let selected = await this.findSelected();
 
                 if (selected) {
