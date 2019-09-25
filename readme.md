@@ -1,4 +1,6 @@
-Laradium allows you to create advanced CRUD views with relations in a lightweight admin panel.
+# Laradium
+
+**Laradium** allows you to create advanced CRUD views with relations in a lightweight admin panel.
 
 This package is built using plain Laravel database structure, models and VueJS which makes it very flexible and easily adjustable to your needs.
 
