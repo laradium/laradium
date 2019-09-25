@@ -9,8 +9,6 @@ This package is built using plain Laravel database structure, models and VueJS w
 ### Getting started
 * [Installation](https://github.com/laradium/laradium/wiki/Installation)
 * [Configuration](https://github.com/laradium/laradium/wiki/Configuration)
-* [Upgrade guide](#)
-* [Contributing](#)
 
 ### Resources
 * [Introduction](https://github.com/laradium/laradium/wiki/Introduction-%7C-Resources)
@@ -24,14 +22,7 @@ This package is built using plain Laravel database structure, models and VueJS w
 
 ### Tables
 * [Introduction](https://github.com/laradium/laradium/wiki/Introduction-%7C-Tables)
-* [Usage](#)
 * [Examples](https://github.com/laradium/laradium/wiki/Examples)
 
 ### Translations
 * [Usage](https://github.com/laradium/laradium/wiki/Usage-%7C-Translations)
-
-### Advanced
-* [Interface Builder](#)
-    * [Introduction](#)
-    * [Usage](#)
-    * [Examples](#)
