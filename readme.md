@@ -27,6 +27,9 @@ This package is built using plain Laravel database structure, models and VueJS w
 * [Usage](#)
 * [Examples](https://github.com/laradium/laradium/wiki/Examples)
 
+### Translations
+* [Usage](https://github.com/laradium/laradium/wiki/Usage-%7C-Translations)
+
 ### Advanced
 * [Interface Builder](#)
     * [Introduction](#)
