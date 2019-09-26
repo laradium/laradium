@@ -37,16 +37,6 @@ class MakeLaradiumTranslationModel extends Command
     protected $type;
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -88,7 +78,7 @@ class MakeLaradiumTranslationModel extends Command
     {
         $namespace = $this->getNamespace();
 
-        $resource = str_replace([
+        $model = str_replace([
             '{{namespace}}',
             '{{model}}'
         ], [
@@ -96,7 +86,7 @@ class MakeLaradiumTranslationModel extends Command
             $this->name
         ], $this->getResourceStub());
 
-        return $resource;
+        return $model;
     }
 
     /**
