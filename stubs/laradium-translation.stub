@@ -1,0 +1,19 @@
+<?php
+
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Database\Eloquent\Model;
+
+class {{model}}Translation extends Model
+{
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'locale',
+        //
+    ];
+
+}
