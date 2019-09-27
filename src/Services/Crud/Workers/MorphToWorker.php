@@ -3,22 +3,20 @@
 namespace Laradium\Laradium\Services\Crud\Workers;
 
 use Illuminate\Database\Eloquent\Model;
-use ReflectionException;
 
 class MorphToWorker extends AbstractWorker
 {
 
     /**
-     * @return array
+     * @return void
      */
-    public function beforeSave(): array
+    public function beforeSave(): void
     {
-        return $this->formData;
+        //
     }
 
     /**
      * @return void
-     * @throws ReflectionException
      */
     public function afterSave(): void
     {

@@ -59,7 +59,7 @@ class Chart
      */
     public function __construct($dataSetOptions = [])
     {
-        $this->dataSetOptions = $dataSetOptions;
+        $this->dataSetOptions = $this->getType() !== 'pie' ? array_collapse($dataSetOptions) : $dataSetOptions;
     }
 
     /**
@@ -129,7 +129,7 @@ class Chart
      */
     public function getData(): array
     {
-        $dataSet = $this->data;
+        $dataSet = array_values($this->data);
 
         if ($this->getDataSource() === 'ajax') {
             return [
@@ -160,6 +160,8 @@ class Chart
     private function getDataSet($dataSet): array
     {
         if ($this->isMultidimensional($dataSet)) {
+            $data = [];
+
             foreach ($dataSet as $key => $array) {
                 $data[] = array_merge([
                     'data' => array_values($array)
