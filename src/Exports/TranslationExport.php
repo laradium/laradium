@@ -4,9 +4,10 @@ namespace Laradium\Laradium\Exports;
 
 use Laradium\Laradium\Models\Translation;
 use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class TranslationExport implements FromArray, WithHeadings
+class TranslationExport implements FromArray, WithHeadings, ShouldAutoSize
 {
     /**
      * @return
@@ -14,9 +15,7 @@ class TranslationExport implements FromArray, WithHeadings
     public function array(): array
     {
         $languages = translate()->languages();
-        $allTranslations = Translation::orderBy('group', 'asc')
-            ->orderBy('key', 'asc')
-            ->get();
+        $allTranslations = \DB::table('translations')->orderByRaw('LENGTH(`group`), `group`')->orderByRaw('LENGTH(`key`), `key`')->get();
         $translations = [];
 
         foreach ($allTranslations as $translation) {
@@ -24,11 +23,13 @@ class TranslationExport implements FromArray, WithHeadings
             $translations[$translation->group . '.' . $translation->key]['group'] = $translation->group;
             $translations[$translation->group . '.' . $translation->key]['key'] = $translation->key;
             $translations[$translation->group . '.' . $translation->key]['id'] = $translation->id;
+            $translations[$translation->group . '.' . $translation->key]['full_key'] = $translation->key . '.' . $translation->group;
         }
 
         $translations = collect($translations)->map(function ($item) {
             return (object)$item;
-        })->sortBy('group');
+        });
+
 
         $translations = $translations->map(function ($t, $index) use ($languages) {
             $item = [
