@@ -217,10 +217,11 @@ class HasMany extends Field
 
             if (get_class($item) === config('laradium.menu_item_class', MenuItem::class)) {
                 $tree['data'] = [
-                    'name'           => $item->name,
-                    'url'            => $item->url,
-                    'icon'           => $item->icon,
-                    'has_permission' => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true,
+                    'name'            => $item->name,
+                    'url'             => $item->url,
+                    'icon'            => $item->icon,
+                    'data_attributes' => $item->getDataAttributes(),
+                    'has_permission'  => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true,
                 ];
             }
 

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMenuItemsTable extends Migration
 {
@@ -21,6 +21,7 @@ class CreateMenuItemsTable extends Migration
             $table->integer('sequence_no')->default(0);
             $table->string('icon')->nullable();
             $table->string('resource')->nullable();
+            $table->string('data_attributes')->nullable();
 
             $table->unsignedInteger('menu_id')->nullable();
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');

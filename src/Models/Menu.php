@@ -63,14 +63,16 @@ class Menu extends Model
     {
         $items = [];
         foreach ($this->items()->orderBy('sequence_no')->get() as $item) {
+
             $items[] = [
                 'id'     => $item->id,
                 'parent' => $item->parent_id ?: '#',
                 'data'   => [
-                    'name'           => $item->name,
-                    'url'            => $item->url,
-                    'icon'           => $item->icon,
-                    'has_permission' => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true
+                    'name'            => $item->name,
+                    'url'             => $item->url,
+                    'icon'            => $item->icon,
+                    'data_attributes' => $item->getDataAttributes(),
+                    'has_permission'  => ($resource = $item->getResource()) ? $resource->hasPermission('view') : true
                 ]
             ];
         }
