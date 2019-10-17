@@ -4,10 +4,11 @@
             v-if="item.data && item.data.has_permission"
             :class="{has_sub: item.children && item.children.length, 'active' : item.data.url.includes(active) || (item.children && item.children.filter(i => i.data.url.includes(active)).length > 0) }">
             <a :href="item.children && item.children.length ? 'javascript:;': item.data.url"
+               v-bind="item.data.data_attributes"
                :class="{'active' : item.data.url.includes(active) || (item.children && item.children.filter(i => i.data.url.includes(active)).length > 0), 'waves-effect': item.children && item.children.length}">
                 <i v-if="item.data.icon" :class="item.data.icon"></i>
                 <i v-else class="mdi mdi-view-dashboard"></i>
-                <span> {{ item.data.name }} </span>
+                <span> {{ item.data.name }}</span>
                 <div class="pull-right">
                     <span class="fa fa-caret-down" v-if="item.children && item.children.length"></span>
                 </div>
