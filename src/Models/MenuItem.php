@@ -114,7 +114,7 @@ class MenuItem extends \Baum\Node
     /**
      * @return array
      */
-    public function getDataAttributes()
+    public function getDataAttributes(): array
     {
         $delimiter = strpos($this->data_attributes, ',') !== false ? ',' : ' ';
         $attributeString = explode($delimiter, $this->data_attributes);

@@ -63,7 +63,6 @@ class Menu extends Model
     {
         $items = [];
         foreach ($this->items()->orderBy('sequence_no')->get() as $item) {
-
             $items[] = [
                 'id'     => $item->id,
                 'parent' => $item->parent_id ?: '#',
