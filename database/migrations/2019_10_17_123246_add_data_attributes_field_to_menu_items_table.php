@@ -13,7 +13,7 @@ class AddDataAttributesFieldToMenuItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('menu_items', function (Blueprint $table) {
+        Schema::table('menu_items', function (Blueprint $table) {
             $table->string('data_attributes')->nullable();
         });
     }
