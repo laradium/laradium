@@ -16,9 +16,9 @@ class AddNestedsetForMenuItemsTable extends Migration
     {
         Schema::table('menu_items', function (Blueprint $table) {
             $table->integer('parent_id')->nullable()->after('resource');
-            $table->integer('lft')->nullable()->after('parent_id');
-            $table->integer('rgt')->nullable()->after('lft');
-            $table->integer('depth')->nullable()->after('rgt');
+            $table->integer('left')->nullable()->after('parent_id');
+            $table->integer('right')->nullable()->after('left');
+            $table->integer('depth')->nullable()->after('right');
         });
 
         if (!\Laradium\Laradium\Models\MenuItem::get()->count()) {
@@ -68,7 +68,7 @@ class AddNestedsetForMenuItemsTable extends Migration
     public function down()
     {
         Schema::table('menu_items', function (Blueprint $table) {
-            $table->dropColumn('parent_id', 'lft', 'rgt', 'depth');
+            $table->dropColumn('parent_id', 'left', 'right', 'depth');
         });
     }
 
