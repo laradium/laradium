@@ -3,10 +3,10 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Laradium\Laradium\Models\Menu;
 
-class AddNestedsetForMenuItemsTable extends Migration
+class AlterNestedsetForMenuItemsTableRenameFields extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,10 +15,8 @@ class AddNestedsetForMenuItemsTable extends Migration
     public function up()
     {
         Schema::table('menu_items', function (Blueprint $table) {
-            $table->integer('parent_id')->nullable()->after('resource');
-            $table->integer('lft')->nullable()->after('parent_id');
-            $table->integer('rgt')->nullable()->after('lft');
-            $table->integer('depth')->nullable()->after('rgt');
+            $table->renameColumn('lft', 'left');
+            $table->renameColumn('rgt', 'right');
         });
     }
 
@@ -30,7 +28,8 @@ class AddNestedsetForMenuItemsTable extends Migration
     public function down()
     {
         Schema::table('menu_items', function (Blueprint $table) {
-            $table->dropColumn('parent_id', 'lft', 'rgt', 'depth');
+            $table->renameColumn('left', 'lft');
+            $table->renameColumn('right', 'rgt');
         });
     }
 }
