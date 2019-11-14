@@ -55,7 +55,7 @@ abstract class AbstractWorker
     /**
      * Before save
      */
-    abstract public function beforeSave(): void;
+    abstract public function beforeSave();
 
     /**
      * After save
