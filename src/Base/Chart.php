@@ -150,7 +150,7 @@ class Chart
      */
     public function getOptions(): array
     {
-        return !empty($this->options) ? array_merge($this->options, $this->defaultOptions) : $this->defaultOptions;
+        return !empty($this->options) ? array_merge($this->defaultOptions, $this->options) : $this->defaultOptions;
     }
 
     /**
@@ -161,7 +161,7 @@ class Chart
     {
         if ($this->isMultidimensional($dataSet)) {
             $data = [];
-
+            
             foreach ($dataSet as $key => $array) {
                 $data[] = array_merge([
                     'data' => array_values($array)
