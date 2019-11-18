@@ -96,7 +96,7 @@ class Datatable
         }
 
         foreach ($addedColumns as $column) {
-            $this->dataTable->addColumn($column['column_parsed'], $column['modify']);
+            $this->dataTable->addColumn($column['column'], $column['modify']);
         }
     }
 
@@ -112,7 +112,7 @@ class Datatable
         }
 
         foreach ($modifiedColumns as $column) {
-            $this->dataTable->editColumn($column['column_parsed'], $column['modify']);
+            $this->dataTable->editColumn($column['column'], $column['modify']);
         }
     }
 
@@ -125,7 +125,7 @@ class Datatable
         $slug = $this->table->getSlug();
 
         foreach ($editableColumns as $column) {
-            $this->dataTable->editColumn($column['column_parsed'], function ($item) use ($column, $slug) {
+            $this->dataTable->editColumn($column['column'], function ($item) use ($column, $slug) {
                 return view('laradium::admin.table._partials.editable', compact('item', 'column', 'slug'))->render();
             });
         }
@@ -139,7 +139,7 @@ class Datatable
         $translatableColumns = $this->table->getTranslatableColumns();
 
         foreach ($translatableColumns as $column) {
-            $this->dataTable->addColumn($column['column_parsed'], function ($item) use ($column) {
+            $this->dataTable->addColumn($column['column'], function ($item) use ($column) {
                 return view('laradium::admin.resource._partials.translation', compact('item', 'column'))->render();
             });
         }
@@ -154,7 +154,7 @@ class Datatable
         $slug = $this->table->getSlug();
 
         foreach ($translatableColumns as $column) {
-            $this->dataTable->addColumn($column['column_parsed'], function ($item) use ($column, $slug) {
+            $this->dataTable->addColumn($column['column'], function ($item) use ($column, $slug) {
                 return view('laradium::admin.resource._partials.translation_editable',
                     compact('item', 'column', 'slug'))
                     ->render();

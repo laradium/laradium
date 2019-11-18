@@ -399,7 +399,7 @@ class Table
 
         foreach ($this->columns() as $column) {
             $config->push([
-                'data'       => $column['column_parsed'],
+                'data'       => $column['column'],
                 'name'       => $column['column'],
                 'searchable' => !($column['translatable'] || $column['not_searchable']),
                 'orderable'  => !($column['translatable'] || $column['not_sortable']),
