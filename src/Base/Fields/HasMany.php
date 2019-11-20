@@ -85,13 +85,13 @@ class HasMany extends Field
     {
         parent::build($attributes);
 
-
         if ($this->getModel() && get_class($this->getModel()) === config('laradium.menu_class', Menu::Class)) {
             config('laradium.menu_item_class', MenuItem::class)::rebuild();
         }
 
         $this->templateData = $this->getTemplateData();
         $this->validationRules($this->templateData['validation_rules']);
+        $this->validationKeyAttributes($this->templateData['validation_attributes']);
 
         return $this;
     }
@@ -119,6 +119,7 @@ class HasMany extends Field
     {
         $fields = [];
         $validationRules = [];
+        $validationKeyAttributes = [];
         $this->addReplacementAttribute();
         $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
 
@@ -145,16 +146,19 @@ class HasMany extends Field
                 if ($field->getRules()) {
                     $validationRules[$field->getValidationKey()] = $field->getRules();
                 }
+
+                $validationKeyAttributes[$field->getValidationKey()] = $field->getLabel();
             }
 
             $fields[] = $field->formattedResponse();
         }
 
         return [
-            'label'            => 'Entry',
-            'fields'           => $fields,
-            'replacement_ids'  => $this->getReplacementAttributes(),
-            'validation_rules' => $validationRules,
+            'label'                 => 'Entry',
+            'fields'                => $fields,
+            'replacement_ids'       => $this->getReplacementAttributes(),
+            'validation_rules'      => $validationRules,
+            'validation_attributes' => $validationKeyAttributes,
         ];
     }
 

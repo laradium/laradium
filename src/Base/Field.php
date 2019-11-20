@@ -74,6 +74,11 @@ class Field
     private $validationAttributes = [];
 
     /**
+     * @var array
+     */
+    private $validationKeyAttributes = [];
+
+    /**
      * @var string
      */
     private $type;
@@ -118,6 +123,7 @@ class Field
         if ($attributes) {
             $this->attributes = $attributes;
         }
+
         $currentAttributes = $this->attributes;
         $this->attributes = array_merge($currentAttributes, [$this->getFieldName()]);
 
@@ -145,12 +151,14 @@ class Field
                 $this->validationKey($attributes);
 
                 $this->validationRules += [$this->getValidationKey() => $this->getRules()];
+                $this->validationKeyAttributes += [$this->getValidationKey() => $this->getLabel()];
             }
 
             return;
         }
 
         $this->validationRules = [$this->getValidationKey() => $this->getRules()];
+        $this->validationKeyAttributes = [$this->getValidationKey() => $this->getLabel()];
 
         return;
     }
@@ -310,6 +318,25 @@ class Field
     public function getValidationRules(): array
     {
         return $this->validationRules;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function validationKeyAttributes($value)
+    {
+        $this->validationKeyAttributes = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationKeyAttributes(): array
+    {
+        return $this->validationKeyAttributes;
     }
 
     /**

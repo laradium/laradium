@@ -60,6 +60,14 @@ class Table
     }
 
     /**
+     * @return array
+     */
+    public function getValidationKeyAttributes(): array
+    {
+        return [];
+    }
+
+    /**
      * @return Collection
      */
     public function getFields(): Collection

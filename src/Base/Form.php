@@ -38,6 +38,11 @@ class Form
     protected $validationRules = [];
 
     /**
+     * @var array
+     */
+    protected $validationAttributes = [];
+
+    /**
      * @var bool
      */
     protected $isTranslatable = true;
@@ -177,8 +182,7 @@ class Form
         $validationRequest = $this->crudDataHandler->prepareRequest($request);
 
         $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
-        $validationRules = $this->getValidationRules();
-        $validationRequest->validate($validationRules);
+        $validationRequest->validate($this->getValidationRules(), [], $this->getValidationAttributes());
 
         $model = $this->crudDataHandler->saveData($request->all(), $this->getModel());
         $this->model($model);
@@ -196,10 +200,9 @@ class Form
     {
         $this->build();
         $validationRequest = $this->crudDataHandler->prepareRequest($request);
-        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
 
-        $validationRules = $this->getValidationRules();
-        $validationRequest->validate($validationRules);
+        $this->fireEvent(['beforeSave', 'beforeUpdate'], $request);
+        $validationRequest->validate($this->getValidationRules(), [], $this->getValidationAttributes());
 
         $model = $this->crudDataHandler->saveData($request->all(), $this->getModel());
         $this->model($model);
@@ -311,6 +314,7 @@ class Form
         foreach ($this->getFieldSetFields() as $field) {
             $field->shared($this->isShared())->build();
             $this->setValidationRules($field->getValidationRules());
+            $this->setValidationAttributes($field->getValidationKeyAttributes());
 
             $this->fields->push($field);
         }
@@ -432,11 +436,30 @@ class Form
     }
 
     /**
+     * @param $attributes
+     * @return $this
+     */
+    public function setValidationAttributes($attributes): self
+    {
+        $this->validationAttributes = array_merge($this->getValidationAttributes(), $attributes);
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getValidationRules(): array
     {
         return $this->validationRules;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationAttributes(): array
+    {
+        return $this->validationAttributes;
     }
 
     /**

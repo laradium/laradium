@@ -43,6 +43,11 @@ class Element
     protected $validationRules = [];
 
     /**
+     * @var array
+     */
+    private $validationKeyAttributes = [];
+
+    /**
      * @var string
      */
     private $type;
@@ -110,6 +115,7 @@ class Element
             }
 
             $this->validationRules = array_merge($this->validationRules, $field->getValidationRules());
+            $this->validationKeyAttributes = array_merge($this->validationKeyAttributes, $field->getValidationKeyAttributes());
 
             $fields[] = $field->formattedResponse();
         }
@@ -137,6 +143,14 @@ class Element
     public function getValidationRules(): array
     {
         return $this->validationRules;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationKeyAttributes(): array
+    {
+        return $this->validationKeyAttributes;
     }
 
     /**

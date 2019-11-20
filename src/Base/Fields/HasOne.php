@@ -60,6 +60,7 @@ class HasOne extends Field
 
         $this->templateData = $this->getTemplateData();
         $this->validationRules($this->templateData['validation_rules']);
+        $this->validationKeyAttributes($this->templateData['validation_attributes']);
 
         return $this;
     }
@@ -86,6 +87,7 @@ class HasOne extends Field
     {
         $fields = [];
         $validationRules = [];
+        $validationKeyAttributes = [];
         $this->addReplacementAttribute();
         $lastReplacementAttribute = [array_last($this->getReplacementAttributes())];
 
@@ -100,13 +102,16 @@ class HasOne extends Field
                 $validationRules[$field->getValidationKey()] = $field->getRules();
             }
 
+            $validationKeyAttributes[$field->getValidationKey()] = $field->getLabel();
+
             $fields[] = $field->formattedResponse();
         }
 
         return [
-            'fields'           => $fields,
-            'replacement_ids'  => $this->getReplacementAttributes(),
-            'validation_rules' => $validationRules
+            'fields'                => $fields,
+            'replacement_ids'       => $this->getReplacementAttributes(),
+            'validation_rules'      => $validationRules,
+            'validation_attributes' => $validationKeyAttributes,
         ];
     }
 
