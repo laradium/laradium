@@ -48,7 +48,7 @@ class MorphToWorker extends AbstractWorker
     private function saveMorphToData(Model $model, string $morphableType, string $morphableName, array $data): void
     {
         $morphableModel = new $morphableType;
-        $createdMorphableModel = $this->crudDataHandler($data, $morphableModel);
+        $createdMorphableModel = $this->crudDataHandler->saveData($data, $morphableModel);
 
         $model->{$morphableName . '_id'} = $createdMorphableModel->id;
         $model->{$morphableName . '_type'} = $morphableType;
