@@ -51,6 +51,8 @@
 </template>
 
 <script>
+    import {serverBus} from '../../laradium';
+
     export default {
         name: 'Crud',
 
@@ -77,6 +79,10 @@
         },
 
         mounted() {
+            serverBus.$on('change_language', iso => {
+                this.current_language = iso;
+            });
+
             $(this.$el).on('submit-crud', () => {
                 this.onSubmit(this.$el);
             });
