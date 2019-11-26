@@ -295,7 +295,7 @@ abstract class AbstractResource extends Controller
     /**
      * @return callable
      */
-    private function addActionColumn(): callable
+    protected function addActionColumn(): callable
     {
         return function (ColumnSet $column) {
             $hasActions = collect($this->getActions())->filter(function ($action) {

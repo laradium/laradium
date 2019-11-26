@@ -191,9 +191,10 @@ const app = new Vue({
     data: {
         selectedPage: false
     },
-    methods: {
-        redirectToCreatePage() {
-            window.location = '/admin/pages/create?channel=' + this.selectedPage;
-        }
+    mounted() {
+        $(document).on('click', '.js-channel-select-btn', function () {
+            let channel = $('.js-channel-select').val();
+            window.location = '/admin/pages/create?channel=' + channel;
+        })
     }
 });

@@ -15,7 +15,7 @@
         </div>
 
         <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
-                   :language="field.config.default_language"></row-field>
+                   :language="current_language"></row-field>
 
         <div v-if="!countFieldsByType('save-buttons') && !countFieldsByType('form-submit')" class="crud-bottom">
             <div class="row">
@@ -38,7 +38,7 @@
                     Language
                 </div>
                 <div class="col-md-2" v-if="field.config.is_translatable && field.config.languages.length">
-                    <select class="form-control language-select" v-model="field.config.default_language">
+                    <select class="form-control language-select" v-model="current_language">
                         <option :value="language.iso_code" v-for="language in field.config.languages">
                             {{ language.iso_code }}
                         </option>
@@ -57,6 +57,12 @@
         props: ['field', 'language'],
 
         data() {
+            let current_language = '';
+
+            if(this.field.config.is_translatable && this.field.config.languages.length) {
+                current_language= this.field.config.languages[0].iso_code;
+            }
+
             return {
                 current_tab: '',
                 success: '',
@@ -65,7 +71,8 @@
                 data: [],
                 rows: [],
                 loading: true,
-                isSubmitted: false
+                isSubmitted: false,
+                current_language: current_language
             };
         },
 
