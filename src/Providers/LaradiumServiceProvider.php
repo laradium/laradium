@@ -8,6 +8,7 @@ use Laradium\Laradium\Console\Commands\FindTranslations;
 use Laradium\Laradium\Console\Commands\ImportTranslations;
 use Laradium\Laradium\Console\Commands\MakeLaradiumApiResource;
 use Laradium\Laradium\Console\Commands\MakeLaradiumResource;
+use Laradium\Laradium\Console\Commands\MakeLaradiumTranslationModel;
 use Laradium\Laradium\Helpers\Translate;
 use Laradium\Laradium\Http\Middleware\LaradiumMiddleware;
 use Laradium\Laradium\Registries\FieldRegistry;
@@ -51,7 +52,7 @@ class LaradiumServiceProvider extends ServiceProvider
     private function registerProviders()
     {
         $this->app->register(\Dimsav\Translatable\TranslatableServiceProvider::class);
-        $this->app->register(\Baum\Providers\BaumServiceProvider::class);
+        $this->app->register(\Baum\BaumServiceProvider::class);
         $this->app->register(LaradiumTranslationServiceProvider::class);
     }
 
@@ -240,7 +241,8 @@ class LaradiumServiceProvider extends ServiceProvider
                 MakeLaradiumResource::class,
                 MakeLaradiumApiResource::class,
                 ImportTranslations::class,
-                FindTranslations::class
+                FindTranslations::class,
+                MakeLaradiumTranslationModel::class
             ]);
         }
     }

@@ -53,6 +53,7 @@ Class MenuResource extends AbstractResource
                     $set->text('url')->rules('required_if:items.*.type,url|max:255')->translatable()->col(4);
                     $set->select('resource')->options($this->getResourceOptions())->rules('required_if:items.*.type,resource')->col(4);
                     $set->select('route')->options($this->getRouteOptions())->rules('required_if:items.*.type,route')->col(4);
+                    $set->text('data_attributes');
                 })->sortable()->attr([
                     'key' => optional($this->getModel())->key
                 ]);

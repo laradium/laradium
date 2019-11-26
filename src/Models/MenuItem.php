@@ -6,6 +6,7 @@ use Dimsav\Translatable\Translatable;
 
 class MenuItem extends \Baum\Node
 {
+
     use Translatable;
 
     /**
@@ -20,6 +21,7 @@ class MenuItem extends \Baum\Node
         'type',
         'route',
         'resource',
+        'data_attributes',
         'parent_id',
     ];
 
@@ -107,5 +109,25 @@ class MenuItem extends \Baum\Node
         } catch (\Exception $e) {
             return '';
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getDataAttributes(): array
+    {
+        $delimiter = strpos($this->data_attributes, ',') !== false ? ',' : ' ';
+        $attributeString = explode($delimiter, $this->data_attributes);
+        $attributes = [];
+
+        foreach ($attributeString as $attribute) {
+            $attr = strstr($attribute, '=', true);
+            $value = ltrim(strstr($attribute, '='), '=');
+            $value = trim($value, '"');
+
+            $attributes[$attr] = $value;
+        }
+
+        return $attributes;
     }
 }

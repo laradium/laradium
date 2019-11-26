@@ -19,7 +19,6 @@ class LaradiumMiddleware
         auth()->shouldUse('admin');
 
         $user = auth()->user();
-
         if (!$user) {
             return redirect('/admin/login');
         }
