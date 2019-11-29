@@ -2,7 +2,6 @@
 
 namespace Laradium\Laradium\Base\Fields;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Laradium\Laradium\Base\Form;
 
@@ -50,11 +49,11 @@ class Crud
             'method' => $this->form->getMethod(),
             'name'   => $this->form->getName(),
             'config' => [
-                'is_translatable' => $this->isTranslatable(),
+                'is_translatable'  => $this->isTranslatable(),
                 'default_language' => translate()->getLanguage()->iso_code,
                 'languages'        => translate()->languagesForForm(),
-                'col'             => 'col-md-12',
-                'without_card'    => $this->getWithoutCard()
+                'col'              => 'col-md-12',
+                'without_card'     => $this->getWithoutCard()
             ],
         ];
     }
@@ -84,6 +83,14 @@ class Crud
     public function getValidationRules(): array
     {
         return $this->form->getValidationRules();
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationKeyAttributes(): array
+    {
+        return $this->form->getValidationAttributes();
     }
 
     /**
