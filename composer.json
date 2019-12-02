@@ -21,7 +21,8 @@
     "cviebrock/eloquent-sluggable": "6.*",
     "laracasts/utilities": "^3.0",
     "baum/baum": "v2.x-dev",
-    "ext-json": "*"
+    "ext-json": "*",
+    "laravel/helpers": "^1.0@dev"
   },
   "autoload": {
     "psr-4": {
