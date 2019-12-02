@@ -2,12 +2,13 @@
 
 namespace Laradium\Laradium\Models;
 
+use Astrotomic\Translatable\Translatable;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Czim\Paperclip\Model\PaperclipTrait;
-use Dimsav\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Laradium\Laradium\Traits\PaperclipAndTranslatable;
 
-class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInterface
+class Setting extends Model implements \Czim\Paperclip\Contracts\AttachableInterface, TranslatableContract
 {
     use PaperclipTrait, PaperclipAndTranslatable;
 
