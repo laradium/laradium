@@ -228,7 +228,7 @@ class Table
     public function getTranslatableColumnsWithEditable(): array
     {
         return $this->columnSet->list->filter(function ($column) {
-            return $column['translatable'] === true;
+            return $column['translatable'] === true && $column['editable'] === true;
         })->toArray();
     }
 
