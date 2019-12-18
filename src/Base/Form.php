@@ -45,7 +45,7 @@ class Form
     /**
      * @var bool
      */
-    protected $isTranslatable = true;
+    protected $isTranslatable = false;
 
     /**
      * @var
@@ -58,7 +58,7 @@ class Form
     private $fieldSetFields;
 
     /**
-     * @var
+     * @var string
      */
     private $url;
 
@@ -305,7 +305,6 @@ class Form
         return $this;
     }
 
-
     /**
      * @return $this
      */
@@ -315,6 +314,10 @@ class Form
             $field->shared($this->isShared())->build();
             $this->setValidationRules($field->getValidationRules());
             $this->setValidationAttributes($field->getValidationKeyAttributes());
+
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
 
             $this->fields->push($field);
         }
