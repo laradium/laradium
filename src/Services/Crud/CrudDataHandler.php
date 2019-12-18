@@ -48,7 +48,6 @@ class CrudDataHandler
             $formData = array_merge($unmodifiedData, $worker->getData());
         }
 
-
         // Update or create base model
         $baseData = collect($formData)->filter(function ($value, $index) {
             return $index !== 'translations' && !is_array($value);
@@ -114,7 +113,7 @@ class CrudDataHandler
     private function recursiveUnset(&$array): bool
     {
         foreach ($array as $index => &$value) {
-            if (in_array($index, self::UNWANTED_KEYS, false)) {
+            if (is_string($index) && in_array($index, self::UNWANTED_KEYS, false)) {
                 unset($array[$index]);
             }
 
@@ -123,7 +122,7 @@ class CrudDataHandler
                     unset($array[$index]);
                 }
 
-                $this->recursiveUnset($value, self::UNWANTED_KEYS);
+                $this->recursiveUnset($value);
             }
         }
 
