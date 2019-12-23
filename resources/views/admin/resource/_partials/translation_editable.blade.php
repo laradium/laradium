@@ -9,7 +9,7 @@
            data-name="{{ $column['column_parsed'] }}"
            data-type="text"
            data-pk="{{ $item->id }}"
-           data-url="/admin/{{ $slug }}/editable/{{ $language->iso_code }}"
+           data-url="{{ $slug }}/editable/{{ $language->iso_code }}"
            data-title="Enter value">{{ $translation->{$column['column_parsed']} ?? '' }}</a>
     </li>
 @endforeach

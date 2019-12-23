@@ -93,6 +93,16 @@ class Form
     protected $shared = false;
 
     /**
+     * @var string
+     */
+    private $createMessage = '';
+
+    /**
+     * @var string
+     */
+    private $updateMessage = '';
+
+    /**
      * Form constructor.
      * @param string $name
      */
@@ -189,7 +199,7 @@ class Form
 
         $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
-        return response()->json($this->data(), 201);
+        return response()->json($this->data($this->getCreateMessage()), 201);
     }
 
     /**
@@ -209,7 +219,7 @@ class Form
 
         $this->fireEvent(['afterSave', 'afterUpdate'], $request);
 
-        return response()->json($this->data());
+        return response()->json($this->data($this->getUpdateMessage()));
     }
 
     /**
@@ -338,12 +348,12 @@ class Form
     /**
      * @return array
      */
-    public function data(): array
+    public function data($message = null): array
     {
         return [
             'success' => true,
             'data'    => [
-                'message'          => 'Form successfully updated',
+                'message'          => $message ?? 'Form successfully updated',
                 'form'             => $this->getFormattedFieldResponse(),
                 'languages'        => translate()->languagesForForm(),
                 'is_translatable'  => $this->isTranslatable(),
@@ -489,5 +499,33 @@ class Form
     public function isShared(): bool
     {
         return $this->shared;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function message(...$value)
+    {
+        $this->createMessage = $value[0] ?? '';
+        $this->updateMessage = $value[1] ?? '';
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreateMessage()
+    {
+        return $this->createMessage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdateMessage()
+    {
+        return $this->updateMessage;
     }
 }

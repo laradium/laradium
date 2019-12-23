@@ -128,12 +128,14 @@ abstract class AbstractResource extends Controller
     protected function getForm(): Form
     {
         $model = $this->getModel();
+        $resourceName = Str::singular($this->getBaseResource()->getName());
 
         return (new Form('crud-form'))
             ->model($model)
             ->returnUrl($this->getAction())
             ->fields($this->resource()->closure())
-            ->shared($this->isShared());
+            ->shared($this->isShared())
+            ->message($resourceName . ' successfully created', $resourceName . ' successfully updated');
     }
 
     /**
@@ -204,9 +206,11 @@ abstract class AbstractResource extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
-            return $this->getAction('edit', $model->id);
-        })->store($request);
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->redirectTo(function ($model) {
+                return $this->getAction('edit', $model->id);
+            })->store($request);
     }
 
     /**
@@ -254,9 +258,11 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
-            return $this->getAction('edit', $model->id);
-        })->update($request);
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->redirectTo(function ($model) {
+                return $this->getAction('edit', $model->id);
+            })->update($request);
     }
 
     /**
