@@ -108,7 +108,7 @@ class Element
                 $field->model($this->getModel());
             }
 
-            $field->build();
+            $field->shared($this->isShared())->build();
 
             if ($field->isTranslatable()) {
                 $this->isTranslatable = true;

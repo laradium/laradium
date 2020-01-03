@@ -12,6 +12,30 @@ class File extends Field
     private $deletable = true;
 
     /**
+     * @var bool
+     */
+    private $viewable = false;
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function viewable($value = true): self
+    {
+        $this->viewable = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    private function getViewable(): bool
+    {
+        return $this->viewable;
+    }
+
+    /**
      * @param bool $value
      * @return $this
      */
@@ -25,7 +49,7 @@ class File extends Field
     /**
      * @return bool
      */
-    public function getDeletable(): bool
+    private function getDeletable(): bool
     {
         return $this->deletable;
     }
@@ -75,9 +99,14 @@ class File extends Field
         $fieldName = $this->getFieldName();
         $attachment = $model->{$fieldName};
         $storage = $attachment->getConfig()['storage'] ?? '';
-        $url = encrypt([get_class($model), $model->id, $fieldName]);
 
-        return $storage === 'local' ? route($this->isShared() ? 'resource.' . $action . '-file' : 'admin.resource.' . $action . '-file', $url) : $attachment->url();
+        if ($storage === 'local') {
+            $url = encrypt([get_class($model), $model->id, $fieldName, $this->getViewable()]);
+
+            return route($this->isShared() ? 'resource.' . $action . '-file' : 'admin.resource.' . $action . '-file', $url);
+        }
+
+        return $attachment->url();
     }
 
     /**
