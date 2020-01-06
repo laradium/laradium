@@ -19,6 +19,11 @@ class Crud
     private $withoutCard = false;
 
     /**
+     * @var bool
+     */
+    private $shared = false;
+
+    /**
      * CrudForm constructor.
      * @param $parameters
      */
@@ -107,5 +112,23 @@ class Crud
     public function isTranslatable(): bool
     {
         return $this->form->isTranslatable();
+    }
+
+    /**
+     * @param $value
+     */
+    public function shared($value): self
+    {
+        $this->shared = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShared(): bool
+    {
+        return $this->shared;
     }
 }

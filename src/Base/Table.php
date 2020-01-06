@@ -189,7 +189,7 @@ class Table
     {
         return $this->columnSet->list->filter(function ($column) {
             return $column['raw'] === true;
-        })->pluck('column_parsed')->toArray();
+        })->pluck('column')->toArray();
     }
 
     /**
