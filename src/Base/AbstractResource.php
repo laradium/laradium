@@ -628,7 +628,7 @@ abstract class AbstractResource extends Controller
             return true;
         }
 
-        return $user->hasPermissionTo($this->getPermission($action), $guard);
+        return $user->can($this->getPermission($action), $guard);
     }
 
     /**
