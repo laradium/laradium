@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Services\Crud;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Base\Fields\BelongsToMany;
+use Laradium\Laradium\Base\Fields\Date;
 use Laradium\Laradium\Base\Fields\DateTime;
 use Laradium\Laradium\Base\Fields\HasMany;
 use Laradium\Laradium\Base\Fields\HasOne;
@@ -28,7 +29,8 @@ class CrudDataHandler
         MorphTo::class,
         BelongsToMany::class,
         HasOne::class,
-        DateTime::class
+        DateTime::class,
+        Date::class
     ];
 
     /**
