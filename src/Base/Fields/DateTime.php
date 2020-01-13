@@ -15,14 +15,15 @@ class DateTime extends Field
         'dayOfWeekStart' => 1
     ];
 
-
     /**
      * @param array $attributes
-     * @return Field|void
+     * @return $this|Field
      */
     public function build($attributes = [])
     {
-        parent::build(['datetime']);
+        parent::build(array_merge($attributes, ['datetime']));
+
+        return $this;
     }
 
     /**

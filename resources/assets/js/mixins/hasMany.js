@@ -36,6 +36,10 @@ export default {
                     continue;
                 }
 
+                if (field.worker) {
+                    field.worker.name = field.worker.name.replace(id, this.new_replacement_ids[id]);
+                }
+
                 if (!field.config.is_translatable) {
                     field.name = field.name.replace(id, this.new_replacement_ids[id]);
                 } else {

@@ -17,11 +17,13 @@ class Date extends Field
 
     /**
      * @param array $attributes
-     * @return Field|void
+     * @return $this|Field
      */
     public function build($attributes = [])
     {
-        parent::build(['date']);
+        parent::build(array_merge($attributes, ['date']));
+
+        return $this;
     }
 
     /**
@@ -30,12 +32,14 @@ class Date extends Field
     public function formattedResponse(): array
     {
         $data = parent::formattedResponse();
+
         $attributes = $this->getAttributes();
         unset($attributes[count($attributes) - 1]);
 
         $data['worker'] = (new Hidden('crud_worker', $this->getModel()))
-            ->build(array_merge($attributes, []))
+            ->build($attributes)
             ->value(get_class($this))
+            ->replacementAttributes($this->getReplacementAttributes())
             ->formattedResponse();
         $data['value'] = $this->getValue() ? Carbon::parse($this->getValue())->format($this->config['format']) : '';
         $data['config'] = array_merge($data['config'], $this->getConfig());

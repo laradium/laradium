@@ -105,6 +105,10 @@
 
                         for (let field in template.fields) {
                             for (let id in this.new_replacement_ids) {
+                                if (template.fields[field].worker) {
+                                    template.fields[field].worker.name = template.fields[field].worker.name.replace(id, this.new_replacement_ids[id]);
+                                }
+
                                 if (!template.fields[field].config.is_translatable) {
                                     template.fields[field].name = template.fields[field].name.replace(id, this.new_replacement_ids[id]);
                                 } else {
