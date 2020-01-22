@@ -33,9 +33,9 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                autoWidth: false,
                 ajax: this.field.table.url,
-                columns: this.field.
-                    table.columns,
+                columns: this.field.table.columns,
                 order: this.field.order
             }).on('draw.dt', function () {
                 $('.js-editable').editable({
