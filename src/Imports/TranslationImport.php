@@ -27,9 +27,12 @@ class TranslationImport implements ToCollection, WithHeadingRow
 
             unset($row['key']);
 
-            $languages = array_keys(array_intersect_key($row,
-                array_flip(array_filter(array_keys($row), 'is_string'))));
+            $languages = array_keys(array_intersect_key($row, array_flip(array_filter(array_keys($row), 'is_string'))));
             foreach ($languages as $lang) {
+                if (!$lang) {
+                    continue;
+                }
+
                 $data[] = [
                     'locale' => $lang,
                     'group'  => $group,
