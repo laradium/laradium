@@ -37,11 +37,11 @@
                     <div class="row" v-show="!block.config.is_collapsed">
                         <div v-for="(field, index) in block.fields" :class="field.config.col">
                             <component
-                                    :is="field.type + '-field'"
-                                    :field="field"
-                                    :language="language"
-                                    :replacement_ids="new_replacement_ids"
-                                    :key="index">
+                                :is="field.type + '-field'"
+                                :field="field"
+                                :language="language"
+                                :replacement_ids="new_replacement_ids"
+                                :key="index">
                             </component>
                         </div>
                     </div>
@@ -127,13 +127,16 @@
                 }
 
                 this.field.blocks.push(template);
-
+                this.onUpdate(this.field.blocks);
             },
 
             onUpdate(items) {
                 let i = 0;
                 for (let item in items) {
                     let fields = items[item].fields;
+                    if(items[item].config.is_deleted !== undefined && items[item].config.is_deleted === true) {
+                        continue;
+                    }
                     for (let field in fields) {
                         if (fields[field].label == 'Sequence no') {
                             fields[field].value = i;
@@ -180,12 +183,15 @@
                                 }];
                                 if (this.field.blocks[index].config.is_deleted !== undefined) {
                                     this.field.blocks[index].config.is_deleted = true;
+                                    this.onUpdate(this.field.blocks);
+
                                 }
                             } else {
                                 this.field.blocks.splice(index, 1);
                             }
                         }
                     });
+
             },
 
             getBlockTitle(block) {
@@ -195,7 +201,7 @@
                     return field.label === 'Widget title';
                 });
 
-                if(field[0] !== undefined && field[0].value) {
+                if (field[0] !== undefined && field[0].value) {
                     return field[0].value;
                 }
 
@@ -206,6 +212,7 @@
                 this.field.blocks[index].fields = this.removed_items[index].fields;
                 if (this.field.blocks[index].config.is_deleted !== undefined) {
                     this.field.blocks[index].config.is_deleted = false;
+                    this.onUpdate(this.field.blocks);
                 }
             },
 
