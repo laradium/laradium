@@ -83,10 +83,9 @@ class Tabs extends Element
      */
     public function getTabFields(FieldSet $fieldSet): array
     {
-
         $fields = [];
-        foreach ($fieldSet->fields() as $field) {
 
+        foreach ($fieldSet->fields() as $field) {
             $field->build();
 
             if ($field->isTranslatable()) {
@@ -94,6 +93,7 @@ class Tabs extends Element
             }
 
             $this->validationRules = array_merge($this->validationRules, $field->getValidationRules());
+            $this->validationKeyAttributes = array_merge($this->validationKeyAttributes, $field->getValidationKeyAttributes());
 
             $fields[] = $field->formattedResponse();
         }
