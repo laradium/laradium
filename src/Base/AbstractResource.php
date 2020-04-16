@@ -233,6 +233,7 @@ abstract class AbstractResource extends Controller
 
         return view($this->getView('edit'), [
             'resource' => $this,
+            'js'       => $this->layout->assetManager()->js()->bundle()->render(),
             'layout'   => $this->layout,
             'builder'  => $this->formBuilder($this->getAction('update'), 'put')
         ]);

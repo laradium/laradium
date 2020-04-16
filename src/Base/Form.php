@@ -278,6 +278,63 @@ class Form
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function duplicate(Request $request): JsonResponse
+    {
+        $this->build();
+        $validationRequest = $this->crudDataHandler->prepareRequest($request);
+
+        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
+        $validationRequest->validate($this->getValidationRules(), [], $this->getValidationAttributes());
+
+        $requestData = $request->all();
+        foreach ($requestData['translations'] as $locale => $translations) {
+            if ($translations['title']) {
+                $requestData['translations'][$locale]['title'] = $translations['title'] . ' copy';
+            }
+
+            if ($translations['slug']) {
+                $requestData['translations'][$locale]['slug'] = $translations['slug'] . '-copy';
+            }
+
+            $requestData['is_active'] = false;
+        }
+
+        $this->recursiveUnsetIds($requestData);
+        $model = $this->crudDataHandler->saveData($requestData, $this->getModel());
+        $this->model($model);
+
+        $this->fireEvent(['afterSave', 'afterCreate'], $request);
+
+        return response()->json($this->data($this->getCreateMessage()), 201);
+    }
+
+    /**
+     * @param $array
+     * @return bool
+     */
+    private function recursiveUnsetIds(&$array): bool
+    {
+        foreach ($array as $index => &$value) {
+            if (in_array($index, ['id']) && !is_numeric($index)) {
+                unset($array[$index]);
+            }
+
+            if (is_array($value)) {
+                if (array_get($value, 'remove', null)) {
+                    unset($array[$index]);
+                }
+
+                $this->recursiveUnsetIds($value, ['id']);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @return string
      */
     public function getMethod(): string
