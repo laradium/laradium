@@ -45,7 +45,7 @@ class Element
     /**
      * @var array
      */
-    private $validationKeyAttributes = [];
+    protected $validationKeyAttributes = [];
 
     /**
      * @var string

@@ -14,6 +14,10 @@
             </li>
         </div>
 
+        <div class="alert alert-success" v-show="success">
+            {{ success }}
+        </div>
+
         <row-field v-for="(row, index) in rows" :key="'row' + index" :data="row"
                    :language="current_language"></row-field>
 
@@ -61,8 +65,8 @@
         data() {
             let current_language = '';
 
-            if(this.field.config.is_translatable && this.field.config.languages.length) {
-                current_language= this.field.config.languages[0].iso_code;
+            if (this.field.config.is_translatable && this.field.config.languages.length) {
+                current_language = this.field.config.languages[0].iso_code;
             }
 
             return {
@@ -113,7 +117,7 @@
 
         methods: {
             onSubmit(form, redirect = null) {
-                this.removeErrors($(form).find(':input.is-invalid'));
+                this.removeErrors($(form));
                 this.isSubmitted = true;
                 let form_data = new FormData();
                 this.errors = [];
@@ -178,35 +182,50 @@
 
                     if (!errors) {
                         let status = res.response.status;
-                        this.errors.push('There was a technical problem with status code ' + status + ', please contact technical staff!');
+                        if (status === 422 && res.response.data.message) {
+                            this.errors.push(res.response.data.message);
+                        } else {
+                            this.errors.push('There was a technical problem with status code ' + status + ', please contact support!');
+                        }
                     }
 
                     this.$nextTick(() => {
-                        $('html, body').animate({'scrollTop': $(form).find('.is-invalid:first').offset().top - 50});
+                        if ($(form).find('.is-invalid:first')) {
+                            $('html, body').animate({'scrollTop': $(form).find('.is-invalid:first').offset().top - 50});
+                        }
                     });
 
                     formButton.attr('disabled', false);
                     $(form).trigger('form-submitted');
-
                 });
             },
             addErrorsToTheInputs(errors) {
                 for (let error in errors) {
-                    let input = '[name="' + this.dotsToBrackets(error) + '"]';
-                    let errorTextBlock = $('<div/>').addClass('invalid-feedback').text(errors[error][0]);
+                    let field = this.dotsToBrackets(error);
+                    let name = '[name="' + field + '"]';
+                    let errorTextBlock = $('<div/>').addClass('invalid-feedback').css({display: 'block'}).text(errors[error][0]);
 
-                    $(this.$el)
-                        .find(input)
-                        .addClass('is-invalid')
-                        .after(errorTextBlock);
+                    this.getFieldsByType('belongstomany').forEach(function (name) {
+                        let childInput = '[name="' + name + '[crud_worker]"]';
+
+                        if (field === name) {
+                            $(this.$el)
+                                .find(childInput)
+                                .addClass('is-invalid')
+                                .after(errorTextBlock);
+                        }
+                    }, this);
+
+                    // Basic input
+                    let input = $(this.$el).find(name).addClass('is-invalid');
+                    input.after(errorTextBlock);
                 }
             },
-            removeErrors(fields) {
-                _.forEach(fields, (field) => {
-                    let fld = $(field);
-                    fld.removeClass('is-invalid');
-                    fld.next('.invalid-feedback').remove();
-                })
+            removeErrors(form) {
+                $(form).find('.is-invalid').each(function () {
+                    $(this).removeClass('is-invalid');
+                    $(this).parent().find('.invalid-feedback').remove();
+                });
             },
             countFieldsByType(type, fields) {
                 if (!this.data) {
@@ -240,6 +259,31 @@
                 }
 
                 return bracketedIdentifier;
+            },
+            getFieldsByType(type) {
+                let fields = this.field.fields;
+                let found = [];
+
+                this.recursiveFields(found, fields, type);
+
+                return found;
+            },
+            recursiveFields(found, fields, type) {
+                fields.forEach(field => {
+                    if (field.type === type) {
+                        found.push(field.name);
+                    }
+
+                    if (field.fields) {
+                        this.recursiveFields(found, field.fields, type)
+                    }
+
+                    if (field.tabs) {
+                        field.tabs.forEach(tab => {
+                            this.recursiveFields(found, tab.fields, type);
+                        });
+                    }
+                });
             }
         }
     }

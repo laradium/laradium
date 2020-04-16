@@ -105,10 +105,18 @@ class Table
      */
     public function getTableConfig(): array
     {
+        $order = [[0, 'desc']];
+        if (isset($this->getOrderBy()['key'])) {
+            $order = [[
+                $this->getOrderBy()['key'],
+                $this->getOrderBy()['direction']
+            ]];
+        }
+
         return [
             'columns'      => $this->getColumnConfig(),
             'base_columns' => $this->columns(),
-            'order'        => isset($this->getOrderBy()['key']) ? ['[' . $this->getOrderBy()['key'] . ', "' . $this->getOrderBy()['direction'] . '"]'] : ['[0, "desc"]'],
+            'order'        => $order,
             'url'          => $this->getUrl(),
             'toggle_url'   => $this->getToggleUrl(),
         ];
@@ -286,7 +294,6 @@ class Table
         return $this->url;
     }
 
-
     /**
      * @param string $value
      * @return Table
@@ -318,7 +325,7 @@ class Table
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSlug(): string
     {
@@ -332,7 +339,6 @@ class Table
 
         return '/admin/' . $this->getResource()->getBaseResource()->getSlug();
     }
-
 
     /**
      * @param string $value

@@ -36,7 +36,7 @@
                 autoWidth: false,
                 ajax: this.field.table.url,
                 columns: this.field.table.columns,
-                order: this.field.order
+                order: this.field.table.order
             }).on('draw.dt', function () {
                 $('.js-editable').editable({
                     error: function (response) {

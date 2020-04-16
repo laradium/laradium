@@ -119,6 +119,7 @@ class MorphTo extends Field
         }
 
         $validationRules = [];
+        $validationKeyAttributes = [];
 
         foreach ($this->fieldSet->fields() as $temporaryField) {
             $field = clone $temporaryField;
@@ -138,10 +139,15 @@ class MorphTo extends Field
                 $validationRules[] = $field->getValidationRules();
             }
 
+            if ($field->getValidationKeyAttributes()) {
+                $validationKeyAttributes[] = $field->getValidationKeyAttributes();
+            }
+
             $fields[] = $field->formattedResponse();
         }
 
         $this->validationRules(array_collapse($validationRules));
+        $this->validationKeyAttributes(array_collapse($validationKeyAttributes));
 
         return $fields;
     }
