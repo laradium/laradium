@@ -14,22 +14,19 @@ trait PaperclipAndTranslatable
      */
     public function getAttribute($key)
     {
-        list($attribute, $locale) = $this->getAttributeAndLocale($key);
+        [$attribute, $locale] = $this->getAttributeAndLocale($key);
 
         if ($this->isTranslationAttribute($attribute)) {
             if ($this->getTranslation($locale) === null) {
                 return $this->getAttributeValue($attribute);
             }
-
             // If the given $attribute has a mutator, we push it to $attributes and then call getAttributeValue
             // on it. This way, we can use Eloquent's checking for Mutation, type casting, and
             // Date fields.
             if ($this->hasGetMutator($attribute)) {
                 $this->attributes[$attribute] = $this->getAttributeOrFallback($locale, $attribute);
-
                 return $this->getAttributeValue($attribute);
             }
-
             return $this->getAttributeOrFallback($locale, $attribute);
         }
 
@@ -67,19 +64,16 @@ trait PaperclipAndTranslatable
             }
 
             $this->attachedUpdated = true;
-            return ;
+            return;
         }
-        parent::setAttribute($key, $value);
 
-
-        list($attribute, $locale) = $this->getAttributeAndLocale($key);
-
+        [$attribute, $locale] = $this->getAttributeAndLocale($key);
         if ($this->isTranslationAttribute($attribute)) {
             $this->getTranslationOrNew($locale)->$attribute = $value;
-        } else {
-            return parent::setAttribute($key, $value);
+
+            return $this;
         }
 
-        return $this;
+        return parent::setAttribute($key, $value);
     }
 }

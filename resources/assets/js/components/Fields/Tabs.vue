@@ -1,7 +1,7 @@
 <template>
     <div>
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" v-for="tab in data.tabs">
+        <ul class="nav nav-tabs" role="tablist" v-bind="fieldAttributes['ul.nav']">
+            <li class="nav-item"  v-bind="fieldAttributes['li.nav-item']" v-for="tab in data.tabs">
                 <a class="nav-link"
                    :class="{ active: active === tab.slug}"
                    data-toggle="tab"
@@ -15,11 +15,13 @@
             </li>
         </ul>
 
-        <div class="tab-content">
-            <div class="tab-pane fade" :class="{ active: active === tab.slug, show: active === tab.slug}"
+        <div class="tab-content" v-bind="fieldAttributes['div.tab-content']">
+            <div class="tab-pane fade"
+                 :class="{ active: active === tab.slug, show: active === tab.slug}"
                  :id="tab.slug"
                  role="tabpanel"
-                 v-for="tab in data.tabs">
+                 v-for="tab in data.tabs"
+                 v-bind="fieldAttributes['div.tab-pane']">
                 <div v-for="field in tab.fields" :class="field.config.col">
                     <component :is="field.type + '-field'"
                                :field="field"
@@ -46,11 +48,10 @@
         mounted() {
             let hash = window.location.hash;
             let tab = _.filter(this.data.tabs, (tab) => {
-                return tab.slug === _.replace(hash,new RegExp('#','g'),'');
+                return tab.slug === _.replace(hash, new RegExp('#', 'g'), '');
             });
 
-
-            if(tab.length) {
+            if (tab.length) {
                 this.setActive(tab[0]);
             }
 
@@ -61,11 +62,13 @@
             getStorageKey() {
                 return 'tab-' + _.map(this.data.tabs, 'slug').join('-');
             },
+
             setActive(tab) {
                 localStorage.setItem(this.getStorageKey(), tab.slug);
 
                 return tab.slug;
             },
+
             getActive() {
                 let activeFromStorage = localStorage.getItem(this.getStorageKey());
                 if (!activeFromStorage) {

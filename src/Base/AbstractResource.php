@@ -128,12 +128,14 @@ abstract class AbstractResource extends Controller
     protected function getForm(): Form
     {
         $model = $this->getModel();
+        $resourceName = Str::singular($this->getBaseResource()->getName());
 
         return (new Form('crud-form'))
             ->model($model)
             ->returnUrl($this->getAction())
             ->fields($this->resource()->closure())
-            ->shared($this->isShared());
+            ->shared($this->isShared())
+            ->message($resourceName . ' successfully created', $resourceName . ' successfully updated');
     }
 
     /**
@@ -204,9 +206,11 @@ abstract class AbstractResource extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
-            return $this->getAction('edit', $model->id);
-        })->store($request);
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->redirectTo(function ($model) {
+                return $this->getAction('edit', $model->id);
+            })->store($request);
     }
 
     /**
@@ -229,6 +233,7 @@ abstract class AbstractResource extends Controller
 
         return view($this->getView('edit'), [
             'resource' => $this,
+            'js'       => $this->layout->assetManager()->js()->bundle()->render(),
             'layout'   => $this->layout,
             'builder'  => $this->formBuilder($this->getAction('update'), 'put')
         ]);
@@ -254,9 +259,11 @@ abstract class AbstractResource extends Controller
 
         $this->model($model->findOrFail($id));
 
-        return $this->getForm()->events($this->getEvents())->redirectTo(function ($model) {
-            return $this->getAction('edit', $model->id);
-        })->update($request);
+        return $this->getForm()
+            ->events($this->getEvents())
+            ->redirectTo(function ($model) {
+                return $this->getAction('edit', $model->id);
+            })->update($request);
     }
 
     /**
@@ -622,7 +629,7 @@ abstract class AbstractResource extends Controller
             return true;
         }
 
-        return $user->hasPermissionTo($this->getPermission($action), $guard);
+        return $user->can($this->getPermission($action), $guard);
     }
 
     /**

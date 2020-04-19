@@ -45,7 +45,7 @@ class Form
     /**
      * @var bool
      */
-    protected $isTranslatable = true;
+    protected $isTranslatable = false;
 
     /**
      * @var
@@ -58,7 +58,7 @@ class Form
     private $fieldSetFields;
 
     /**
-     * @var
+     * @var string
      */
     private $url;
 
@@ -91,6 +91,16 @@ class Form
      * @var bool
      */
     protected $shared = false;
+
+    /**
+     * @var string
+     */
+    private $createMessage = '';
+
+    /**
+     * @var string
+     */
+    private $updateMessage = '';
 
     /**
      * Form constructor.
@@ -189,7 +199,7 @@ class Form
 
         $this->fireEvent(['afterSave', 'afterCreate'], $request);
 
-        return response()->json($this->data(), 201);
+        return response()->json($this->data($this->getCreateMessage()), 201);
     }
 
     /**
@@ -209,7 +219,7 @@ class Form
 
         $this->fireEvent(['afterSave', 'afterUpdate'], $request);
 
-        return response()->json($this->data());
+        return response()->json($this->data($this->getUpdateMessage()));
     }
 
     /**
@@ -268,6 +278,63 @@ class Form
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function duplicate(Request $request): JsonResponse
+    {
+        $this->build();
+        $validationRequest = $this->crudDataHandler->prepareRequest($request);
+
+        $this->fireEvent(['beforeSave', 'beforeCreate'], $request);
+        $validationRequest->validate($this->getValidationRules(), [], $this->getValidationAttributes());
+
+        $requestData = $request->all();
+        foreach ($requestData['translations'] as $locale => $translations) {
+            if ($translations['title']) {
+                $requestData['translations'][$locale]['title'] = $translations['title'] . ' copy';
+            }
+
+            if ($translations['slug']) {
+                $requestData['translations'][$locale]['slug'] = $translations['slug'] . '-copy';
+            }
+
+            $requestData['is_active'] = false;
+        }
+
+        $this->recursiveUnsetIds($requestData);
+        $model = $this->crudDataHandler->saveData($requestData, $this->getModel());
+        $this->model($model);
+
+        $this->fireEvent(['afterSave', 'afterCreate'], $request);
+
+        return response()->json($this->data($this->getCreateMessage()), 201);
+    }
+
+    /**
+     * @param $array
+     * @return bool
+     */
+    private function recursiveUnsetIds(&$array): bool
+    {
+        foreach ($array as $index => &$value) {
+            if (in_array($index, ['id']) && !is_numeric($index)) {
+                unset($array[$index]);
+            }
+
+            if (is_array($value)) {
+                if (array_get($value, 'remove', null)) {
+                    unset($array[$index]);
+                }
+
+                $this->recursiveUnsetIds($value, ['id']);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @return string
      */
     public function getMethod(): string
@@ -305,7 +372,6 @@ class Form
         return $this;
     }
 
-
     /**
      * @return $this
      */
@@ -315,6 +381,10 @@ class Form
             $field->shared($this->isShared())->build();
             $this->setValidationRules($field->getValidationRules());
             $this->setValidationAttributes($field->getValidationKeyAttributes());
+
+            if ($field->isTranslatable()) {
+                $this->isTranslatable = true;
+            }
 
             $this->fields->push($field);
         }
@@ -335,12 +405,12 @@ class Form
     /**
      * @return array
      */
-    public function data(): array
+    public function data($message = null): array
     {
         return [
             'success' => true,
             'data'    => [
-                'message'          => 'Form successfully updated',
+                'message'          => $message ?? 'Form successfully updated',
                 'form'             => $this->getFormattedFieldResponse(),
                 'languages'        => translate()->languagesForForm(),
                 'is_translatable'  => $this->isTranslatable(),
@@ -486,5 +556,33 @@ class Form
     public function isShared(): bool
     {
         return $this->shared;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function message(...$value)
+    {
+        $this->createMessage = $value[0] ?? '';
+        $this->updateMessage = $value[1] ?? '';
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreateMessage()
+    {
+        return $this->createMessage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdateMessage()
+    {
+        return $this->updateMessage;
     }
 }

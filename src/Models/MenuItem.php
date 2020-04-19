@@ -2,9 +2,10 @@
 
 namespace Laradium\Laradium\Models;
 
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
+use Astrotomic\Translatable\Translatable;
 
-class MenuItem extends \Baum\Node
+class MenuItem extends \Baum\Node implements TranslatableContract
 {
     use Translatable;
 

@@ -2,9 +2,10 @@
 
 namespace Laradium\Laradium\Services;
 
+use Illuminate\Contracts\Translation\Loader;
 use Laradium\Laradium\Models\Translation;
 
-class TranslationLoader
+class TranslationLoader implements Loader
 {
 
     /**
@@ -26,7 +27,7 @@ class TranslationLoader
      * @param $key
      * @return null
      */
-    public function load($locale, $group, $key)
+    public function load($locale, $group, $key = null)
     {
         try {
             $this->cacheTranslations();
@@ -51,5 +52,38 @@ class TranslationLoader
                 return $translations;
             });
         }
+    }
+
+    /**
+     * Add a new namespace to the loader.
+     *
+     * @param  string  $namespace
+     * @param  string  $hint
+     * @return void
+     */
+    public function addNamespace($namespace, $hint)
+    {
+        //
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
+    {
+        //
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        //
     }
 }

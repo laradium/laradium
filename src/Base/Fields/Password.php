@@ -13,7 +13,9 @@ class Password extends Field
      */
     public function build($attributes = [])
     {
-        parent::build(['password']);
+        parent::build(array_merge($attributes, ['password']));
+
+        return $this;
     }
 
     /**

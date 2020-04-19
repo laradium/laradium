@@ -12,11 +12,15 @@ class ResourceController
      */
     public function getFile($url)
     {
-        list($model, $id, $file) = decrypt($url);
+        list($model, $id, $file, $view) = decrypt($url);
 
         $model = $model::findOrFail($id);
 
         abort_unless($model->{$file}->exists(), 404);
+
+        if ($view) {
+            return response()->file(storage_path('app/' . $model->{$file}->path()));
+        }
 
         return response()->download(storage_path('app/' . $model->{$file}->path()));
     }

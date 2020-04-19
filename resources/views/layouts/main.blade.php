@@ -185,7 +185,7 @@
     @endforeach
 @endisset
 
-{!! $layout->assetManager()->js()->bundle()->render() !!}
+{!! $js ?? $layout->assetManager()->js()->bundle()->render() !!}
 
 @stack('scripts')
 

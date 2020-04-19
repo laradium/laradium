@@ -1,5 +1,10 @@
 <template>
     <div class="form-group">
+        <component :is="field.worker.type + '-field'"
+                   :field="field.worker"
+                   :language="language"
+                   :replacement_ids="{}"
+        ></component>
         <label for="">
             {{ field.label }}
             <span v-if="field.info"><i class="fa fa-info-circle" v-tooltip:top="field.info"></i></span>

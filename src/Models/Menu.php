@@ -2,10 +2,11 @@
 
 namespace Laradium\Laradium\Models;
 
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 
-class Menu extends Model
+class Menu extends Model implements TranslatableContract
 {
 
     use Translatable;

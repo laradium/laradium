@@ -29,6 +29,10 @@
 
                 for (let field in fields) {
                     for (let id in this.new_replacement_ids) {
+                        if (fields[field].worker) {
+                            fields[field].worker.name = fields[field].worker.name.replace(id, this.new_replacement_ids[id]);
+                        }
+
                         if (!fields[field].config.is_translatable) {
                             fields[field].name = fields[field].name.replace(id, this.new_replacement_ids[id]);
                         } else {

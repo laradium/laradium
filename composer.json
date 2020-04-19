@@ -13,14 +13,15 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "dimsav/laravel-translatable": "^9.0",
+    "astrotomic/laravel-translatable": "^11.0",
     "yajra/laravel-datatables-oracle": "~9.0",
     "czim/laravel-paperclip": "2.*",
     "maatwebsite/excel": "3.1.*",
     "doctrine/dbal": "2.8.*",
-    "cviebrock/eloquent-sluggable": "4.8.*",
+    "cviebrock/eloquent-sluggable": "7.*",
     "laracasts/utilities": "^3.0",
     "baum/baum": "v2.x-dev",
+    "laravel/helpers": "1.*",
     "ext-json": "*"
   },
   "autoload": {

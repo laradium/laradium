@@ -5,6 +5,7 @@ namespace Laradium\Laradium\Services\Crud;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laradium\Laradium\Base\Fields\BelongsToMany;
+use Laradium\Laradium\Base\Fields\Date;
 use Laradium\Laradium\Base\Fields\DateTime;
 use Laradium\Laradium\Base\Fields\HasMany;
 use Laradium\Laradium\Base\Fields\HasOne;
@@ -28,7 +29,8 @@ class CrudDataHandler
         MorphTo::class,
         BelongsToMany::class,
         HasOne::class,
-        DateTime::class
+        DateTime::class,
+        Date::class
     ];
 
     /**
@@ -47,7 +49,6 @@ class CrudDataHandler
 
             $formData = array_merge($unmodifiedData, $worker->getData());
         }
-
 
         // Update or create base model
         $baseData = collect($formData)->filter(function ($value, $index) {
@@ -114,7 +115,7 @@ class CrudDataHandler
     private function recursiveUnset(&$array): bool
     {
         foreach ($array as $index => &$value) {
-            if (in_array($index, self::UNWANTED_KEYS, false)) {
+            if (is_string($index) && in_array($index, self::UNWANTED_KEYS, false)) {
                 unset($array[$index]);
             }
 
@@ -123,7 +124,7 @@ class CrudDataHandler
                     unset($array[$index]);
                 }
 
-                $this->recursiveUnset($value, self::UNWANTED_KEYS);
+                $this->recursiveUnset($value);
             }
         }
 

@@ -135,6 +135,7 @@ class HasMany extends Field
             $field = clone $temporaryField;
 
             $field->model($this->getRelationBaseModel())
+                ->shared($this->isShared())
                 ->replacementAttributes($this->getReplacementAttributes())
                 ->build(array_merge($this->getAttributes(), $lastReplacementAttribute));
 

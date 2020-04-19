@@ -105,6 +105,10 @@
 
                         for (let field in template.fields) {
                             for (let id in this.new_replacement_ids) {
+                                if (template.fields[field].worker) {
+                                    template.fields[field].worker.name = template.fields[field].worker.name.replace(id, this.new_replacement_ids[id]);
+                                }
+
                                 if (!template.fields[field].config.is_translatable) {
                                     template.fields[field].name = template.fields[field].name.replace(id, this.new_replacement_ids[id]);
                                 } else {
@@ -123,13 +127,16 @@
                 }
 
                 this.field.blocks.push(template);
-
+                this.onUpdate(this.field.blocks);
             },
 
             onUpdate(items) {
                 let i = 0;
                 for (let item in items) {
                     let fields = items[item].fields;
+                    if (items[item].config.is_deleted !== undefined && items[item].config.is_deleted === true) {
+                        continue;
+                    }
                     for (let field in fields) {
                         if (fields[field].label == 'Sequence no') {
                             fields[field].value = i;
@@ -174,14 +181,17 @@
                                     },
                                     translations: []
                                 }];
+
                                 if (this.field.blocks[index].config.is_deleted !== undefined) {
                                     this.field.blocks[index].config.is_deleted = true;
+                                    this.onUpdate(this.field.blocks);
                                 }
                             } else {
                                 this.field.blocks.splice(index, 1);
                             }
                         }
                     });
+
             },
 
             getBlockTitle(block) {
@@ -191,7 +201,7 @@
                     return field.label === 'Widget title';
                 });
 
-                if(field[0] !== undefined && field[0].value) {
+                if (field[0] !== undefined && field[0].value) {
                     return field[0].value;
                 }
 
@@ -202,6 +212,7 @@
                 this.field.blocks[index].fields = this.removed_items[index].fields;
                 if (this.field.blocks[index].config.is_deleted !== undefined) {
                     this.field.blocks[index].config.is_deleted = false;
+                    this.onUpdate(this.field.blocks);
                 }
             },
 
