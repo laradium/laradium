@@ -56,7 +56,7 @@
                     class="btn btn-primary btn-sm"
                     type="button"
                     @click.prevent="addItem()"
-                    v-if="field.config.actions.includes('create')">
+                    v-if="field.config.actions.includes('create') && (field.config.limit == 0 || (field.entries.length+1) <= field.config.limit)">
 
                     <i class="fa fa-plus"></i> Add {{ field.label }}
                 </button>

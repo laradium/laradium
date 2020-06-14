@@ -63,6 +63,11 @@ class HasMany extends Field
     private $renderAsTable = false;
 
     /**
+     * @var int
+     */
+    private $limit = 0;
+
+    /**
      * HasMany constructor.
      * @param $parameters
      * @param null|Model $model
@@ -108,6 +113,7 @@ class HasMany extends Field
         $data['config']['is_sortable'] = $this->isSortable();
         $data['config']['actions'] = $this->getActions();
         $data['config']['render_as_table'] = $this->renderAsTable;
+        $data['config']['limit'] = $this->limit;
 
         return $data;
     }
@@ -297,6 +303,17 @@ class HasMany extends Field
     public function entryLabel($value): self
     {
         $this->entryLabel = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param int $limit
+     * @return $this
+     */
+    public function limit(int $limit)
+    {
+        $this->limit = $limit;
 
         return $this;
     }
