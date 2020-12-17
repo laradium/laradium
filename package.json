@@ -27,7 +27,7 @@
   "dependencies": {
     "@tinymce/tinymce-vue": "^2.1.0",
     "chart.js": "^2.8.0",
-    "datatables.net": "^1.10.19",
+    "datatables.net": "^1.10.22",
     "datatables.net-bs4": "^1.10.19",
     "datatables.net-responsive-bs4": "^2.2.3",
     "font-awesome": "^4.7.0",
