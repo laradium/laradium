@@ -39,7 +39,7 @@
     "select2": "^4.0.7",
     "sweetalert2": "^7.29.0",
     "switchery": "0.0.2",
-    "tinymce": "^5.0.8",
+    "tinymce": "^5.9.0",
     "toastr": "^2.1.4",
     "vue-codemirror": "^4.0.6",
     "vue2-google-maps": "^0.10.7",
